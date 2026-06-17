@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Weinkeller">
+<title>Weinkeller</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e0608;
+  --surface: #1a1016;
+  --card: #221820;
+  --card-hover: #2a1f28;
+  --border: #2e1f2b;
+  --border-light: #3d2b3a;
+  --wine: #8b1a2e;
+  --wine-light: #b02340;
+  --gold: #c4a24a;
+  --gold-light: #dfc06e;
+  --white-wine: #c8b45a;
+  --rose: #c47080;
+  --sparkling: #8ab4c8;
+  --text: #e8ddd4;
+  --text-muted: #8a7080;
+  --text-dim: #4a3845;
+  --green: #4a8b5e;
+  --amber: #c4842a;
+  --red-alert: #c43a3a;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  min-height: 100vh;
+  max-width: 430px;
+  margin: 0 auto;
+  overflow-x: hidden;
+  padding-bottom: 80px;
+}
+/* ── NAV ── */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 100%; max-width: 430px;
+  background: #150f13;
+  border-top: 1px solid var(--border);
+  display: flex;
+  z-index: 200;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 10px 4px 8px;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: color .2s;
+}
+.nav-btn.active { color: var(--gold); }
+.nav-icon { font-size: 20px; line-height: 1; }
+/* ── TABS ── */
+.tab { display: none; }
+.tab.active { display: block; }
+/* ── HEADER ── */
+.page-header {
+  padding: 52px 20px 16px;
+  background: linear-gradient(180deg, #120a10 0%, var(--bg) 100%);
+  position: sticky; top: 0; z-index: 50;
+}
+.page-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 400;
+  color: var(--gold-light);
+}
+.page-header .subtitle {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+/* ── KELLER TAB ── */
+.keller-stats {
+  display: flex;
+  gap: 8px;
+  padding: 0 16px 16px;
+}
+.stat-pill {
+  flex: 1;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 8px;
+  text-align: center;
+}
+.stat-pill .val {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  color: var(--gold);
+  line-height: 1;
+}
+.stat-pill .lbl {
+  font-size: 9px;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+.search-filter {
+  padding: 0 16px 12px;
+  display: flex;
+  gap: 8px;
+}
+.search-input {
+  flex: 1;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  outline: none;
+}
+.search-input::placeholder { color: var(--text-dim); }
+.filter-scroll {
+  padding: 0 16px 16px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.filter-scroll::-webkit-scrollbar { display: none; }
+.filter-chip {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text-muted);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.filter-chip.active {
+  background: var(--wine);
+  border-color: var(--wine);
+  color: #fff;
+}
+/* ── WINE CARDS ── */
+.wine-list { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
+.wine-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  transition: background .2s;
+}
+.wine-card:active { background: var(--card-hover); }
+.wine-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.wine-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  color: var(--text);
+  line-height: 1.3;
+}
+.wine-year { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.wine-type-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+.dot-rot { background: var(--wine-light); }
+.dot-weiß { background: var(--white-wine); }
+.dot-rosé { background: var(--rose); }
+.dot-sekt { background: var(--sparkling); }
+.dot-other { background: var(--text-muted); }
+.wine-meta { display: flex; gap: 12px; margin-top: 10px; align-items: center; flex-wrap: wrap; }
+.wine-stars { color: var(--gold); font-size: 13px; letter-spacing: 1px; }
+.wine-region { font-size: 11px; color: var(--text-muted); }
+.wine-count-badge {
+  margin-left: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 3px 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.wine-ripeness {
+  margin-top: 10px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.wine-ripeness-bar {
+  height: 100%;
+  border-radius: 2px;
+  transition: width .4s;
+}
+.ripeness-jung { background: var(--sparkling); }
+.ripeness-optimal { background: var(--green); }
+.ripeness-peak { background: var(--gold); }
+.ripeness-over { background: var(--red-alert); }
+.wine-actions { display: flex; gap: 8px; margin-top: 12px; }
+.wine-btn {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text-muted);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.wine-btn:active { background: var(--border); }
+.wine-btn.danger { color: var(--red-alert); border-color: var(--red-alert); }
+.wine-btn.primary { color: var(--gold); border-color: var(--gold-light); }
+/* ── FAB ── */
+.fab {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: var(--wine);
+  border: none;
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(139,26,46,.5);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100;
+  transition: transform .2s;
+}
+.fab:active { transform: scale(.92); }
+/* ── MODAL ── */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.7);
+  z-index: 300;
+  align-items: flex-end;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  width: 100%; max-width: 430px;
+  margin: 0 auto;
+  background: #1e1620;
+  border-radius: 24px 24px 0 0;
+  padding: 24px 20px 40px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal-handle {
+  width: 36px; height: 4px;
+  background: var(--border-light);
+  border-radius: 2px;
+  margin: 0 auto 20px;
+}
+.modal h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  color: var(--gold-light);
+  margin-bottom: 20px;
+}
+.form-group { margin-bottom: 14px; }
+.form-group label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  outline: none;
+}
+.form-group textarea { resize: none; height: 70px; }
+.form-row { display: flex; gap: 10px; }
+.form-row .form-group { flex: 1; }
+.form-group select option { background: #1e1620; }
+.star-select { display: flex; gap: 6px; margin-top: 2px; }
+.star-btn {
+  font-size: 22px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--border-light);
+  transition: color .15s, transform .1s;
+}
+.star-btn.active { color: var(--gold); }
+.star-btn:active { transform: scale(1.3); }
+.btn-row { display: flex; gap: 10px; margin-top: 20px; }
+.btn-primary {
+  flex: 1;
+  padding: 14px;
+  background: var(--wine);
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.btn-secondary {
+  padding: 14px 20px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text-muted);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  cursor: pointer;
+}
+.scan-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--card);
+  border: 1px dashed var(--border-light);
+  border-radius: 12px;
+  color: var(--gold);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+/* ── STATS TAB ── */
+.stats-section { padding: 0 16px 20px; }
+.stats-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 14px;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.stats-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+}
+.stats-card .big {
+  font-family: 'Playfair Display', serif;
+  font-size: 30px;
+  color: var(--gold);
+  line-height: 1;
+}
+.stats-card .label {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+.type-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.type-bar-label { font-size: 12px; color: var(--text-muted); width: 48px; flex-shrink: 0; }
+.type-bar-track { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.type-bar-fill { height: 100%; border-radius: 3px; transition: width .5s; }
+.type-bar-count { font-size: 11px; color: var(--text-dim); width: 24px; text-align: right; }
+/* ── TRINKREIFE TAB ── */
+.ripeness-card {
+  margin: 0 16px 10px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+}
+.ripeness-wine-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+.ripeness-meta { font-size: 11px; color: var(--text-muted); margin-bottom: 12px; }
+.ripeness-timeline {
+  display: flex;
+  gap: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  height: 20px;
+  margin-bottom: 8px;
+}
+.rt-seg {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.rt-jung { background: #1a3a4a; color: var(--sparkling); }
+.rt-optimal { background: #1a3a2a; color: var(--green); }
+.rt-peak { background: #3a2e10; color: var(--gold); }
+.rt-over { background: #3a1a1a; color: var(--red-alert); }
+.rt-now-marker {
+  position: relative;
+  width: 100%;
+  height: 8px;
+  margin-bottom: 6px;
+}
+.rt-now-line {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background: #fff;
+  border-radius: 1px;
+  transform: translateX(-50%);
+}
+.ripeness-status {
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 4px;
+}
+/* ── WISHLIST TAB ── */
+.wish-list { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
+.wish-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.wish-check {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--border-light);
+  background: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  transition: all .2s;
+}
+.wish-check.done { background: var(--green); border-color: var(--green); color: #fff; }
+.wish-info { flex: 1; }
+.wish-name { font-size: 14px; color: var(--text); }
+.wish-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.wish-actions { display: flex; gap: 6px; }
+.wish-action-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 5px 10px;
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+}
+/* ── EXPORT TAB ── */
+.export-section { padding: 0 16px 16px; }
+.export-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: background .2s;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.export-card:active { background: var(--card-hover); }
+.export-icon { font-size: 28px; }
+.export-info .title { font-size: 15px; font-weight: 500; color: var(--text); }
+.export-info .desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #2e2a20;
+  border: 1px solid var(--gold);
+  color: var(--gold-light);
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 13px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all .3s;
+  z-index: 500;
+  white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+/* ── EMPTY STATE ── */
+.empty-state {
+  text-align: center;
+  padding: 60px 30px;
+  color: var(--text-dim);
+}
+.empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+.empty-state p { font-size: 14px; line-height: 1.6; }
+input[type="file"] { display: none; }
+</style>
+</head>
+<body>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="showTab('keller',this)">
+    <span class="nav-icon">🍾</span>Keller
+  </button>
+  <button class="nav-btn" onclick="showTab('stats',this)">
+    <span class="nav-icon">📊</span>Statistik
+  </button>
+  <button class="nav-btn" onclick="showTab('trinkreife',this)">
+    <span class="nav-icon">⏱</span>Trinkreife
+  </button>
+  <button class="nav-btn" onclick="showTab('wishlist',this)">
+    <span class="nav-icon">⭐</span>Wishlist
+  </button>
+  <button class="nav-btn" onclick="showTab('export',this)">
+    <span class="nav-icon">📤</span>Export
+  </button>
+</nav>
+
+<!-- FAB -->
+<button class="fab" onclick="openAddModal()" id="fab">+</button>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- CAMERA INPUT -->
+<input type="file" id="camera-input" accept="image/*" capture="environment" onchange="handleScan(event)">
+
+<!-- ════════════════════════════════════════
+     KELLER TAB
+════════════════════════════════════════ -->
+<div class="tab active" id="tab-keller">
+  <div class="page-header">
+    <h1>Weinkeller</h1>
+    <div class="subtitle" id="keller-subtitle">Meine Sammlung</div>
+  </div>
+  <div class="keller-stats" id="keller-stats"></div>
+  <div class="search-filter">
+    <input class="search-input" id="search-input" placeholder="🔍  Wein suchen…" oninput="renderKeller()">
+  </div>
+  <div class="filter-scroll" id="filter-scroll"></div>
+  <div class="wine-list" id="wine-list"></div>
+</div>
+
+<!-- ════════════════════════════════════════
+     STATS TAB
+════════════════════════════════════════ -->
+<div class="tab" id="tab-stats">
+  <div class="page-header">
+    <h1>Statistik</h1>
+    <div class="subtitle">Überblick</div>
+  </div>
+  <div id="stats-content" style="padding:0 16px 20px"></div>
+</div>
+
+<!-- ════════════════════════════════════════
+     TRINKREIFE TAB
+════════════════════════════════════════ -->
+<div class="tab" id="tab-trinkreife">
+  <div class="page-header">
+    <h1>Trinkreife</h1>
+    <div class="subtitle">Wann trinken?</div>
+  </div>
+  <div id="trinkreife-list"></div>
+</div>
+
+<!-- ════════════════════════════════════════
+     WISHLIST TAB
+════════════════════════════════════════ -->
+<div class="tab" id="tab-wishlist">
+  <div class="page-header">
+    <h1>Wunschliste</h1>
+    <div class="subtitle">Noch zu kaufen</div>
+  </div>
+  <div style="padding:0 16px 16px">
+    <button class="btn-primary" style="width:100%" onclick="openWishModal()">+ Wunsch hinzufügen</button>
+  </div>
+  <div class="wish-list" id="wish-list"></div>
+</div>
+
+<!-- ════════════════════════════════════════
+     EXPORT TAB
+════════════════════════════════════════ -->
+<div class="tab" id="tab-export">
+  <div class="page-header">
+    <h1>Export</h1>
+    <div class="subtitle">Daten sichern</div>
+  </div>
+  <div class="export-section">
+    <div class="export-card" onclick="exportCSV()">
+      <div class="export-icon">📋</div>
+      <div class="export-info">
+        <div class="title">CSV exportieren</div>
+        <div class="desc">Tabelle für Excel oder Numbers</div>
+      </div>
+    </div>
+    <div class="export-card" onclick="exportJSON()">
+      <div class="export-icon">💾</div>
+      <div class="export-info">
+        <div class="title">JSON Backup</div>
+        <div class="desc">Vollständige Datensicherung</div>
+      </div>
+    </div>
+    <div class="export-card" onclick="copyToClipboard()">
+      <div class="export-icon">📎</div>
+      <div class="export-info">
+        <div class="title">In Zwischenablage</div>
+        <div class="desc">Text-Liste kopieren</div>
+      </div>
+    </div>
+    <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border)">
+      <div class="stats-title" style="margin-bottom:12px">Import</div>
+      <div class="export-card" onclick="document.getElementById('import-input').click()">
+        <div class="export-icon">📥</div>
+        <div class="export-info">
+          <div class="title">JSON importieren</div>
+          <div class="desc">Backup wiederherstellen</div>
+        </div>
+      </div>
+      <input type="file" id="import-input" accept=".json" onchange="importJSON(event)">
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     ADD WINE MODAL
+════════════════════════════════════════ -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2 id="modal-title">Wein hinzufügen</h2>
+    <button class="scan-btn" onclick="document.getElementById('camera-input').click()">
+      📷  Etikett scannen (KI)
+    </button>
+    <div id="scan-loading" style="display:none;text-align:center;padding:12px;color:var(--text-muted);font-size:13px">
+      ⏳ Etikett wird analysiert…
+    </div>
+    <div class="form-group">
+      <label>Name / Weingut</label>
+      <input id="f-name" placeholder="z.B. Château Margaux" type="text">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Jahrgang</label>
+        <input id="f-year" placeholder="2019" type="number" min="1900" max="2030">
+      </div>
+      <div class="form-group">
+        <label>Flaschen</label>
+        <input id="f-count" placeholder="1" type="number" min="1" value="1">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Weintyp</label>
+      <select id="f-type">
+        <option value="rot">🔴 Rotwein</option>
+        <option value="weiß">🟡 Weißwein</option>
+        <option value="rosé">🌸 Rosé</option>
+        <option value="sekt">✨ Sekt / Champagner</option>
+        <option value="other">◻️ Sonstiges</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Region</label>
+        <input id="f-region" placeholder="Bordeaux" type="text">
+      </div>
+      <div class="form-group">
+        <label>Rebsorte</label>
+        <input id="f-grape" placeholder="Merlot" type="text">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Trinken ab</label>
+        <input id="f-drink-from" placeholder="2024" type="number">
+      </div>
+      <div class="form-group">
+        <label>Trinken bis</label>
+        <input id="f-drink-to" placeholder="2032" type="number">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Preis (€)</label>
+        <input id="f-price" placeholder="0.00" type="number" step="0.01">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Bewertung</label>
+      <div class="star-select" id="star-select">
+        <button class="star-btn" onclick="setStar(1)">★</button>
+        <button class="star-btn" onclick="setStar(2)">★</button>
+        <button class="star-btn" onclick="setStar(3)">★</button>
+        <button class="star-btn" onclick="setStar(4)">★</button>
+        <button class="star-btn" onclick="setStar(5)">★</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Notiz</label>
+      <textarea id="f-note" placeholder="Geschmack, Anlass, Gedanken…"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="closeModal('add-modal')">Abbrechen</button>
+      <button class="btn-primary" onclick="saveWine()">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- WISH MODAL -->
+<div class="modal-overlay" id="wish-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2>Wunsch hinzufügen</h2>
+    <div class="form-group">
+      <label>Name / Weingut</label>
+      <input id="w-name" placeholder="z.B. Opus One" type="text">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Jahrgang</label>
+        <input id="w-year" placeholder="2020" type="number">
+      </div>
+      <div class="form-group">
+        <label>Typ</label>
+        <select id="w-type">
+          <option value="rot">Rotwein</option>
+          <option value="weiß">Weißwein</option>
+          <option value="rosé">Rosé</option>
+          <option value="sekt">Sekt</option>
+          <option value="other">Sonstiges</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Notiz / Wo kaufen?</label>
+      <textarea id="w-note" placeholder="Gefunden bei…"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="closeModal('wish-modal')">Abbrechen</button>
+      <button class="btn-primary" onclick="saveWish()">Hinzufügen</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════
+const STORE_KEY = 'weinkeller_v2';
+const WISH_KEY  = 'weinkeller_v2_wish';
+let wines = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+let wishes = JSON.parse(localStorage.getItem(WISH_KEY) || '[]');
+let editId = null;
+let currentStar = 0;
+let activeFilter = 'alle';
+
+function save() { localStorage.setItem(STORE_KEY, JSON.stringify(wines)); }
+function saveWishes() { localStorage.setItem(WISH_KEY, JSON.stringify(wishes)); }
+
+// ═══════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════
+function showTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  document.getElementById('fab').style.display = name === 'keller' ? 'flex' : 'none';
+  if (name === 'keller') renderKeller();
+  if (name === 'stats') renderStats();
+  if (name === 'trinkreife') renderTrinkreife();
+  if (name === 'wishlist') renderWishlist();
+}
+
+// ═══════════════════════════════════════
+// KELLER
+// ═══════════════════════════════════════
+const TYPE_COLORS = { rot:'dot-rot', weiß:'dot-weiß', rosé:'dot-rosé', sekt:'dot-sekt', other:'dot-other' };
+const TYPES = ['alle','rot','weiß','rosé','sekt','other'];
+const TYPE_LABELS = { alle:'Alle', rot:'Rotwein', weiß:'Weißwein', rosé:'Rosé', sekt:'Sekt', other:'Sonstiges' };
+
+function renderKeller() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  // stats
+  const total = wines.reduce((s,w) => s + (w.count||1), 0);
+  const val = wines.reduce((s,w) => s + (w.price||0)*(w.count||1), 0);
+  const avgRating = wines.filter(w=>w.rating).length
+    ? (wines.filter(w=>w.rating).reduce((s,w)=>s+w.rating,0)/wines.filter(w=>w.rating).length).toFixed(1)
+    : '–';
+  document.getElementById('keller-stats').innerHTML = `
+    <div class="stat-pill"><div class="val">${total}</div><div class="lbl">Flaschen</div></div>
+    <div class="stat-pill"><div class="val">${wines.length}</div><div class="lbl">Weine</div></div>
+    <div class="stat-pill"><div class="val">${val>0?'€'+Math.round(val):'–'}</div><div class="lbl">Wert</div></div>
+    <div class="stat-pill"><div class="val">${avgRating}</div><div class="lbl">⌀ Ø</div></div>
+  `;
+  document.getElementById('keller-subtitle').textContent = `${wines.length} ${wines.length===1?'Wein':'Weine'} in deiner Sammlung`;
+
+  // filter chips
+  document.getElementById('filter-scroll').innerHTML = TYPES.map(t => `
+    <button class="filter-chip ${activeFilter===t?'active':''}" onclick="setFilter('${t}')">${TYPE_LABELS[t]}</button>
+  `).join('');
+
+  // list
+  let list = wines.filter(w => {
+    const matchQ = !q || w.name.toLowerCase().includes(q) || (w.region||'').toLowerCase().includes(q) || (w.grape||'').toLowerCase().includes(q);
+    const matchF = activeFilter === 'alle' || w.type === activeFilter;
+    return matchQ && matchF;
+  });
+
+  const el = document.getElementById('wine-list');
+  if (!list.length) {
+    el.innerHTML = `<div class="empty-state"><div class="icon">🍷</div><p>Keine Weine gefunden.<br>Füge deinen ersten Wein hinzu!</p></div>`;
+    return;
+  }
+  el.innerHTML = list.map(w => {
+    const stars = w.rating ? '★'.repeat(w.rating) + '☆'.repeat(5-w.rating) : '☆☆☆☆☆';
+    const ripe = getRipenessInfo(w);
+    return `
+    <div class="wine-card">
+      <div class="wine-card-top">
+        <div>
+          <div class="wine-name">${esc(w.name)}</div>
+          <div class="wine-year">${w.year||''} ${w.grape?'· '+esc(w.grape):''}</div>
+        </div>
+        <div class="wine-type-dot ${TYPE_COLORS[w.type]||'dot-other'}"></div>
+      </div>
+      <div class="wine-meta">
+        <div class="wine-stars">${stars}</div>
+        ${w.region?`<div class="wine-region">${esc(w.region)}</div>`:''}
+        <div class="wine-count-badge">${w.count||1} Fl.</div>
+      </div>
+      ${ripe ? `
+      <div class="wine-ripeness">
+        <div class="wine-ripeness-bar ${ripe.cls}" style="width:${ripe.pct}%"></div>
+      </div>` : ''}
+      <div class="wine-actions">
+        <button class="wine-btn" onclick="editWine('${w.id}')">✏️ Bearbeiten</button>
+        <button class="wine-btn primary" onclick="drinkOne('${w.id}')">🥂 Trinken</button>
+        <button class="wine-btn danger" onclick="deleteWine('${w.id}')">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setFilter(f) { activeFilter = f; renderKeller(); }
+
+function getRipenessInfo(w) {
+  if (!w.drinkFrom && !w.drinkTo) return null;
+  const now = new Date().getFullYear();
+  const from = w.drinkFrom || now;
+  const to = w.drinkTo || from + 5;
+  const peak = Math.round(from + (to - from) * 0.6);
+  const span = to - (w.year || from) + 2;
+  if (now < from) {
+    const pct = Math.min(100, ((now - (w.year||from)) / (from - (w.year||from) + 1)) * 40);
+    return { cls: 'ripeness-jung', pct };
+  } else if (now <= peak) {
+    return { cls: 'ripeness-optimal', pct: 40 + ((now-from)/(peak-from+1))*40 };
+  } else if (now <= to) {
+    return { cls: 'ripeness-peak', pct: 80 + ((now-peak)/(to-peak+1))*15 };
+  } else {
+    return { cls: 'ripeness-over', pct: 100 };
+  }
+}
+
+function drinkOne(id) {
+  const w = wines.find(x => x.id === id);
+  if (!w) return;
+  if ((w.count||1) <= 1) {
+    if (!confirm(`Letzte Flasche von "${w.name}" als getrunken markieren und entfernen?`)) return;
+    wines = wines.filter(x => x.id !== id);
+  } else {
+    w.count = (w.count||1) - 1;
+  }
+  save(); renderKeller(); showToast('🥂 Prost!');
+}
+
+function deleteWine(id) {
+  if (!confirm('Wein entfernen?')) return;
+  wines = wines.filter(w => w.id !== id);
+  save(); renderKeller(); showToast('Entfernt');
+}
+
+function editWine(id) {
+  const w = wines.find(x => x.id === id);
+  if (!w) return;
+  editId = id;
+  document.getElementById('f-name').value = w.name||'';
+  document.getElementById('f-year').value = w.year||'';
+  document.getElementById('f-count').value = w.count||1;
+  document.getElementById('f-type').value = w.type||'rot';
+  document.getElementById('f-region').value = w.region||'';
+  document.getElementById('f-grape').value = w.grape||'';
+  document.getElementById('f-drink-from').value = w.drinkFrom||'';
+  document.getElementById('f-drink-to').value = w.drinkTo||'';
+  document.getElementById('f-price').value = w.price||'';
+  document.getElementById('f-note').value = w.note||'';
+  setStar(w.rating||0);
+  document.getElementById('modal-title').textContent = 'Wein bearbeiten';
+  document.getElementById('add-modal').classList.add('show');
+}
+
+// ═══════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════
+function openAddModal() {
+  editId = null;
+  ['f-name','f-year','f-region','f-grape','f-note','f-drink-from','f-drink-to','f-price'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-count').value = 1;
+  document.getElementById('f-type').value = 'rot';
+  setStar(0);
+  document.getElementById('modal-title').textContent = 'Wein hinzufügen';
+  document.getElementById('add-modal').classList.add('show');
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+function setStar(n) {
+  currentStar = n;
+  document.querySelectorAll('.star-btn').forEach((btn,i) => {
+    btn.classList.toggle('active', i < n);
+  });
+}
+
+function saveWine() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { showToast('Bitte Name eingeben'); return; }
+  const wine = {
+    id: editId || Date.now().toString(),
+    name,
+    year: parseInt(document.getElementById('f-year').value)||null,
+    count: parseInt(document.getElementById('f-count').value)||1,
+    type: document.getElementById('f-type').value,
+    region: document.getElementById('f-region').value.trim()||null,
+    grape: document.getElementById('f-grape').value.trim()||null,
+    drinkFrom: parseInt(document.getElementById('f-drink-from').value)||null,
+    drinkTo: parseInt(document.getElementById('f-drink-to').value)||null,
+    price: parseFloat(document.getElementById('f-price').value)||null,
+    rating: currentStar||null,
+    note: document.getElementById('f-note').value.trim()||null,
+    added: editId ? (wines.find(w=>w.id===editId)||{}).added : new Date().toISOString()
+  };
+  if (editId) {
+    wines = wines.map(w => w.id === editId ? wine : w);
+    showToast('Aktualisiert ✓');
+  } else {
+    wines.push(wine);
+    showToast('Hinzugefügt ✓');
+  }
+  save();
+  closeModal('add-modal');
+  renderKeller();
+}
+
+// ═══════════════════════════════════════
+// KI SCAN
+// ═══════════════════════════════════════
+async function handleScan(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const loading = document.getElementById('scan-loading');
+  loading.style.display = 'block';
+  try {
+    const base64 = await new Promise((res,rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result.split(',')[1]);
+      r.onerror = () => rej();
+      r.readAsDataURL(file);
+    });
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: 'Du bist ein Weinetikett-Experte. Antworte NUR mit einem JSON-Objekt ohne Markdown-Backticks. Felder: name (Weingut + Weinname), year (Jahrgang als Zahl oder null), type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), grape (Rebsorte oder null). Wenn etwas nicht erkennbar ist, nutze null.',
+        messages: [{ role: 'user', content: [
+          { type: 'image', source: { type: 'base64', media_type: file.type||'image/jpeg', data: base64 } },
+          { type: 'text', text: 'Analysiere dieses Weinetikett.' }
+        ]}]
+      })
+    });
+    const data = await resp.json();
+    const text = data.content?.find(b => b.type==='text')?.text || '{}';
+    let info;
+    try { info = JSON.parse(text.replace(/```json?|```/g,'')); } catch { info = {}; }
+    if (info.name) document.getElementById('f-name').value = info.name;
+    if (info.year) document.getElementById('f-year').value = info.year;
+    if (info.type) document.getElementById('f-type').value = info.type;
+    if (info.region) document.getElementById('f-region').value = info.region;
+    if (info.grape) document.getElementById('f-grape').value = info.grape;
+    showToast('Etikett erkannt ✓');
+  } catch {
+    showToast('Scan fehlgeschlagen');
+  } finally {
+    loading.style.display = 'none';
+    e.target.value = '';
+  }
+}
+
+// ═══════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════
+function renderStats() {
+  const total = wines.reduce((s,w) => s+(w.count||1),0);
+  const val = wines.reduce((s,w) => s+(w.price||0)*(w.count||1),0);
+  const rated = wines.filter(w=>w.rating);
+  const avg = rated.length ? (rated.reduce((s,w)=>s+w.rating,0)/rated.length).toFixed(1) : '–';
+  const types = {};
+  wines.forEach(w => { types[w.type] = (types[w.type]||0) + (w.count||1); });
+  const typeColors = { rot:'var(--wine-light)', weiß:'var(--white-wine)', rosé:'var(--rose)', sekt:'var(--sparkling)', other:'var(--text-muted)' };
+
+  let html = `
+    <div class="stats-grid">
+      <div class="stats-card"><div class="big">${total}</div><div class="label">Flaschen</div></div>
+      <div class="stats-card"><div class="big">${wines.length}</div><div class="label">Weine</div></div>
+      <div class="stats-card"><div class="big">${val>0?'€'+Math.round(val):'–'}</div><div class="label">Gesamtwert</div></div>
+      <div class="stats-card"><div class="big">${avg}</div><div class="label">Ø Bewertung</div></div>
+    </div>
+    <div class="stats-title">Nach Typ</div>
+  `;
+  ['rot','weiß','rosé','sekt','other'].forEach(t => {
+    const cnt = types[t]||0;
+    const pct = total > 0 ? Math.round((cnt/total)*100) : 0;
+    html += `<div class="type-bar-row">
+      <div class="type-bar-label">${TYPE_LABELS[t]}</div>
+      <div class="type-bar-track"><div class="type-bar-fill" style="width:${pct}%;background:${typeColors[t]}"></div></div>
+      <div class="type-bar-count">${cnt}</div>
+    </div>`;
+  });
+
+  // top rated
+  const top = [...wines].filter(w=>w.rating).sort((a,b)=>b.rating-a.rating).slice(0,3);
+  if (top.length) {
+    html += `<div class="stats-title" style="margin-top:20px">Top Weine</div>`;
+    top.forEach((w,i) => {
+      html += `<div class="stats-card" style="margin-bottom:8px;display:flex;align-items:center;gap:12px">
+        <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--gold)">${i+1}</div>
+        <div><div style="font-size:13px">${esc(w.name)}</div><div style="font-size:11px;color:var(--text-muted)">${'★'.repeat(w.rating)} ${w.year||''}</div></div>
+      </div>`;
+    });
+  }
+  document.getElementById('stats-content').innerHTML = html;
+}
+
+// ═══════════════════════════════════════
+// TRINKREIFE
+// ═══════════════════════════════════════
+function renderTrinkreife() {
+  const now = new Date().getFullYear();
+  const withRipe = wines.filter(w => w.drinkFrom || w.drinkTo).sort((a,b)=>(a.drinkFrom||0)-(b.drinkFrom||0));
+  const el = document.getElementById('trinkreife-list');
+  if (!withRipe.length) {
+    el.innerHTML = `<div class="empty-state"><div class="icon">⏱</div><p>Noch keine Weine mit<br>Trinkreife-Angabe.<br>Beim Hinzufügen „Trinken ab/bis" ausfüllen.</p></div>`;
+    return;
+  }
+  el.innerHTML = withRipe.map(w => {
+    const from = w.drinkFrom || now;
+    const to = w.drinkTo || from + 5;
+    const peak = Math.round(from + (to - from) * 0.6);
+    let status, statusColor, pct;
+    if (now < from) {
+      status = `Noch ${from - now} Jahr${from-now===1?'':'e'} warten`;
+      statusColor = 'var(--sparkling)';
+      pct = Math.max(5, ((now - (w.year||from-5)) / (from - (w.year||from-5)+1)) * 30);
+    } else if (now <= peak) {
+      status = `Optimal trinken — bis ${to}`;
+      statusColor = 'var(--green)';
+      pct = 30 + ((now-from)/(peak-from+1))*40;
+    } else if (now <= to) {
+      status = `Jetzt auf dem Höhepunkt!`;
+      statusColor = 'var(--gold)';
+      pct = 70 + ((now-peak)/(to-peak+1))*25;
+    } else {
+      status = `Überschritten seit ${now - to} Jahr${now-to===1?'':'en'}`;
+      statusColor = 'var(--red-alert)';
+      pct = 100;
+    }
+    return `
+    <div class="ripeness-card">
+      <div class="ripeness-wine-name">${esc(w.name)}</div>
+      <div class="ripeness-meta">${w.year||''} ${w.type?' · '+w.type:''}</div>
+      <div style="display:flex;gap:0;border-radius:6px;overflow:hidden;height:18px;margin-bottom:6px">
+        <div class="rt-seg rt-jung" style="flex:${from-(w.year||from-3)}">Jung</div>
+        <div class="rt-seg rt-optimal" style="flex:${peak-from+1}">Optimal</div>
+        <div class="rt-seg rt-peak" style="flex:${to-peak+1}">Peak</div>
+        <div class="rt-seg rt-over" style="flex:2">–</div>
+      </div>
+      <div style="position:relative;height:10px;margin-bottom:6px">
+        <div style="position:absolute;left:${Math.min(97,pct)}%;top:0;width:3px;height:100%;background:#fff;border-radius:2px;transform:translateX(-50%)"></div>
+        <div style="font-size:9px;position:absolute;left:${Math.min(94,pct)}%;top:0;color:#fff;transform:translateX(-50%)">▲</div>
+      </div>
+      <div class="ripeness-status" style="color:${statusColor}">${status}</div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════
+// WISHLIST
+// ═══════════════════════════════════════
+function openWishModal() {
+  ['w-name','w-year','w-note'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('w-type').value = 'rot';
+  document.getElementById('wish-modal').classList.add('show');
+}
+
+function saveWish() {
+  const name = document.getElementById('w-name').value.trim();
+  if (!name) { showToast('Bitte Name eingeben'); return; }
+  wishes.push({
+    id: Date.now().toString(),
+    name,
+    year: parseInt(document.getElementById('w-year').value)||null,
+    type: document.getElementById('w-type').value,
+    note: document.getElementById('w-note').value.trim()||null,
+    done: false
+  });
+  saveWishes();
+  closeModal('wish-modal');
+  renderWishlist();
+  showToast('Hinzugefügt ✓');
+}
+
+function renderWishlist() {
+  const el = document.getElementById('wish-list');
+  if (!wishes.length) {
+    el.innerHTML = `<div class="empty-state"><div class="icon">⭐</div><p>Noch keine Wünsche.<br>Füge Weine hinzu, die du kaufen möchtest.</p></div>`;
+    return;
+  }
+  el.innerHTML = wishes.map(w => `
+    <div class="wish-card" style="${w.done?'opacity:.5':''}">
+      <button class="wish-check ${w.done?'done':''}" onclick="toggleWish('${w.id}')">${w.done?'✓':''}</button>
+      <div class="wish-info">
+        <div class="wish-name">${esc(w.name)}</div>
+        <div class="wish-sub">${w.year||''} ${w.type?'· '+w.type:''} ${w.note?'· '+esc(w.note):''}</div>
+      </div>
+      <div class="wish-actions">
+        <button class="wish-action-btn" onclick="wishToKeller('${w.id}')">→ Keller</button>
+        <button class="wish-action-btn" onclick="deleteWish('${w.id}')">🗑</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleWish(id) {
+  const w = wishes.find(x=>x.id===id);
+  if (w) { w.done = !w.done; saveWishes(); renderWishlist(); }
+}
+
+function deleteWish(id) {
+  wishes = wishes.filter(w=>w.id!==id);
+  saveWishes(); renderWishlist(); showToast('Entfernt');
+}
+
+function wishToKeller(id) {
+  const w = wishes.find(x=>x.id===id);
+  if (!w) return;
+  wines.push({ id: Date.now().toString(), name: w.name, year: w.year, count: 1, type: w.type, added: new Date().toISOString() });
+  save();
+  wishes = wishes.filter(x=>x.id!==id);
+  saveWishes();
+  renderWishlist();
+  showToast('In Keller verschoben ✓');
+}
+
+// ═══════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════
+function exportCSV() {
+  const headers = ['Name','Jahrgang','Typ','Region','Rebsorte','Flaschen','Bewertung','Preis','Trinken ab','Trinken bis','Notiz'];
+  const rows = wines.map(w => [w.name,w.year||'',w.type,w.region||'',w.grape||'',w.count||1,w.rating||'',w.price||'',w.drinkFrom||'',w.drinkTo||'',w.note||''].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
+  download('weinkeller.csv', 'data:text/csv;charset=utf-8,' + encodeURIComponent([headers.join(','), ...rows].join('\n')));
+  showToast('CSV exportiert ✓');
+}
+
+function exportJSON() {
+  download('weinkeller_backup.json', 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify({wines,wishes},null,2)));
+  showToast('Backup erstellt ✓');
+}
+
+function copyToClipboard() {
+  const text = wines.map(w => `${w.name} ${w.year||''} (${w.type}) — ${w.count||1} Fl.${w.rating?' ★'.repeat(w.rating):''}`).join('\n');
+  navigator.clipboard.writeText(text).then(() => showToast('Kopiert ✓')).catch(() => showToast('Fehler beim Kopieren'));
+}
+
+function importJSON(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (data.wines) { wines = data.wines; save(); }
+      if (data.wishes) { wishes = data.wishes; saveWishes(); }
+      renderKeller();
+      showToast('Import erfolgreich ✓');
+    } catch { showToast('Fehler beim Import'); }
+    e.target.value = '';
+  };
+  r.readAsText(file);
+}
+
+function download(filename, dataURL) {
+  const a = document.createElement('a');
+  a.href = dataURL; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+}
+
+// ═══════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+function esc(str) {
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+renderKeller();
+</script>
+</body>
+</html>
