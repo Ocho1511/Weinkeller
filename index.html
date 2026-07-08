@@ -1138,7 +1138,7 @@ async function handleScan(e) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 1000,
-        system: 'Du bist ein Weinetikett-Experte. Antworte NUR mit einem JSON-Objekt ohne Markdown-Backticks. Felder: name (Weingut + Weinname), year (Jahrgang als Zahl oder null), type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), grape (Rebsorte oder null). Wenn etwas nicht erkennbar ist, nutze null.',
+        system: 'Du bist ein Weinetikett- und Trinkreife-Experte. Antworte NUR mit einem JSON-Objekt ohne Markdown-Backticks. Felder: name (Weingut + Weinname), year (Jahrgang als Zahl oder null), type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), grape (Rebsorte oder null), drinkFrom (Jahr als Zahl, ab dem der Wein grob geschätzt trinkreif ist, basierend auf Rebsorte/Region/Jahrgang, oder null), drinkTo (Jahr als Zahl, bis zu dem er grob geschätzt getrunken werden sollte, oder null). drinkFrom/drinkTo sind nur grobe Schätzungen, keine Angabe vom Etikett selbst. Wenn etwas nicht erkennbar ist oder keine sinnvolle Schätzung möglich ist, nutze null.',
         messages: [{ role: 'user', content: [
           { type: 'image', source: { type: 'base64', media_type: file.type||'image/jpeg', data: base64 } },
           { type: 'text', text: 'Analysiere dieses Weinetikett.' }
@@ -1154,7 +1154,9 @@ async function handleScan(e) {
     if (info.type) document.getElementById('f-type').value = info.type;
     if (info.region) document.getElementById('f-region').value = info.region;
     if (info.grape) document.getElementById('f-grape').value = info.grape;
-    showToast('Etikett erkannt ✓');
+    if (info.drinkFrom) document.getElementById('f-drink-from').value = info.drinkFrom;
+    if (info.drinkTo) document.getElementById('f-drink-to').value = info.drinkTo;
+    showToast(info.drinkFrom || info.drinkTo ? 'Etikett erkannt ✓ (Trinkreife geschätzt)' : 'Etikett erkannt ✓');
   } catch {
     showToast('Scan fehlgeschlagen');
   } finally {
