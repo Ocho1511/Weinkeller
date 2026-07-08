@@ -7,10 +7,10 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Weinkeller">
 <title>Weinkeller</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=UnifrakturMaguntia&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0e0608;
+  --bg: #17120a;
   --surface: #1a1016;
   --card: #221820;
   --card-hover: #2a1f28;
@@ -63,7 +63,7 @@ body {
   padding: 10px 4px 8px;
   background: none;
   border: none;
-  color: var(--text-dim);
+  color: var(--text-muted);
   font-family: 'Inter', sans-serif;
   font-size: 10px;
   letter-spacing: 0.05em;
@@ -82,14 +82,15 @@ body {
   position: sticky; top: 0; z-index: 50;
 }
 .page-header h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: 28px;
+  font-family: 'UnifrakturMaguntia', serif;
+  font-size: 32px;
   font-weight: 400;
-  color: var(--gold-light);
+  color: #40e0d0;
 }
 .page-header .subtitle {
   font-size: 11px;
-  color: var(--text-muted);
+  color: #6b5a68;
+  font-weight: 700;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   margin-top: 2px;
@@ -110,13 +111,15 @@ body {
 }
 .stat-pill .val {
   font-family: 'Playfair Display', serif;
-  font-size: 22px;
-  color: var(--gold);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--gold-light);
   line-height: 1;
 }
 .stat-pill .lbl {
   font-size: 9px;
-  color: var(--text-muted);
+  font-weight: 700;
+  color: var(--text);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   margin-top: 3px;
@@ -141,26 +144,24 @@ body {
 .filter-scroll {
   padding: 0 16px 16px;
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  overflow-x: auto;
-  scrollbar-width: none;
 }
-.filter-scroll::-webkit-scrollbar { display: none; }
 .filter-chip {
-  flex-shrink: 0;
-  padding: 6px 14px;
+  padding: 6px 12px;
   border-radius: 20px;
   border: 1px solid var(--border);
   background: none;
-  color: var(--text-muted);
+  color: var(--text);
   font-family: 'Inter', sans-serif;
   font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
   transition: all .2s;
 }
 .filter-chip.active {
-  background: var(--wine);
-  border-color: var(--wine);
+  background: #1c9a8d;
+  border-color: #1c9a8d;
   color: #fff;
 }
 /* ── WINE CARDS ── */
@@ -195,6 +196,30 @@ body {
 .wine-meta { display: flex; gap: 12px; margin-top: 10px; align-items: center; flex-wrap: wrap; }
 .wine-stars { color: var(--gold); font-size: 13px; letter-spacing: 1px; }
 .wine-region { font-size: 11px; color: var(--text-muted); }
+.wine-row {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.wine-row .wine-type-dot { margin-top: 0; }
+.wine-row-info { flex: 1; min-width: 0; }
+.wine-row-name { font-family: 'Playfair Display', serif; font-size: 14px; color: var(--text); }
+.wine-row-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.wine-row-delete {
+  flex-shrink: 0;
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  border: none;
+  background: var(--red-alert);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
 .wine-count-badge {
   margin-left: auto;
   background: var(--surface);
@@ -243,12 +268,12 @@ body {
   right: 20px;
   width: 52px; height: 52px;
   border-radius: 50%;
-  background: var(--wine);
+  background: #1c9a8d;
   border: none;
   color: #fff;
   font-size: 24px;
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(139,26,46,.5);
+  box-shadow: 0 4px 20px rgba(28,154,141,.5);
   display: flex; align-items: center; justify-content: center;
   z-index: 100;
   transition: transform .2s;
@@ -268,7 +293,7 @@ body {
   margin: 0 auto;
   background: #1e1620;
   border-radius: 24px 24px 0 0;
-  padding: 24px 20px 40px;
+  padding: 18px 20px 24px;
   max-height: 90vh;
   overflow-y: auto;
 }
@@ -276,22 +301,22 @@ body {
   width: 36px; height: 4px;
   background: var(--border-light);
   border-radius: 2px;
-  margin: 0 auto 20px;
+  margin: 0 auto 14px;
 }
 .modal h2 {
   font-family: 'Playfair Display', serif;
-  font-size: 22px;
+  font-size: 20px;
   color: var(--gold-light);
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
-.form-group { margin-bottom: 14px; }
+.form-group { margin-bottom: 9px; }
 .form-group label {
   display: block;
   font-size: 11px;
   color: var(--text-muted);
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 .form-group input,
 .form-group select,
@@ -300,13 +325,13 @@ body {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 12px 14px;
+  padding: 9px 14px;
   color: var(--text);
   font-family: 'Inter', sans-serif;
   font-size: 14px;
   outline: none;
 }
-.form-group textarea { resize: none; height: 70px; }
+.form-group textarea { resize: none; height: 50px; }
 .form-row { display: flex; gap: 10px; }
 .form-row .form-group { flex: 1; }
 .form-group select option { background: #1e1620; }
@@ -321,40 +346,40 @@ body {
 }
 .star-btn.active { color: var(--gold); }
 .star-btn:active { transform: scale(1.3); }
-.btn-row { display: flex; gap: 10px; margin-top: 20px; }
+.btn-row { display: flex; gap: 8px; margin-top: 10px; }
 .btn-primary {
   flex: 1;
-  padding: 14px;
-  background: var(--wine);
+  padding: 8px;
+  background: #1e5c2f;
   border: none;
-  border-radius: 12px;
+  border-radius: 9px;
   color: #fff;
   font-family: 'Inter', sans-serif;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
 }
 .btn-secondary {
-  padding: 14px 20px;
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  color: var(--text-muted);
+  padding: 8px 14px;
+  background: var(--red-alert);
+  border: 1px solid var(--red-alert);
+  border-radius: 9px;
+  color: #fff;
   font-family: 'Inter', sans-serif;
-  font-size: 15px;
+  font-size: 13px;
   cursor: pointer;
 }
 .scan-btn {
   width: 100%;
-  padding: 14px;
+  padding: 8px;
   background: var(--card);
   border: 1px dashed var(--border-light);
-  border-radius: 12px;
+  border-radius: 10px;
   color: var(--gold);
   font-family: 'Inter', sans-serif;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 /* ── STATS TAB ── */
 .stats-section { padding: 0 16px 20px; }
@@ -375,19 +400,21 @@ body {
 }
 .stats-card .big {
   font-family: 'Playfair Display', serif;
-  font-size: 30px;
-  color: var(--gold);
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--gold-light);
   line-height: 1;
 }
 .stats-card .label {
   font-size: 10px;
-  color: var(--text-muted);
+  font-weight: 700;
+  color: var(--text);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   margin-top: 4px;
 }
 .type-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-.type-bar-label { font-size: 12px; color: var(--text-muted); width: 48px; flex-shrink: 0; }
+.type-bar-label { font-size: 12px; font-weight: 600; color: var(--text); width: 48px; flex-shrink: 0; }
 .type-bar-track { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
 .type-bar-fill { height: 100%; border-radius: 3px; transition: width .5s; }
 .type-bar-count { font-size: 11px; color: var(--text-dim); width: 24px; text-align: right; }
@@ -423,10 +450,10 @@ body {
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
-.rt-jung { background: #1a3a4a; color: var(--sparkling); }
-.rt-optimal { background: #1a3a2a; color: var(--green); }
-.rt-peak { background: #3a2e10; color: var(--gold); }
-.rt-over { background: #3a1a1a; color: var(--red-alert); }
+.rt-jung { background: #1d6c8f; color: #fff; }
+.rt-optimal { background: #2f8a52; color: #fff; }
+.rt-peak { background: #c4972a; color: #211705; }
+.rt-over { background: #a5322f; color: #fff; }
 .rt-now-marker {
   position: relative;
   width: 100%;
@@ -524,12 +551,49 @@ body {
 .empty-state {
   text-align: center;
   padding: 60px 30px;
-  color: var(--text-dim);
+  color: var(--text);
 }
 .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
-.empty-state p { font-size: 14px; line-height: 1.6; }
+.empty-state p { font-size: 15px; font-weight: 600; line-height: 1.6; }
 input[type="file"] { display: none; }
+.contact-footer {
+  margin: 24px 0 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.contact-footer summary {
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  list-style: none;
+}
+.contact-footer summary::-webkit-details-marker { display: none; }
+.contact-info { margin-top: 12px; }
+.contact-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.contact-line {
+  display: block;
+  font-size: 13px;
+  color: var(--gold-light);
+  text-decoration: none;
+  margin-top: 4px;
+}
+.contact-copyright {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-top: 12px;
+}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
 
@@ -548,7 +612,7 @@ input[type="file"] { display: none; }
     <span class="nav-icon">⭐</span>Wishlist
   </button>
   <button class="nav-btn" onclick="showTab('export',this)">
-    <span class="nav-icon">📤</span>Export
+    <span class="nav-icon">📤</span>Export/Import
   </button>
 </nav>
 
@@ -560,13 +624,14 @@ input[type="file"] { display: none; }
 
 <!-- CAMERA INPUT -->
 <input type="file" id="camera-input" accept="image/*" capture="environment" onchange="handleScan(event)">
+<input type="file" id="wish-camera-input" accept="image/*" capture="environment" onchange="handleWishScan(event)">
 
 <!-- ════════════════════════════════════════
      KELLER TAB
 ════════════════════════════════════════ -->
 <div class="tab active" id="tab-keller">
   <div class="page-header">
-    <h1>Weinkeller</h1>
+    <h1>Ocho's Weinkeller</h1>
     <div class="subtitle" id="keller-subtitle">Meine Sammlung</div>
   </div>
   <div class="keller-stats" id="keller-stats"></div>
@@ -618,7 +683,7 @@ input[type="file"] { display: none; }
 ════════════════════════════════════════ -->
 <div class="tab" id="tab-export">
   <div class="page-header">
-    <h1>Export</h1>
+    <h1>Export & Import</h1>
     <div class="subtitle">Daten sichern</div>
   </div>
   <div class="export-section">
@@ -627,6 +692,20 @@ input[type="file"] { display: none; }
       <div class="export-info">
         <div class="title">CSV exportieren</div>
         <div class="desc">Tabelle für Excel oder Numbers</div>
+      </div>
+    </div>
+    <div class="export-card" onclick="exportExcel()">
+      <div class="export-icon">📊</div>
+      <div class="export-info">
+        <div class="title">Excel exportieren</div>
+        <div class="desc">Als .xlsx-Datei</div>
+      </div>
+    </div>
+    <div class="export-card" onclick="exportPDF()">
+      <div class="export-icon">📄</div>
+      <div class="export-info">
+        <div class="title">PDF exportieren</div>
+        <div class="desc">Druckfähige Übersicht</div>
       </div>
     </div>
     <div class="export-card" onclick="exportJSON()">
@@ -653,7 +732,32 @@ input[type="file"] { display: none; }
         </div>
       </div>
       <input type="file" id="import-input" accept=".json" onchange="importJSON(event)">
+      <div class="export-card" onclick="document.getElementById('import-csv-input').click()" style="margin-top:10px">
+        <div class="export-icon">📋</div>
+        <div class="export-info">
+          <div class="title">CSV importieren</div>
+          <div class="desc">Tabelle aus Excel oder Numbers</div>
+        </div>
+      </div>
+      <input type="file" id="import-csv-input" accept=".csv" onchange="importCSV(event)">
+      <div class="export-card" onclick="document.getElementById('import-excel-input').click()" style="margin-top:10px">
+        <div class="export-icon">📊</div>
+        <div class="export-info">
+          <div class="title">Excel importieren</div>
+          <div class="desc">.xlsx-Datei einlesen</div>
+        </div>
+      </div>
+      <input type="file" id="import-excel-input" accept=".xlsx,.xls" onchange="importExcel(event)">
     </div>
+    <details class="contact-footer">
+      <summary>Kontakt</summary>
+      <div class="contact-info">
+        <div class="contact-name">Thomas Knecht</div>
+        <a class="contact-line" href="mailto:t.knecht@web.de">✉️ t.knecht@web.de</a>
+        <a class="contact-line" href="tel:+491722644305">📞 +49 172 2644305</a>
+        <div class="contact-copyright">© Copyright 2026</div>
+      </div>
+    </details>
   </div>
 </div>
 
@@ -746,6 +850,12 @@ input[type="file"] { display: none; }
   <div class="modal">
     <div class="modal-handle"></div>
     <h2>Wunsch hinzufügen</h2>
+    <button class="scan-btn" onclick="document.getElementById('wish-camera-input').click()">
+      📷  Etikett scannen (KI)
+    </button>
+    <div id="wish-scan-loading" style="display:none;text-align:center;padding:12px;color:var(--text-muted);font-size:13px">
+      ⏳ Etikett wird analysiert…
+    </div>
     <div class="form-group">
       <label>Name / Weingut</label>
       <input id="w-name" placeholder="z.B. Opus One" type="text">
@@ -788,6 +898,7 @@ let wishes = JSON.parse(localStorage.getItem(WISH_KEY) || '[]');
 let editId = null;
 let currentStar = 0;
 let activeFilter = 'alle';
+let viewMode = 'card';
 
 function save() { localStorage.setItem(STORE_KEY, JSON.stringify(wines)); }
 function saveWishes() { localStorage.setItem(WISH_KEY, JSON.stringify(wishes)); }
@@ -833,7 +944,9 @@ function renderKeller() {
   // filter chips
   document.getElementById('filter-scroll').innerHTML = TYPES.map(t => `
     <button class="filter-chip ${activeFilter===t?'active':''}" onclick="setFilter('${t}')">${TYPE_LABELS[t]}</button>
-  `).join('');
+  `).join('') + `
+    <button class="filter-chip ${viewMode==='list'?'active':''}" onclick="toggleViewMode()">📋 Liste</button>
+  `;
 
   // list
   let list = wines.filter(w => {
@@ -847,6 +960,21 @@ function renderKeller() {
     el.innerHTML = `<div class="empty-state"><div class="icon">🍷</div><p>Keine Weine gefunden.<br>Füge deinen ersten Wein hinzu!</p></div>`;
     return;
   }
+
+  if (viewMode === 'list') {
+    el.innerHTML = list.map(w => `
+      <div class="wine-row">
+        <div class="wine-type-dot ${TYPE_COLORS[w.type]||'dot-other'}"></div>
+        <div class="wine-row-info">
+          <div class="wine-row-name">${esc(w.name)}</div>
+          <div class="wine-row-sub">${w.year||'–'} · ${TYPE_LABELS[w.type]||'Sonstiges'}${w.grape?' · '+esc(w.grape):''}${w.region?' · '+esc(w.region):''}</div>
+        </div>
+        <button class="wine-row-delete" onclick="deleteWine('${w.id}')">🗑</button>
+      </div>
+    `).join('');
+    return;
+  }
+
   el.innerHTML = list.map(w => {
     const stars = w.rating ? '★'.repeat(w.rating) + '☆'.repeat(5-w.rating) : '☆☆☆☆☆';
     const ripe = getRipenessInfo(w);
@@ -878,6 +1006,7 @@ function renderKeller() {
 }
 
 function setFilter(f) { activeFilter = f; renderKeller(); }
+function toggleViewMode() { viewMode = viewMode === 'list' ? 'card' : 'list'; renderKeller(); }
 
 function getRipenessInfo(w) {
   if (!w.drinkFrom && !w.drinkTo) return null;
@@ -1024,6 +1153,47 @@ async function handleScan(e) {
     if (info.type) document.getElementById('f-type').value = info.type;
     if (info.region) document.getElementById('f-region').value = info.region;
     if (info.grape) document.getElementById('f-grape').value = info.grape;
+    showToast('Etikett erkannt ✓');
+  } catch {
+    showToast('Scan fehlgeschlagen');
+  } finally {
+    loading.style.display = 'none';
+    e.target.value = '';
+  }
+}
+
+async function handleWishScan(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const loading = document.getElementById('wish-scan-loading');
+  loading.style.display = 'block';
+  try {
+    const base64 = await new Promise((res,rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result.split(',')[1]);
+      r.onerror = () => rej();
+      r.readAsDataURL(file);
+    });
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: 'Du bist ein Weinetikett-Experte. Antworte NUR mit einem JSON-Objekt ohne Markdown-Backticks. Felder: name (Weingut + Weinname), year (Jahrgang als Zahl oder null), type (rot/weiß/rosé/sekt/other). Wenn etwas nicht erkennbar ist, nutze null.',
+        messages: [{ role: 'user', content: [
+          { type: 'image', source: { type: 'base64', media_type: file.type||'image/jpeg', data: base64 } },
+          { type: 'text', text: 'Analysiere dieses Weinetikett.' }
+        ]}]
+      })
+    });
+    const data = await resp.json();
+    const text = data.content?.find(b => b.type==='text')?.text || '{}';
+    let info;
+    try { info = JSON.parse(text.replace(/```json?|```/g,'')); } catch { info = {}; }
+    if (info.name) document.getElementById('w-name').value = info.name;
+    if (info.year) document.getElementById('w-year').value = info.year;
+    if (info.type) document.getElementById('w-type').value = info.type;
     showToast('Etikett erkannt ✓');
   } catch {
     showToast('Scan fehlgeschlagen');
@@ -1201,11 +1371,65 @@ function wishToKeller(id) {
 // ═══════════════════════════════════════
 // EXPORT
 // ═══════════════════════════════════════
+const EXPORT_HEADERS = ['Name','Jahrgang','Typ','Region','Rebsorte','Flaschen','Bewertung','Preis','Trinken ab','Trinken bis','Notiz'];
+function exportRows() {
+  return wines.map(w => [w.name,w.year||'',w.type,w.region||'',w.grape||'',w.count||1,w.rating||'',w.price||'',w.drinkFrom||'',w.drinkTo||'',w.note||'']);
+}
+
 function exportCSV() {
-  const headers = ['Name','Jahrgang','Typ','Region','Rebsorte','Flaschen','Bewertung','Preis','Trinken ab','Trinken bis','Notiz'];
-  const rows = wines.map(w => [w.name,w.year||'',w.type,w.region||'',w.grape||'',w.count||1,w.rating||'',w.price||'',w.drinkFrom||'',w.drinkTo||'',w.note||''].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
-  download('weinkeller.csv', 'data:text/csv;charset=utf-8,' + encodeURIComponent([headers.join(','), ...rows].join('\n')));
+  const rows = exportRows().map(row => row.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
+  download('weinkeller.csv', 'data:text/csv;charset=utf-8,' + encodeURIComponent([EXPORT_HEADERS.join(','), ...rows].join('\n')));
   showToast('CSV exportiert ✓');
+}
+
+function exportExcel() {
+  const ws = XLSX.utils.aoa_to_sheet([EXPORT_HEADERS, ...exportRows()]);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Weinkeller');
+  XLSX.writeFile(wb, 'weinkeller.xlsx');
+  showToast('Excel exportiert ✓');
+}
+
+function importExcel(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      const wb = XLSX.read(new Uint8Array(ev.target.result), { type: 'array' });
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+      if (rows.length < 2) throw new Error('leer');
+      const added = importRowsIntoWines(rows);
+      save();
+      renderKeller();
+      showToast(`${added} Wein${added===1?'':'e'} importiert ✓`);
+    } catch {
+      showToast('Fehler beim Excel-Import');
+    }
+    e.target.value = '';
+  };
+  r.readAsArrayBuffer(file);
+}
+
+function exportPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.setFontSize(18);
+  doc.text("Ocho's Weinkeller", 14, 18);
+  doc.setFontSize(10);
+  doc.setTextColor(120);
+  doc.text(`${wines.length} Weine · Stand: ${new Date().toLocaleDateString('de-DE')}`, 14, 25);
+  doc.autoTable({
+    head: [['Name','Jahrgang','Typ','Region','Rebsorte','Fl.','Bew.','Preis']],
+    body: wines.map(w => [w.name, w.year||'', TYPE_LABELS[w.type]||w.type, w.region||'', w.grape||'', w.count||1, w.rating?'★'.repeat(w.rating):'', w.price?('€'+Number(w.price).toFixed(2)):'']),
+    startY: 30,
+    styles: { fontSize: 8, cellPadding: 3 },
+    headStyles: { fillColor: [196,162,74], textColor: [30,20,10] },
+    alternateRowStyles: { fillColor: [245,240,235] }
+  });
+  doc.save('weinkeller.pdf');
+  showToast('PDF exportiert ✓');
 }
 
 function exportJSON() {
@@ -1230,6 +1454,87 @@ function importJSON(e) {
       renderKeller();
       showToast('Import erfolgreich ✓');
     } catch { showToast('Fehler beim Import'); }
+    e.target.value = '';
+  };
+  r.readAsText(file);
+}
+
+function parseCSVText(text) {
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (text[i+1] === '"') { field += '"'; i++; }
+        else { inQuotes = false; }
+      } else { field += c; }
+    } else if (c === '"') {
+      inQuotes = true;
+    } else if (c === ',') {
+      row.push(field); field = '';
+    } else if (c === '\r') {
+      // skip, \n handles line breaks
+    } else if (c === '\n') {
+      row.push(field); rows.push(row); row = []; field = '';
+    } else {
+      field += c;
+    }
+  }
+  if (field.length || row.length) { row.push(field); rows.push(row); }
+  return rows.filter(r => r.some(v => v.trim() !== ''));
+}
+
+function importRowsIntoWines(rows) {
+  const header = rows[0].map(h => String(h ?? '').trim().toLowerCase());
+  const col = name => header.indexOf(name);
+  const idx = {
+    name: col('name'), year: col('jahrgang'), type: col('typ'),
+    region: col('region'), grape: col('rebsorte'), count: col('flaschen'),
+    rating: col('bewertung'), price: col('preis'),
+    drinkFrom: col('trinken ab'), drinkTo: col('trinken bis'), note: col('notiz')
+  };
+  if (idx.name === -1) throw new Error('keine Name-Spalte');
+  const validTypes = ['rot','weiß','rosé','sekt','other'];
+  let added = 0;
+  rows.slice(1).forEach((cols, i) => {
+    const name = String(cols[idx.name] ?? '').trim();
+    if (!name) return;
+    const typeRaw = String(idx.type > -1 ? cols[idx.type] ?? '' : '').trim().toLowerCase();
+    wines.push({
+      id: (Date.now() + added + i).toString(),
+      name,
+      year: idx.year > -1 ? parseInt(cols[idx.year]) || null : null,
+      type: validTypes.includes(typeRaw) ? typeRaw : 'other',
+      region: idx.region > -1 ? String(cols[idx.region] ?? '').trim() : '',
+      grape: idx.grape > -1 ? String(cols[idx.grape] ?? '').trim() : '',
+      count: idx.count > -1 ? parseInt(cols[idx.count]) || 1 : 1,
+      rating: idx.rating > -1 ? parseInt(cols[idx.rating]) || 0 : 0,
+      price: idx.price > -1 ? parseFloat(cols[idx.price]) || 0 : 0,
+      drinkFrom: idx.drinkFrom > -1 ? parseInt(cols[idx.drinkFrom]) || null : null,
+      drinkTo: idx.drinkTo > -1 ? parseInt(cols[idx.drinkTo]) || null : null,
+      note: idx.note > -1 ? String(cols[idx.note] ?? '').trim() : ''
+    });
+    added++;
+  });
+  return added;
+}
+
+function importCSV(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      const rows = parseCSVText(ev.target.result);
+      if (rows.length < 2) throw new Error('leer');
+      const added = importRowsIntoWines(rows);
+      save();
+      renderKeller();
+      showToast(`${added} Wein${added===1?'':'e'} importiert ✓`);
+    } catch {
+      showToast('Fehler beim CSV-Import');
+    }
     e.target.value = '';
   };
   r.readAsText(file);
