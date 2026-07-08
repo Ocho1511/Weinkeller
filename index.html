@@ -891,6 +891,7 @@ input[type="file"] { display: none; }
 // ═══════════════════════════════════════
 // DATA
 // ═══════════════════════════════════════
+const SCAN_PROXY_URL = 'https://weinkeller-scan-proxy.YOUR-SUBDOMAIN.workers.dev';
 const STORE_KEY = 'weinkeller_v2';
 const WISH_KEY  = 'weinkeller_v2_wish';
 let wines = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
@@ -1131,7 +1132,7 @@ async function handleScan(e) {
       r.onerror = () => rej();
       r.readAsDataURL(file);
     });
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    const resp = await fetch(SCAN_PROXY_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1174,7 +1175,7 @@ async function handleWishScan(e) {
       r.onerror = () => rej();
       r.readAsDataURL(file);
     });
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    const resp = await fetch(SCAN_PROXY_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
