@@ -279,6 +279,13 @@ body {
   transition: transform .2s;
 }
 .fab:active { transform: scale(.92); }
+.fab-drink {
+  bottom: 144px;
+  width: 46px; height: 46px;
+  font-size: 20px;
+  background: var(--wine);
+  box-shadow: 0 4px 20px rgba(139,26,46,.5);
+}
 /* ── MODAL ── */
 .modal-overlay {
   display: none;
@@ -617,6 +624,7 @@ input[type="file"] { display: none; }
 </nav>
 
 <!-- FAB -->
+<button class="fab fab-drink" onclick="document.getElementById('drink-camera-input').click()" id="fab-drink" title="Wein trinken (Scan)">🥂</button>
 <button class="fab" onclick="openAddModal()" id="fab">+</button>
 
 <!-- TOAST -->
@@ -625,6 +633,7 @@ input[type="file"] { display: none; }
 <!-- CAMERA INPUT -->
 <input type="file" id="camera-input" accept="image/*" capture="environment" onchange="handleScan(event)">
 <input type="file" id="wish-camera-input" accept="image/*" capture="environment" onchange="handleWishScan(event)">
+<input type="file" id="drink-camera-input" accept="image/*" capture="environment" onchange="handleDrinkScan(event)">
 
 <!-- ════════════════════════════════════════
      KELLER TAB
@@ -894,8 +903,10 @@ input[type="file"] { display: none; }
 const SCAN_PROXY_URL = 'https://weinkeller-scan-proxy.ocho1511.workers.dev';
 const STORE_KEY = 'weinkeller_v2';
 const WISH_KEY  = 'weinkeller_v2_wish';
+const DRUNK_KEY = 'weinkeller_v2_drunk';
 let wines = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
 let wishes = JSON.parse(localStorage.getItem(WISH_KEY) || '[]');
+let drunkWines = JSON.parse(localStorage.getItem(DRUNK_KEY) || '[]');
 let editId = null;
 let currentStar = 0;
 let activeFilter = 'alle';
@@ -903,6 +914,7 @@ let viewMode = 'card';
 
 function save() { localStorage.setItem(STORE_KEY, JSON.stringify(wines)); }
 function saveWishes() { localStorage.setItem(WISH_KEY, JSON.stringify(wishes)); }
+function saveDrunk() { localStorage.setItem(DRUNK_KEY, JSON.stringify(drunkWines)); }
 
 // ═══════════════════════════════════════
 // NAV
@@ -913,6 +925,7 @@ function showTab(name, btn) {
   document.getElementById('tab-' + name).classList.add('active');
   btn.classList.add('active');
   document.getElementById('fab').style.display = name === 'keller' ? 'flex' : 'none';
+  document.getElementById('fab-drink').style.display = name === 'keller' ? 'flex' : 'none';
   if (name === 'keller') renderKeller();
   if (name === 'stats') renderStats();
   if (name === 'trinkreife') renderTrinkreife();
@@ -1037,7 +1050,83 @@ function drinkOne(id) {
   } else {
     w.count = (w.count||1) - 1;
   }
-  save(); renderKeller(); showToast('🥂 Prost!');
+  recordDrunk(w);
+  save(); saveDrunk(); renderKeller(); showToast('🥂 Prost!');
+}
+
+function recordDrunk(w) {
+  drunkWines.push({
+    id: Date.now().toString() + Math.random().toString(36).slice(2,7),
+    name: w.name, year: w.year||null, type: w.type||'other',
+    region: w.region||'', grape: w.grape||'',
+    price: w.price||0, rating: w.rating||0,
+    date: new Date().toISOString()
+  });
+}
+
+function findMatchingWine(info) {
+  if (!info || !info.name) return null;
+  const normalize = s => String(s||'').toLowerCase().normalize('NFKD').replace(/[^\w\s]/g,'').trim();
+  const targetName = normalize(info.name);
+  if (!targetName) return null;
+  const targetTokens = targetName.split(/\s+/).filter(Boolean);
+  let best = null, bestScore = 0;
+  wines.forEach(w => {
+    const wName = normalize(w.name);
+    if (!wName) return;
+    let score = 0;
+    if (wName === targetName) score += 3;
+    else if (wName.includes(targetName) || targetName.includes(wName)) score += 2;
+    else {
+      const wTokens = new Set(wName.split(/\s+/).filter(Boolean));
+      const overlap = targetTokens.filter(t => wTokens.has(t)).length;
+      if (overlap >= 2) score += 1;
+    }
+    if (info.year && w.year && Number(info.year) === Number(w.year)) score += 1;
+    if (score > bestScore) { bestScore = score; best = w; }
+  });
+  return bestScore >= 2 ? best : null;
+}
+
+async function handleDrinkScan(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  showToast('⏳ Etikett wird erkannt…');
+  try {
+    const base64 = await new Promise((res,rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result.split(',')[1]);
+      r.onerror = () => rej();
+      r.readAsDataURL(file);
+    });
+    const resp = await fetch(SCAN_PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 300,
+        system: 'Du bist ein Weinetikett-Experte. Antworte NUR mit einem JSON-Objekt ohne Markdown-Backticks. Felder: name (Weingut + Weinname), year (Jahrgang als Zahl oder null). Wenn etwas nicht erkennbar ist, nutze null.',
+        messages: [{ role: 'user', content: [
+          { type: 'image', source: { type: 'base64', media_type: file.type||'image/jpeg', data: base64 } },
+          { type: 'text', text: 'Welcher Wein ist auf diesem Etikett zu sehen?' }
+        ]}]
+      })
+    });
+    const data = await resp.json();
+    const text = data.content?.find(b => b.type==='text')?.text || '{}';
+    let info;
+    try { info = JSON.parse(text.replace(/```json?|```/g,'')); } catch { info = {}; }
+    const match = findMatchingWine(info);
+    if (match) {
+      drinkOne(match.id);
+    } else {
+      showToast('Kein passender Wein im Keller gefunden');
+    }
+  } catch {
+    showToast('Scan fehlgeschlagen');
+  } finally {
+    e.target.value = '';
+  }
 }
 
 function deleteWine(id) {
@@ -1248,6 +1337,26 @@ function renderStats() {
       </div>`;
     });
   }
+
+  // drunk wines
+  const drunkVal = drunkWines.reduce((s,w) => s+(w.price||0), 0);
+  html += `<div class="stats-title" style="margin-top:20px">Getrunkene Weine (${drunkWines.length})</div>`;
+  if (drunkVal > 0) {
+    html += `<div class="stats-card" style="margin-bottom:12px"><div class="big" style="font-size:20px">€${Math.round(drunkVal)}</div><div class="label">Wert der getrunkenen Weine</div></div>`;
+  }
+  if (drunkWines.length) {
+    const recentDrunk = [...drunkWines].sort((a,b) => new Date(b.date)-new Date(a.date)).slice(0,10);
+    recentDrunk.forEach(w => {
+      const d = new Date(w.date).toLocaleDateString('de-DE');
+      html += `<div class="stats-card" style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:12px">
+        <div><div style="font-size:13px">${esc(w.name)}</div><div style="font-size:11px;color:var(--text-muted)">${w.year||''}${w.grape?' · '+esc(w.grape):''}</div></div>
+        <div style="font-size:11px;color:var(--text-muted);white-space:nowrap">${d}</div>
+      </div>`;
+    });
+  } else {
+    html += `<div class="stats-card" style="color:var(--text-muted);font-size:13px">Noch keine Weine als getrunken markiert.</div>`;
+  }
+
   document.getElementById('stats-content').innerHTML = html;
 }
 
@@ -1436,7 +1545,7 @@ function exportPDF() {
 }
 
 function exportJSON() {
-  download('weinkeller_backup.json', 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify({wines,wishes},null,2)));
+  download('weinkeller_backup.json', 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify({wines,wishes,drunkWines},null,2)));
   showToast('Backup erstellt ✓');
 }
 
@@ -1454,6 +1563,7 @@ function importJSON(e) {
       const data = JSON.parse(ev.target.result);
       if (data.wines) { wines = data.wines; save(); }
       if (data.wishes) { wishes = data.wishes; saveWishes(); }
+      if (data.drunkWines) { drunkWines = data.drunkWines; saveDrunk(); }
       renderKeller();
       showToast('Import erfolgreich ✓');
     } catch { showToast('Fehler beim Import'); }
