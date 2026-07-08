@@ -389,7 +389,7 @@ body {
   margin-bottom: 10px;
 }
 .input-with-scan { display: flex; gap: 8px; }
-.input-with-scan input { flex: 1; }
+.input-with-scan input { flex: 1; min-width: 0; }
 .mini-scan-btn {
   flex-shrink: 0;
   width: 42px;
@@ -831,9 +831,11 @@ input[type="file"] { display: none; }
       </div>
     </div>
     <div class="form-group">
-      <label>Lagerplatz</label>
+      <label>Lagerplatz (Regal · Ebene · Platz von links)</label>
       <div class="input-with-scan">
-        <input id="f-location" placeholder="z.B. Regal 3, Fach 2" type="text">
+        <input id="f-loc-regal" placeholder="Regal" type="text">
+        <input id="f-loc-ebene" placeholder="Ebene" type="text">
+        <input id="f-loc-platz" placeholder="Platz v.l." type="text">
         <button type="button" class="mini-scan-btn" onclick="document.getElementById('location-camera-input').click()" title="Lagerplatz scannen">📷</button>
       </div>
     </div>
@@ -959,6 +961,14 @@ const TYPE_COLORS = { rot:'dot-rot', weiß:'dot-weiß', rosé:'dot-rosé', sekt:
 const TYPES = ['alle','rot','weiß','rosé','sekt','other'];
 const TYPE_LABELS = { alle:'Alle', rot:'Rotwein', weiß:'Weißwein', rosé:'Rosé', sekt:'Sekt', other:'Sonstiges' };
 
+function formatLocation(w) {
+  const parts = [];
+  if (w.locRegal) parts.push('Regal ' + w.locRegal);
+  if (w.locEbene) parts.push('Ebene ' + w.locEbene);
+  if (w.locPlatz) parts.push('Platz ' + w.locPlatz);
+  return parts.length ? parts.join(' · ') : (w.location || '');
+}
+
 function renderKeller() {
   const q = document.getElementById('search-input').value.toLowerCase();
   // stats
@@ -1001,7 +1011,7 @@ function renderKeller() {
         <div class="wine-type-dot ${TYPE_COLORS[w.type]||'dot-other'}"></div>
         <div class="wine-row-info">
           <div class="wine-row-name">${esc(w.name)}</div>
-          <div class="wine-row-sub">${w.year||'–'} · ${TYPE_LABELS[w.type]||'Sonstiges'}${w.grape?' · '+esc(w.grape):''}${w.region?' · '+esc(w.region):''}${w.location?' · 📍 '+esc(w.location):''}</div>
+          <div class="wine-row-sub">${w.year||'–'} · ${TYPE_LABELS[w.type]||'Sonstiges'}${w.grape?' · '+esc(w.grape):''}${w.region?' · '+esc(w.region):''}${formatLocation(w)?' · 📍 '+esc(formatLocation(w)):''}</div>
         </div>
         <button class="wine-row-delete" onclick="deleteWine('${w.id}')">🗑</button>
       </div>
@@ -1024,7 +1034,7 @@ function renderKeller() {
       <div class="wine-meta">
         <div class="wine-stars">${stars}</div>
         ${w.region?`<div class="wine-region">${esc(w.region)}</div>`:''}
-        ${w.location?`<div class="wine-region">📍 ${esc(w.location)}</div>`:''}
+        ${formatLocation(w)?`<div class="wine-region">📍 ${esc(formatLocation(w))}</div>`:''}
         <div class="wine-count-badge">${w.count||1} Fl.</div>
       </div>
       ${ripe ? `
@@ -1079,7 +1089,7 @@ function recordDrunk(w) {
   drunkWines.push({
     id: Date.now().toString() + Math.random().toString(36).slice(2,7),
     name: w.name, year: w.year||null, type: w.type||'other',
-    region: w.region||'', grape: w.grape||'', location: w.location||'',
+    region: w.region||'', grape: w.grape||'', location: formatLocation(w),
     price: w.price||0, rating: w.rating||0,
     date: new Date().toISOString()
   });
@@ -1166,7 +1176,9 @@ function editWine(id) {
   document.getElementById('f-type').value = w.type||'rot';
   document.getElementById('f-region').value = w.region||'';
   document.getElementById('f-grape').value = w.grape||'';
-  document.getElementById('f-location').value = w.location||'';
+  document.getElementById('f-loc-regal').value = w.locRegal||'';
+  document.getElementById('f-loc-ebene').value = w.locEbene||'';
+  document.getElementById('f-loc-platz').value = w.locPlatz||'';
   document.getElementById('f-drink-from').value = w.drinkFrom||'';
   document.getElementById('f-drink-to').value = w.drinkTo||'';
   document.getElementById('f-price').value = w.price||'';
@@ -1181,7 +1193,7 @@ function editWine(id) {
 // ═══════════════════════════════════════
 function openAddModal() {
   editId = null;
-  ['f-name','f-year','f-region','f-grape','f-location','f-note','f-drink-from','f-drink-to','f-price'].forEach(id => document.getElementById(id).value = '');
+  ['f-name','f-year','f-region','f-grape','f-loc-regal','f-loc-ebene','f-loc-platz','f-note','f-drink-from','f-drink-to','f-price'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('f-count').value = 1;
   document.getElementById('f-type').value = 'rot';
   setStar(0);
@@ -1209,7 +1221,10 @@ function saveWine() {
     type: document.getElementById('f-type').value,
     region: document.getElementById('f-region').value.trim()||null,
     grape: document.getElementById('f-grape').value.trim()||null,
-    location: document.getElementById('f-location').value.trim()||null,
+    locRegal: document.getElementById('f-loc-regal').value.trim()||null,
+    locEbene: document.getElementById('f-loc-ebene').value.trim()||null,
+    locPlatz: document.getElementById('f-loc-platz').value.trim()||null,
+    location: editId ? ((wines.find(w=>w.id===editId)||{}).location||null) : null,
     drinkFrom: parseInt(document.getElementById('f-drink-from').value)||null,
     drinkTo: parseInt(document.getElementById('f-drink-to').value)||null,
     price: parseFloat(document.getElementById('f-price').value)||null,
@@ -1293,21 +1308,25 @@ async function handleLocationScan(e) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 100,
-        system: 'Du liest Beschriftungen von Regalen, Fächern oder Lagerplatz-Schildern in einem Weinkeller. Antworte NUR mit dem erkannten Text als reinem String (z.B. "Regal 3, Fach 2"), ohne Anführungszeichen, ohne JSON, ohne Erklärung. Falls kein Text erkennbar ist, antworte mit einem leeren String.',
+        max_tokens: 200,
+        system: 'Du liest Beschriftungen von Weinregalen und Lagerplatz-Schildern. Antworte NUR mit einem JSON-Objekt ohne Markdown-Backticks. Felder: regal (Regal-Nummer/-Bezeichnung oder null), ebene (Ebene/Fach-Nummer oder null), platz (Platz-Nummer, von links nach rechts gezählt, oder null). Wenn etwas nicht erkennbar ist, nutze null.',
         messages: [{ role: 'user', content: [
           { type: 'image', source: { type: 'base64', media_type: file.type||'image/jpeg', data: base64 } },
-          { type: 'text', text: 'Welche Lagerplatz-Bezeichnung ist auf diesem Bild zu sehen?' }
+          { type: 'text', text: 'Welcher Lagerplatz (Regal, Ebene, Platz von links) ist auf diesem Bild zu sehen?' }
         ]}]
       })
     });
     const data = await resp.json();
-    const location = (data.content?.find(b => b.type==='text')?.text || '').trim();
-    if (location) {
-      document.getElementById('f-location').value = location;
+    const text = (data.content?.find(b => b.type==='text')?.text || '{}');
+    let info;
+    try { info = JSON.parse(text.replace(/```json?|```/g,'')); } catch { info = {}; }
+    if (info.regal || info.ebene || info.platz) {
+      if (info.regal) document.getElementById('f-loc-regal').value = info.regal;
+      if (info.ebene) document.getElementById('f-loc-ebene').value = info.ebene;
+      if (info.platz) document.getElementById('f-loc-platz').value = info.platz;
       showToast('Lagerplatz erkannt ✓');
     } else {
-      showToast('Kein Text erkannt');
+      showToast('Kein Lagerplatz erkannt');
     }
   } catch {
     showToast('Scan fehlgeschlagen');
@@ -1545,9 +1564,9 @@ function wishToKeller(id) {
 // ═══════════════════════════════════════
 // EXPORT
 // ═══════════════════════════════════════
-const EXPORT_HEADERS = ['Name','Jahrgang','Typ','Region','Rebsorte','Lagerplatz','Flaschen','Bewertung','Preis','Trinken ab','Trinken bis','Notiz'];
+const EXPORT_HEADERS = ['Name','Jahrgang','Typ','Region','Rebsorte','Regal','Ebene','Platz','Flaschen','Bewertung','Preis','Trinken ab','Trinken bis','Notiz'];
 function exportRows() {
-  return wines.map(w => [w.name,w.year||'',w.type,w.region||'',w.grape||'',w.location||'',w.count||1,w.rating||'',w.price||'',w.drinkFrom||'',w.drinkTo||'',w.note||'']);
+  return wines.map(w => [w.name,w.year||'',w.type,w.region||'',w.grape||'',w.locRegal||'',w.locEbene||'',w.locPlatz||'',w.count||1,w.rating||'',w.price||'',w.drinkFrom||'',w.drinkTo||'',w.note||'']);
 }
 
 function exportCSV() {
@@ -1596,7 +1615,7 @@ function exportPDF() {
   doc.text(`${wines.length} Weine · Stand: ${new Date().toLocaleDateString('de-DE')}`, 14, 25);
   doc.autoTable({
     head: [['Name','Jahrgang','Typ','Region','Rebsorte','Lagerplatz','Fl.','Bew.','Preis']],
-    body: wines.map(w => [w.name, w.year||'', TYPE_LABELS[w.type]||w.type, w.region||'', w.grape||'', w.location||'', w.count||1, w.rating?'★'.repeat(w.rating):'', w.price?('€'+Number(w.price).toFixed(2)):'']),
+    body: wines.map(w => [w.name, w.year||'', TYPE_LABELS[w.type]||w.type, w.region||'', w.grape||'', formatLocation(w), w.count||1, w.rating?'★'.repeat(w.rating):'', w.price?('€'+Number(w.price).toFixed(2)):'']),
     startY: 30,
     styles: { fontSize: 8, cellPadding: 3 },
     headStyles: { fillColor: [196,162,74], textColor: [30,20,10] },
@@ -1665,7 +1684,8 @@ function importRowsIntoWines(rows) {
   const col = name => header.indexOf(name);
   const idx = {
     name: col('name'), year: col('jahrgang'), type: col('typ'),
-    region: col('region'), grape: col('rebsorte'), location: col('lagerplatz'), count: col('flaschen'),
+    region: col('region'), grape: col('rebsorte'), location: col('lagerplatz'),
+    locRegal: col('regal'), locEbene: col('ebene'), locPlatz: col('platz'), count: col('flaschen'),
     rating: col('bewertung'), price: col('preis'),
     drinkFrom: col('trinken ab'), drinkTo: col('trinken bis'), note: col('notiz')
   };
@@ -1684,6 +1704,9 @@ function importRowsIntoWines(rows) {
       region: idx.region > -1 ? String(cols[idx.region] ?? '').trim() : '',
       grape: idx.grape > -1 ? String(cols[idx.grape] ?? '').trim() : '',
       location: idx.location > -1 ? String(cols[idx.location] ?? '').trim() : '',
+      locRegal: idx.locRegal > -1 ? String(cols[idx.locRegal] ?? '').trim() : '',
+      locEbene: idx.locEbene > -1 ? String(cols[idx.locEbene] ?? '').trim() : '',
+      locPlatz: idx.locPlatz > -1 ? String(cols[idx.locPlatz] ?? '').trim() : '',
       count: idx.count > -1 ? parseInt(cols[idx.count]) || 1 : 1,
       rating: idx.rating > -1 ? parseInt(cols[idx.rating]) || 0 : 0,
       price: idx.price > -1 ? parseFloat(cols[idx.price]) || 0 : 0,
