@@ -689,6 +689,7 @@ input[type="file"] { display: none; }
       <option value="grape">↕ Rebsorte</option>
       <option value="region">↕ Region</option>
       <option value="country">↕ Land</option>
+      <option value="ripeness">↕ Trinkreife (dringendste zuerst)</option>
     </select>
   </div>
   <div class="wine-list" id="wine-list"></div>
@@ -1047,6 +1048,14 @@ function renderKeller() {
   else if (sortMode === 'grape') list.sort(cmpText('grape'));
   else if (sortMode === 'region') list.sort(cmpText('region'));
   else if (sortMode === 'country') list.sort(cmpText('country'));
+  else if (sortMode === 'ripeness') list.sort((a,b) => {
+    const ra = getRipenessInfo(a), rb = getRipenessInfo(b);
+    if (!ra && !rb) return 0;
+    if (!ra) return 1;
+    if (!rb) return -1;
+    if (rb.pct !== ra.pct) return rb.pct - ra.pct;
+    return (a.drinkTo||9999) - (b.drinkTo||9999);
+  });
 
   const el = document.getElementById('wine-list');
   if (!list.length) {
