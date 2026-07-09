@@ -1472,7 +1472,7 @@ function renderStats() {
   ['rot','weiß','rosé','sekt','other'].forEach(t => {
     const cnt = types[t]||0;
     const pct = total > 0 ? Math.round((cnt/total)*100) : 0;
-    html += `<div class="type-bar-row">
+    html += `<div class="type-bar-row" onclick="goToFilter('${t}')" style="cursor:pointer">
       <div class="type-bar-label">${TYPE_LABELS[t]}</div>
       <div class="type-bar-track"><div class="type-bar-fill" style="width:${pct}%;background:${typeColors[t]}"></div></div>
       <div class="type-bar-count">${cnt}</div>
@@ -1484,7 +1484,7 @@ function renderStats() {
   if (top.length) {
     html += `<div class="stats-title" style="margin-top:20px">Top Weine</div>`;
     top.forEach((w,i) => {
-      html += `<div class="stats-card" style="margin-bottom:8px;display:flex;align-items:center;gap:12px">
+      html += `<div class="stats-card" onclick="goToWine('${w.id}')" style="margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer">
         <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--gold)">${i+1}</div>
         <div><div style="font-size:13px">${esc(w.name)}</div><div style="font-size:11px;color:var(--text-muted)">${'★'.repeat(w.rating)} ${w.year||''}</div></div>
       </div>`;
@@ -1516,6 +1516,13 @@ function renderStats() {
 // ═══════════════════════════════════════
 // TRINKREIFE
 // ═══════════════════════════════════════
+function goToFilter(type) {
+  activeFilter = type;
+  const search = document.getElementById('search-input');
+  if (search) search.value = '';
+  showTab('keller', document.querySelector('.bottom-nav .nav-btn'));
+}
+
 function goToWine(id) {
   activeFilter = 'alle';
   const search = document.getElementById('search-input');
