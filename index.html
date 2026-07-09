@@ -395,6 +395,20 @@ body {
 }
 .input-with-scan { display: flex; gap: 8px; }
 .input-with-scan input { flex: 1; min-width: 0; }
+.sort-row { padding: 0 16px 12px; }
+.sort-select {
+  width: 100%;
+  padding: 7px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  outline: none;
+}
+.sort-select option { background: #1e1620; }
 .mini-scan-btn {
   flex-shrink: 0;
   width: 42px;
@@ -666,6 +680,16 @@ input[type="file"] { display: none; }
     <input class="search-input" id="search-input" placeholder="🔍  Wein suchen…" oninput="renderKeller()">
   </div>
   <div class="filter-scroll" id="filter-scroll"></div>
+  <div class="sort-row">
+    <select class="sort-select" id="sort-select" onchange="setSort(this.value)">
+      <option value="added">↕ Sortierung: Neueste zuerst</option>
+      <option value="name">↕ Name (A–Z)</option>
+      <option value="year">↕ Jahrgang</option>
+      <option value="grape">↕ Rebsorte</option>
+      <option value="region">↕ Region</option>
+      <option value="country">↕ Land</option>
+    </select>
+  </div>
   <div class="wine-list" id="wine-list"></div>
 </div>
 
@@ -831,6 +855,10 @@ input[type="file"] { display: none; }
         <input id="f-region" placeholder="Bordeaux" type="text">
       </div>
       <div class="form-group">
+        <label>Land</label>
+        <input id="f-country" placeholder="Frankreich" type="text">
+      </div>
+      <div class="form-group">
         <label>Rebsorte</label>
         <input id="f-grape" placeholder="Merlot" type="text">
       </div>
@@ -938,6 +966,7 @@ let editId = null;
 let currentStar = 0;
 let activeFilter = 'alle';
 let viewMode = 'card';
+let sortMode = 'added';
 
 function save() { localStorage.setItem(STORE_KEY, JSON.stringify(wines)); }
 function saveWishes() { localStorage.setItem(WISH_KEY, JSON.stringify(wishes)); }
@@ -999,10 +1028,24 @@ function renderKeller() {
 
   // list
   let list = wines.filter(w => {
-    const matchQ = !q || w.name.toLowerCase().includes(q) || (w.region||'').toLowerCase().includes(q) || (w.grape||'').toLowerCase().includes(q);
+    const matchQ = !q || w.name.toLowerCase().includes(q) || (w.region||'').toLowerCase().includes(q) || (w.country||'').toLowerCase().includes(q) || (w.grape||'').toLowerCase().includes(q);
     const matchF = activeFilter === 'alle' || w.type === activeFilter;
     return matchQ && matchF;
   });
+
+  // sort
+  const cmpText = k => (a,b) => {
+    const av = String(a[k]||''), bv = String(b[k]||'');
+    if (!av && !bv) return 0;
+    if (!av) return 1;
+    if (!bv) return -1;
+    return av.localeCompare(bv, 'de');
+  };
+  if (sortMode === 'name') list.sort(cmpText('name'));
+  else if (sortMode === 'year') list.sort((a,b) => (a.year||9999) - (b.year||9999));
+  else if (sortMode === 'grape') list.sort(cmpText('grape'));
+  else if (sortMode === 'region') list.sort(cmpText('region'));
+  else if (sortMode === 'country') list.sort(cmpText('country'));
 
   const el = document.getElementById('wine-list');
   if (!list.length) {
@@ -1016,7 +1059,7 @@ function renderKeller() {
         <div class="wine-type-dot ${TYPE_COLORS[w.type]||'dot-other'}"></div>
         <div class="wine-row-info">
           <div class="wine-row-name">${esc(w.name)}</div>
-          <div class="wine-row-sub">${w.year||'–'} · ${TYPE_LABELS[w.type]||'Sonstiges'}${w.grape?' · '+esc(w.grape):''}${w.region?' · '+esc(w.region):''}${formatLocation(w)?' · 📍 '+esc(formatLocation(w)):''}</div>
+          <div class="wine-row-sub">${w.year||'–'} · ${TYPE_LABELS[w.type]||'Sonstiges'}${w.grape?' · '+esc(w.grape):''}${(w.region||w.country)?' · '+esc([w.region,w.country].filter(Boolean).join(', ')):''}${formatLocation(w)?' · 📍 '+esc(formatLocation(w)):''}</div>
         </div>
         <button class="wine-row-delete" onclick="deleteWine('${w.id}')">🗑</button>
       </div>
@@ -1038,7 +1081,7 @@ function renderKeller() {
       </div>
       <div class="wine-meta">
         <div class="wine-stars">${stars}</div>
-        ${w.region?`<div class="wine-region">${esc(w.region)}</div>`:''}
+        ${(w.region||w.country)?`<div class="wine-region">${esc([w.region,w.country].filter(Boolean).join(', '))}</div>`:''}
         ${formatLocation(w)?`<div class="wine-region">📍 ${esc(formatLocation(w))}</div>`:''}
         <div class="wine-count-badge">${w.count||1} Fl.</div>
       </div>
@@ -1057,6 +1100,7 @@ function renderKeller() {
 
 function setFilter(f) { activeFilter = f; renderKeller(); }
 function toggleViewMode() { viewMode = viewMode === 'list' ? 'card' : 'list'; renderKeller(); }
+function setSort(s) { sortMode = s; renderKeller(); }
 
 function getRipenessInfo(w) {
   if (!w.drinkFrom && !w.drinkTo) return null;
@@ -1094,7 +1138,7 @@ function recordDrunk(w) {
   drunkWines.push({
     id: Date.now().toString() + Math.random().toString(36).slice(2,7),
     name: w.name, year: w.year||null, type: w.type||'other',
-    region: w.region||'', grape: w.grape||'', location: formatLocation(w),
+    region: w.region||'', country: w.country||'', grape: w.grape||'', location: formatLocation(w),
     price: w.price||0, rating: w.rating||0,
     date: new Date().toISOString()
   });
@@ -1180,6 +1224,7 @@ function editWine(id) {
   document.getElementById('f-count').value = w.count||1;
   document.getElementById('f-type').value = w.type||'rot';
   document.getElementById('f-region').value = w.region||'';
+  document.getElementById('f-country').value = w.country||'';
   document.getElementById('f-grape').value = w.grape||'';
   document.getElementById('f-loc-regal').value = w.locRegal||'';
   document.getElementById('f-loc-ebene').value = w.locEbene||'';
@@ -1198,7 +1243,7 @@ function editWine(id) {
 // ═══════════════════════════════════════
 function openAddModal() {
   editId = null;
-  ['f-name','f-year','f-region','f-grape','f-loc-regal','f-loc-ebene','f-loc-platz','f-note','f-drink-from','f-drink-to','f-price'].forEach(id => document.getElementById(id).value = '');
+  ['f-name','f-year','f-region','f-country','f-grape','f-loc-regal','f-loc-ebene','f-loc-platz','f-note','f-drink-from','f-drink-to','f-price'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('f-count').value = 1;
   document.getElementById('f-type').value = 'rot';
   setStar(0);
@@ -1225,6 +1270,7 @@ function saveWine() {
     count: parseInt(document.getElementById('f-count').value)||1,
     type: document.getElementById('f-type').value,
     region: document.getElementById('f-region').value.trim()||null,
+    country: document.getElementById('f-country').value.trim()||null,
     grape: document.getElementById('f-grape').value.trim()||null,
     locRegal: document.getElementById('f-loc-regal').value.trim()||null,
     locEbene: document.getElementById('f-loc-ebene').value.trim()||null,
@@ -1245,7 +1291,7 @@ function saveWine() {
     const existing = wines.find(w => norm(w.name) === norm(wine.name) && (w.year||null) === (wine.year||null));
     if (existing) {
       existing.count = (existing.count||1) + (wine.count||1);
-      ['region','grape','locRegal','locEbene','locPlatz','drinkFrom','drinkTo','price','rating','note'].forEach(k => {
+      ['region','country','grape','locRegal','locEbene','locPlatz','drinkFrom','drinkTo','price','rating','note'].forEach(k => {
         if (!existing[k] && wine[k]) existing[k] = wine[k];
       });
       showToast(`Anzahl erhöht ✓ (jetzt ${existing.count} Fl.)`);
@@ -1280,7 +1326,7 @@ async function handleScan(e) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 1000,
-        system: 'Du bist ein Weinetikett- und Trinkreife-Experte. Antworte NUR mit einem JSON-Objekt ohne Markdown-Backticks. Felder: name (Weingut + Weinname), year (Jahrgang als Zahl oder null), type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), grape (Rebsorte oder null), drinkFrom (Jahr als Zahl, ab dem der Wein grob geschätzt trinkreif ist, basierend auf Rebsorte/Region/Jahrgang, oder null), drinkTo (Jahr als Zahl, bis zu dem er grob geschätzt getrunken werden sollte, oder null). drinkFrom/drinkTo sind nur grobe Schätzungen, keine Angabe vom Etikett selbst. Wenn etwas nicht erkennbar ist oder keine sinnvolle Schätzung möglich ist, nutze null.',
+        system: 'Du bist ein Weinetikett- und Trinkreife-Experte. Antworte NUR mit einem JSON-Objekt ohne Markdown-Backticks. Felder: name (Weingut + Weinname), year (Jahrgang als Zahl oder null), type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), land (Herkunftsland auf Deutsch, z.B. Frankreich, oder null), grape (Rebsorte oder null), drinkFrom (Jahr als Zahl, ab dem der Wein grob geschätzt trinkreif ist, basierend auf Rebsorte/Region/Jahrgang, oder null), drinkTo (Jahr als Zahl, bis zu dem er grob geschätzt getrunken werden sollte, oder null). drinkFrom/drinkTo sind nur grobe Schätzungen, keine Angabe vom Etikett selbst. Wenn etwas nicht erkennbar ist oder keine sinnvolle Schätzung möglich ist, nutze null.',
         messages: [{ role: 'user', content: [
           { type: 'image', source: { type: 'base64', media_type: file.type||'image/jpeg', data: base64 } },
           { type: 'text', text: 'Analysiere dieses Weinetikett.' }
@@ -1295,6 +1341,7 @@ async function handleScan(e) {
     if (info.year) document.getElementById('f-year').value = info.year;
     if (info.type) document.getElementById('f-type').value = info.type;
     if (info.region) document.getElementById('f-region').value = info.region;
+    if (info.land) document.getElementById('f-country').value = info.land;
     if (info.grape) document.getElementById('f-grape').value = info.grape;
     if (info.drinkFrom) document.getElementById('f-drink-from').value = info.drinkFrom;
     if (info.drinkTo) document.getElementById('f-drink-to').value = info.drinkTo;
@@ -1594,9 +1641,9 @@ function wishToKeller(id) {
 // ═══════════════════════════════════════
 // EXPORT
 // ═══════════════════════════════════════
-const EXPORT_HEADERS = ['Name','Jahrgang','Typ','Region','Rebsorte','Regal','Ebene','Platz','Flaschen','Bewertung','Preis','Trinken ab','Trinken bis','Notiz'];
+const EXPORT_HEADERS = ['Name','Jahrgang','Typ','Region','Land','Rebsorte','Regal','Ebene','Platz','Flaschen','Bewertung','Preis','Trinken ab','Trinken bis','Notiz'];
 function exportRows() {
-  return wines.map(w => [w.name,w.year||'',w.type,w.region||'',w.grape||'',w.locRegal||'',w.locEbene||'',w.locPlatz||'',w.count||1,w.rating||'',w.price||'',w.drinkFrom||'',w.drinkTo||'',w.note||'']);
+  return wines.map(w => [w.name,w.year||'',w.type,w.region||'',w.country||'',w.grape||'',w.locRegal||'',w.locEbene||'',w.locPlatz||'',w.count||1,w.rating||'',w.price||'',w.drinkFrom||'',w.drinkTo||'',w.note||'']);
 }
 
 function exportCSV() {
@@ -1645,7 +1692,7 @@ function exportPDF() {
   doc.text(`${wines.length} Weine · Stand: ${new Date().toLocaleDateString('de-DE')}`, 14, 25);
   doc.autoTable({
     head: [['Name','Jahrgang','Typ','Region','Rebsorte','Lagerplatz','Fl.','Bew.','Preis']],
-    body: wines.map(w => [w.name, w.year||'', TYPE_LABELS[w.type]||w.type, w.region||'', w.grape||'', formatLocation(w), w.count||1, w.rating?'★'.repeat(w.rating):'', w.price?('€'+Number(w.price).toFixed(2)):'']),
+    body: wines.map(w => [w.name, w.year||'', TYPE_LABELS[w.type]||w.type, [w.region,w.country].filter(Boolean).join(', '), w.grape||'', formatLocation(w), w.count||1, w.rating?'★'.repeat(w.rating):'', w.price?('€'+Number(w.price).toFixed(2)):'']),
     startY: 30,
     styles: { fontSize: 8, cellPadding: 3 },
     headStyles: { fillColor: [196,162,74], textColor: [30,20,10] },
@@ -1714,7 +1761,7 @@ function importRowsIntoWines(rows) {
   const col = name => header.indexOf(name);
   const idx = {
     name: col('name'), year: col('jahrgang'), type: col('typ'),
-    region: col('region'), grape: col('rebsorte'), location: col('lagerplatz'),
+    region: col('region'), country: col('land'), grape: col('rebsorte'), location: col('lagerplatz'),
     locRegal: col('regal'), locEbene: col('ebene'), locPlatz: col('platz'), count: col('flaschen'),
     rating: col('bewertung'), price: col('preis'),
     drinkFrom: col('trinken ab'), drinkTo: col('trinken bis'), note: col('notiz')
@@ -1732,6 +1779,7 @@ function importRowsIntoWines(rows) {
       year: idx.year > -1 ? parseInt(cols[idx.year]) || null : null,
       type: validTypes.includes(typeRaw) ? typeRaw : 'other',
       region: idx.region > -1 ? String(cols[idx.region] ?? '').trim() : '',
+      country: idx.country > -1 ? String(cols[idx.country] ?? '').trim() : '',
       grape: idx.grape > -1 ? String(cols[idx.grape] ?? '').trim() : '',
       location: idx.location > -1 ? String(cols[idx.location] ?? '').trim() : '',
       locRegal: idx.locRegal > -1 ? String(cols[idx.locRegal] ?? '').trim() : '',
