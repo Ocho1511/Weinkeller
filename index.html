@@ -1236,8 +1236,18 @@ function saveWine() {
     wines = wines.map(w => w.id === editId ? wine : w);
     showToast('Aktualisiert ✓');
   } else {
-    wines.push(wine);
-    showToast('Hinzugefügt ✓');
+    const norm = s => String(s||'').toLowerCase().replace(/\s+/g,' ').trim();
+    const existing = wines.find(w => norm(w.name) === norm(wine.name) && (w.year||null) === (wine.year||null));
+    if (existing) {
+      existing.count = (existing.count||1) + (wine.count||1);
+      ['region','grape','locRegal','locEbene','locPlatz','drinkFrom','drinkTo','price','rating','note'].forEach(k => {
+        if (!existing[k] && wine[k]) existing[k] = wine[k];
+      });
+      showToast(`Anzahl erhöht ✓ (jetzt ${existing.count} Fl.)`);
+    } else {
+      wines.push(wine);
+      showToast('Hinzugefügt ✓');
+    }
   }
   save();
   closeModal('add-modal');
