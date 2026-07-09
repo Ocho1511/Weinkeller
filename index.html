@@ -942,6 +942,20 @@ input[type="file"] { display: none; }
         </select>
       </div>
     </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Region</label>
+        <input id="w-region" placeholder="Bordeaux" type="text">
+      </div>
+      <div class="form-group">
+        <label>Land</label>
+        <input id="w-country" placeholder="Frankreich" type="text">
+      </div>
+      <div class="form-group">
+        <label>Rebsorte</label>
+        <input id="w-grape" placeholder="Merlot" type="text">
+      </div>
+    </div>
     <div class="form-group">
       <label>Notiz / Wo kaufen?</label>
       <textarea id="w-note" placeholder="Gefunden bei…"></textarea>
@@ -1425,7 +1439,7 @@ async function handleWishScan(e) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 1000,
-        system: 'Du bist ein Weinetikett-Experte. Antworte NUR mit einem JSON-Objekt ohne Markdown-Backticks. Felder: name (Weingut + Weinname), year (Jahrgang als Zahl oder null), type (rot/weiß/rosé/sekt/other). Wenn etwas nicht erkennbar ist, nutze null.',
+        system: 'Du bist ein Weinetikett-Experte. Antworte NUR mit einem JSON-Objekt ohne Markdown-Backticks. Felder: name (Weingut + Weinname), year (Jahrgang als Zahl oder null), type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), land (Herkunftsland auf Deutsch, z.B. Frankreich, oder null), grape (Rebsorte oder null). Wenn etwas nicht erkennbar ist, nutze null.',
         messages: [{ role: 'user', content: [
           { type: 'image', source: { type: 'base64', media_type: file.type||'image/jpeg', data: base64 } },
           { type: 'text', text: 'Analysiere dieses Weinetikett.' }
@@ -1439,6 +1453,9 @@ async function handleWishScan(e) {
     if (info.name) document.getElementById('w-name').value = info.name;
     if (info.year) document.getElementById('w-year').value = info.year;
     if (info.type) document.getElementById('w-type').value = info.type;
+    if (info.region) document.getElementById('w-region').value = info.region;
+    if (info.land) document.getElementById('w-country').value = info.land;
+    if (info.grape) document.getElementById('w-grape').value = info.grape;
     showToast('Etikett erkannt ✓');
   } catch {
     showToast('Scan fehlgeschlagen');
@@ -1591,7 +1608,7 @@ function renderTrinkreife() {
 // WISHLIST
 // ═══════════════════════════════════════
 function openWishModal() {
-  ['w-name','w-year','w-note'].forEach(id => document.getElementById(id).value='');
+  ['w-name','w-year','w-region','w-country','w-grape','w-note'].forEach(id => document.getElementById(id).value='');
   document.getElementById('w-type').value = 'rot';
   document.getElementById('wish-modal').classList.add('show');
 }
@@ -1604,6 +1621,9 @@ function saveWish() {
     name,
     year: parseInt(document.getElementById('w-year').value)||null,
     type: document.getElementById('w-type').value,
+    region: document.getElementById('w-region').value.trim()||null,
+    country: document.getElementById('w-country').value.trim()||null,
+    grape: document.getElementById('w-grape').value.trim()||null,
     note: document.getElementById('w-note').value.trim()||null,
     done: false
   });
@@ -1624,7 +1644,7 @@ function renderWishlist() {
       <button class="wish-check ${w.done?'done':''}" onclick="toggleWish('${w.id}')">${w.done?'✓':''}</button>
       <div class="wish-info">
         <div class="wish-name">${esc(w.name)}</div>
-        <div class="wish-sub">${w.year||''} ${w.type?'· '+w.type:''} ${w.note?'· '+esc(w.note):''}</div>
+        <div class="wish-sub">${w.year||''} ${w.type?'· '+w.type:''}${w.grape?' · '+esc(w.grape):''}${(w.region||w.country)?' · '+esc([w.region,w.country].filter(Boolean).join(', ')):''} ${w.note?'· '+esc(w.note):''}</div>
       </div>
       <div class="wish-actions">
         <button class="wish-action-btn" onclick="wishToKeller('${w.id}')">→ Keller</button>
@@ -1647,7 +1667,7 @@ function deleteWish(id) {
 function wishToKeller(id) {
   const w = wishes.find(x=>x.id===id);
   if (!w) return;
-  wines.push({ id: Date.now().toString(), name: w.name, year: w.year, count: 1, type: w.type, added: new Date().toISOString() });
+  wines.push({ id: Date.now().toString(), name: w.name, year: w.year, count: 1, type: w.type, region: w.region||null, country: w.country||null, grape: w.grape||null, added: new Date().toISOString() });
   save();
   wishes = wishes.filter(x=>x.id!==id);
   saveWishes();
