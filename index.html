@@ -174,6 +174,11 @@ body {
   transition: background .2s;
 }
 .wine-card:active { background: var(--card-hover); }
+@keyframes wineFlash {
+  0%, 100% { box-shadow: none; border-color: var(--border); }
+  50% { box-shadow: 0 0 12px rgba(28,154,141,.6); border-color: #1c9a8d; }
+}
+.wine-highlight { animation: wineFlash 1.2s ease 2; }
 .wine-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
 .wine-name {
   font-family: 'Playfair Display', serif;
@@ -1007,7 +1012,7 @@ function renderKeller() {
 
   if (viewMode === 'list') {
     el.innerHTML = list.map(w => `
-      <div class="wine-row">
+      <div class="wine-row" data-wine-id="${w.id}">
         <div class="wine-type-dot ${TYPE_COLORS[w.type]||'dot-other'}"></div>
         <div class="wine-row-info">
           <div class="wine-row-name">${esc(w.name)}</div>
@@ -1023,7 +1028,7 @@ function renderKeller() {
     const stars = w.rating ? '★'.repeat(w.rating) + '☆'.repeat(5-w.rating) : '☆☆☆☆☆';
     const ripe = getRipenessInfo(w);
     return `
-    <div class="wine-card">
+    <div class="wine-card" data-wine-id="${w.id}">
       <div class="wine-card-top">
         <div>
           <div class="wine-name">${esc(w.name)}</div>
@@ -1454,6 +1459,21 @@ function renderStats() {
 // ═══════════════════════════════════════
 // TRINKREIFE
 // ═══════════════════════════════════════
+function goToWine(id) {
+  activeFilter = 'alle';
+  const search = document.getElementById('search-input');
+  if (search) search.value = '';
+  showTab('keller', document.querySelector('.bottom-nav .nav-btn'));
+  setTimeout(() => {
+    const card = document.querySelector(`[data-wine-id="${id}"]`);
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.classList.add('wine-highlight');
+      setTimeout(() => card.classList.remove('wine-highlight'), 2500);
+    }
+  }, 50);
+}
+
 function renderTrinkreife() {
   const now = new Date().getFullYear();
   const withRipe = wines.filter(w => w.drinkFrom || w.drinkTo).sort((a,b)=>(a.drinkFrom||0)-(b.drinkFrom||0));
@@ -1485,7 +1505,7 @@ function renderTrinkreife() {
       pct = 100;
     }
     return `
-    <div class="ripeness-card">
+    <div class="ripeness-card" onclick="goToWine('${w.id}')" style="cursor:pointer">
       <div class="ripeness-wine-name">${esc(w.name)}</div>
       <div class="ripeness-meta">${w.year||''} ${w.type?' · '+w.type:''}</div>
       <div style="display:flex;gap:0;border-radius:6px;overflow:hidden;height:18px;margin-bottom:6px">
