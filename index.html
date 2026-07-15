@@ -642,19 +642,22 @@ input[type="file"] { display: none; }
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <button class="nav-btn active" onclick="showTab('keller',this)">
-    <span class="nav-icon">🍾</span>Keller
+    <span class="nav-icon">🍾</span><span data-i18n="nav_keller">Keller</span>
   </button>
   <button class="nav-btn" onclick="showTab('stats',this)">
-    <span class="nav-icon">📊</span>Statistik
+    <span class="nav-icon">📊</span><span data-i18n="nav_stats">Statistik</span>
   </button>
   <button class="nav-btn" onclick="showTab('trinkreife',this)">
-    <span class="nav-icon">⏱</span>Trinkreife
+    <span class="nav-icon">⏱</span><span data-i18n="nav_ripe">Trinkreife</span>
   </button>
   <button class="nav-btn" onclick="showTab('wishlist',this)">
-    <span class="nav-icon">⭐</span>Wishlist
+    <span class="nav-icon">⭐</span><span data-i18n="nav_wish">Wishlist</span>
   </button>
   <button class="nav-btn" onclick="showTab('export',this)">
-    <span class="nav-icon">📤</span>Export/Import
+    <span class="nav-icon">📤</span><span data-i18n="nav_export">Export/Import</span>
+  </button>
+  <button class="nav-btn" onclick="showTab('setup',this)">
+    <span class="nav-icon">⚙️</span><span data-i18n="nav_setup">Setup</span>
   </button>
 </nav>
 
@@ -681,18 +684,18 @@ input[type="file"] { display: none; }
   </div>
   <div class="keller-stats" id="keller-stats"></div>
   <div class="search-filter">
-    <input class="search-input" id="search-input" placeholder="🔍  Wein suchen…" oninput="renderKeller()">
+    <input class="search-input" id="search-input" placeholder="🔍  Wein suchen…" data-i18n-ph="search_ph" oninput="renderKeller()">
   </div>
   <div class="filter-scroll" id="filter-scroll"></div>
   <div class="sort-row">
     <select class="sort-select" id="sort-select" onchange="setSort(this.value)">
-      <option value="added">↕ Sortierung: Neueste zuerst</option>
-      <option value="name">↕ Name (A–Z)</option>
-      <option value="year">↕ Jahrgang</option>
-      <option value="grape">↕ Rebsorte</option>
-      <option value="region">↕ Region</option>
-      <option value="country">↕ Land</option>
-      <option value="ripeness">↕ Trinkreife (dringendste zuerst)</option>
+      <option value="added" data-i18n="sort_added">↕ Sortierung: Neueste zuerst</option>
+      <option value="name" data-i18n="sort_name">↕ Name (A–Z)</option>
+      <option value="year" data-i18n="sort_year">↕ Jahrgang</option>
+      <option value="grape" data-i18n="sort_grape">↕ Rebsorte</option>
+      <option value="region" data-i18n="sort_region">↕ Region</option>
+      <option value="country" data-i18n="sort_country">↕ Land</option>
+      <option value="ripeness" data-i18n="sort_ripeness">↕ Trinkreife (dringendste zuerst)</option>
     </select>
   </div>
   <div class="wine-list" id="wine-list"></div>
@@ -703,8 +706,8 @@ input[type="file"] { display: none; }
 ════════════════════════════════════════ -->
 <div class="tab" id="tab-stats">
   <div class="page-header">
-    <h1>Ocho's Statistik</h1>
-    <div class="subtitle">Überblick</div>
+    <h1 data-i18n="stats_title">Ocho's Statistik</h1>
+    <div class="subtitle" data-i18n="stats_sub">Überblick</div>
   </div>
   <div id="stats-content" style="padding:0 16px 20px"></div>
 </div>
@@ -714,8 +717,8 @@ input[type="file"] { display: none; }
 ════════════════════════════════════════ -->
 <div class="tab" id="tab-trinkreife">
   <div class="page-header">
-    <h1>Trinkreife</h1>
-    <div class="subtitle">Wann trinken?</div>
+    <h1 data-i18n="ripe_title">Trinkreife</h1>
+    <div class="subtitle" data-i18n="ripe_sub">Wann trinken?</div>
   </div>
   <div id="trinkreife-list"></div>
 </div>
@@ -725,11 +728,11 @@ input[type="file"] { display: none; }
 ════════════════════════════════════════ -->
 <div class="tab" id="tab-wishlist">
   <div class="page-header">
-    <h1>Ocho's Wunschliste</h1>
-    <div class="subtitle">Noch zu kaufen</div>
+    <h1 data-i18n="wish_title">Ocho's Wunschliste</h1>
+    <div class="subtitle" data-i18n="wish_sub">Noch zu kaufen</div>
   </div>
   <div style="padding:0 16px 16px">
-    <button class="btn-primary" style="width:100%" onclick="openWishModal()">+ Wunsch hinzufügen</button>
+    <button class="btn-primary" style="width:100%" onclick="openWishModal()" data-i18n="wish_add">+ Wunsch hinzufügen</button>
   </div>
   <div class="wish-list" id="wish-list"></div>
 </div>
@@ -739,74 +742,74 @@ input[type="file"] { display: none; }
 ════════════════════════════════════════ -->
 <div class="tab" id="tab-export">
   <div class="page-header">
-    <h1>Export & Import</h1>
-    <div class="subtitle">Daten sichern</div>
+    <h1 data-i18n="exp_title">Export & Import</h1>
+    <div class="subtitle" data-i18n="exp_sub">Daten sichern</div>
   </div>
   <div class="export-section">
     <div class="export-card" onclick="exportCSV()">
       <div class="export-icon">📋</div>
       <div class="export-info">
-        <div class="title">CSV exportieren</div>
-        <div class="desc">Tabelle für Excel oder Numbers</div>
+        <div class="title" data-i18n="exp_csv">CSV exportieren</div>
+        <div class="desc" data-i18n="exp_csv_d">Tabelle für Excel oder Numbers</div>
       </div>
     </div>
     <div class="export-card" onclick="exportExcel()">
       <div class="export-icon">📊</div>
       <div class="export-info">
-        <div class="title">Excel exportieren</div>
-        <div class="desc">Als .xlsx-Datei</div>
+        <div class="title" data-i18n="exp_xlsx">Excel exportieren</div>
+        <div class="desc" data-i18n="exp_xlsx_d">Als .xlsx-Datei</div>
       </div>
     </div>
     <div class="export-card" onclick="exportPDF()">
       <div class="export-icon">📄</div>
       <div class="export-info">
-        <div class="title">PDF exportieren</div>
-        <div class="desc">Druckfähige Übersicht</div>
+        <div class="title" data-i18n="exp_pdf">PDF exportieren</div>
+        <div class="desc" data-i18n="exp_pdf_d">Druckfähige Übersicht</div>
       </div>
     </div>
     <div class="export-card" onclick="exportJSON()">
       <div class="export-icon">💾</div>
       <div class="export-info">
-        <div class="title">JSON Backup</div>
-        <div class="desc">Vollständige Datensicherung</div>
+        <div class="title" data-i18n="exp_json">JSON Backup</div>
+        <div class="desc" data-i18n="exp_json_d">Vollständige Datensicherung</div>
       </div>
     </div>
     <div class="export-card" onclick="copyToClipboard()">
       <div class="export-icon">📎</div>
       <div class="export-info">
-        <div class="title">In Zwischenablage</div>
-        <div class="desc">Text-Liste kopieren</div>
+        <div class="title" data-i18n="exp_clip">In Zwischenablage</div>
+        <div class="desc" data-i18n="exp_clip_d">Text-Liste kopieren</div>
       </div>
     </div>
     <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border)">
-      <div class="stats-title" style="margin-bottom:12px">Import</div>
+      <div class="stats-title" style="margin-bottom:12px" data-i18n="imp_title">Import</div>
       <div class="export-card" onclick="document.getElementById('import-input').click()">
         <div class="export-icon">📥</div>
         <div class="export-info">
-          <div class="title">JSON importieren</div>
-          <div class="desc">Backup wiederherstellen</div>
+          <div class="title" data-i18n="imp_json">JSON importieren</div>
+          <div class="desc" data-i18n="imp_json_d">Backup wiederherstellen</div>
         </div>
       </div>
       <input type="file" id="import-input" accept=".json" onchange="importJSON(event)">
       <div class="export-card" onclick="document.getElementById('import-csv-input').click()" style="margin-top:10px">
         <div class="export-icon">📋</div>
         <div class="export-info">
-          <div class="title">CSV importieren</div>
-          <div class="desc">Tabelle aus Excel oder Numbers</div>
+          <div class="title" data-i18n="imp_csv">CSV importieren</div>
+          <div class="desc" data-i18n="imp_csv_d">Tabelle aus Excel oder Numbers</div>
         </div>
       </div>
       <input type="file" id="import-csv-input" accept=".csv" onchange="importCSV(event)">
       <div class="export-card" onclick="document.getElementById('import-excel-input').click()" style="margin-top:10px">
         <div class="export-icon">📊</div>
         <div class="export-info">
-          <div class="title">Excel importieren</div>
-          <div class="desc">.xlsx-Datei einlesen</div>
+          <div class="title" data-i18n="imp_xlsx">Excel importieren</div>
+          <div class="desc" data-i18n="imp_xlsx_d">.xlsx-Datei einlesen</div>
         </div>
       </div>
       <input type="file" id="import-excel-input" accept=".xlsx,.xls" onchange="importExcel(event)">
     </div>
     <details class="contact-footer">
-      <summary>Kontakt</summary>
+      <summary data-i18n="contact">Kontakt</summary>
       <div class="contact-info">
         <div class="contact-name">Thomas Knecht</div>
         <a class="contact-line" href="mailto:t.knecht@web.de">✉️ t.knecht@web.de</a>
@@ -818,83 +821,111 @@ input[type="file"] { display: none; }
 </div>
 
 <!-- ════════════════════════════════════════
+     SETUP TAB
+════════════════════════════════════════ -->
+<div class="tab" id="tab-setup">
+  <div class="page-header">
+    <h1 data-i18n="setup_title">Setup</h1>
+    <div class="subtitle" data-i18n="setup_sub">Einstellungen</div>
+  </div>
+  <div class="export-section">
+    <div class="form-group">
+      <label data-i18n="setup_currency">Währung</label>
+      <select id="setup-currency" onchange="setCurrency(this.value)">
+        <option value="€">€ — Euro</option>
+        <option value="$">$ — US-Dollar</option>
+        <option value="£">£ — Pfund</option>
+        <option value="CHF">CHF — Schweizer Franken</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-top:14px">
+      <label data-i18n="setup_lang">Sprache</label>
+      <select id="setup-lang" onchange="setLanguage(this.value)">
+        <option value="de">🇩🇪 Deutsch</option>
+        <option value="en">🇬🇧 English</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
      ADD WINE MODAL
 ════════════════════════════════════════ -->
 <div class="modal-overlay" id="add-modal">
   <div class="modal">
     <div class="modal-handle"></div>
     <h2 id="modal-title">Wein hinzufügen</h2>
-    <button class="scan-btn" onclick="document.getElementById('camera-input').click()">
+    <button class="scan-btn" onclick="document.getElementById('camera-input').click()" data-i18n="m_scan">
       📷  Etikett scannen (KI)
     </button>
-    <div id="scan-loading" style="display:none;text-align:center;padding:12px;color:var(--text-muted);font-size:13px">
+    <div id="scan-loading" style="display:none;text-align:center;padding:12px;color:var(--text-muted);font-size:13px" data-i18n="m_scanning">
       ⏳ Etikett wird analysiert…
     </div>
     <div class="form-group">
-      <label>Name / Weingut</label>
+      <label data-i18n="l_name">Name / Weingut</label>
       <input id="f-name" placeholder="z.B. Château Margaux" type="text">
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label>Jahrgang</label>
+        <label data-i18n="l_year">Jahrgang</label>
         <input id="f-year" placeholder="2019" type="number" min="1900" max="2030">
       </div>
       <div class="form-group">
-        <label>Flaschen</label>
+        <label data-i18n="l_count">Flaschen</label>
         <input id="f-count" placeholder="1" type="number" min="1" value="1">
       </div>
     </div>
     <div class="form-group">
-      <label>Weintyp</label>
+      <label data-i18n="l_type">Weintyp</label>
       <select id="f-type">
-        <option value="rot">🔴 Rotwein</option>
-        <option value="weiß">🟡 Weißwein</option>
-        <option value="rosé">🌸 Rosé</option>
-        <option value="sekt">✨ Sekt / Champagner</option>
-        <option value="other">◻️ Sonstiges</option>
+        <option value="rot" data-i18n="o_rot">🔴 Rotwein</option>
+        <option value="weiß" data-i18n="o_weiss">🟡 Weißwein</option>
+        <option value="rosé" data-i18n="o_rose">🌸 Rosé</option>
+        <option value="sekt" data-i18n="o_sekt">✨ Sekt / Champagner</option>
+        <option value="other" data-i18n="o_other">◻️ Sonstiges</option>
       </select>
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label>Region</label>
+        <label data-i18n="l_region">Region</label>
         <input id="f-region" placeholder="Bordeaux" type="text">
       </div>
       <div class="form-group">
-        <label>Land</label>
+        <label data-i18n="l_country">Land</label>
         <input id="f-country" placeholder="Frankreich" type="text">
       </div>
       <div class="form-group">
-        <label>Rebsorte</label>
+        <label data-i18n="l_grape">Rebsorte</label>
         <input id="f-grape" placeholder="Merlot" type="text">
       </div>
     </div>
     <div class="form-group">
-      <label>Lagerplatz (Regal · Ebene · Platz von links)</label>
+      <label data-i18n="l_location">Lagerplatz (Regal · Ebene · Platz von links)</label>
       <div class="input-with-scan">
-        <input id="f-loc-regal" placeholder="Regal" type="text">
-        <input id="f-loc-ebene" placeholder="Ebene" type="text">
-        <input id="f-loc-platz" placeholder="Platz v.l." type="text">
+        <input id="f-loc-regal" placeholder="Regal" data-i18n-ph="ph_regal" type="text">
+        <input id="f-loc-ebene" placeholder="Ebene" data-i18n-ph="ph_ebene" type="text">
+        <input id="f-loc-platz" placeholder="Platz v.l." data-i18n-ph="ph_platz" type="text">
         <button type="button" class="mini-scan-btn" onclick="document.getElementById('location-camera-input').click()" title="Lagerplatz scannen">📷</button>
       </div>
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label>Trinken ab</label>
+        <label data-i18n="l_from">Trinken ab</label>
         <input id="f-drink-from" placeholder="2024" type="number">
       </div>
       <div class="form-group">
-        <label>Trinken bis</label>
+        <label data-i18n="l_to">Trinken bis</label>
         <input id="f-drink-to" placeholder="2032" type="number">
       </div>
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label>Preis (€)</label>
+        <label id="price-label">Preis (€)</label>
         <input id="f-price" placeholder="0.00" type="number" step="0.01">
       </div>
     </div>
     <div class="form-group">
-      <label>Bewertung</label>
+      <label data-i18n="l_rating">Bewertung</label>
       <div class="star-select" id="star-select">
         <button class="star-btn" onclick="setStar(1)">★</button>
         <button class="star-btn" onclick="setStar(2)">★</button>
@@ -904,12 +935,12 @@ input[type="file"] { display: none; }
       </div>
     </div>
     <div class="form-group">
-      <label>Notiz</label>
-      <textarea id="f-note" placeholder="Geschmack, Anlass, Gedanken…"></textarea>
+      <label data-i18n="l_note">Notiz</label>
+      <textarea id="f-note" placeholder="Geschmack, Anlass, Gedanken…" data-i18n-ph="ph_note"></textarea>
     </div>
     <div class="btn-row">
-      <button class="btn-secondary" onclick="closeModal('add-modal')">Abbrechen</button>
-      <button class="btn-primary" onclick="saveWine()">Speichern</button>
+      <button class="btn-secondary" onclick="closeModal('add-modal')" data-i18n="btn_cancel">Abbrechen</button>
+      <button class="btn-primary" onclick="saveWine()" data-i18n="btn_save">Speichern</button>
     </div>
   </div>
 </div>
@@ -918,54 +949,54 @@ input[type="file"] { display: none; }
 <div class="modal-overlay" id="wish-modal">
   <div class="modal">
     <div class="modal-handle"></div>
-    <h2>Wunsch hinzufügen</h2>
-    <button class="scan-btn" onclick="document.getElementById('wish-camera-input').click()">
+    <h2 data-i18n="wm_title">Wunsch hinzufügen</h2>
+    <button class="scan-btn" onclick="document.getElementById('wish-camera-input').click()" data-i18n="m_scan">
       📷  Etikett scannen (KI)
     </button>
-    <div id="wish-scan-loading" style="display:none;text-align:center;padding:12px;color:var(--text-muted);font-size:13px">
+    <div id="wish-scan-loading" style="display:none;text-align:center;padding:12px;color:var(--text-muted);font-size:13px" data-i18n="m_scanning">
       ⏳ Etikett wird analysiert…
     </div>
     <div class="form-group">
-      <label>Name / Weingut</label>
+      <label data-i18n="l_name">Name / Weingut</label>
       <input id="w-name" placeholder="z.B. Opus One" type="text">
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label>Jahrgang</label>
+        <label data-i18n="l_year">Jahrgang</label>
         <input id="w-year" placeholder="2020" type="number">
       </div>
       <div class="form-group">
-        <label>Typ</label>
+        <label data-i18n="l_type">Typ</label>
         <select id="w-type">
-          <option value="rot">Rotwein</option>
-          <option value="weiß">Weißwein</option>
-          <option value="rosé">Rosé</option>
-          <option value="sekt">Sekt</option>
-          <option value="other">Sonstiges</option>
+          <option value="rot" data-i18n="t_rot">Rotwein</option>
+          <option value="weiß" data-i18n="t_weiss">Weißwein</option>
+          <option value="rosé" data-i18n="t_rose">Rosé</option>
+          <option value="sekt" data-i18n="t_sekt">Sekt</option>
+          <option value="other" data-i18n="t_other">Sonstiges</option>
         </select>
       </div>
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label>Region</label>
+        <label data-i18n="l_region">Region</label>
         <input id="w-region" placeholder="Bordeaux" type="text">
       </div>
       <div class="form-group">
-        <label>Land</label>
+        <label data-i18n="l_country">Land</label>
         <input id="w-country" placeholder="Frankreich" type="text">
       </div>
       <div class="form-group">
-        <label>Rebsorte</label>
+        <label data-i18n="l_grape">Rebsorte</label>
         <input id="w-grape" placeholder="Merlot" type="text">
       </div>
     </div>
     <div class="form-group">
-      <label>Notiz / Wo kaufen?</label>
-      <textarea id="w-note" placeholder="Gefunden bei…"></textarea>
+      <label data-i18n="l_wnote">Notiz / Wo kaufen?</label>
+      <textarea id="w-note" placeholder="Gefunden bei…" data-i18n-ph="ph_wnote"></textarea>
     </div>
     <div class="btn-row">
-      <button class="btn-secondary" onclick="closeModal('wish-modal')">Abbrechen</button>
-      <button class="btn-primary" onclick="saveWish()">Hinzufügen</button>
+      <button class="btn-secondary" onclick="closeModal('wish-modal')" data-i18n="btn_cancel">Abbrechen</button>
+      <button class="btn-primary" onclick="saveWish()" data-i18n="btn_add">Hinzufügen</button>
     </div>
   </div>
 </div>
@@ -978,9 +1009,11 @@ const SCAN_PROXY_URL = 'https://weinkeller-scan-proxy.ocho1511.workers.dev';
 const STORE_KEY = 'weinkeller_v2';
 const WISH_KEY  = 'weinkeller_v2_wish';
 const DRUNK_KEY = 'weinkeller_v2_drunk';
+const SETTINGS_KEY = 'weinkeller_v2_settings';
 let wines = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
 let wishes = JSON.parse(localStorage.getItem(WISH_KEY) || '[]');
 let drunkWines = JSON.parse(localStorage.getItem(DRUNK_KEY) || '[]');
+let settings = Object.assign({currency:'€', lang:'de'}, JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'));
 let editId = null;
 let currentStar = 0;
 let activeFilter = 'alle';
@@ -990,6 +1023,147 @@ let sortMode = 'added';
 function save() { localStorage.setItem(STORE_KEY, JSON.stringify(wines)); }
 function saveWishes() { localStorage.setItem(WISH_KEY, JSON.stringify(wishes)); }
 function saveDrunk() { localStorage.setItem(DRUNK_KEY, JSON.stringify(drunkWines)); }
+function saveSettings() { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }
+
+function fmtMoney(n) { return settings.currency === 'CHF' ? 'CHF ' + n : settings.currency + n; }
+function dateLocale() { return settings.lang === 'de' ? 'de-DE' : 'en-US'; }
+
+// ═══════════════════════════════════════
+// I18N
+// ═══════════════════════════════════════
+const I18N = {
+de: {
+  nav_keller:'Keller', nav_stats:'Statistik', nav_ripe:'Trinkreife', nav_wish:'Wishlist', nav_export:'Export/Import', nav_setup:'Setup',
+  stats_title:"Ocho's Statistik", stats_sub:'Überblick',
+  ripe_title:'Trinkreife', ripe_sub:'Wann trinken?',
+  wish_title:"Ocho's Wunschliste", wish_sub:'Noch zu kaufen',
+  exp_title:'Export & Import', exp_sub:'Daten sichern',
+  setup_title:'Setup', setup_sub:'Einstellungen',
+  setup_currency:'Währung', setup_lang:'Sprache',
+  search_ph:'🔍  Wein suchen…',
+  sort_added:'↕ Sortierung: Neueste zuerst', sort_name:'↕ Name (A–Z)', sort_year:'↕ Jahrgang', sort_grape:'↕ Rebsorte', sort_region:'↕ Region', sort_country:'↕ Land', sort_ripeness:'↕ Trinkreife (dringendste zuerst)',
+  t_all:'Alle', t_rot:'Rotwein', t_weiss:'Weißwein', t_rose:'Rosé', t_sekt:'Sekt', t_other:'Sonstiges',
+  list_chip:'📋 Liste',
+  pill_bottles:'Flaschen', pill_wines:'Weine', pill_value:'Wert', pill_avg:'⌀ Ø',
+  keller_sub_one:'Wein in deiner Sammlung', keller_sub_many:'Weine in deiner Sammlung',
+  empty_keller:'Keine Weine gefunden.<br>Füge deinen ersten Wein hinzu!',
+  btn_edit:'✏️ Bearbeiten', btn_drink:'🥂 Trinken', fl:'Fl.',
+  s_value:'Gesamtwert', s_avg:'Ø Bewertung', s_bytype:'Nach Typ', s_top:'Top Weine',
+  s_drunk:'Getrunkene Weine', s_drunkvalue:'Wert der getrunkenen Weine', s_nodrunk:'Noch keine Weine als getrunken markiert.',
+  ripe_empty:'Noch keine Weine mit<br>Trinkreife-Angabe.<br>Beim Hinzufügen „Trinken ab/bis" ausfüllen.',
+  seg_young:'Jung', seg_optimal:'Optimal', seg_peak:'Peak',
+  st_wait1:'Noch 1 Jahr warten', st_wait:'Noch {n} Jahre warten', st_optimal:'Optimal trinken — bis {to}', st_peak:'Jetzt auf dem Höhepunkt!', st_over1:'Überschritten seit 1 Jahr', st_over:'Überschritten seit {n} Jahren',
+  wish_empty:'Noch keine Wünsche.<br>Füge Weine hinzu, die du kaufen möchtest.', to_cellar:'→ Keller', wish_add:'+ Wunsch hinzufügen',
+  exp_csv:'CSV exportieren', exp_csv_d:'Tabelle für Excel oder Numbers',
+  exp_xlsx:'Excel exportieren', exp_xlsx_d:'Als .xlsx-Datei',
+  exp_pdf:'PDF exportieren', exp_pdf_d:'Druckfähige Übersicht',
+  exp_json:'JSON Backup', exp_json_d:'Vollständige Datensicherung',
+  exp_clip:'In Zwischenablage', exp_clip_d:'Text-Liste kopieren',
+  imp_title:'Import',
+  imp_json:'JSON importieren', imp_json_d:'Backup wiederherstellen',
+  imp_csv:'CSV importieren', imp_csv_d:'Tabelle aus Excel oder Numbers',
+  imp_xlsx:'Excel importieren', imp_xlsx_d:'.xlsx-Datei einlesen',
+  contact:'Kontakt',
+  m_add_title:'Wein hinzufügen', m_edit_title:'Wein bearbeiten', m_scan:'📷  Etikett scannen (KI)', m_scanning:'⏳ Etikett wird analysiert…',
+  l_name:'Name / Weingut', l_year:'Jahrgang', l_count:'Flaschen', l_type:'Weintyp', l_region:'Region', l_country:'Land', l_grape:'Rebsorte',
+  l_location:'Lagerplatz (Regal · Ebene · Platz von links)', ph_regal:'Regal', ph_ebene:'Ebene', ph_platz:'Platz v.l.',
+  l_from:'Trinken ab', l_to:'Trinken bis', l_price:'Preis', l_rating:'Bewertung', l_note:'Notiz',
+  o_rot:'🔴 Rotwein', o_weiss:'🟡 Weißwein', o_rose:'🌸 Rosé', o_sekt:'✨ Sekt / Champagner', o_other:'◻️ Sonstiges',
+  btn_cancel:'Abbrechen', btn_save:'Speichern', btn_add:'Hinzufügen',
+  wm_title:'Wunsch hinzufügen', l_wnote:'Notiz / Wo kaufen?', ph_note:'Geschmack, Anlass, Gedanken…', ph_wnote:'Gefunden bei…',
+  toast_prost:'🥂 Prost!', toast_added:'Hinzugefügt ✓', toast_updated:'Aktualisiert ✓', toast_removed:'Entfernt',
+  toast_count:'Anzahl erhöht ✓ (jetzt {n} Fl.)', toast_name:'Bitte Name eingeben',
+  toast_scanfail:'Scan fehlgeschlagen', toast_label:'Etikett erkannt ✓', toast_label_ripe:'Etikett erkannt ✓ (Trinkreife geschätzt)',
+  toast_loc:'Lagerplatz erkannt ✓', toast_noloc:'Kein Lagerplatz erkannt', toast_nomatch:'Kein passender Wein im Keller gefunden',
+  toast_reading:'⏳ Etikett wird erkannt…', toast_locreading:'⏳ Lagerplatz wird gelesen…',
+  toast_imported1:'1 Wein importiert ✓', toast_imported:'{n} Weine importiert ✓',
+  toast_csv:'CSV exportiert ✓', toast_xlsx:'Excel exportiert ✓', toast_pdf:'PDF exportiert ✓', toast_backup:'Backup erstellt ✓',
+  toast_copy:'Kopiert ✓', toast_copyfail:'Fehler beim Kopieren', toast_import_ok:'Import erfolgreich ✓', toast_import_fail:'Fehler beim Import',
+  toast_csvfail:'Fehler beim CSV-Import', toast_xlsxfail:'Fehler beim Excel-Import', toast_moved:'In Keller verschoben ✓',
+  confirm_last:'Letzte Flasche von "{name}" als getrunken markieren und entfernen?', confirm_del:'Wein entfernen?',
+  pdf_sub:'{n} Weine · Stand: {d}'
+},
+en: {
+  nav_keller:'Cellar', nav_stats:'Statistics', nav_ripe:'Readiness', nav_wish:'Wishlist', nav_export:'Export/Import', nav_setup:'Setup',
+  stats_title:"Ocho's Statistics", stats_sub:'Overview',
+  ripe_title:'Drinking Window', ripe_sub:'When to drink?',
+  wish_title:"Ocho's Wishlist", wish_sub:'Still to buy',
+  exp_title:'Export & Import', exp_sub:'Back up your data',
+  setup_title:'Setup', setup_sub:'Settings',
+  setup_currency:'Currency', setup_lang:'Language',
+  search_ph:'🔍  Search wine…',
+  sort_added:'↕ Sort: Newest first', sort_name:'↕ Name (A–Z)', sort_year:'↕ Vintage', sort_grape:'↕ Grape', sort_region:'↕ Region', sort_country:'↕ Country', sort_ripeness:'↕ Readiness (most urgent first)',
+  t_all:'All', t_rot:'Red', t_weiss:'White', t_rose:'Rosé', t_sekt:'Sparkling', t_other:'Other',
+  list_chip:'📋 List',
+  pill_bottles:'Bottles', pill_wines:'Wines', pill_value:'Value', pill_avg:'⌀ Avg',
+  keller_sub_one:'wine in your collection', keller_sub_many:'wines in your collection',
+  empty_keller:'No wines found.<br>Add your first wine!',
+  btn_edit:'✏️ Edit', btn_drink:'🥂 Drink', fl:'btl.',
+  s_value:'Total value', s_avg:'Avg rating', s_bytype:'By type', s_top:'Top wines',
+  s_drunk:'Wines drunk', s_drunkvalue:'Value of wines drunk', s_nodrunk:'No wines marked as drunk yet.',
+  ripe_empty:'No wines with a<br>drinking window yet.<br>Fill in "Drink from/until" when adding.',
+  seg_young:'Young', seg_optimal:'Optimal', seg_peak:'Peak',
+  st_wait1:'Wait 1 more year', st_wait:'Wait {n} more years', st_optimal:'Drink now — until {to}', st_peak:'At its peak now!', st_over1:'Past its window by 1 year', st_over:'Past its window by {n} years',
+  wish_empty:'No wishes yet.<br>Add wines you would like to buy.', to_cellar:'→ Cellar', wish_add:'+ Add wish',
+  exp_csv:'Export CSV', exp_csv_d:'Table for Excel or Numbers',
+  exp_xlsx:'Export Excel', exp_xlsx_d:'As .xlsx file',
+  exp_pdf:'Export PDF', exp_pdf_d:'Printable overview',
+  exp_json:'JSON backup', exp_json_d:'Complete data backup',
+  exp_clip:'To clipboard', exp_clip_d:'Copy text list',
+  imp_title:'Import',
+  imp_json:'Import JSON', imp_json_d:'Restore a backup',
+  imp_csv:'Import CSV', imp_csv_d:'Table from Excel or Numbers',
+  imp_xlsx:'Import Excel', imp_xlsx_d:'Read .xlsx file',
+  contact:'Contact',
+  m_add_title:'Add wine', m_edit_title:'Edit wine', m_scan:'📷  Scan label (AI)', m_scanning:'⏳ Analyzing label…',
+  l_name:'Name / Winery', l_year:'Vintage', l_count:'Bottles', l_type:'Wine type', l_region:'Region', l_country:'Country', l_grape:'Grape',
+  l_location:'Storage (rack · level · slot from left)', ph_regal:'Rack', ph_ebene:'Level', ph_platz:'Slot f.l.',
+  l_from:'Drink from', l_to:'Drink until', l_price:'Price', l_rating:'Rating', l_note:'Note',
+  o_rot:'🔴 Red', o_weiss:'🟡 White', o_rose:'🌸 Rosé', o_sekt:'✨ Sparkling / Champagne', o_other:'◻️ Other',
+  btn_cancel:'Cancel', btn_save:'Save', btn_add:'Add',
+  wm_title:'Add wish', l_wnote:'Note / Where to buy?', ph_note:'Taste, occasion, thoughts…', ph_wnote:'Found at…',
+  toast_prost:'🥂 Cheers!', toast_added:'Added ✓', toast_updated:'Updated ✓', toast_removed:'Removed',
+  toast_count:'Count increased ✓ (now {n} btl.)', toast_name:'Please enter a name',
+  toast_scanfail:'Scan failed', toast_label:'Label recognized ✓', toast_label_ripe:'Label recognized ✓ (window estimated)',
+  toast_loc:'Storage location recognized ✓', toast_noloc:'No storage location recognized', toast_nomatch:'No matching wine found in the cellar',
+  toast_reading:'⏳ Reading label…', toast_locreading:'⏳ Reading storage location…',
+  toast_imported1:'1 wine imported ✓', toast_imported:'{n} wines imported ✓',
+  toast_csv:'CSV exported ✓', toast_xlsx:'Excel exported ✓', toast_pdf:'PDF exported ✓', toast_backup:'Backup created ✓',
+  toast_copy:'Copied ✓', toast_copyfail:'Copy failed', toast_import_ok:'Import successful ✓', toast_import_fail:'Import failed',
+  toast_csvfail:'CSV import failed', toast_xlsxfail:'Excel import failed', toast_moved:'Moved to cellar ✓',
+  confirm_last:'Mark the last bottle of "{name}" as drunk and remove it?', confirm_del:'Remove wine?',
+  pdf_sub:'{n} wines · as of {d}'
+}
+};
+
+function t(key, vars) {
+  let s = (I18N[settings.lang] && I18N[settings.lang][key]) ?? I18N.de[key] ?? key;
+  if (vars) Object.entries(vars).forEach(([k,v]) => { s = s.split('{'+k+'}').join(v); });
+  return s;
+}
+
+function buildTypeLabels() {
+  return { alle:t('t_all'), rot:t('t_rot'), weiß:t('t_weiss'), rosé:t('t_rose'), sekt:t('t_sekt'), other:t('t_other') };
+}
+
+function applyI18n() {
+  document.documentElement.lang = settings.lang;
+  TYPE_LABELS = buildTypeLabels();
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.getAttribute('data-i18n-ph')); });
+  const priceLabel = document.getElementById('price-label');
+  if (priceLabel) priceLabel.textContent = t('l_price') + ' (' + settings.currency + ')';
+  const active = document.querySelector('.tab.active');
+  if (active) {
+    if (active.id === 'tab-keller') renderKeller();
+    if (active.id === 'tab-stats') renderStats();
+    if (active.id === 'tab-trinkreife') renderTrinkreife();
+    if (active.id === 'tab-wishlist') renderWishlist();
+  }
+}
+
+function setCurrency(c) { settings.currency = c; saveSettings(); applyI18n(); }
+function setLanguage(l) { settings.lang = l; saveSettings(); applyI18n(); }
 
 // ═══════════════════════════════════════
 // NAV
@@ -1005,6 +1179,10 @@ function showTab(name, btn) {
   if (name === 'stats') renderStats();
   if (name === 'trinkreife') renderTrinkreife();
   if (name === 'wishlist') renderWishlist();
+  if (name === 'setup') {
+    document.getElementById('setup-currency').value = settings.currency;
+    document.getElementById('setup-lang').value = settings.lang;
+  }
 }
 
 // ═══════════════════════════════════════
@@ -1012,7 +1190,7 @@ function showTab(name, btn) {
 // ═══════════════════════════════════════
 const TYPE_COLORS = { rot:'dot-rot', weiß:'dot-weiß', rosé:'dot-rosé', sekt:'dot-sekt', other:'dot-other' };
 const TYPES = ['alle','rot','weiß','rosé','sekt','other'];
-const TYPE_LABELS = { alle:'Alle', rot:'Rotwein', weiß:'Weißwein', rosé:'Rosé', sekt:'Sekt', other:'Sonstiges' };
+let TYPE_LABELS = buildTypeLabels();
 
 function formatLocation(w) {
   const parts = [];
@@ -1031,18 +1209,18 @@ function renderKeller() {
     ? (wines.filter(w=>w.rating).reduce((s,w)=>s+w.rating,0)/wines.filter(w=>w.rating).length).toFixed(1)
     : '–';
   document.getElementById('keller-stats').innerHTML = `
-    <div class="stat-pill"><div class="val">${total}</div><div class="lbl">Flaschen</div></div>
-    <div class="stat-pill"><div class="val">${wines.length}</div><div class="lbl">Weine</div></div>
-    <div class="stat-pill"><div class="val">${val>0?'€'+Math.round(val):'–'}</div><div class="lbl">Wert</div></div>
-    <div class="stat-pill"><div class="val">${avgRating}</div><div class="lbl">⌀ Ø</div></div>
+    <div class="stat-pill"><div class="val">${total}</div><div class="lbl">${t('pill_bottles')}</div></div>
+    <div class="stat-pill"><div class="val">${wines.length}</div><div class="lbl">${t('pill_wines')}</div></div>
+    <div class="stat-pill"><div class="val">${val>0?fmtMoney(Math.round(val)):'–'}</div><div class="lbl">${t('pill_value')}</div></div>
+    <div class="stat-pill"><div class="val">${avgRating}</div><div class="lbl">${t('pill_avg')}</div></div>
   `;
-  document.getElementById('keller-subtitle').textContent = `${wines.length} ${wines.length===1?'Wein':'Weine'} in deiner Sammlung`;
+  document.getElementById('keller-subtitle').textContent = `${wines.length} ${wines.length===1?t('keller_sub_one'):t('keller_sub_many')}`;
 
   // filter chips
-  document.getElementById('filter-scroll').innerHTML = TYPES.map(t => `
-    <button class="filter-chip ${activeFilter===t?'active':''}" onclick="setFilter('${t}')">${TYPE_LABELS[t]}</button>
+  document.getElementById('filter-scroll').innerHTML = TYPES.map(ty => `
+    <button class="filter-chip ${activeFilter===ty?'active':''}" onclick="setFilter('${ty}')">${TYPE_LABELS[ty]}</button>
   `).join('') + `
-    <button class="filter-chip ${viewMode==='list'?'active':''}" onclick="toggleViewMode()">📋 Liste</button>
+    <button class="filter-chip ${viewMode==='list'?'active':''}" onclick="toggleViewMode()">${t('list_chip')}</button>
   `;
 
   // list
@@ -1076,7 +1254,7 @@ function renderKeller() {
 
   const el = document.getElementById('wine-list');
   if (!list.length) {
-    el.innerHTML = `<div class="empty-state"><div class="icon">🍷</div><p>Keine Weine gefunden.<br>Füge deinen ersten Wein hinzu!</p></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="icon">🍷</div><p>${t('empty_keller')}</p></div>`;
     return;
   }
 
@@ -1110,15 +1288,15 @@ function renderKeller() {
         <div class="wine-stars">${stars}</div>
         ${(w.region||w.country)?`<div class="wine-region">${esc([w.region,w.country].filter(Boolean).join(', '))}</div>`:''}
         ${formatLocation(w)?`<div class="wine-region">📍 ${esc(formatLocation(w))}</div>`:''}
-        <div class="wine-count-badge">${w.count||1} Fl.</div>
+        <div class="wine-count-badge">${w.count||1} ${t('fl')}</div>
       </div>
       ${ripe ? `
       <div class="wine-ripeness">
         <div class="wine-ripeness-bar ${ripe.cls}" style="width:${ripe.pct}%"></div>
       </div>` : ''}
       <div class="wine-actions">
-        <button class="wine-btn" onclick="editWine('${w.id}')">✏️ Bearbeiten</button>
-        <button class="wine-btn primary" onclick="drinkOne('${w.id}')">🥂 Trinken</button>
+        <button class="wine-btn" onclick="editWine('${w.id}')">${t('btn_edit')}</button>
+        <button class="wine-btn primary" onclick="drinkOne('${w.id}')">${t('btn_drink')}</button>
         <button class="wine-btn danger" onclick="deleteWine('${w.id}')">🗑</button>
       </div>
     </div>`;
@@ -1152,13 +1330,13 @@ function drinkOne(id) {
   const w = wines.find(x => x.id === id);
   if (!w) return;
   if ((w.count||1) <= 1) {
-    if (!confirm(`Letzte Flasche von "${w.name}" als getrunken markieren und entfernen?`)) return;
+    if (!confirm(t('confirm_last', {name: w.name}))) return;
     wines = wines.filter(x => x.id !== id);
   } else {
     w.count = (w.count||1) - 1;
   }
   recordDrunk(w);
-  save(); saveDrunk(); renderKeller(); showToast('🥂 Prost!');
+  save(); saveDrunk(); renderKeller(); showToast(t('toast_prost'));
 }
 
 function recordDrunk(w) {
@@ -1198,7 +1376,7 @@ function findMatchingWine(info) {
 async function handleDrinkScan(e) {
   const file = e.target.files[0];
   if (!file) return;
-  showToast('⏳ Etikett wird erkannt…');
+  showToast(t('toast_reading'));
   try {
     const base64 = await new Promise((res,rej) => {
       const r = new FileReader();
@@ -1227,19 +1405,19 @@ async function handleDrinkScan(e) {
     if (match) {
       drinkOne(match.id);
     } else {
-      showToast('Kein passender Wein im Keller gefunden');
+      showToast(t('toast_nomatch'));
     }
   } catch {
-    showToast('Scan fehlgeschlagen');
+    showToast(t('toast_scanfail'));
   } finally {
     e.target.value = '';
   }
 }
 
 function deleteWine(id) {
-  if (!confirm('Wein entfernen?')) return;
+  if (!confirm(t('confirm_del'))) return;
   wines = wines.filter(w => w.id !== id);
-  save(); renderKeller(); showToast('Entfernt');
+  save(); renderKeller(); showToast(t('toast_removed'));
 }
 
 function editWine(id) {
@@ -1261,7 +1439,7 @@ function editWine(id) {
   document.getElementById('f-price').value = w.price||'';
   document.getElementById('f-note').value = w.note||'';
   setStar(w.rating||0);
-  document.getElementById('modal-title').textContent = 'Wein bearbeiten';
+  document.getElementById('modal-title').textContent = t('m_edit_title');
   document.getElementById('add-modal').classList.add('show');
 }
 
@@ -1274,7 +1452,7 @@ function openAddModal() {
   document.getElementById('f-count').value = 1;
   document.getElementById('f-type').value = 'rot';
   setStar(0);
-  document.getElementById('modal-title').textContent = 'Wein hinzufügen';
+  document.getElementById('modal-title').textContent = t('m_add_title');
   document.getElementById('add-modal').classList.add('show');
 }
 
@@ -1289,7 +1467,7 @@ function setStar(n) {
 
 function saveWine() {
   const name = document.getElementById('f-name').value.trim();
-  if (!name) { showToast('Bitte Name eingeben'); return; }
+  if (!name) { showToast(t('toast_name')); return; }
   const wine = {
     id: editId || Date.now().toString(),
     name,
@@ -1312,7 +1490,7 @@ function saveWine() {
   };
   if (editId) {
     wines = wines.map(w => w.id === editId ? wine : w);
-    showToast('Aktualisiert ✓');
+    showToast(t('toast_updated'));
   } else {
     const norm = s => String(s||'').toLowerCase().replace(/\s+/g,' ').trim();
     const existing = wines.find(w => norm(w.name) === norm(wine.name) && (w.year||null) === (wine.year||null));
@@ -1321,10 +1499,10 @@ function saveWine() {
       ['region','country','grape','locRegal','locEbene','locPlatz','drinkFrom','drinkTo','price','rating','note'].forEach(k => {
         if (!existing[k] && wine[k]) existing[k] = wine[k];
       });
-      showToast(`Anzahl erhöht ✓ (jetzt ${existing.count} Fl.)`);
+      showToast(t('toast_count', {n: existing.count}));
     } else {
       wines.push(wine);
-      showToast('Hinzugefügt ✓');
+      showToast(t('toast_added'));
     }
   }
   save();
@@ -1372,9 +1550,9 @@ async function handleScan(e) {
     if (info.grape) document.getElementById('f-grape').value = info.grape;
     if (info.drinkFrom) document.getElementById('f-drink-from').value = info.drinkFrom;
     if (info.drinkTo) document.getElementById('f-drink-to').value = info.drinkTo;
-    showToast(info.drinkFrom || info.drinkTo ? 'Etikett erkannt ✓ (Trinkreife geschätzt)' : 'Etikett erkannt ✓');
+    showToast(info.drinkFrom || info.drinkTo ? t('toast_label_ripe') : t('toast_label'));
   } catch {
-    showToast('Scan fehlgeschlagen');
+    showToast(t('toast_scanfail'));
   } finally {
     loading.style.display = 'none';
     e.target.value = '';
@@ -1384,7 +1562,7 @@ async function handleScan(e) {
 async function handleLocationScan(e) {
   const file = e.target.files[0];
   if (!file) return;
-  showToast('⏳ Lagerplatz wird gelesen…');
+  showToast(t('toast_locreading'));
   try {
     const base64 = await new Promise((res,rej) => {
       const r = new FileReader();
@@ -1413,12 +1591,12 @@ async function handleLocationScan(e) {
       if (info.regal) document.getElementById('f-loc-regal').value = info.regal;
       if (info.ebene) document.getElementById('f-loc-ebene').value = info.ebene;
       if (info.platz) document.getElementById('f-loc-platz').value = info.platz;
-      showToast('Lagerplatz erkannt ✓');
+      showToast(t('toast_loc'));
     } else {
-      showToast('Kein Lagerplatz erkannt');
+      showToast(t('toast_noloc'));
     }
   } catch {
-    showToast('Scan fehlgeschlagen');
+    showToast(t('toast_scanfail'));
   } finally {
     e.target.value = '';
   }
@@ -1459,9 +1637,9 @@ async function handleWishScan(e) {
     if (info.region) document.getElementById('w-region').value = info.region;
     if (info.land) document.getElementById('w-country').value = info.land;
     if (info.grape) document.getElementById('w-grape').value = info.grape;
-    showToast('Etikett erkannt ✓');
+    showToast(t('toast_label'));
   } catch {
-    showToast('Scan fehlgeschlagen');
+    showToast(t('toast_scanfail'));
   } finally {
     loading.style.display = 'none';
     e.target.value = '';
@@ -1482,19 +1660,19 @@ function renderStats() {
 
   let html = `
     <div class="stats-grid">
-      <div class="stats-card"><div class="big">${total}</div><div class="label">Flaschen</div></div>
-      <div class="stats-card"><div class="big">${wines.length}</div><div class="label">Weine</div></div>
-      <div class="stats-card"><div class="big">${val>0?'€'+Math.round(val):'–'}</div><div class="label">Gesamtwert</div></div>
-      <div class="stats-card"><div class="big">${avg}</div><div class="label">Ø Bewertung</div></div>
+      <div class="stats-card"><div class="big">${total}</div><div class="label">${t('pill_bottles')}</div></div>
+      <div class="stats-card"><div class="big">${wines.length}</div><div class="label">${t('pill_wines')}</div></div>
+      <div class="stats-card"><div class="big">${val>0?fmtMoney(Math.round(val)):'–'}</div><div class="label">${t('s_value')}</div></div>
+      <div class="stats-card"><div class="big">${avg}</div><div class="label">${t('s_avg')}</div></div>
     </div>
-    <div class="stats-title">Nach Typ</div>
+    <div class="stats-title">${t('s_bytype')}</div>
   `;
-  ['rot','weiß','rosé','sekt','other'].forEach(t => {
-    const cnt = types[t]||0;
+  ['rot','weiß','rosé','sekt','other'].forEach(ty => {
+    const cnt = types[ty]||0;
     const pct = total > 0 ? Math.round((cnt/total)*100) : 0;
-    html += `<div class="type-bar-row" onclick="goToFilter('${t}')" style="cursor:pointer">
-      <div class="type-bar-label">${TYPE_LABELS[t]}</div>
-      <div class="type-bar-track"><div class="type-bar-fill" style="width:${pct}%;background:${typeColors[t]}"></div></div>
+    html += `<div class="type-bar-row" onclick="goToFilter('${ty}')" style="cursor:pointer">
+      <div class="type-bar-label">${TYPE_LABELS[ty]}</div>
+      <div class="type-bar-track"><div class="type-bar-fill" style="width:${pct}%;background:${typeColors[ty]}"></div></div>
       <div class="type-bar-count">${cnt}</div>
     </div>`;
   });
@@ -1502,7 +1680,7 @@ function renderStats() {
   // top rated
   const top = [...wines].filter(w=>w.rating).sort((a,b)=>b.rating-a.rating).slice(0,3);
   if (top.length) {
-    html += `<div class="stats-title" style="margin-top:20px">Top Weine</div>`;
+    html += `<div class="stats-title" style="margin-top:20px">${t('s_top')}</div>`;
     top.forEach((w,i) => {
       html += `<div class="stats-card" onclick="goToWine('${w.id}')" style="margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer">
         <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--gold)">${i+1}</div>
@@ -1513,21 +1691,21 @@ function renderStats() {
 
   // drunk wines
   const drunkVal = drunkWines.reduce((s,w) => s+(w.price||0), 0);
-  html += `<div class="stats-title" style="margin-top:20px">Getrunkene Weine (${drunkWines.length})</div>`;
+  html += `<div class="stats-title" style="margin-top:20px">${t('s_drunk')} (${drunkWines.length})</div>`;
   if (drunkVal > 0) {
-    html += `<div class="stats-card" style="margin-bottom:12px"><div class="big" style="font-size:20px">€${Math.round(drunkVal)}</div><div class="label">Wert der getrunkenen Weine</div></div>`;
+    html += `<div class="stats-card" style="margin-bottom:12px"><div class="big" style="font-size:20px">${fmtMoney(Math.round(drunkVal))}</div><div class="label">${t('s_drunkvalue')}</div></div>`;
   }
   if (drunkWines.length) {
     const recentDrunk = [...drunkWines].sort((a,b) => new Date(b.date)-new Date(a.date)).slice(0,10);
     recentDrunk.forEach(w => {
-      const d = new Date(w.date).toLocaleDateString('de-DE');
+      const d = new Date(w.date).toLocaleDateString(dateLocale());
       html += `<div class="stats-card" style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:12px">
         <div><div style="font-size:13px">${esc(w.name)}</div><div style="font-size:11px;color:var(--text-muted)">${w.year||''}${w.grape?' · '+esc(w.grape):''}${w.location?' · 📍 '+esc(w.location):''}</div></div>
         <div style="font-size:11px;color:var(--text-muted);white-space:nowrap">${d}</div>
       </div>`;
     });
   } else {
-    html += `<div class="stats-card" style="color:var(--text-muted);font-size:13px">Noch keine Weine als getrunken markiert.</div>`;
+    html += `<div class="stats-card" style="color:var(--text-muted);font-size:13px">${t('s_nodrunk')}</div>`;
   }
 
   document.getElementById('stats-content').innerHTML = html;
@@ -1563,7 +1741,7 @@ function renderTrinkreife() {
   const withRipe = wines.filter(w => w.drinkFrom || w.drinkTo).sort((a,b)=>(a.drinkFrom||0)-(b.drinkFrom||0));
   const el = document.getElementById('trinkreife-list');
   if (!withRipe.length) {
-    el.innerHTML = `<div class="empty-state"><div class="icon">⏱</div><p>Noch keine Weine mit<br>Trinkreife-Angabe.<br>Beim Hinzufügen „Trinken ab/bis" ausfüllen.</p></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="icon">⏱</div><p>${t('ripe_empty')}</p></div>`;
     return;
   }
   el.innerHTML = withRipe.map(w => {
@@ -1572,19 +1750,19 @@ function renderTrinkreife() {
     const peak = Math.round(from + (to - from) * 0.6);
     let status, statusColor, pct;
     if (now < from) {
-      status = `Noch ${from - now} Jahr${from-now===1?'':'e'} warten`;
+      status = (from - now === 1) ? t('st_wait1') : t('st_wait', {n: from - now});
       statusColor = 'var(--sparkling)';
       pct = Math.max(5, ((now - (w.year||from-5)) / (from - (w.year||from-5)+1)) * 30);
     } else if (now <= peak) {
-      status = `Optimal trinken — bis ${to}`;
+      status = t('st_optimal', {to});
       statusColor = 'var(--green)';
       pct = 30 + ((now-from)/(peak-from+1))*40;
     } else if (now <= to) {
-      status = `Jetzt auf dem Höhepunkt!`;
+      status = t('st_peak');
       statusColor = 'var(--gold)';
       pct = 70 + ((now-peak)/(to-peak+1))*25;
     } else {
-      status = `Überschritten seit ${now - to} Jahr${now-to===1?'':'en'}`;
+      status = (now - to === 1) ? t('st_over1') : t('st_over', {n: now - to});
       statusColor = 'var(--red-alert)';
       pct = 100;
     }
@@ -1593,9 +1771,9 @@ function renderTrinkreife() {
       <div class="ripeness-wine-name">${esc(w.name)}</div>
       <div class="ripeness-meta">${w.year||''} ${w.type?' · '+w.type:''}</div>
       <div style="display:flex;gap:0;border-radius:6px;overflow:hidden;height:18px;margin-bottom:6px">
-        <div class="rt-seg rt-jung" style="flex:${from-(w.year||from-3)}">Jung</div>
-        <div class="rt-seg rt-optimal" style="flex:${peak-from+1}">Optimal</div>
-        <div class="rt-seg rt-peak" style="flex:${to-peak+1}">Peak</div>
+        <div class="rt-seg rt-jung" style="flex:${from-(w.year||from-3)}">${t('seg_young')}</div>
+        <div class="rt-seg rt-optimal" style="flex:${peak-from+1}">${t('seg_optimal')}</div>
+        <div class="rt-seg rt-peak" style="flex:${to-peak+1}">${t('seg_peak')}</div>
         <div class="rt-seg rt-over" style="flex:2">–</div>
       </div>
       <div style="position:relative;height:10px;margin-bottom:6px">
@@ -1618,7 +1796,7 @@ function openWishModal() {
 
 function saveWish() {
   const name = document.getElementById('w-name').value.trim();
-  if (!name) { showToast('Bitte Name eingeben'); return; }
+  if (!name) { showToast(t('toast_name')); return; }
   wishes.push({
     id: Date.now().toString(),
     name,
@@ -1633,13 +1811,13 @@ function saveWish() {
   saveWishes();
   closeModal('wish-modal');
   renderWishlist();
-  showToast('Hinzugefügt ✓');
+  showToast(t('toast_added'));
 }
 
 function renderWishlist() {
   const el = document.getElementById('wish-list');
   if (!wishes.length) {
-    el.innerHTML = `<div class="empty-state"><div class="icon">⭐</div><p>Noch keine Wünsche.<br>Füge Weine hinzu, die du kaufen möchtest.</p></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="icon">⭐</div><p>${t('wish_empty')}</p></div>`;
     return;
   }
   el.innerHTML = wishes.map(w => `
@@ -1650,7 +1828,7 @@ function renderWishlist() {
         <div class="wish-sub">${w.year||''} ${w.type?'· '+w.type:''}${w.grape?' · '+esc(w.grape):''}${(w.region||w.country)?' · '+esc([w.region,w.country].filter(Boolean).join(', ')):''} ${w.note?'· '+esc(w.note):''}</div>
       </div>
       <div class="wish-actions">
-        <button class="wish-action-btn" onclick="wishToKeller('${w.id}')">→ Keller</button>
+        <button class="wish-action-btn" onclick="wishToKeller('${w.id}')">${t('to_cellar')}</button>
         <button class="wish-action-btn" onclick="deleteWish('${w.id}')">🗑</button>
       </div>
     </div>
@@ -1664,7 +1842,7 @@ function toggleWish(id) {
 
 function deleteWish(id) {
   wishes = wishes.filter(w=>w.id!==id);
-  saveWishes(); renderWishlist(); showToast('Entfernt');
+  saveWishes(); renderWishlist(); showToast(t('toast_removed'));
 }
 
 function wishToKeller(id) {
@@ -1675,7 +1853,7 @@ function wishToKeller(id) {
   wishes = wishes.filter(x=>x.id!==id);
   saveWishes();
   renderWishlist();
-  showToast('In Keller verschoben ✓');
+  showToast(t('toast_moved'));
 }
 
 // ═══════════════════════════════════════
@@ -1689,7 +1867,7 @@ function exportRows() {
 function exportCSV() {
   const rows = exportRows().map(row => row.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
   download('weinkeller.csv', 'data:text/csv;charset=utf-8,' + encodeURIComponent([EXPORT_HEADERS.join(','), ...rows].join('\n')));
-  showToast('CSV exportiert ✓');
+  showToast(t('toast_csv'));
 }
 
 function exportExcel() {
@@ -1697,7 +1875,7 @@ function exportExcel() {
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Weinkeller');
   XLSX.writeFile(wb, 'weinkeller.xlsx');
-  showToast('Excel exportiert ✓');
+  showToast(t('toast_xlsx'));
 }
 
 function importExcel(e) {
@@ -1713,9 +1891,9 @@ function importExcel(e) {
       const added = importRowsIntoWines(rows);
       save();
       renderKeller();
-      showToast(`${added} Wein${added===1?'':'e'} importiert ✓`);
+      showToast(added===1 ? t('toast_imported1') : t('toast_imported', {n: added}));
     } catch {
-      showToast('Fehler beim Excel-Import');
+      showToast(t('toast_xlsxfail'));
     }
     e.target.value = '';
   };
@@ -1729,27 +1907,27 @@ function exportPDF() {
   doc.text("Ocho's Weinkeller", 14, 18);
   doc.setFontSize(10);
   doc.setTextColor(120);
-  doc.text(`${wines.length} Weine · Stand: ${new Date().toLocaleDateString('de-DE')}`, 14, 25);
+  doc.text(t('pdf_sub', {n: wines.length, d: new Date().toLocaleDateString(dateLocale())}), 14, 25);
   doc.autoTable({
     head: [['Name','Jahrgang','Typ','Region','Rebsorte','Lagerplatz','Fl.','Bew.','Preis']],
-    body: wines.map(w => [w.name, w.year||'', TYPE_LABELS[w.type]||w.type, [w.region,w.country].filter(Boolean).join(', '), w.grape||'', formatLocation(w), w.count||1, w.rating?'★'.repeat(w.rating):'', w.price?('€'+Number(w.price).toFixed(2)):'']),
+    body: wines.map(w => [w.name, w.year||'', TYPE_LABELS[w.type]||w.type, [w.region,w.country].filter(Boolean).join(', '), w.grape||'', formatLocation(w), w.count||1, w.rating?'★'.repeat(w.rating):'', w.price?fmtMoney(Number(w.price).toFixed(2)):'']),
     startY: 30,
     styles: { fontSize: 8, cellPadding: 3 },
     headStyles: { fillColor: [196,162,74], textColor: [30,20,10] },
     alternateRowStyles: { fillColor: [245,240,235] }
   });
   doc.save('weinkeller.pdf');
-  showToast('PDF exportiert ✓');
+  showToast(t('toast_pdf'));
 }
 
 function exportJSON() {
   download('weinkeller_backup.json', 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify({wines,wishes,drunkWines},null,2)));
-  showToast('Backup erstellt ✓');
+  showToast(t('toast_backup'));
 }
 
 function copyToClipboard() {
   const text = wines.map(w => `${w.name} ${w.year||''} (${w.type}) — ${w.count||1} Fl.${w.rating?' ★'.repeat(w.rating):''}`).join('\n');
-  navigator.clipboard.writeText(text).then(() => showToast('Kopiert ✓')).catch(() => showToast('Fehler beim Kopieren'));
+  navigator.clipboard.writeText(text).then(() => showToast(t('toast_copy'))).catch(() => showToast(t('toast_copyfail')));
 }
 
 function importJSON(e) {
@@ -1763,8 +1941,8 @@ function importJSON(e) {
       if (data.wishes) { wishes = data.wishes; saveWishes(); }
       if (data.drunkWines) { drunkWines = data.drunkWines; saveDrunk(); }
       renderKeller();
-      showToast('Import erfolgreich ✓');
-    } catch { showToast('Fehler beim Import'); }
+      showToast(t('toast_import_ok'));
+    } catch { showToast(t('toast_import_fail')); }
     e.target.value = '';
   };
   r.readAsText(file);
@@ -1848,9 +2026,9 @@ function importCSV(e) {
       const added = importRowsIntoWines(rows);
       save();
       renderKeller();
-      showToast(`${added} Wein${added===1?'':'e'} importiert ✓`);
+      showToast(added===1 ? t('toast_imported1') : t('toast_imported', {n: added}));
     } catch {
-      showToast('Fehler beim CSV-Import');
+      showToast(t('toast_csvfail'));
     }
     e.target.value = '';
   };
@@ -1868,10 +2046,10 @@ function download(filename, dataURL) {
 // UTILS
 // ═══════════════════════════════════════
 function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
 }
 function esc(str) {
   return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -1880,7 +2058,7 @@ function esc(str) {
 // ═══════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════
-renderKeller();
+applyI18n();
 </script>
 </body>
 </html>
