@@ -834,7 +834,7 @@ input[type="file"] { display: none; }
       <select id="setup-currency" onchange="setCurrency(this.value)">
         <option value="€">€ — Euro</option>
         <option value="$">$ — US-Dollar</option>
-        <option value="£">£ — Pfund</option>
+        <option value="£">£ — Britisches Pfund (GBP)</option>
         <option value="CHF">CHF — Schweizer Franken</option>
       </select>
     </div>
@@ -843,6 +843,7 @@ input[type="file"] { display: none; }
       <select id="setup-lang" onchange="setLanguage(this.value)">
         <option value="de">🇩🇪 Deutsch</option>
         <option value="en">🇬🇧 English</option>
+        <option value="es">🇪🇸 Español</option>
       </select>
     </div>
   </div>
@@ -1026,7 +1027,7 @@ function saveDrunk() { localStorage.setItem(DRUNK_KEY, JSON.stringify(drunkWines
 function saveSettings() { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }
 
 function fmtMoney(n) { return settings.currency === 'CHF' ? 'CHF ' + n : settings.currency + n; }
-function dateLocale() { return settings.lang === 'de' ? 'de-DE' : 'en-US'; }
+function dateLocale() { return settings.lang === 'de' ? 'de-DE' : settings.lang === 'es' ? 'es-ES' : 'en-US'; }
 
 // ═══════════════════════════════════════
 // I18N
@@ -1133,6 +1134,57 @@ en: {
   toast_csvfail:'CSV import failed', toast_xlsxfail:'Excel import failed', toast_moved:'Moved to cellar ✓',
   confirm_last:'Mark the last bottle of "{name}" as drunk and remove it?', confirm_del:'Remove wine?',
   pdf_sub:'{n} wines · as of {d}'
+},
+es: {
+  nav_keller:'Bodega', nav_stats:'Estadísticas', nav_ripe:'Madurez', nav_wish:'Deseos', nav_export:'Export/Import', nav_setup:'Ajustes',
+  stats_title:"Estadísticas de Ocho", stats_sub:'Resumen',
+  ripe_title:'Ventana de consumo', ripe_sub:'¿Cuándo beber?',
+  wish_title:"Lista de deseos de Ocho", wish_sub:'Por comprar',
+  exp_title:'Exportar e importar', exp_sub:'Copia de seguridad',
+  setup_title:'Ajustes', setup_sub:'Configuración',
+  setup_currency:'Moneda', setup_lang:'Idioma',
+  search_ph:'🔍  Buscar vino…',
+  sort_added:'↕ Orden: Más recientes primero', sort_name:'↕ Nombre (A–Z)', sort_year:'↕ Añada', sort_grape:'↕ Uva', sort_region:'↕ Región', sort_country:'↕ País', sort_ripeness:'↕ Madurez (más urgentes primero)',
+  t_all:'Todos', t_rot:'Tinto', t_weiss:'Blanco', t_rose:'Rosado', t_sekt:'Espumoso', t_other:'Otros',
+  list_chip:'📋 Lista',
+  pill_bottles:'Botellas', pill_wines:'Vinos', pill_value:'Valor', pill_avg:'⌀ Med',
+  keller_sub_one:'vino en tu colección', keller_sub_many:'vinos en tu colección',
+  empty_keller:'No se encontraron vinos.<br>¡Añade tu primer vino!',
+  btn_edit:'✏️ Editar', btn_drink:'🥂 Beber', fl:'bot.',
+  s_value:'Valor total', s_avg:'Valoración media', s_bytype:'Por tipo', s_top:'Mejores vinos',
+  s_drunk:'Vinos bebidos', s_drunkvalue:'Valor de los vinos bebidos', s_nodrunk:'Aún no hay vinos marcados como bebidos.',
+  ripe_empty:'Aún no hay vinos con<br>ventana de consumo.<br>Rellena "Beber desde/hasta" al añadir.',
+  seg_young:'Joven', seg_optimal:'Óptimo', seg_peak:'Pico',
+  st_wait1:'Espera 1 año más', st_wait:'Espera {n} años más', st_optimal:'Beber ahora — hasta {to}', st_peak:'¡Ahora en su mejor momento!', st_over1:'Pasado desde hace 1 año', st_over:'Pasado desde hace {n} años',
+  wish_empty:'Aún no hay deseos.<br>Añade vinos que quieras comprar.', to_cellar:'→ Bodega', wish_add:'+ Añadir deseo',
+  exp_csv:'Exportar CSV', exp_csv_d:'Tabla para Excel o Numbers',
+  exp_xlsx:'Exportar Excel', exp_xlsx_d:'Como archivo .xlsx',
+  exp_pdf:'Exportar PDF', exp_pdf_d:'Vista imprimible',
+  exp_json:'Copia JSON', exp_json_d:'Copia de seguridad completa',
+  exp_clip:'Al portapapeles', exp_clip_d:'Copiar lista de texto',
+  imp_title:'Importar',
+  imp_json:'Importar JSON', imp_json_d:'Restaurar una copia',
+  imp_csv:'Importar CSV', imp_csv_d:'Tabla de Excel o Numbers',
+  imp_xlsx:'Importar Excel', imp_xlsx_d:'Leer archivo .xlsx',
+  contact:'Contacto',
+  m_add_title:'Añadir vino', m_edit_title:'Editar vino', m_scan:'📷  Escanear etiqueta (IA)', m_scanning:'⏳ Analizando etiqueta…',
+  l_name:'Nombre / Bodega', l_year:'Añada', l_count:'Botellas', l_type:'Tipo de vino', l_region:'Región', l_country:'País', l_grape:'Uva',
+  l_location:'Ubicación (estante · nivel · sitio desde la izq.)', ph_regal:'Estante', ph_ebene:'Nivel', ph_platz:'Sitio izq.',
+  l_from:'Beber desde', l_to:'Beber hasta', l_price:'Precio', l_rating:'Valoración', l_note:'Nota',
+  o_rot:'🔴 Tinto', o_weiss:'🟡 Blanco', o_rose:'🌸 Rosado', o_sekt:'✨ Espumoso / Champán', o_other:'◻️ Otros',
+  btn_cancel:'Cancelar', btn_save:'Guardar', btn_add:'Añadir',
+  wm_title:'Añadir deseo', l_wnote:'Nota / ¿Dónde comprar?', ph_note:'Sabor, ocasión, ideas…', ph_wnote:'Encontrado en…',
+  toast_prost:'🥂 ¡Salud!', toast_added:'Añadido ✓', toast_updated:'Actualizado ✓', toast_removed:'Eliminado',
+  toast_count:'Cantidad aumentada ✓ (ahora {n} bot.)', toast_name:'Introduce un nombre',
+  toast_scanfail:'Error al escanear', toast_label:'Etiqueta reconocida ✓', toast_label_ripe:'Etiqueta reconocida ✓ (ventana estimada)',
+  toast_loc:'Ubicación reconocida ✓', toast_noloc:'Ubicación no reconocida', toast_nomatch:'Ningún vino coincidente en la bodega',
+  toast_reading:'⏳ Leyendo etiqueta…', toast_locreading:'⏳ Leyendo ubicación…',
+  toast_imported1:'1 vino importado ✓', toast_imported:'{n} vinos importados ✓',
+  toast_csv:'CSV exportado ✓', toast_xlsx:'Excel exportado ✓', toast_pdf:'PDF exportado ✓', toast_backup:'Copia creada ✓',
+  toast_copy:'Copiado ✓', toast_copyfail:'Error al copiar', toast_import_ok:'Importación correcta ✓', toast_import_fail:'Error al importar',
+  toast_csvfail:'Error al importar CSV', toast_xlsxfail:'Error al importar Excel', toast_moved:'Movido a la bodega ✓',
+  confirm_last:'¿Marcar la última botella de "{name}" como bebida y eliminarla?', confirm_del:'¿Eliminar vino?',
+  pdf_sub:'{n} vinos · a fecha: {d}'
 }
 };
 
