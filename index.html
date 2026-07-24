@@ -1016,6 +1016,24 @@ input[type="file"] { display: none; }
   </div>
 </div>
 
+<!-- DRINK MODAL -->
+<div class="modal-overlay" id="drink-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2 data-i18n="dm_title">Wein trinken</h2>
+    <div id="drink-modal-wine" style="font-family:'Playfair Display',serif;font-size:16px;color:var(--gold-light);margin-bottom:6px"></div>
+    <div id="drink-modal-note" style="display:none;font-size:12px;font-weight:600;color:var(--red-alert);margin-bottom:10px"></div>
+    <div class="form-group">
+      <label data-i18n="dm_with">Mit wem getrunken?</label>
+      <input id="drink-with" type="text" placeholder="z.B. Anna, Ben" data-i18n-ph="dm_with_ph">
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="closeModal('drink-modal')" data-i18n="btn_cancel">Abbrechen</button>
+      <button class="btn-primary" onclick="confirmDrink()" data-i18n="btn_drink_confirm">🥂 Trinken</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ═══════════════════════════════════════
 // DATA
@@ -1099,6 +1117,7 @@ de: {
   toast_copy:'Kopiert ✓', toast_copyfail:'Fehler beim Kopieren', toast_import_ok:'Import erfolgreich ✓', toast_import_fail:'Fehler beim Import',
   toast_csvfail:'Fehler beim CSV-Import', toast_xlsxfail:'Fehler beim Excel-Import', toast_moved:'In Keller verschoben ✓',
   confirm_last:'Letzte Flasche von "{name}" als getrunken markieren und entfernen?', confirm_del:'Wein entfernen?',
+  dm_title:'Wein trinken', dm_with:'Mit wem getrunken?', dm_with_ph:'z.B. Anna, Ben', dm_last:'Dies ist die letzte Flasche — der Wein wird aus dem Keller entfernt.', btn_drink_confirm:'🥂 Trinken',
   pdf_sub:'{n} Weine · Stand: {d}'
 },
 en: {
@@ -1151,6 +1170,7 @@ en: {
   toast_copy:'Copied ✓', toast_copyfail:'Copy failed', toast_import_ok:'Import successful ✓', toast_import_fail:'Import failed',
   toast_csvfail:'CSV import failed', toast_xlsxfail:'Excel import failed', toast_moved:'Moved to cellar ✓',
   confirm_last:'Mark the last bottle of "{name}" as drunk and remove it?', confirm_del:'Remove wine?',
+  dm_title:'Drink wine', dm_with:'Drunk with whom?', dm_with_ph:'e.g. Anna, Ben', dm_last:'This is the last bottle — the wine will be removed from the cellar.', btn_drink_confirm:'🥂 Drink',
   pdf_sub:'{n} wines · as of {d}'
 },
 es: {
@@ -1203,6 +1223,7 @@ es: {
   toast_copy:'Copiado ✓', toast_copyfail:'Error al copiar', toast_import_ok:'Importación correcta ✓', toast_import_fail:'Error al importar',
   toast_csvfail:'Error al importar CSV', toast_xlsxfail:'Error al importar Excel', toast_moved:'Movido a la bodega ✓',
   confirm_last:'¿Marcar la última botella de "{name}" como bebida y eliminarla?', confirm_del:'¿Eliminar vino?',
+  dm_title:'Beber vino', dm_with:'¿Con quién lo bebiste?', dm_with_ph:'p.ej. Anna, Ben', dm_last:'Es la última botella — el vino se eliminará de la bodega.', btn_drink_confirm:'🥂 Beber',
   pdf_sub:'{n} vinos · a fecha: {d}'
 }
 };
@@ -1397,28 +1418,40 @@ function getRipenessInfo(w) {
   }
 }
 
+let drinkId = null;
 function drinkOne(id) {
   const w = wines.find(x => x.id === id);
   if (!w) return;
-  if ((w.count||1) <= 1) {
-    if (!confirm(t('confirm_last', {name: w.name}))) return;
-    wines = wines.filter(x => x.id !== id);
-  } else {
-    w.count = (w.count||1) - 1;
-  }
-  recordDrunk(w);
+  drinkId = id;
+  document.getElementById('drink-with').value = '';
+  document.getElementById('drink-modal-wine').textContent = w.name + (w.year ? ' · ' + w.year : '');
+  const note = document.getElementById('drink-modal-note');
+  if ((w.count||1) <= 1) { note.textContent = t('dm_last'); note.style.display = 'block'; }
+  else { note.style.display = 'none'; }
+  document.getElementById('drink-modal').classList.add('show');
+}
+
+function confirmDrink() {
+  const w = wines.find(x => x.id === drinkId);
+  if (!w) { closeModal('drink-modal'); return; }
+  const companions = document.getElementById('drink-with').value.trim();
+  if ((w.count||1) <= 1) wines = wines.filter(x => x.id !== drinkId);
+  else w.count = (w.count||1) - 1;
+  recordDrunk(w, companions);
   save(); saveDrunk();
+  closeModal('drink-modal');
   const active = document.querySelector('.tab.active');
   if (active && active.id === 'tab-trinkreife') renderTrinkreife(); else renderKeller();
   showToast(t('toast_prost'));
 }
 
-function recordDrunk(w) {
+function recordDrunk(w, companions) {
   drunkWines.push({
     id: Date.now().toString() + Math.random().toString(36).slice(2,7),
     name: w.name, year: w.year||null, type: w.type||'other',
     region: w.region||'', country: w.country||'', grape: w.grape||'', location: formatLocation(w),
     price: w.price||0, rating: w.rating||0,
+    companions: companions||'',
     date: new Date().toISOString()
   });
 }
@@ -1772,10 +1805,12 @@ function renderStats() {
   if (drunkWines.length) {
     const recentDrunk = [...drunkWines].sort((a,b) => new Date(b.date)-new Date(a.date)).slice(0,10);
     recentDrunk.forEach(w => {
-      const d = new Date(w.date).toLocaleDateString(dateLocale());
+      const dt = new Date(w.date);
+      const d = dt.toLocaleDateString(dateLocale());
+      const time = dt.toLocaleTimeString(dateLocale(), {hour:'2-digit', minute:'2-digit'});
       html += `<div class="stats-card" style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:12px">
-        <div><div style="font-size:13px">${esc(w.name)}</div><div style="font-size:11px;color:var(--text-muted)">${w.year||''}${w.grape?' · '+esc(w.grape):''}${w.location?' · 📍 '+esc(w.location):''}</div></div>
-        <div style="font-size:11px;color:var(--text-muted);white-space:nowrap">${d}</div>
+        <div><div style="font-size:13px">${esc(w.name)}</div><div style="font-size:11px;color:var(--text-muted)">${w.year||''}${w.grape?' · '+esc(w.grape):''}${w.location?' · 📍 '+esc(w.location):''}${w.companions?' · 👥 '+esc(w.companions):''}</div></div>
+        <div style="font-size:11px;color:var(--text-muted);white-space:nowrap;text-align:right">${d}<br>${time}</div>
       </div>`;
     });
   } else {
