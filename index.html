@@ -720,6 +720,8 @@ input[type="file"] { display: none; }
     <h1 data-i18n="ripe_title">Trinkreife</h1>
     <div class="subtitle" data-i18n="ripe_sub">Wann trinken?</div>
   </div>
+  <div class="filter-scroll" id="ripe-filter-type" style="padding-bottom:8px"></div>
+  <div class="filter-scroll" id="ripe-filter-status"></div>
   <div id="trinkreife-list"></div>
 </div>
 
@@ -1020,6 +1022,8 @@ let currentStar = 0;
 let activeFilter = 'alle';
 let viewMode = 'card';
 let sortMode = 'added';
+let ripeFilterType = 'alle';
+let ripeFilterStatus = 'alle';
 
 function save() { localStorage.setItem(STORE_KEY, JSON.stringify(wines)); }
 function saveWishes() { localStorage.setItem(WISH_KEY, JSON.stringify(wishes)); }
@@ -1052,7 +1056,8 @@ de: {
   s_value:'Gesamtwert', s_avg:'Ø Bewertung', s_bytype:'Nach Typ', s_top:'Top Weine',
   s_drunk:'Getrunkene Weine', s_drunkvalue:'Wert der getrunkenen Weine', s_nodrunk:'Noch keine Weine als getrunken markiert.',
   ripe_empty:'Noch keine Weine mit<br>Trinkreife-Angabe.<br>Beim Hinzufügen „Trinken ab/bis" ausfüllen.',
-  seg_young:'Jung', seg_optimal:'Optimal', seg_peak:'Peak',
+  seg_young:'Jung', seg_optimal:'Optimal', seg_peak:'Peak', seg_over:'Überschritten',
+  ripe_nomatch:'Keine Weine für diese Filter.',
   st_wait1:'Noch 1 Jahr warten', st_wait:'Noch {n} Jahre warten', st_optimal:'Optimal trinken — bis {to}', st_peak:'Jetzt auf dem Höhepunkt!', st_over1:'Überschritten seit 1 Jahr', st_over:'Überschritten seit {n} Jahren',
   wish_empty:'Noch keine Wünsche.<br>Füge Weine hinzu, die du kaufen möchtest.', to_cellar:'→ Keller', wish_add:'+ Wunsch hinzufügen',
   exp_csv:'CSV exportieren', exp_csv_d:'Tabelle für Excel oder Numbers',
@@ -1103,7 +1108,8 @@ en: {
   s_value:'Total value', s_avg:'Avg rating', s_bytype:'By type', s_top:'Top wines',
   s_drunk:'Wines drunk', s_drunkvalue:'Value of wines drunk', s_nodrunk:'No wines marked as drunk yet.',
   ripe_empty:'No wines with a<br>drinking window yet.<br>Fill in "Drink from/until" when adding.',
-  seg_young:'Young', seg_optimal:'Optimal', seg_peak:'Peak',
+  seg_young:'Young', seg_optimal:'Optimal', seg_peak:'Peak', seg_over:'Overdue',
+  ripe_nomatch:'No wines match these filters.',
   st_wait1:'Wait 1 more year', st_wait:'Wait {n} more years', st_optimal:'Drink now — until {to}', st_peak:'At its peak now!', st_over1:'Past its window by 1 year', st_over:'Past its window by {n} years',
   wish_empty:'No wishes yet.<br>Add wines you would like to buy.', to_cellar:'→ Cellar', wish_add:'+ Add wish',
   exp_csv:'Export CSV', exp_csv_d:'Table for Excel or Numbers',
@@ -1154,7 +1160,8 @@ es: {
   s_value:'Valor total', s_avg:'Valoración media', s_bytype:'Por tipo', s_top:'Mejores vinos',
   s_drunk:'Vinos bebidos', s_drunkvalue:'Valor de los vinos bebidos', s_nodrunk:'Aún no hay vinos marcados como bebidos.',
   ripe_empty:'Aún no hay vinos con<br>ventana de consumo.<br>Rellena "Beber desde/hasta" al añadir.',
-  seg_young:'Joven', seg_optimal:'Óptimo', seg_peak:'Pico',
+  seg_young:'Joven', seg_optimal:'Óptimo', seg_peak:'Pico', seg_over:'Pasado',
+  ripe_nomatch:'Ningún vino coincide con estos filtros.',
   st_wait1:'Espera 1 año más', st_wait:'Espera {n} años más', st_optimal:'Beber ahora — hasta {to}', st_peak:'¡Ahora en su mejor momento!', st_over1:'Pasado desde hace 1 año', st_over:'Pasado desde hace {n} años',
   wish_empty:'Aún no hay deseos.<br>Añade vinos que quieras comprar.', to_cellar:'→ Bodega', wish_add:'+ Añadir deseo',
   exp_csv:'Exportar CSV', exp_csv_d:'Tabla para Excel o Numbers',
@@ -1788,12 +1795,44 @@ function goToWine(id) {
   }, 50);
 }
 
+function ripeStatusKey(w) {
+  const now = new Date().getFullYear();
+  const from = w.drinkFrom || now;
+  const to = w.drinkTo || from + 5;
+  const peak = Math.round(from + (to - from) * 0.6);
+  if (now < from) return 'young';
+  if (now <= peak) return 'optimal';
+  if (now <= to) return 'peak';
+  return 'over';
+}
+
+function setRipeFilterType(v) { ripeFilterType = v; renderTrinkreife(); }
+function setRipeFilterStatus(v) { ripeFilterStatus = v; renderTrinkreife(); }
+
 function renderTrinkreife() {
   const now = new Date().getFullYear();
-  const withRipe = wines.filter(w => w.drinkFrom || w.drinkTo).sort((a,b)=>(a.drinkFrom||0)-(b.drinkFrom||0));
+
+  // filter chips: Weinsorte + Zustand
+  document.getElementById('ripe-filter-type').innerHTML = TYPES.map(ty => `
+    <button class="filter-chip ${ripeFilterType===ty?'active':''}" onclick="setRipeFilterType('${ty}')">${TYPE_LABELS[ty]}</button>
+  `).join('');
+  const statuses = [['alle',t('t_all')],['young',t('seg_young')],['optimal',t('seg_optimal')],['peak',t('seg_peak')],['over',t('seg_over')]];
+  document.getElementById('ripe-filter-status').innerHTML = statuses.map(([k,label]) => `
+    <button class="filter-chip ${ripeFilterStatus===k?'active':''}" onclick="setRipeFilterStatus('${k}')">${label}</button>
+  `).join('');
+
+  const allRipe = wines.filter(w => w.drinkFrom || w.drinkTo);
+  const withRipe = allRipe
+    .filter(w => ripeFilterType === 'alle' || w.type === ripeFilterType)
+    .filter(w => ripeFilterStatus === 'alle' || ripeStatusKey(w) === ripeFilterStatus)
+    .sort((a,b)=>(a.drinkFrom||0)-(b.drinkFrom||0));
   const el = document.getElementById('trinkreife-list');
-  if (!withRipe.length) {
+  if (!allRipe.length) {
     el.innerHTML = `<div class="empty-state"><div class="icon">⏱</div><p>${t('ripe_empty')}</p></div>`;
+    return;
+  }
+  if (!withRipe.length) {
+    el.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><p>${t('ripe_nomatch')}</p></div>`;
     return;
   }
   el.innerHTML = withRipe.map(w => {
