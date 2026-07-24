@@ -704,6 +704,11 @@ input[type="file"] { display: none; }
 <input type="file" id="drink-camera-input" accept="image/*" capture="environment" onchange="handleDrinkScan(event)">
 <input type="file" id="location-camera-input" accept="image/*" capture="environment" onchange="handleLocationScan(event)">
 
+<!-- WEINDATENBANK (Autovervollständigung) -->
+<datalist id="dl-grape"></datalist>
+<datalist id="dl-region"></datalist>
+<datalist id="dl-country"></datalist>
+
 <!-- ════════════════════════════════════════
      KELLER TAB
 ════════════════════════════════════════ -->
@@ -911,6 +916,9 @@ input[type="file"] { display: none; }
       <label data-i18n="l_name">Name / Weingut</label>
       <input id="f-name" placeholder="z.B. Château Margaux" type="text">
     </div>
+    <button class="scan-btn" onclick="lookupWine()" data-i18n="lookup_btn" style="margin-top:2px">
+      🔎  Wein nachschlagen (KI)
+    </button>
     <div class="form-row">
       <div class="form-group">
         <label data-i18n="l_year">Jahrgang</label>
@@ -934,15 +942,15 @@ input[type="file"] { display: none; }
     <div class="form-row">
       <div class="form-group">
         <label data-i18n="l_region">Region</label>
-        <input id="f-region" placeholder="Bordeaux" type="text">
+        <input id="f-region" placeholder="Bordeaux" type="text" list="dl-region">
       </div>
       <div class="form-group">
         <label data-i18n="l_country">Land</label>
-        <input id="f-country" placeholder="Frankreich" type="text">
+        <input id="f-country" placeholder="Frankreich" type="text" list="dl-country">
       </div>
       <div class="form-group">
         <label data-i18n="l_grape">Rebsorte</label>
-        <input id="f-grape" placeholder="Merlot" type="text">
+        <input id="f-grape" placeholder="Merlot" type="text" list="dl-grape">
       </div>
     </div>
     <div class="form-group">
@@ -1025,15 +1033,15 @@ input[type="file"] { display: none; }
     <div class="form-row">
       <div class="form-group">
         <label data-i18n="l_region">Region</label>
-        <input id="w-region" placeholder="Bordeaux" type="text">
+        <input id="w-region" placeholder="Bordeaux" type="text" list="dl-region">
       </div>
       <div class="form-group">
         <label data-i18n="l_country">Land</label>
-        <input id="w-country" placeholder="Frankreich" type="text">
+        <input id="w-country" placeholder="Frankreich" type="text" list="dl-country">
       </div>
       <div class="form-group">
         <label data-i18n="l_grape">Rebsorte</label>
-        <input id="w-grape" placeholder="Merlot" type="text">
+        <input id="w-grape" placeholder="Merlot" type="text" list="dl-grape">
       </div>
     </div>
     <div class="form-group">
@@ -1138,6 +1146,63 @@ function fmtMoney(n) { return settings.currency === 'CHF' ? 'CHF ' + n : setting
 function dateLocale() { return settings.lang === 'de' ? 'de-DE' : settings.lang === 'es' ? 'es-ES' : 'en-US'; }
 
 // ═══════════════════════════════════════
+// WEINDATENBANK (Autovervollständigung + KI-Nachschlagen)
+// ═══════════════════════════════════════
+const DB_GRAPES = ['Cabernet Sauvignon','Cabernet Franc','Merlot','Pinot Noir','Spätburgunder','Syrah','Shiraz','Nebbiolo','Sangiovese','Tempranillo','Grenache','Garnacha','Zinfandel','Primitivo','Malbec','Carmenère','Barbera','Montepulciano','Nero d\'Avola','Gamay','Petit Verdot','Touriga Nacional','Dornfelder','Zweigelt','Blaufränkisch','Portugieser','Trollinger','Lemberger',
+'Riesling','Chardonnay','Sauvignon Blanc','Grauburgunder','Pinot Gris','Weißburgunder','Pinot Blanc','Chenin Blanc','Gewürztraminer','Grüner Veltliner','Silvaner','Müller-Thurgau','Viognier','Sémillon','Muskateller','Verdejo','Albariño','Vermentino','Garganega','Trebbiano','Furmint','Scheurebe','Kerner','Bacchus'];
+const DB_REGIONS = ['Bordeaux','Bourgogne','Champagne','Rhône','Loire','Alsace','Beaujolais','Languedoc','Provence','Toscana','Piemonte','Veneto','Alto Adige','Friuli','Sicilia','Puglia','Rioja','Ribera del Duero','Priorat','Rías Baixas','Rueda','Mosel','Rheingau','Rheinhessen','Pfalz','Baden','Württemberg','Nahe','Franken','Ahr','Wachau','Kamptal','Burgenland','Steiermark','Douro','Alentejo','Vinho Verde','Napa Valley','Sonoma','Willamette Valley','Mendoza','Maipo','Colchagua','Barossa Valley','McLaren Vale','Marlborough','Central Otago','Stellenbosch','Swartland'];
+const DB_COUNTRIES = {
+  de: ['Frankreich','Italien','Spanien','Deutschland','Portugal','Österreich','Schweiz','USA','Argentinien','Chile','Australien','Neuseeland','Südafrika','Griechenland','Ungarn','Kroatien','Georgien','Kanada','Libanon','Israel','Slowenien','Rumänien','Bulgarien','Uruguay','Brasilien','Moldau','England'],
+  en: ['France','Italy','Spain','Germany','Portugal','Austria','Switzerland','USA','Argentina','Chile','Australia','New Zealand','South Africa','Greece','Hungary','Croatia','Georgia','Canada','Lebanon','Israel','Slovenia','Romania','Bulgaria','Uruguay','Brazil','Moldova','England'],
+  es: ['Francia','Italia','España','Alemania','Portugal','Austria','Suiza','EE.UU.','Argentina','Chile','Australia','Nueva Zelanda','Sudáfrica','Grecia','Hungría','Croacia','Georgia','Canadá','Líbano','Israel','Eslovenia','Rumanía','Bulgaria','Uruguay','Brasil','Moldavia','Inglaterra']
+};
+function fillDatalist(id, items) {
+  document.getElementById(id).innerHTML = items.map(v => `<option value="${v.replace(/"/g,'&quot;')}"></option>`).join('');
+}
+function buildWineData() {
+  fillDatalist('dl-grape', DB_GRAPES);
+  fillDatalist('dl-region', DB_REGIONS);
+  fillDatalist('dl-country', DB_COUNTRIES[settings.lang] || DB_COUNTRIES.de);
+}
+function setIfEmpty(id, val) {
+  const el = document.getElementById(id);
+  if (el && !el.value && val) el.value = val;
+}
+
+async function lookupWine() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { showToast(t('toast_name')); return; }
+  const year = document.getElementById('f-year').value.trim();
+  showToast(t('toast_lookup'));
+  try {
+    const resp = await fetch(SCAN_PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 300,
+        system: 'Du bist ein Wein-Experte mit breitem Wissen über Weine weltweit. Antworte NUR mit einem JSON-Objekt ohne Markdown-Backticks. Felder: type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), land (Herkunftsland auf Deutsch oder null), grape (Hauptrebsorte oder null), drinkFrom (Jahr als Zahl, grobe Schätzung Trinkbeginn, oder null), drinkTo (Jahr als Zahl, grobe Schätzung Trinkende, oder null). Wenn ein Wein nicht bekannt ist, schätze anhand von Name/Region/Rebsorte so gut wie möglich; nutze null nur wenn gar keine Angabe möglich ist.',
+        messages: [{ role: 'user', content: `Wein: ${name}${year ? ' (Jahrgang ' + year + ')' : ''}. Nenne Typ, Region, Land, Hauptrebsorte und ein geschätztes Trinkfenster.` }]
+      })
+    });
+    const data = await resp.json();
+    const text = data.content?.find(b => b.type==='text')?.text || '{}';
+    let info;
+    try { info = JSON.parse(text.replace(/```json?|```/g,'')); } catch { info = {}; }
+    if (info.type) document.getElementById('f-type').value = info.type;
+    setIfEmpty('f-region', info.region);
+    setIfEmpty('f-country', info.land);
+    setIfEmpty('f-grape', info.grape);
+    setIfEmpty('f-drink-from', info.drinkFrom);
+    setIfEmpty('f-drink-to', info.drinkTo);
+    const found = info.region || info.land || info.grape || info.drinkFrom || info.drinkTo;
+    showToast(found ? t('toast_lookup_ok') : t('toast_lookup_none'));
+  } catch {
+    showToast(t('toast_scanfail'));
+  }
+}
+
+// ═══════════════════════════════════════
 // I18N
 // ═══════════════════════════════════════
 const I18N = {
@@ -1176,6 +1241,7 @@ de: {
   imp_xlsx:'Excel importieren', imp_xlsx_d:'.xlsx-Datei einlesen',
   contact:'Kontakt',
   m_add_title:'Wein hinzufügen', m_edit_title:'Wein bearbeiten', m_scan:'📷  Etikett scannen (KI)', m_scanning:'⏳ Etikett wird analysiert…',
+  lookup_btn:'🔎  Wein nachschlagen (KI)', toast_lookup:'⏳ Wein wird nachgeschlagen…', toast_lookup_ok:'Wein gefunden ✓', toast_lookup_none:'Keine Daten gefunden',
   l_name:'Name / Weingut', l_year:'Jahrgang', l_count:'Flaschen', l_type:'Weintyp', l_region:'Region', l_country:'Land', l_grape:'Rebsorte',
   l_location:'Lagerplatz (Regal · Ebene · Platz von links)', ph_regal:'Regal', ph_ebene:'Ebene', ph_platz:'Platz v.l.',
   l_from:'Trinken ab', l_to:'Trinken bis', l_price:'Preis', l_rating:'Bewertung', l_note:'Notiz',
@@ -1231,6 +1297,7 @@ en: {
   imp_xlsx:'Import Excel', imp_xlsx_d:'Read .xlsx file',
   contact:'Contact',
   m_add_title:'Add wine', m_edit_title:'Edit wine', m_scan:'📷  Scan label (AI)', m_scanning:'⏳ Analyzing label…',
+  lookup_btn:'🔎  Look up wine (AI)', toast_lookup:'⏳ Looking up wine…', toast_lookup_ok:'Wine found ✓', toast_lookup_none:'No data found',
   l_name:'Name / Winery', l_year:'Vintage', l_count:'Bottles', l_type:'Wine type', l_region:'Region', l_country:'Country', l_grape:'Grape',
   l_location:'Storage (rack · level · slot from left)', ph_regal:'Rack', ph_ebene:'Level', ph_platz:'Slot f.l.',
   l_from:'Drink from', l_to:'Drink until', l_price:'Price', l_rating:'Rating', l_note:'Note',
@@ -1286,6 +1353,7 @@ es: {
   imp_xlsx:'Importar Excel', imp_xlsx_d:'Leer archivo .xlsx',
   contact:'Contacto',
   m_add_title:'Añadir vino', m_edit_title:'Editar vino', m_scan:'📷  Escanear etiqueta (IA)', m_scanning:'⏳ Analizando etiqueta…',
+  lookup_btn:'🔎  Buscar vino (IA)', toast_lookup:'⏳ Buscando vino…', toast_lookup_ok:'Vino encontrado ✓', toast_lookup_none:'Sin datos',
   l_name:'Nombre / Bodega', l_year:'Añada', l_count:'Botellas', l_type:'Tipo de vino', l_region:'Región', l_country:'País', l_grape:'Uva',
   l_location:'Ubicación (estante · nivel · sitio desde la izq.)', ph_regal:'Estante', ph_ebene:'Nivel', ph_platz:'Sitio izq.',
   l_from:'Beber desde', l_to:'Beber hasta', l_price:'Precio', l_rating:'Valoración', l_note:'Nota',
@@ -1321,6 +1389,7 @@ function buildTypeLabels() {
 function applyI18n() {
   document.documentElement.lang = settings.lang;
   TYPE_LABELS = buildTypeLabels();
+  buildWineData();
   document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
   document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.getAttribute('data-i18n-ph')); });
   const priceLabel = document.getElementById('price-label');
