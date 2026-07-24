@@ -56,23 +56,25 @@ body {
 }
 .nav-btn {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 3px;
-  padding: 10px 4px 8px;
+  padding: 10px 2px 8px;
   background: none;
   border: none;
   color: var(--text);
   font-family: 'Inter', sans-serif;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.02em;
   cursor: pointer;
   transition: color .2s;
 }
+.nav-btn > span:last-child { line-height: 1.15; word-break: break-word; }
 .nav-btn.active { color: var(--gold); }
-.nav-icon { font-size: 20px; line-height: 1; }
+.nav-icon { font-size: 19px; line-height: 1; }
 /* ── TABS ── */
 .tab { display: none; }
 .tab.active { display: block; }
@@ -675,6 +677,9 @@ input[type="file"] { display: none; }
   <button class="nav-btn" onclick="showTab('trinkreife',this)">
     <span class="nav-icon">⏱</span><span data-i18n="nav_ripe">Trinkreife</span>
   </button>
+  <button class="nav-btn" onclick="showTab('history',this)">
+    <span class="nav-icon">📖</span><span data-i18n="nav_history">Historie</span>
+  </button>
   <button class="nav-btn" onclick="showTab('wishlist',this)">
     <span class="nav-icon">⭐</span><span data-i18n="nav_wish">Wishlist</span>
   </button>
@@ -748,6 +753,19 @@ input[type="file"] { display: none; }
   <div class="filter-scroll" id="ripe-filter-type" style="padding-bottom:8px"></div>
   <div class="filter-scroll" id="ripe-filter-status"></div>
   <div id="trinkreife-list"></div>
+</div>
+
+<!-- ════════════════════════════════════════
+     HISTORIE TAB
+════════════════════════════════════════ -->
+<div class="tab" id="tab-history">
+  <div class="page-header">
+    <h1 data-i18n="hist_title">Historie</h1>
+    <div class="subtitle" data-i18n="hist_sub">Getrunkene Weine</div>
+  </div>
+  <div class="filter-scroll" id="hist-filter-type" style="padding-bottom:8px"></div>
+  <div class="filter-scroll" id="hist-filter-occ"></div>
+  <div id="history-content" style="padding:0 16px 20px"></div>
 </div>
 
 <!-- ════════════════════════════════════════
@@ -1079,6 +1097,8 @@ let viewMode = 'card';
 let sortMode = 'added';
 let ripeFilterType = 'alle';
 let ripeFilterStatus = 'alle';
+let histFilterType = 'alle';
+let histFilterOcc = 'alle';
 
 function save() { localStorage.setItem(STORE_KEY, JSON.stringify(wines)); }
 function saveWishes() { localStorage.setItem(WISH_KEY, JSON.stringify(wishes)); }
@@ -1093,7 +1113,8 @@ function dateLocale() { return settings.lang === 'de' ? 'de-DE' : settings.lang 
 // ═══════════════════════════════════════
 const I18N = {
 de: {
-  nav_keller:'Keller', nav_stats:'Statistik', nav_ripe:'Trinkreife', nav_wish:'Wishlist', nav_export:'Export/Import', nav_setup:'Setup',
+  nav_keller:'Keller', nav_stats:'Statistik', nav_ripe:'Trinkreife', nav_history:'Historie', nav_wish:'Wishlist', nav_export:'Export/Import', nav_setup:'Setup',
+  hist_title:'Historie', hist_sub:'Getrunkene Weine',
   stats_title:"Ocho's Statistik", stats_sub:'Überblick',
   ripe_title:'Trinkreife', ripe_sub:'Wann trinken?',
   wish_title:"Ocho's Wunschliste", wish_sub:'Noch zu kaufen',
@@ -1147,7 +1168,8 @@ de: {
   pdf_sub:'{n} Weine · Stand: {d}'
 },
 en: {
-  nav_keller:'Cellar', nav_stats:'Statistics', nav_ripe:'Readiness', nav_wish:'Wishlist', nav_export:'Export/Import', nav_setup:'Setup',
+  nav_keller:'Cellar', nav_stats:'Statistics', nav_ripe:'Readiness', nav_history:'History', nav_wish:'Wishlist', nav_export:'Export/Import', nav_setup:'Setup',
+  hist_title:'History', hist_sub:'Wines drunk',
   stats_title:"Ocho's Statistics", stats_sub:'Overview',
   ripe_title:'Drinking Window', ripe_sub:'When to drink?',
   wish_title:"Ocho's Wishlist", wish_sub:'Still to buy',
@@ -1201,7 +1223,8 @@ en: {
   pdf_sub:'{n} wines · as of {d}'
 },
 es: {
-  nav_keller:'Bodega', nav_stats:'Estadísticas', nav_ripe:'Madurez', nav_wish:'Deseos', nav_export:'Export/Import', nav_setup:'Ajustes',
+  nav_keller:'Bodega', nav_stats:'Estadísticas', nav_ripe:'Madurez', nav_history:'Historial', nav_wish:'Deseos', nav_export:'Export/Import', nav_setup:'Ajustes',
+  hist_title:'Historial', hist_sub:'Vinos bebidos',
   stats_title:"Estadísticas de Ocho", stats_sub:'Resumen',
   ripe_title:'Ventana de consumo', ripe_sub:'¿Cuándo beber?',
   wish_title:"Lista de deseos de Ocho", wish_sub:'Por comprar',
@@ -1278,6 +1301,7 @@ function applyI18n() {
     if (active.id === 'tab-keller') renderKeller();
     if (active.id === 'tab-stats') renderStats();
     if (active.id === 'tab-trinkreife') renderTrinkreife();
+    if (active.id === 'tab-history') renderHistory();
     if (active.id === 'tab-wishlist') renderWishlist();
   }
 }
@@ -1298,6 +1322,7 @@ function showTab(name, btn) {
   if (name === 'keller') renderKeller();
   if (name === 'stats') renderStats();
   if (name === 'trinkreife') renderTrinkreife();
+  if (name === 'history') renderHistory();
   if (name === 'wishlist') renderWishlist();
   if (name === 'setup') {
     document.getElementById('setup-currency').value = settings.currency;
@@ -1827,15 +1852,42 @@ function renderStats() {
     });
   }
 
-  // drunk wines
-  const drunkVal = drunkWines.reduce((s,w) => s+(w.price||0), 0);
-  html += `<div class="stats-title" style="margin-top:20px">${t('s_drunk')} (${drunkWines.length})</div>`;
+  document.getElementById('stats-content').innerHTML = html;
+}
+
+// ═══════════════════════════════════════
+// HISTORIE
+// ═══════════════════════════════════════
+const OCCASIONS = ['spring','summer','autumn','winter','birthday','party','justbecause'];
+function setHistFilterType(v) { histFilterType = v; renderHistory(); }
+function setHistFilterOcc(v) { histFilterOcc = v; renderHistory(); }
+
+function renderHistory() {
+  // filter chips: Weinsorte + Anlass
+  document.getElementById('hist-filter-type').innerHTML = TYPES.map(ty => `
+    <button class="filter-chip ${histFilterType===ty?'active':''}" onclick="setHistFilterType('${ty}')">${TYPE_LABELS[ty]}</button>
+  `).join('');
+  const occs = [['alle', t('t_all')], ...OCCASIONS.map(o => [o, t('occ_'+o)])];
+  document.getElementById('hist-filter-occ').innerHTML = occs.map(([k,label]) => `
+    <button class="filter-chip ${histFilterOcc===k?'active':''}" onclick="setHistFilterOcc('${k}')">${label}</button>
+  `).join('');
+
+  const list = [...drunkWines]
+    .filter(w => histFilterType === 'alle' || w.type === histFilterType)
+    .filter(w => histFilterOcc === 'alle' || (w.occasions||[]).includes(histFilterOcc))
+    .sort((a,b) => new Date(b.date) - new Date(a.date));
+  const drunkVal = list.reduce((s,w) => s+(w.price||0), 0);
+
+  let html = `<div class="stats-title">${t('s_drunk')} (${list.length})</div>`;
   if (drunkVal > 0) {
     html += `<div class="stats-card" style="margin-bottom:12px"><div class="big" style="font-size:20px">${fmtMoney(Math.round(drunkVal))}</div><div class="label">${t('s_drunkvalue')}</div></div>`;
   }
-  if (drunkWines.length) {
-    const recentDrunk = [...drunkWines].sort((a,b) => new Date(b.date)-new Date(a.date)).slice(0,10);
-    recentDrunk.forEach(w => {
+  if (!drunkWines.length) {
+    html += `<div class="empty-state"><div class="icon">📖</div><p>${t('s_nodrunk')}</p></div>`;
+  } else if (!list.length) {
+    html += `<div class="empty-state"><div class="icon">🔍</div><p>${t('ripe_nomatch')}</p></div>`;
+  } else {
+    list.forEach(w => {
       const dt = new Date(w.date);
       const d = dt.toLocaleDateString(dateLocale());
       const time = dt.toLocaleTimeString(dateLocale(), {hour:'2-digit', minute:'2-digit'});
@@ -1844,11 +1896,8 @@ function renderStats() {
         <div style="font-size:11px;color:var(--text-muted);white-space:nowrap;text-align:right">${d}<br>${time}</div>
       </div>`;
     });
-  } else {
-    html += `<div class="stats-card" style="color:var(--text-muted);font-size:13px">${t('s_nodrunk')}</div>`;
   }
-
-  document.getElementById('stats-content').innerHTML = html;
+  document.getElementById('history-content').innerHTML = html;
 }
 
 // ═══════════════════════════════════════
