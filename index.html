@@ -395,6 +395,19 @@ body {
   cursor: pointer;
   margin-bottom: 10px;
 }
+.occ-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+.occ-chip {
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.occ-chip.active { background: #1c9a8d; border-color: #1c9a8d; color: #fff; }
 .input-with-scan { display: flex; gap: 8px; }
 .input-with-scan input { flex: 1; min-width: 0; }
 .sort-row { padding: 0 16px 12px; }
@@ -1027,6 +1040,18 @@ input[type="file"] { display: none; }
       <label data-i18n="dm_with">Mit wem getrunken?</label>
       <input id="drink-with" type="text" placeholder="z.B. Anna, Ben" data-i18n-ph="dm_with_ph">
     </div>
+    <div class="form-group">
+      <label data-i18n="dm_occasion">Anlass</label>
+      <div class="occ-wrap" id="drink-occasions">
+        <button type="button" class="occ-chip" data-occ="spring" onclick="this.classList.toggle('active')" data-i18n="occ_spring">Frühling</button>
+        <button type="button" class="occ-chip" data-occ="summer" onclick="this.classList.toggle('active')" data-i18n="occ_summer">Sommer</button>
+        <button type="button" class="occ-chip" data-occ="autumn" onclick="this.classList.toggle('active')" data-i18n="occ_autumn">Herbst</button>
+        <button type="button" class="occ-chip" data-occ="winter" onclick="this.classList.toggle('active')" data-i18n="occ_winter">Winter</button>
+        <button type="button" class="occ-chip" data-occ="birthday" onclick="this.classList.toggle('active')" data-i18n="occ_birthday">Geburtstag</button>
+        <button type="button" class="occ-chip" data-occ="party" onclick="this.classList.toggle('active')" data-i18n="occ_party">Party</button>
+        <button type="button" class="occ-chip" data-occ="justbecause" onclick="this.classList.toggle('active')" data-i18n="occ_justbecause">Nur so</button>
+      </div>
+    </div>
     <div class="btn-row">
       <button class="btn-secondary" onclick="closeModal('drink-modal')" data-i18n="btn_cancel">Abbrechen</button>
       <button class="btn-primary" onclick="confirmDrink()" data-i18n="btn_drink_confirm">🥂 Trinken</button>
@@ -1118,6 +1143,7 @@ de: {
   toast_csvfail:'Fehler beim CSV-Import', toast_xlsxfail:'Fehler beim Excel-Import', toast_moved:'In Keller verschoben ✓',
   confirm_last:'Letzte Flasche von "{name}" als getrunken markieren und entfernen?', confirm_del:'Wein entfernen?',
   dm_title:'Wein trinken', dm_with:'Mit wem getrunken?', dm_with_ph:'z.B. Anna, Ben', dm_last:'Dies ist die letzte Flasche — der Wein wird aus dem Keller entfernt.', btn_drink_confirm:'🥂 Trinken',
+  dm_occasion:'Anlass', occ_spring:'Frühling', occ_summer:'Sommer', occ_autumn:'Herbst', occ_winter:'Winter', occ_birthday:'Geburtstag', occ_party:'Party', occ_justbecause:'Nur so',
   pdf_sub:'{n} Weine · Stand: {d}'
 },
 en: {
@@ -1171,6 +1197,7 @@ en: {
   toast_csvfail:'CSV import failed', toast_xlsxfail:'Excel import failed', toast_moved:'Moved to cellar ✓',
   confirm_last:'Mark the last bottle of "{name}" as drunk and remove it?', confirm_del:'Remove wine?',
   dm_title:'Drink wine', dm_with:'Drunk with whom?', dm_with_ph:'e.g. Anna, Ben', dm_last:'This is the last bottle — the wine will be removed from the cellar.', btn_drink_confirm:'🥂 Drink',
+  dm_occasion:'Occasion', occ_spring:'Spring', occ_summer:'Summer', occ_autumn:'Autumn', occ_winter:'Winter', occ_birthday:'Birthday', occ_party:'Party', occ_justbecause:'Just because',
   pdf_sub:'{n} wines · as of {d}'
 },
 es: {
@@ -1224,6 +1251,7 @@ es: {
   toast_csvfail:'Error al importar CSV', toast_xlsxfail:'Error al importar Excel', toast_moved:'Movido a la bodega ✓',
   confirm_last:'¿Marcar la última botella de "{name}" como bebida y eliminarla?', confirm_del:'¿Eliminar vino?',
   dm_title:'Beber vino', dm_with:'¿Con quién lo bebiste?', dm_with_ph:'p.ej. Anna, Ben', dm_last:'Es la última botella — el vino se eliminará de la bodega.', btn_drink_confirm:'🥂 Beber',
+  dm_occasion:'Ocasión', occ_spring:'Primavera', occ_summer:'Verano', occ_autumn:'Otoño', occ_winter:'Invierno', occ_birthday:'Cumpleaños', occ_party:'Fiesta', occ_justbecause:'Porque sí',
   pdf_sub:'{n} vinos · a fecha: {d}'
 }
 };
@@ -1424,6 +1452,7 @@ function drinkOne(id) {
   if (!w) return;
   drinkId = id;
   document.getElementById('drink-with').value = '';
+  document.querySelectorAll('#drink-occasions .occ-chip').forEach(c => c.classList.remove('active'));
   document.getElementById('drink-modal-wine').textContent = w.name + (w.year ? ' · ' + w.year : '');
   const note = document.getElementById('drink-modal-note');
   if ((w.count||1) <= 1) { note.textContent = t('dm_last'); note.style.display = 'block'; }
@@ -1435,9 +1464,10 @@ function confirmDrink() {
   const w = wines.find(x => x.id === drinkId);
   if (!w) { closeModal('drink-modal'); return; }
   const companions = document.getElementById('drink-with').value.trim();
+  const occasions = [...document.querySelectorAll('#drink-occasions .occ-chip.active')].map(c => c.getAttribute('data-occ'));
   if ((w.count||1) <= 1) wines = wines.filter(x => x.id !== drinkId);
   else w.count = (w.count||1) - 1;
-  recordDrunk(w, companions);
+  recordDrunk(w, companions, occasions);
   save(); saveDrunk();
   closeModal('drink-modal');
   const active = document.querySelector('.tab.active');
@@ -1445,16 +1475,17 @@ function confirmDrink() {
   showToast(t('toast_prost'));
 }
 
-function recordDrunk(w, companions) {
+function recordDrunk(w, companions, occasions) {
   drunkWines.push({
     id: Date.now().toString() + Math.random().toString(36).slice(2,7),
     name: w.name, year: w.year||null, type: w.type||'other',
     region: w.region||'', country: w.country||'', grape: w.grape||'', location: formatLocation(w),
     price: w.price||0, rating: w.rating||0,
-    companions: companions||'',
+    companions: companions||'', occasions: occasions||[],
     date: new Date().toISOString()
   });
 }
+function occLabels(occs) { return (occs||[]).map(o => t('occ_'+o)).join(', '); }
 
 function findMatchingWine(info) {
   if (!info || !info.name) return null;
@@ -1809,7 +1840,7 @@ function renderStats() {
       const d = dt.toLocaleDateString(dateLocale());
       const time = dt.toLocaleTimeString(dateLocale(), {hour:'2-digit', minute:'2-digit'});
       html += `<div class="stats-card" style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:12px">
-        <div><div style="font-size:13px">${esc(w.name)}</div><div style="font-size:11px;color:var(--text-muted)">${w.year||''}${w.grape?' · '+esc(w.grape):''}${w.location?' · 📍 '+esc(w.location):''}${w.companions?' · 👥 '+esc(w.companions):''}</div></div>
+        <div><div style="font-size:13px">${esc(w.name)}</div><div style="font-size:11px;color:var(--text-muted)">${w.year||''}${w.grape?' · '+esc(w.grape):''}${w.location?' · 📍 '+esc(w.location):''}${w.companions?' · 👥 '+esc(w.companions):''}${(w.occasions&&w.occasions.length)?' · 🎉 '+esc(occLabels(w.occasions)):''}</div></div>
         <div style="font-size:11px;color:var(--text-muted);white-space:nowrap;text-align:right">${d}<br>${time}</div>
       </div>`;
     });
