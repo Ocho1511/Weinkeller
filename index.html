@@ -896,6 +896,16 @@ input[type="file"] { display: none; }
         <option value="es">🇪🇸 Español</option>
       </select>
     </div>
+    <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border)">
+      <div class="stats-title" style="margin-bottom:12px" data-i18n="setup_db">Weindatenbank</div>
+      <div class="export-card" onclick="enrichAllWines()">
+        <div class="export-icon">🔄</div>
+        <div class="export-info">
+          <div class="title" data-i18n="enrich_btn">Alle Weine ergänzen (KI)</div>
+          <div class="desc" data-i18n="enrich_desc">Fehlende Region, Land, Rebsorte & Trinkfenster automatisch nachschlagen</div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1169,27 +1179,31 @@ function setIfEmpty(id, val) {
   if (el && !el.value && val) el.value = val;
 }
 
+async function lookupWineData(name, year) {
+  const resp = await fetch(SCAN_PROXY_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 300,
+      system: 'Du bist ein Wein-Experte mit breitem Wissen über Weine weltweit. Antworte NUR mit einem JSON-Objekt ohne Markdown-Backticks. Felder: type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), land (Herkunftsland auf Deutsch oder null), grape (Hauptrebsorte oder null), drinkFrom (Jahr als Zahl, grobe Schätzung Trinkbeginn, oder null), drinkTo (Jahr als Zahl, grobe Schätzung Trinkende, oder null). Wenn ein Wein nicht bekannt ist, schätze anhand von Name/Region/Rebsorte so gut wie möglich; nutze null nur wenn gar keine Angabe möglich ist.',
+      messages: [{ role: 'user', content: `Wein: ${name}${year ? ' (Jahrgang ' + year + ')' : ''}. Nenne Typ, Region, Land, Hauptrebsorte und ein geschätztes Trinkfenster.` }]
+    })
+  });
+  const data = await resp.json();
+  if (data.type === 'error' || !data.content) return null;
+  const text = data.content?.find(b => b.type==='text')?.text || '{}';
+  try { return JSON.parse(text.replace(/```json?|```/g,'')); } catch { return null; }
+}
+
 async function lookupWine() {
   const name = document.getElementById('f-name').value.trim();
   if (!name) { showToast(t('toast_name')); return; }
   const year = document.getElementById('f-year').value.trim();
   showToast(t('toast_lookup'));
   try {
-    const resp = await fetch(SCAN_PROXY_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 300,
-        system: 'Du bist ein Wein-Experte mit breitem Wissen über Weine weltweit. Antworte NUR mit einem JSON-Objekt ohne Markdown-Backticks. Felder: type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), land (Herkunftsland auf Deutsch oder null), grape (Hauptrebsorte oder null), drinkFrom (Jahr als Zahl, grobe Schätzung Trinkbeginn, oder null), drinkTo (Jahr als Zahl, grobe Schätzung Trinkende, oder null). Wenn ein Wein nicht bekannt ist, schätze anhand von Name/Region/Rebsorte so gut wie möglich; nutze null nur wenn gar keine Angabe möglich ist.',
-        messages: [{ role: 'user', content: `Wein: ${name}${year ? ' (Jahrgang ' + year + ')' : ''}. Nenne Typ, Region, Land, Hauptrebsorte und ein geschätztes Trinkfenster.` }]
-      })
-    });
-    const data = await resp.json();
-    if (data.type === 'error' || !data.content) { showToast(t('toast_scanfail')); return; }
-    const text = data.content?.find(b => b.type==='text')?.text || '{}';
-    let info;
-    try { info = JSON.parse(text.replace(/```json?|```/g,'')); } catch { info = {}; }
+    const info = await lookupWineData(name, year);
+    if (!info) { showToast(t('toast_scanfail')); return; }
     if (['rot','weiß','rosé','sekt','other'].includes(info.type)) document.getElementById('f-type').value = info.type;
     setIfEmpty('f-region', info.region);
     setIfEmpty('f-country', info.land);
@@ -1201,6 +1215,31 @@ async function lookupWine() {
   } catch {
     showToast(t('toast_scanfail'));
   }
+}
+
+async function enrichAllWines() {
+  const targets = wines.filter(w => !w.region || !w.country || !w.grape || !w.drinkFrom || !w.drinkTo);
+  if (!targets.length) { showToast(t('toast_enrich_none')); return; }
+  if (!confirm(t('confirm_enrich', {n: targets.length}))) return;
+  let updated = 0;
+  for (let i = 0; i < targets.length; i++) {
+    const w = targets[i];
+    showToast(t('toast_enrich_prog', {done: i+1, total: targets.length}));
+    try {
+      const info = await lookupWineData(w.name, w.year);
+      if (info) {
+        let changed = false;
+        if (!w.region && info.region) { w.region = info.region; changed = true; }
+        if (!w.country && info.land) { w.country = info.land; changed = true; }
+        if (!w.grape && info.grape) { w.grape = info.grape; changed = true; }
+        if (!w.drinkFrom && info.drinkFrom) { w.drinkFrom = parseInt(info.drinkFrom)||null; changed = true; }
+        if (!w.drinkTo && info.drinkTo) { w.drinkTo = parseInt(info.drinkTo)||null; changed = true; }
+        if (changed) { updated++; save(); }
+      }
+    } catch {}
+  }
+  renderKeller();
+  showToast(t('toast_enrich_done', {n: updated}));
 }
 
 // ═══════════════════════════════════════
@@ -1243,6 +1282,8 @@ de: {
   contact:'Kontakt',
   m_add_title:'Wein hinzufügen', m_edit_title:'Wein bearbeiten', m_scan:'📷  Etikett scannen (KI)', m_scanning:'⏳ Etikett wird analysiert…',
   lookup_btn:'🔎  Wein nachschlagen (KI)', toast_lookup:'⏳ Wein wird nachgeschlagen…', toast_lookup_ok:'Wein gefunden ✓', toast_lookup_none:'Keine Daten gefunden',
+  setup_db:'Weindatenbank', enrich_btn:'Alle Weine ergänzen (KI)', enrich_desc:'Fehlende Region, Land, Rebsorte & Trinkfenster automatisch nachschlagen',
+  confirm_enrich:'{n} Wein(e) haben fehlende Angaben. Jetzt per KI ergänzen? (kostet minimal pro Wein)', toast_enrich_none:'Alle Weine sind bereits vollständig ✓', toast_enrich_prog:'⏳ Ergänze {done}/{total}…', toast_enrich_done:'{n} Wein(e) ergänzt ✓',
   l_name:'Name / Weingut', l_year:'Jahrgang', l_count:'Flaschen', l_type:'Weintyp', l_region:'Region', l_country:'Land', l_grape:'Rebsorte',
   l_location:'Lagerplatz (Regal · Ebene · Platz von links)', ph_regal:'Regal', ph_ebene:'Ebene', ph_platz:'Platz v.l.',
   l_from:'Trinken ab', l_to:'Trinken bis', l_price:'Preis', l_rating:'Bewertung', l_note:'Notiz',
@@ -1299,6 +1340,8 @@ en: {
   contact:'Contact',
   m_add_title:'Add wine', m_edit_title:'Edit wine', m_scan:'📷  Scan label (AI)', m_scanning:'⏳ Analyzing label…',
   lookup_btn:'🔎  Look up wine (AI)', toast_lookup:'⏳ Looking up wine…', toast_lookup_ok:'Wine found ✓', toast_lookup_none:'No data found',
+  setup_db:'Wine database', enrich_btn:'Enrich all wines (AI)', enrich_desc:'Automatically look up missing region, country, grape & drinking window',
+  confirm_enrich:'{n} wine(s) have missing details. Enrich them via AI now? (small cost per wine)', toast_enrich_none:'All wines are already complete ✓', toast_enrich_prog:'⏳ Enriching {done}/{total}…', toast_enrich_done:'{n} wine(s) enriched ✓',
   l_name:'Name / Winery', l_year:'Vintage', l_count:'Bottles', l_type:'Wine type', l_region:'Region', l_country:'Country', l_grape:'Grape',
   l_location:'Storage (rack · level · slot from left)', ph_regal:'Rack', ph_ebene:'Level', ph_platz:'Slot f.l.',
   l_from:'Drink from', l_to:'Drink until', l_price:'Price', l_rating:'Rating', l_note:'Note',
@@ -1355,6 +1398,8 @@ es: {
   contact:'Contacto',
   m_add_title:'Añadir vino', m_edit_title:'Editar vino', m_scan:'📷  Escanear etiqueta (IA)', m_scanning:'⏳ Analizando etiqueta…',
   lookup_btn:'🔎  Buscar vino (IA)', toast_lookup:'⏳ Buscando vino…', toast_lookup_ok:'Vino encontrado ✓', toast_lookup_none:'Sin datos',
+  setup_db:'Base de datos de vinos', enrich_btn:'Completar todos los vinos (IA)', enrich_desc:'Buscar automáticamente región, país, uva y ventana de consumo faltantes',
+  confirm_enrich:'{n} vino(s) tienen datos incompletos. ¿Completarlos con IA ahora? (coste mínimo por vino)', toast_enrich_none:'Todos los vinos ya están completos ✓', toast_enrich_prog:'⏳ Completando {done}/{total}…', toast_enrich_done:'{n} vino(s) completados ✓',
   l_name:'Nombre / Bodega', l_year:'Añada', l_count:'Botellas', l_type:'Tipo de vino', l_region:'Región', l_country:'País', l_grape:'Uva',
   l_location:'Ubicación (estante · nivel · sitio desde la izq.)', ph_regal:'Estante', ph_ebene:'Nivel', ph_platz:'Sitio izq.',
   l_from:'Beber desde', l_to:'Beber hasta', l_price:'Precio', l_rating:'Valoración', l_note:'Nota',
