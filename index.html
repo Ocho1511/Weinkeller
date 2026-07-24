@@ -1186,10 +1186,11 @@ async function lookupWine() {
       })
     });
     const data = await resp.json();
+    if (data.type === 'error' || !data.content) { showToast(t('toast_scanfail')); return; }
     const text = data.content?.find(b => b.type==='text')?.text || '{}';
     let info;
     try { info = JSON.parse(text.replace(/```json?|```/g,'')); } catch { info = {}; }
-    if (info.type) document.getElementById('f-type').value = info.type;
+    if (['rot','weiß','rosé','sekt','other'].includes(info.type)) document.getElementById('f-type').value = info.type;
     setIfEmpty('f-region', info.region);
     setIfEmpty('f-country', info.land);
     setIfEmpty('f-grape', info.grape);
