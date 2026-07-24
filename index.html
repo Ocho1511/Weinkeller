@@ -1821,6 +1821,14 @@ function ripeStatusKey(w) {
   return 'over';
 }
 
+// Wie weit ist der Wein über sein "Trinken bis" hinaus? Höher = länger überschritten.
+function ripeOverdue(w) {
+  const now = new Date().getFullYear();
+  const from = w.drinkFrom || now;
+  const to = w.drinkTo || from + 5;
+  return now - to;
+}
+
 function setRipeFilterType(v) { ripeFilterType = v; renderTrinkreife(); }
 function setRipeFilterStatus(v) { ripeFilterStatus = v; renderTrinkreife(); }
 
@@ -1840,7 +1848,7 @@ function renderTrinkreife() {
   const withRipe = allRipe
     .filter(w => ripeFilterType === 'alle' || w.type === ripeFilterType)
     .filter(w => ripeFilterStatus === 'alle' || ripeStatusKey(w) === ripeFilterStatus)
-    .sort((a,b)=>(a.drinkFrom||0)-(b.drinkFrom||0));
+    .sort((a,b) => ripeOverdue(b) - ripeOverdue(a));
   const el = document.getElementById('trinkreife-list');
   if (!allRipe.length) {
     el.innerHTML = `<div class="empty-state"><div class="icon">⏱</div><p>${t('ripe_empty')}</p></div>`;
