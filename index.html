@@ -1077,6 +1077,35 @@ input[type="file"] { display: none; }
   </div>
 </div>
 
+<!-- HISTORY EDIT MODAL -->
+<div class="modal-overlay" id="hist-edit-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2 data-i18n="he_title">Eintrag bearbeiten</h2>
+    <div id="hist-edit-wine" style="font-family:'Playfair Display',serif;font-size:16px;color:var(--gold-light);margin-bottom:10px"></div>
+    <div class="form-group">
+      <label data-i18n="dm_with">Mit wem getrunken?</label>
+      <input id="hist-edit-with" type="text" placeholder="z.B. Anna, Ben" data-i18n-ph="dm_with_ph">
+    </div>
+    <div class="form-group">
+      <label data-i18n="dm_occasion">Anlass</label>
+      <div class="occ-wrap" id="hist-edit-occasions">
+        <button type="button" class="occ-chip" data-occ="spring" onclick="this.classList.toggle('active')" data-i18n="occ_spring">Frühling</button>
+        <button type="button" class="occ-chip" data-occ="summer" onclick="this.classList.toggle('active')" data-i18n="occ_summer">Sommer</button>
+        <button type="button" class="occ-chip" data-occ="autumn" onclick="this.classList.toggle('active')" data-i18n="occ_autumn">Herbst</button>
+        <button type="button" class="occ-chip" data-occ="winter" onclick="this.classList.toggle('active')" data-i18n="occ_winter">Winter</button>
+        <button type="button" class="occ-chip" data-occ="birthday" onclick="this.classList.toggle('active')" data-i18n="occ_birthday">Geburtstag</button>
+        <button type="button" class="occ-chip" data-occ="party" onclick="this.classList.toggle('active')" data-i18n="occ_party">Party</button>
+        <button type="button" class="occ-chip" data-occ="justbecause" onclick="this.classList.toggle('active')" data-i18n="occ_justbecause">Nur so</button>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="closeModal('hist-edit-modal')" data-i18n="btn_cancel">Abbrechen</button>
+      <button class="btn-primary" onclick="saveHistoryEdit()" data-i18n="btn_save">Speichern</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ═══════════════════════════════════════
 // DATA
@@ -1114,7 +1143,7 @@ function dateLocale() { return settings.lang === 'de' ? 'de-DE' : settings.lang 
 const I18N = {
 de: {
   nav_keller:'Keller', nav_stats:'Statistik', nav_ripe:'Trinkreife', nav_history:'Historie', nav_wish:'Wishlist', nav_export:'Export/Import', nav_setup:'Setup',
-  hist_title:'Historie', hist_sub:'Getrunkene Weine',
+  hist_title:'Historie', hist_sub:'Getrunkene Weine', he_title:'Eintrag bearbeiten',
   stats_title:"Ocho's Statistik", stats_sub:'Überblick',
   ripe_title:'Trinkreife', ripe_sub:'Wann trinken?',
   wish_title:"Ocho's Wunschliste", wish_sub:'Noch zu kaufen',
@@ -1169,7 +1198,7 @@ de: {
 },
 en: {
   nav_keller:'Cellar', nav_stats:'Statistics', nav_ripe:'Readiness', nav_history:'History', nav_wish:'Wishlist', nav_export:'Export/Import', nav_setup:'Setup',
-  hist_title:'History', hist_sub:'Wines drunk',
+  hist_title:'History', hist_sub:'Wines drunk', he_title:'Edit entry',
   stats_title:"Ocho's Statistics", stats_sub:'Overview',
   ripe_title:'Drinking Window', ripe_sub:'When to drink?',
   wish_title:"Ocho's Wishlist", wish_sub:'Still to buy',
@@ -1224,7 +1253,7 @@ en: {
 },
 es: {
   nav_keller:'Bodega', nav_stats:'Estadísticas', nav_ripe:'Madurez', nav_history:'Historial', nav_wish:'Deseos', nav_export:'Export/Import', nav_setup:'Ajustes',
-  hist_title:'Historial', hist_sub:'Vinos bebidos',
+  hist_title:'Historial', hist_sub:'Vinos bebidos', he_title:'Editar entrada',
   stats_title:"Estadísticas de Ocho", stats_sub:'Resumen',
   ripe_title:'Ventana de consumo', ripe_sub:'¿Cuándo beber?',
   wish_title:"Lista de deseos de Ocho", wish_sub:'Por comprar',
@@ -1891,13 +1920,35 @@ function renderHistory() {
       const dt = new Date(w.date);
       const d = dt.toLocaleDateString(dateLocale());
       const time = dt.toLocaleTimeString(dateLocale(), {hour:'2-digit', minute:'2-digit'});
-      html += `<div class="stats-card" style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:12px">
-        <div><div style="font-size:13px">${esc(w.name)}</div><div style="font-size:11px;color:var(--text-muted)">${w.year||''}${w.grape?' · '+esc(w.grape):''}${w.location?' · 📍 '+esc(w.location):''}${w.companions?' · 👥 '+esc(w.companions):''}${(w.occasions&&w.occasions.length)?' · 🎉 '+esc(occLabels(w.occasions)):''}</div></div>
+      html += `<div class="stats-card" onclick="editHistory('${w.id}')" style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:12px;cursor:pointer">
+        <div><div style="font-size:13px">${esc(w.name)} <span style="font-size:11px;color:var(--text-dim)">✏️</span></div><div style="font-size:11px;color:var(--text-muted)">${w.year||''}${w.grape?' · '+esc(w.grape):''}${w.location?' · 📍 '+esc(w.location):''}${w.companions?' · 👥 '+esc(w.companions):''}${(w.occasions&&w.occasions.length)?' · 🎉 '+esc(occLabels(w.occasions)):''}</div></div>
         <div style="font-size:11px;color:var(--text-muted);white-space:nowrap;text-align:right">${d}<br>${time}</div>
       </div>`;
     });
   }
   document.getElementById('history-content').innerHTML = html;
+}
+
+let histEditId = null;
+function editHistory(id) {
+  const w = drunkWines.find(x => x.id === id);
+  if (!w) return;
+  histEditId = id;
+  document.getElementById('hist-edit-wine').textContent = w.name + (w.year ? ' · ' + w.year : '');
+  document.getElementById('hist-edit-with').value = w.companions || '';
+  document.querySelectorAll('#hist-edit-occasions .occ-chip').forEach(c =>
+    c.classList.toggle('active', (w.occasions||[]).includes(c.getAttribute('data-occ'))));
+  document.getElementById('hist-edit-modal').classList.add('show');
+}
+function saveHistoryEdit() {
+  const w = drunkWines.find(x => x.id === histEditId);
+  if (!w) { closeModal('hist-edit-modal'); return; }
+  w.companions = document.getElementById('hist-edit-with').value.trim();
+  w.occasions = [...document.querySelectorAll('#hist-edit-occasions .occ-chip.active')].map(c => c.getAttribute('data-occ'));
+  saveDrunk();
+  closeModal('hist-edit-modal');
+  renderHistory();
+  showToast(t('toast_updated'));
 }
 
 // ═══════════════════════════════════════
