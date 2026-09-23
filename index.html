@@ -1179,21 +1179,60 @@ function setIfEmpty(id, val) {
   if (el && !el.value && val) el.value = val;
 }
 
+// Reifezeit (Jahre nach Jahrgang) je Rebsorte bzw. Typ → lokale Trinkfenster-Schätzung
+const MATURATION_GRAPE = {
+  'barolo':[4,30],'barbaresco':[4,25],'nebbiolo':[4,25],'brunello':[5,30],'sangiovese':[3,15],
+  'cabernet':[5,25],'bordeaux':[5,30],'merlot':[3,15],'malbec':[3,12],'carmenère':[3,12],
+  'syrah':[4,20],'shiraz':[4,20],'grenache':[3,12],'garnacha':[3,12],'tempranillo':[4,20],'rioja':[3,20],
+  'pinot noir':[3,15],'spätburgunder':[3,15],'zinfandel':[2,8],'primitivo':[2,8],'barbera':[2,8],
+  'montepulciano':[3,12],'touriga':[4,20],'portugieser':[1,5],'dornfelder':[1,6],'zweigelt':[2,8],'blaufränkisch':[3,12],
+  'riesling':[2,20],'chardonnay':[1,8],'sauvignon':[0,3],'grüner veltliner':[1,7],'chenin':[2,15],
+  'gewürztraminer':[1,8],'grauburgunder':[1,6],'pinot gris':[1,6],'weißburgunder':[1,6],'pinot blanc':[1,6],
+  'silvaner':[1,5],'müller-thurgau':[0,3],'viognier':[1,5],'sémillon':[2,15],'albariño':[1,4],
+  'vermentino':[0,3],'muskateller':[0,3],'scheurebe':[1,6],'kerner':[1,6],
+  'champagne':[1,10],'champagner':[1,10],'crémant':[1,5],'cava':[1,4],'prosecco':[0,2]
+};
+const MATURATION_TYPE = { rot:[3,12], 'weiß':[1,5], 'rosé':[0,2], sekt:[1,6], other:[2,8] };
+function maturationOffset(grape, type) {
+  const g = (grape||'').toLowerCase();
+  for (const key in MATURATION_GRAPE) if (g.includes(key)) return MATURATION_GRAPE[key];
+  return MATURATION_TYPE[type] || MATURATION_TYPE.other;
+}
+let autoDrink = { from: null, to: null };
+function autoFillDrinkWindow() {
+  const y = parseInt(document.getElementById('f-year').value);
+  if (!y || y < 1900 || y > 2100) return;
+  const [off1, off2] = maturationOffset(document.getElementById('f-grape').value, document.getElementById('f-type').value);
+  const nf = y + off1, nt = y + off2;
+  const dfEl = document.getElementById('f-drink-from'), dtEl = document.getElementById('f-drink-to');
+  if (!dfEl.value || String(dfEl.value) === String(autoDrink.from)) dfEl.value = nf;
+  if (!dtEl.value || String(dtEl.value) === String(autoDrink.to)) dtEl.value = nt;
+  autoDrink = { from: nf, to: nt };
+}
+
+function currencyName() {
+  return { '€':'Euro', '$':'US-Dollar', '£':'Britische Pfund', 'CHF':'Schweizer Franken' }[settings.currency] || 'Euro';
+}
+
+// KI-Nachschlagen MIT Web-Suche → liefert Beschreibung + aktuellen Durchschnittspreis
 async function lookupWineData(name, year) {
   const resp = await fetch(SCAN_PROXY_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'claude-sonnet-4-6',
-      max_tokens: 300,
-      system: 'Du bist ein Wein-Experte mit breitem Wissen über Weine weltweit. Antworte NUR mit einem JSON-Objekt ohne Markdown-Backticks. Felder: type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), land (Herkunftsland auf Deutsch oder null), grape (Hauptrebsorte oder null), drinkFrom (Jahr als Zahl, grobe Schätzung Trinkbeginn, oder null), drinkTo (Jahr als Zahl, grobe Schätzung Trinkende, oder null). Wenn ein Wein nicht bekannt ist, schätze anhand von Name/Region/Rebsorte so gut wie möglich; nutze null nur wenn gar keine Angabe möglich ist.',
-      messages: [{ role: 'user', content: `Wein: ${name}${year ? ' (Jahrgang ' + year + ')' : ''}. Nenne Typ, Region, Land, Hauptrebsorte und ein geschätztes Trinkfenster.` }]
+      max_tokens: 1200,
+      tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 3 }],
+      system: `Du bist ein Wein-Experte. Recherchiere den aktuellen durchschnittlichen Marktpreis (Endverbraucher, 0,75-l-Flasche) mit der Websuche. Antworte am Ende mit GENAU EINEM JSON-Objekt (ohne Markdown) mit den Feldern: type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), land (Herkunftsland auf Deutsch oder null), grape (Hauptrebsorte oder null), drinkFrom (Jahr als Zahl oder null), drinkTo (Jahr als Zahl oder null), price (aktueller Durchschnittspreis pro Flasche in ${currencyName()} als Zahl ohne Währungssymbol, gerundet, oder null). Für Beschreibungsfelder nutze dein Wissen; für den Preis die Websuche. Nutze null nur wenn keine sinnvolle Angabe möglich ist.`,
+      messages: [{ role: 'user', content: `Wein: ${name}${year ? ' (Jahrgang ' + year + ')' : ''}. Nenne Typ, Region, Land, Hauptrebsorte, ein geschätztes Trinkfenster und den aktuellen Durchschnittspreis pro Flasche in ${currencyName()}.` }]
     })
   });
   const data = await resp.json();
   if (data.type === 'error' || !data.content) return null;
-  const text = data.content?.find(b => b.type==='text')?.text || '{}';
-  try { return JSON.parse(text.replace(/```json?|```/g,'')); } catch { return null; }
+  const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n');
+  const m = text.match(/\{[\s\S]*\}/);
+  if (!m) return null;
+  try { return JSON.parse(m[0]); } catch { return null; }
 }
 
 async function lookupWine() {
@@ -1210,15 +1249,42 @@ async function lookupWine() {
     setIfEmpty('f-grape', info.grape);
     setIfEmpty('f-drink-from', info.drinkFrom);
     setIfEmpty('f-drink-to', info.drinkTo);
-    const found = info.region || info.land || info.grape || info.drinkFrom || info.drinkTo;
+    if (info.price != null) setIfEmpty('f-price', info.price);
+    const found = info.region || info.land || info.grape || info.drinkFrom || info.drinkTo || info.price != null;
     showToast(found ? t('toast_lookup_ok') : t('toast_lookup_none'));
   } catch {
     showToast(t('toast_scanfail'));
   }
 }
 
+// Beim Eintragen von Jahrgang/Name: Trinkfenster sofort lokal, Preis+Rest per KI/Web
+let lastAutoLookupKey = '';
+async function maybeAutoLookup() {
+  if (editId) return;
+  const name = document.getElementById('f-name').value.trim();
+  const year = document.getElementById('f-year').value.trim();
+  if (!name || !(parseInt(year) >= 1900)) return;
+  if (document.getElementById('f-price').value) return;
+  const key = name.toLowerCase() + '|' + year;
+  if (key === lastAutoLookupKey) return;
+  lastAutoLookupKey = key;
+  showToast(t('toast_price_lookup'));
+  try {
+    const info = await lookupWineData(name, year);
+    if (!info) return;
+    if (['rot','weiß','rosé','sekt','other'].includes(info.type)) setIfEmpty('f-type', info.type);
+    setIfEmpty('f-region', info.region);
+    setIfEmpty('f-country', info.land);
+    setIfEmpty('f-grape', info.grape);
+    setIfEmpty('f-drink-from', info.drinkFrom);
+    setIfEmpty('f-drink-to', info.drinkTo);
+    if (info.price != null) { setIfEmpty('f-price', info.price); showToast(t('toast_price_ok', {p: fmtMoney(Math.round(info.price))})); }
+  } catch {}
+}
+function onVintageInput() { autoFillDrinkWindow(); maybeAutoLookup(); }
+
 async function enrichAllWines() {
-  const targets = wines.filter(w => !w.region || !w.country || !w.grape || !w.drinkFrom || !w.drinkTo);
+  const targets = wines.filter(w => !w.region || !w.country || !w.grape || !w.drinkFrom || !w.drinkTo || !w.price);
   if (!targets.length) { showToast(t('toast_enrich_none')); return; }
   if (!confirm(t('confirm_enrich', {n: targets.length}))) return;
   let updated = 0;
@@ -1234,6 +1300,7 @@ async function enrichAllWines() {
         if (!w.grape && info.grape) { w.grape = info.grape; changed = true; }
         if (!w.drinkFrom && info.drinkFrom) { w.drinkFrom = parseInt(info.drinkFrom)||null; changed = true; }
         if (!w.drinkTo && info.drinkTo) { w.drinkTo = parseInt(info.drinkTo)||null; changed = true; }
+        if (!w.price && info.price != null) { w.price = parseFloat(info.price)||null; changed = true; }
         if (changed) { updated++; save(); }
       }
     } catch {}
@@ -1282,7 +1349,8 @@ de: {
   contact:'Kontakt',
   m_add_title:'Wein hinzufügen', m_edit_title:'Wein bearbeiten', m_scan:'📷  Etikett scannen (KI)', m_scanning:'⏳ Etikett wird analysiert…',
   lookup_btn:'🔎  Wein nachschlagen (KI)', toast_lookup:'⏳ Wein wird nachgeschlagen…', toast_lookup_ok:'Wein gefunden ✓', toast_lookup_none:'Keine Daten gefunden',
-  setup_db:'Weindatenbank', enrich_btn:'Alle Weine ergänzen (KI)', enrich_desc:'Fehlende Region, Land, Rebsorte & Trinkfenster automatisch nachschlagen',
+  toast_price_lookup:'⏳ Aktueller Preis wird gesucht…', toast_price_ok:'Preis gefunden: {p} ✓',
+  setup_db:'Weindatenbank', enrich_btn:'Alle Weine ergänzen (KI)', enrich_desc:'Fehlende Region, Land, Rebsorte, Trinkfenster & Preis automatisch nachschlagen',
   confirm_enrich:'{n} Wein(e) haben fehlende Angaben. Jetzt per KI ergänzen? (kostet minimal pro Wein)', toast_enrich_none:'Alle Weine sind bereits vollständig ✓', toast_enrich_prog:'⏳ Ergänze {done}/{total}…', toast_enrich_done:'{n} Wein(e) ergänzt ✓',
   l_name:'Name / Weingut', l_year:'Jahrgang', l_count:'Flaschen', l_type:'Weintyp', l_region:'Region', l_country:'Land', l_grape:'Rebsorte',
   l_location:'Lagerplatz (Regal · Ebene · Platz von links)', ph_regal:'Regal', ph_ebene:'Ebene', ph_platz:'Platz v.l.',
@@ -1340,7 +1408,8 @@ en: {
   contact:'Contact',
   m_add_title:'Add wine', m_edit_title:'Edit wine', m_scan:'📷  Scan label (AI)', m_scanning:'⏳ Analyzing label…',
   lookup_btn:'🔎  Look up wine (AI)', toast_lookup:'⏳ Looking up wine…', toast_lookup_ok:'Wine found ✓', toast_lookup_none:'No data found',
-  setup_db:'Wine database', enrich_btn:'Enrich all wines (AI)', enrich_desc:'Automatically look up missing region, country, grape & drinking window',
+  toast_price_lookup:'⏳ Looking up current price…', toast_price_ok:'Price found: {p} ✓',
+  setup_db:'Wine database', enrich_btn:'Enrich all wines (AI)', enrich_desc:'Automatically look up missing region, country, grape, drinking window & price',
   confirm_enrich:'{n} wine(s) have missing details. Enrich them via AI now? (small cost per wine)', toast_enrich_none:'All wines are already complete ✓', toast_enrich_prog:'⏳ Enriching {done}/{total}…', toast_enrich_done:'{n} wine(s) enriched ✓',
   l_name:'Name / Winery', l_year:'Vintage', l_count:'Bottles', l_type:'Wine type', l_region:'Region', l_country:'Country', l_grape:'Grape',
   l_location:'Storage (rack · level · slot from left)', ph_regal:'Rack', ph_ebene:'Level', ph_platz:'Slot f.l.',
@@ -1398,7 +1467,8 @@ es: {
   contact:'Contacto',
   m_add_title:'Añadir vino', m_edit_title:'Editar vino', m_scan:'📷  Escanear etiqueta (IA)', m_scanning:'⏳ Analizando etiqueta…',
   lookup_btn:'🔎  Buscar vino (IA)', toast_lookup:'⏳ Buscando vino…', toast_lookup_ok:'Vino encontrado ✓', toast_lookup_none:'Sin datos',
-  setup_db:'Base de datos de vinos', enrich_btn:'Completar todos los vinos (IA)', enrich_desc:'Buscar automáticamente región, país, uva y ventana de consumo faltantes',
+  toast_price_lookup:'⏳ Buscando precio actual…', toast_price_ok:'Precio encontrado: {p} ✓',
+  setup_db:'Base de datos de vinos', enrich_btn:'Completar todos los vinos (IA)', enrich_desc:'Buscar automáticamente región, país, uva, ventana de consumo y precio faltantes',
   confirm_enrich:'{n} vino(s) tienen datos incompletos. ¿Completarlos con IA ahora? (coste mínimo por vino)', toast_enrich_none:'Todos los vinos ya están completos ✓', toast_enrich_prog:'⏳ Completando {done}/{total}…', toast_enrich_done:'{n} vino(s) completados ✓',
   l_name:'Nombre / Bodega', l_year:'Añada', l_count:'Botellas', l_type:'Tipo de vino', l_region:'Región', l_country:'País', l_grape:'Uva',
   l_location:'Ubicación (estante · nivel · sitio desde la izq.)', ph_regal:'Estante', ph_ebene:'Nivel', ph_platz:'Sitio izq.',
@@ -1755,6 +1825,8 @@ function editWine(id) {
 // ═══════════════════════════════════════
 function openAddModal() {
   editId = null;
+  autoDrink = { from: null, to: null };
+  lastAutoLookupKey = '';
   ['f-name','f-year','f-region','f-country','f-grape','f-loc-regal','f-loc-ebene','f-loc-platz','f-note','f-drink-from','f-drink-to','f-price'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('f-count').value = 1;
   document.getElementById('f-type').value = 'rot';
@@ -2457,6 +2529,10 @@ function esc(str) {
 // INIT
 // ═══════════════════════════════════════
 applyI18n();
+document.getElementById('f-year').addEventListener('change', onVintageInput);
+document.getElementById('f-name').addEventListener('change', maybeAutoLookup);
+document.getElementById('f-grape').addEventListener('change', autoFillDrinkWindow);
+document.getElementById('f-type').addEventListener('change', autoFillDrinkWindow);
 </script>
 </body>
 </html>
