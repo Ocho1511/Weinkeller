@@ -593,6 +593,7 @@ body {
   gap: 14px;
 }
 .export-card:active { background: var(--card-hover); }
+.export-card.is-busy { opacity: .55; pointer-events: none; }
 .export-icon { font-size: 28px; }
 .export-info .title { font-size: 15px; font-weight: 500; color: var(--text); }
 .export-info .desc { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-top: 2px; }
@@ -898,7 +899,7 @@ input[type="file"] { display: none; }
     </div>
     <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border)">
       <div class="stats-title" style="margin-bottom:12px" data-i18n="setup_db">Weindatenbank</div>
-      <div class="export-card" onclick="enrichAllWines()">
+      <div class="export-card" id="enrich-btn" onclick="enrichAllWines()">
         <div class="export-icon">🔄</div>
         <div class="export-info">
           <div class="title" data-i18n="enrich_btn">Alle Weine ergänzen (KI)</div>
@@ -1283,27 +1284,37 @@ async function maybeAutoLookup() {
 }
 function onVintageInput() { autoFillDrinkWindow(); maybeAutoLookup(); }
 
+let enrichRunning = false;
 async function enrichAllWines() {
+  if (enrichRunning) { showToast(t('toast_enrich_busy')); return; }
   const targets = wines.filter(w => !w.region || !w.country || !w.grape || !w.drinkFrom || !w.drinkTo || !w.price);
   if (!targets.length) { showToast(t('toast_enrich_none')); return; }
   if (!confirm(t('confirm_enrich', {n: targets.length}))) return;
+  enrichRunning = true;
+  const btn = document.getElementById('enrich-btn');
+  if (btn) btn.classList.add('is-busy');
   let updated = 0;
-  for (let i = 0; i < targets.length; i++) {
-    const w = targets[i];
-    showToast(t('toast_enrich_prog', {done: i+1, total: targets.length}));
-    try {
-      const info = await lookupWineData(w.name, w.year);
-      if (info) {
-        let changed = false;
-        if (!w.region && info.region) { w.region = info.region; changed = true; }
-        if (!w.country && info.land) { w.country = info.land; changed = true; }
-        if (!w.grape && info.grape) { w.grape = info.grape; changed = true; }
-        if (!w.drinkFrom && info.drinkFrom) { w.drinkFrom = parseInt(info.drinkFrom)||null; changed = true; }
-        if (!w.drinkTo && info.drinkTo) { w.drinkTo = parseInt(info.drinkTo)||null; changed = true; }
-        if (!w.price && info.price != null) { w.price = parseFloat(info.price)||null; changed = true; }
-        if (changed) { updated++; save(); }
-      }
-    } catch {}
+  try {
+    for (let i = 0; i < targets.length; i++) {
+      const w = targets[i];
+      showToast(t('toast_enrich_prog', {done: i+1, total: targets.length}));
+      try {
+        const info = await lookupWineData(w.name, w.year);
+        if (info) {
+          let changed = false;
+          if (!w.region && info.region) { w.region = info.region; changed = true; }
+          if (!w.country && info.land) { w.country = info.land; changed = true; }
+          if (!w.grape && info.grape) { w.grape = info.grape; changed = true; }
+          if (!w.drinkFrom && info.drinkFrom) { w.drinkFrom = parseInt(info.drinkFrom)||null; changed = true; }
+          if (!w.drinkTo && info.drinkTo) { w.drinkTo = parseInt(info.drinkTo)||null; changed = true; }
+          if (!w.price && info.price != null) { w.price = parseFloat(info.price)||null; changed = true; }
+          if (changed) { updated++; save(); }
+        }
+      } catch {}
+    }
+  } finally {
+    enrichRunning = false;
+    if (btn) btn.classList.remove('is-busy');
   }
   renderKeller();
   showToast(t('toast_enrich_done', {n: updated}));
@@ -1351,7 +1362,7 @@ de: {
   lookup_btn:'🔎  Wein nachschlagen (KI)', toast_lookup:'⏳ Wein wird nachgeschlagen…', toast_lookup_ok:'Wein gefunden ✓', toast_lookup_none:'Keine Daten gefunden',
   toast_price_lookup:'⏳ Aktueller Preis wird gesucht…', toast_price_ok:'Preis gefunden: {p} ✓',
   setup_db:'Weindatenbank', enrich_btn:'Alle Weine ergänzen (KI)', enrich_desc:'Fehlende Region, Land, Rebsorte, Trinkfenster & Preis automatisch nachschlagen',
-  confirm_enrich:'{n} Wein(e) haben fehlende Angaben. Jetzt per KI ergänzen? (kostet minimal pro Wein)', toast_enrich_none:'Alle Weine sind bereits vollständig ✓', toast_enrich_prog:'⏳ Ergänze {done}/{total}…', toast_enrich_done:'{n} Wein(e) ergänzt ✓',
+  confirm_enrich:'{n} Wein(e) haben fehlende Angaben. Jetzt per KI ergänzen? (kostet minimal pro Wein)', toast_enrich_none:'Alle Weine sind bereits vollständig ✓', toast_enrich_prog:'⏳ Ergänze {done}/{total}…', toast_enrich_done:'{n} Wein(e) ergänzt ✓', toast_enrich_busy:'Aktualisierung läuft bereits…',
   l_name:'Name / Weingut', l_year:'Jahrgang', l_count:'Flaschen', l_type:'Weintyp', l_region:'Region', l_country:'Land', l_grape:'Rebsorte',
   l_location:'Lagerplatz (Regal · Ebene · Platz von links)', ph_regal:'Regal', ph_ebene:'Ebene', ph_platz:'Platz v.l.',
   l_from:'Trinken ab', l_to:'Trinken bis', l_price:'Preis', l_rating:'Bewertung', l_note:'Notiz',
@@ -1410,7 +1421,7 @@ en: {
   lookup_btn:'🔎  Look up wine (AI)', toast_lookup:'⏳ Looking up wine…', toast_lookup_ok:'Wine found ✓', toast_lookup_none:'No data found',
   toast_price_lookup:'⏳ Looking up current price…', toast_price_ok:'Price found: {p} ✓',
   setup_db:'Wine database', enrich_btn:'Enrich all wines (AI)', enrich_desc:'Automatically look up missing region, country, grape, drinking window & price',
-  confirm_enrich:'{n} wine(s) have missing details. Enrich them via AI now? (small cost per wine)', toast_enrich_none:'All wines are already complete ✓', toast_enrich_prog:'⏳ Enriching {done}/{total}…', toast_enrich_done:'{n} wine(s) enriched ✓',
+  confirm_enrich:'{n} wine(s) have missing details. Enrich them via AI now? (small cost per wine)', toast_enrich_none:'All wines are already complete ✓', toast_enrich_prog:'⏳ Enriching {done}/{total}…', toast_enrich_done:'{n} wine(s) enriched ✓', toast_enrich_busy:'Update already running…',
   l_name:'Name / Winery', l_year:'Vintage', l_count:'Bottles', l_type:'Wine type', l_region:'Region', l_country:'Country', l_grape:'Grape',
   l_location:'Storage (rack · level · slot from left)', ph_regal:'Rack', ph_ebene:'Level', ph_platz:'Slot f.l.',
   l_from:'Drink from', l_to:'Drink until', l_price:'Price', l_rating:'Rating', l_note:'Note',
@@ -1469,7 +1480,7 @@ es: {
   lookup_btn:'🔎  Buscar vino (IA)', toast_lookup:'⏳ Buscando vino…', toast_lookup_ok:'Vino encontrado ✓', toast_lookup_none:'Sin datos',
   toast_price_lookup:'⏳ Buscando precio actual…', toast_price_ok:'Precio encontrado: {p} ✓',
   setup_db:'Base de datos de vinos', enrich_btn:'Completar todos los vinos (IA)', enrich_desc:'Buscar automáticamente región, país, uva, ventana de consumo y precio faltantes',
-  confirm_enrich:'{n} vino(s) tienen datos incompletos. ¿Completarlos con IA ahora? (coste mínimo por vino)', toast_enrich_none:'Todos los vinos ya están completos ✓', toast_enrich_prog:'⏳ Completando {done}/{total}…', toast_enrich_done:'{n} vino(s) completados ✓',
+  confirm_enrich:'{n} vino(s) tienen datos incompletos. ¿Completarlos con IA ahora? (coste mínimo por vino)', toast_enrich_none:'Todos los vinos ya están completos ✓', toast_enrich_prog:'⏳ Completando {done}/{total}…', toast_enrich_done:'{n} vino(s) completados ✓', toast_enrich_busy:'La actualización ya está en curso…',
   l_name:'Nombre / Bodega', l_year:'Añada', l_count:'Botellas', l_type:'Tipo de vino', l_region:'Región', l_country:'País', l_grape:'Uva',
   l_location:'Ubicación (estante · nivel · sitio desde la izq.)', ph_regal:'Estante', ph_ebene:'Nivel', ph_platz:'Sitio izq.',
   l_from:'Beber desde', l_to:'Beber hasta', l_price:'Precio', l_rating:'Valoración', l_note:'Nota',
