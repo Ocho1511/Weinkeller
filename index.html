@@ -410,6 +410,26 @@ body {
   cursor: pointer;
 }
 .occ-chip.active { background: #1c9a8d; border-color: #1c9a8d; color: #fff; }
+/* ── REGALE ── */
+.rack-box { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 14px; overflow-x: auto; }
+.rack-box-title { font-family: 'Playfair Display', serif; font-size: 15px; color: var(--gold-light); margin-bottom: 2px; }
+.rack-box-sub { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 12px; }
+.rack-grid { display: inline-grid; gap: 7px; }
+.rack-elabel { font-size: 10px; color: var(--text-dim); display: flex; align-items: center; justify-content: flex-end; padding-right: 4px; }
+.rack-collabel { font-size: 10px; color: var(--text-dim); text-align: center; }
+.rack-slot { width: 60px; height: 22px; }
+.rack-slot.filled { cursor: pointer; }
+.rack-empty { height: 15px; margin: 3px 0; border: 1.5px dashed var(--border); border-radius: 8px; }
+.rack-unassigned { display: flex; flex-wrap: wrap; gap: 8px; }
+.rack-chip-wine { display: flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px 5px 8px; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text); }
+.rack-add-row { display: flex; gap: 8px; margin-top: 10px; }
+.rack-add-row input { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 9px 10px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px; outline: none; min-width: 0; }
+.rack-add-row #rack-new-name { flex: 2; }
+.rack-add-row #rack-new-rows, .rack-add-row #rack-new-cols { flex: 1; }
+.rack-setup-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.rack-setup-item .n { flex: 1; font-size: 13px; font-weight: 600; color: var(--text); }
+.rack-setup-item .d { font-size: 12px; color: var(--text-muted); }
+.rack-setup-del { flex-shrink: 0; width: 30px; height: 30px; border-radius: 8px; border: none; background: var(--red-alert); color: #fff; font-size: 13px; cursor: pointer; }
 .input-with-scan { display: flex; gap: 8px; }
 .input-with-scan input { flex: 1; min-width: 0; }
 .sort-row { padding: 0 16px 12px; }
@@ -681,6 +701,9 @@ input[type="file"] { display: none; }
   <button class="nav-btn" onclick="showTab('history',this)">
     <span class="nav-icon">📖</span><span data-i18n="nav_history">Historie</span>
   </button>
+  <button class="nav-btn" onclick="showTab('racks',this)">
+    <span class="nav-icon">🗄️</span><span data-i18n="nav_racks">Regale</span>
+  </button>
   <button class="nav-btn" onclick="showTab('wishlist',this)">
     <span class="nav-icon">⭐</span><span data-i18n="nav_wish">Wishlist</span>
   </button>
@@ -772,6 +795,18 @@ input[type="file"] { display: none; }
   <div class="filter-scroll" id="hist-filter-type" style="padding-bottom:8px"></div>
   <div class="filter-scroll" id="hist-filter-occ"></div>
   <div id="history-content" style="padding:0 16px 20px"></div>
+</div>
+
+<!-- ════════════════════════════════════════
+     REGALE TAB
+════════════════════════════════════════ -->
+<div class="tab" id="tab-racks">
+  <div class="page-header">
+    <h1 data-i18n="racks_title">Regale</h1>
+    <div class="subtitle" data-i18n="racks_sub">Kellerplan</div>
+  </div>
+  <div class="filter-scroll" id="rack-chips"></div>
+  <div id="racks-content" style="padding:0 16px 24px"></div>
 </div>
 
 <!-- ════════════════════════════════════════
@@ -905,6 +940,17 @@ input[type="file"] { display: none; }
           <div class="title" data-i18n="enrich_btn">Alle Weine ergänzen (KI)</div>
           <div class="desc" data-i18n="enrich_desc">Fehlende Region, Land, Rebsorte & Trinkfenster automatisch nachschlagen</div>
         </div>
+      </div>
+    </div>
+    <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border)">
+      <div class="stats-title" style="margin-bottom:4px" data-i18n="setup_racks">Regale</div>
+      <div style="font-size:12px; font-weight:600; color:var(--text-muted); margin-bottom:12px" data-i18n="setup_racks_desc">Definiere deine Regale mit Ebenen und Plätzen für den Kellerplan.</div>
+      <div id="rack-setup-list"></div>
+      <div class="rack-add-row">
+        <input id="rack-new-name" type="text" placeholder="Regal-Name" data-i18n-ph="rack_ph_name">
+        <input id="rack-new-rows" type="number" min="1" max="30" placeholder="Ebenen" data-i18n-ph="rack_ph_rows">
+        <input id="rack-new-cols" type="number" min="1" max="40" placeholder="Plätze" data-i18n-ph="rack_ph_cols">
+        <button class="mini-scan-btn" onclick="addRack()" title="Regal hinzufügen">＋</button>
       </div>
     </div>
   </div>
@@ -1137,7 +1183,8 @@ const SETTINGS_KEY = 'weinkeller_v2_settings';
 let wines = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
 let wishes = JSON.parse(localStorage.getItem(WISH_KEY) || '[]');
 let drunkWines = JSON.parse(localStorage.getItem(DRUNK_KEY) || '[]');
-let settings = Object.assign({currency:'€', lang:'de'}, JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'));
+let settings = Object.assign({currency:'€', lang:'de', racks:[]}, JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'));
+if (!Array.isArray(settings.racks)) settings.racks = [];
 let editId = null;
 let currentStar = 0;
 let activeFilter = 'alle';
@@ -1325,7 +1372,10 @@ async function enrichAllWines() {
 // ═══════════════════════════════════════
 const I18N = {
 de: {
-  nav_keller:'Keller', nav_stats:'Statistik', nav_ripe:'Trinkreife', nav_history:'Historie', nav_wish:'Wishlist', nav_export:'Export/Import', nav_setup:'Setup',
+  nav_keller:'Keller', nav_stats:'Statistik', nav_ripe:'Trinkreife', nav_history:'Historie', nav_racks:'Regale', nav_wish:'Wishlist', nav_export:'Export/Import', nav_setup:'Setup',
+  racks_title:'Regale', racks_sub:'Kellerplan', racks_none:'Noch keine Regale definiert.<br>Lege im Setup unter „Regale" eins an.', racks_filled:'belegt', racks_unassigned:'Nicht zugeordnet', racks_all_placed:'Alle Weine sind einem Fach zugeordnet ✓',
+  setup_racks:'Regale', setup_racks_desc:'Definiere deine Regale mit Ebenen und Plätzen für den Kellerplan.', rack_ph_name:'Regal-Name', rack_ph_rows:'Ebenen', rack_ph_cols:'Plätze',
+  rack_invalid:'Bitte Name, Ebenen und Plätze angeben', rack_dup:'Regal-Name existiert bereits', rack_added:'Regal hinzugefügt ✓', rack_del_confirm:'Regal "{name}" entfernen? (Weine bleiben erhalten)',
   hist_title:'Historie', hist_sub:'Getrunkene Weine', he_title:'Eintrag bearbeiten',
   stats_title:"Ocho's Statistik", stats_sub:'Überblick',
   ripe_title:'Trinkreife', ripe_sub:'Wann trinken?',
@@ -1384,7 +1434,10 @@ de: {
   pdf_sub:'{n} Weine · Stand: {d}'
 },
 en: {
-  nav_keller:'Cellar', nav_stats:'Statistics', nav_ripe:'Readiness', nav_history:'History', nav_wish:'Wishlist', nav_export:'Export/Import', nav_setup:'Setup',
+  nav_keller:'Cellar', nav_stats:'Statistics', nav_ripe:'Readiness', nav_history:'History', nav_racks:'Racks', nav_wish:'Wishlist', nav_export:'Export/Import', nav_setup:'Setup',
+  racks_title:'Racks', racks_sub:'Cellar map', racks_none:'No racks defined yet.<br>Add one under "Racks" in Setup.', racks_filled:'filled', racks_unassigned:'Unassigned', racks_all_placed:'All wines are assigned to a slot ✓',
+  setup_racks:'Racks', setup_racks_desc:'Define your racks with levels and positions for the cellar map.', rack_ph_name:'Rack name', rack_ph_rows:'Levels', rack_ph_cols:'Positions',
+  rack_invalid:'Enter name, levels and positions', rack_dup:'Rack name already exists', rack_added:'Rack added ✓', rack_del_confirm:'Remove rack "{name}"? (wines are kept)',
   hist_title:'History', hist_sub:'Wines drunk', he_title:'Edit entry',
   stats_title:"Ocho's Statistics", stats_sub:'Overview',
   ripe_title:'Drinking Window', ripe_sub:'When to drink?',
@@ -1443,7 +1496,10 @@ en: {
   pdf_sub:'{n} wines · as of {d}'
 },
 es: {
-  nav_keller:'Bodega', nav_stats:'Estadísticas', nav_ripe:'Madurez', nav_history:'Historial', nav_wish:'Deseos', nav_export:'Export/Import', nav_setup:'Ajustes',
+  nav_keller:'Bodega', nav_stats:'Estadísticas', nav_ripe:'Madurez', nav_history:'Historial', nav_racks:'Estantes', nav_wish:'Deseos', nav_export:'Export/Import', nav_setup:'Ajustes',
+  racks_title:'Estantes', racks_sub:'Plano de bodega', racks_none:'Aún no hay estantes definidos.<br>Crea uno en Ajustes → "Estantes".', racks_filled:'ocupados', racks_unassigned:'Sin asignar', racks_all_placed:'Todos los vinos tienen un hueco asignado ✓',
+  setup_racks:'Estantes', setup_racks_desc:'Define tus estantes con niveles y posiciones para el plano de bodega.', rack_ph_name:'Nombre del estante', rack_ph_rows:'Niveles', rack_ph_cols:'Posiciones',
+  rack_invalid:'Introduce nombre, niveles y posiciones', rack_dup:'Ese nombre de estante ya existe', rack_added:'Estante añadido ✓', rack_del_confirm:'¿Eliminar el estante "{name}"? (los vinos se conservan)',
   hist_title:'Historial', hist_sub:'Vinos bebidos', he_title:'Editar entrada',
   stats_title:"Estadísticas de Ocho", stats_sub:'Resumen',
   ripe_title:'Ventana de consumo', ripe_sub:'¿Cuándo beber?',
@@ -1527,6 +1583,7 @@ function applyI18n() {
     if (active.id === 'tab-stats') renderStats();
     if (active.id === 'tab-trinkreife') renderTrinkreife();
     if (active.id === 'tab-history') renderHistory();
+    if (active.id === 'tab-racks') renderRacks();
     if (active.id === 'tab-wishlist') renderWishlist();
   }
 }
@@ -1548,10 +1605,12 @@ function showTab(name, btn) {
   if (name === 'stats') renderStats();
   if (name === 'trinkreife') renderTrinkreife();
   if (name === 'history') renderHistory();
+  if (name === 'racks') renderRacks();
   if (name === 'wishlist') renderWishlist();
   if (name === 'setup') {
     document.getElementById('setup-currency').value = settings.currency;
     document.getElementById('setup-lang').value = settings.lang;
+    renderRackSetup();
   }
 }
 
@@ -2147,6 +2206,106 @@ function saveHistoryEdit() {
   closeModal('hist-edit-modal');
   renderHistory();
   showToast(t('toast_updated'));
+}
+
+// ═══════════════════════════════════════
+// REGALE (Kellerplan)
+// ═══════════════════════════════════════
+const TYPE_FILL = { rot:'var(--wine-light)', 'weiß':'var(--white-wine)', 'rosé':'var(--rose)', sekt:'var(--sparkling)', other:'var(--text-muted)' };
+let rackActive = 0;
+function bottleSvg(fill) {
+  return `<svg width="60" height="22" viewBox="0 0 60 22" aria-hidden="true" style="display:block">
+    <rect x="1" y="4" width="38" height="14" rx="6" fill="${fill}"/>
+    <polygon points="38,4 46,8 46,14 38,18" fill="${fill}"/>
+    <rect x="45" y="8" width="8" height="6" rx="1.5" fill="${fill}"/>
+    <rect x="52" y="7" width="5" height="8" rx="1.5" fill="#c9a66b"/>
+  </svg>`;
+}
+function wineAt(rackName, e, p) {
+  return wines.find(w => (w.locRegal||'') === rackName && String(w.locEbene) === String(e) && String(w.locPlatz) === String(p));
+}
+function isPlaced(w) {
+  if (!w.locRegal || !w.locEbene || !w.locPlatz) return false;
+  const r = settings.racks.find(r => r.name === w.locRegal);
+  if (!r) return false;
+  const e = parseInt(w.locEbene), p = parseInt(w.locPlatz);
+  return e >= 1 && e <= r.rows && p >= 1 && p <= r.cols;
+}
+
+function renderRacks() {
+  const chips = document.getElementById('rack-chips');
+  const el = document.getElementById('racks-content');
+  const racks = settings.racks;
+  if (!racks.length) {
+    chips.innerHTML = '';
+    el.innerHTML = `<div class="empty-state"><div class="icon">🗄️</div><p>${t('racks_none')}</p></div>`;
+    return;
+  }
+  if (rackActive >= racks.length) rackActive = 0;
+  chips.innerHTML = racks.map((r,i) => `<button class="filter-chip ${i===rackActive?'active':''}" onclick="setRackActive(${i})">${esc(r.name)}</button>`).join('');
+
+  const r = racks[rackActive];
+  const total = r.rows * r.cols;
+  let filled = 0;
+  for (let e=1;e<=r.rows;e++) for (let p=1;p<=r.cols;p++) if (wineAt(r.name,e,p)) filled++;
+
+  let html = `<div class="rack-box"><div class="rack-box-title">${esc(r.name)}</div><div class="rack-box-sub">${filled} / ${total} ${t('racks_filled')}</div>`;
+  const colTmpl = `28px repeat(${r.cols}, 60px)`;
+  // Kopfzeile mit Platz-Nummern
+  html += `<div class="rack-grid" style="grid-template-columns:${colTmpl}"><div></div>`;
+  for (let p=1;p<=r.cols;p++) html += `<div class="rack-collabel">${p}</div>`;
+  // Ebenen von oben (höchste) nach unten (Ebene 1)
+  for (let e=r.rows; e>=1; e--) {
+    html += `<div class="rack-elabel">E${e}</div>`;
+    for (let p=1;p<=r.cols;p++) {
+      const w = wineAt(r.name, e, p);
+      if (w) html += `<div class="rack-slot filled" onclick="goToWine('${w.id}')" title="${esc(w.name)}${w.year?' · '+w.year:''}">${bottleSvg(TYPE_FILL[w.type]||TYPE_FILL.other)}</div>`;
+      else html += `<div class="rack-slot"><div class="rack-empty"></div></div>`;
+    }
+  }
+  html += `</div></div>`;
+
+  // Nicht zugeordnet
+  const unplaced = wines.filter(w => !isPlaced(w));
+  html += `<div class="stats-title" style="margin:8px 0 10px">${t('racks_unassigned')} (${unplaced.length})</div>`;
+  if (unplaced.length) {
+    html += `<div class="rack-unassigned">` + unplaced.map(w =>
+      `<div class="rack-chip-wine" onclick="goToWine('${w.id}')">${bottleSvg(TYPE_FILL[w.type]||TYPE_FILL.other)}<span>${esc(w.name)}${w.year?' · '+w.year:''}</span></div>`
+    ).join('') + `</div>`;
+  } else {
+    html += `<div style="font-size:13px;color:var(--text-muted)">${t('racks_all_placed')}</div>`;
+  }
+  el.innerHTML = html;
+}
+function setRackActive(i) { rackActive = i; renderRacks(); }
+
+// Setup: Regale verwalten
+function renderRackSetup() {
+  const list = document.getElementById('rack-setup-list');
+  if (!list) return;
+  list.innerHTML = settings.racks.map((r,i) =>
+    `<div class="rack-setup-item"><span class="n">${esc(r.name)}</span><span class="d">${r.rows} × ${r.cols}</span><button class="rack-setup-del" onclick="removeRack(${i})">🗑</button></div>`
+  ).join('');
+}
+function addRack() {
+  const name = document.getElementById('rack-new-name').value.trim();
+  const rows = parseInt(document.getElementById('rack-new-rows').value);
+  const cols = parseInt(document.getElementById('rack-new-cols').value);
+  if (!name || !(rows>=1) || !(cols>=1)) { showToast(t('rack_invalid')); return; }
+  if (settings.racks.some(r => r.name === name)) { showToast(t('rack_dup')); return; }
+  settings.racks.push({ name, rows: Math.min(rows,30), cols: Math.min(cols,40) });
+  saveSettings();
+  document.getElementById('rack-new-name').value = '';
+  document.getElementById('rack-new-rows').value = '';
+  document.getElementById('rack-new-cols').value = '';
+  renderRackSetup();
+  showToast(t('rack_added'));
+}
+function removeRack(i) {
+  if (!confirm(t('rack_del_confirm', {name: settings.racks[i].name}))) return;
+  settings.racks.splice(i,1);
+  saveSettings();
+  renderRackSetup();
 }
 
 // ═══════════════════════════════════════
