@@ -738,7 +738,7 @@ input[type="file"] { display: none; }
 ════════════════════════════════════════ -->
 <div class="tab active" id="tab-keller">
   <div class="page-header">
-    <h1>Ocho's Weinkeller</h1>
+    <h1 id="title-keller">Ocho's Weinkeller</h1>
     <div class="subtitle" id="keller-subtitle">Meine Sammlung</div>
   </div>
   <div class="keller-stats" id="keller-stats"></div>
@@ -916,6 +916,11 @@ input[type="file"] { display: none; }
   </div>
   <div class="export-section">
     <div class="form-group">
+      <label data-i18n="setup_owner">Anzeigename (Titel)</label>
+      <input id="setup-owner" type="text" placeholder="z.B. Peter" data-i18n-ph="setup_owner_ph" onchange="setOwner(this.value)">
+      <div style="font-size:12px; font-weight:600; color:var(--text-muted); margin-top:4px" data-i18n="setup_owner_desc">Leer lassen für den Standardtitel.</div>
+    </div>
+    <div class="form-group" style="margin-top:14px">
       <label data-i18n="setup_currency">Währung</label>
       <select id="setup-currency" onchange="setCurrency(this.value)">
         <option value="€">€ — Euro</option>
@@ -1183,7 +1188,7 @@ const SETTINGS_KEY = 'weinkeller_v2_settings';
 let wines = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
 let wishes = JSON.parse(localStorage.getItem(WISH_KEY) || '[]');
 let drunkWines = JSON.parse(localStorage.getItem(DRUNK_KEY) || '[]');
-let settings = Object.assign({currency:'€', lang:'de', racks:[]}, JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'));
+let settings = Object.assign({currency:'€', lang:'de', racks:[], owner:''}, JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'));
 if (!Array.isArray(settings.racks)) settings.racks = [];
 let editId = null;
 let currentStar = 0;
@@ -1383,6 +1388,7 @@ de: {
   exp_title:'Export & Import', exp_sub:'Daten sichern',
   setup_title:'Setup', setup_sub:'Einstellungen',
   setup_currency:'Währung', setup_lang:'Sprache',
+  setup_owner:'Anzeigename (Titel)', setup_owner_ph:'z.B. Peter', setup_owner_desc:'Leer lassen für den Standardtitel. Name → „Name\'s Weinkeller".',
   search_ph:'🔍  Wein suchen…',
   sort_added:'↕ Sortierung: Neueste zuerst', sort_name:'↕ Name (A–Z)', sort_year:'↕ Jahrgang', sort_grape:'↕ Rebsorte', sort_region:'↕ Region', sort_country:'↕ Land', sort_ripeness:'↕ Trinkreife (dringendste zuerst)',
   t_all:'Alle', t_rot:'Rotwein', t_weiss:'Weißwein', t_rose:'Rosé', t_sekt:'Sekt', t_other:'Sonstiges',
@@ -1445,6 +1451,7 @@ en: {
   exp_title:'Export & Import', exp_sub:'Back up your data',
   setup_title:'Setup', setup_sub:'Settings',
   setup_currency:'Currency', setup_lang:'Language',
+  setup_owner:'Display name (title)', setup_owner_ph:'e.g. Peter', setup_owner_desc:'Leave empty for the default title. Name → "Name\'s Weinkeller".',
   search_ph:'🔍  Search wine…',
   sort_added:'↕ Sort: Newest first', sort_name:'↕ Name (A–Z)', sort_year:'↕ Vintage', sort_grape:'↕ Grape', sort_region:'↕ Region', sort_country:'↕ Country', sort_ripeness:'↕ Readiness (most urgent first)',
   t_all:'All', t_rot:'Red', t_weiss:'White', t_rose:'Rosé', t_sekt:'Sparkling', t_other:'Other',
@@ -1507,6 +1514,7 @@ es: {
   exp_title:'Exportar e importar', exp_sub:'Copia de seguridad',
   setup_title:'Ajustes', setup_sub:'Configuración',
   setup_currency:'Moneda', setup_lang:'Idioma',
+  setup_owner:'Nombre (título)', setup_owner_ph:'p.ej. Peter', setup_owner_desc:'Déjalo vacío para el título estándar. Nombre → "Bodega de Nombre".',
   search_ph:'🔍  Buscar vino…',
   sort_added:'↕ Orden: Más recientes primero', sort_name:'↕ Nombre (A–Z)', sort_year:'↕ Añada', sort_grape:'↕ Uva', sort_region:'↕ Región', sort_country:'↕ País', sort_ripeness:'↕ Madurez (más urgentes primero)',
   t_all:'Todos', t_rot:'Tinto', t_weiss:'Blanco', t_rose:'Rosado', t_sekt:'Espumoso', t_other:'Otros',
@@ -1577,6 +1585,7 @@ function applyI18n() {
   document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.getAttribute('data-i18n-ph')); });
   const priceLabel = document.getElementById('price-label');
   if (priceLabel) priceLabel.textContent = t('l_price') + ' (' + settings.currency + ')';
+  applyOwnerTitles();
   const active = document.querySelector('.tab.active');
   if (active) {
     if (active.id === 'tab-keller') renderKeller();
@@ -1588,8 +1597,33 @@ function applyI18n() {
   }
 }
 
+let BRAND_TITLE = null;
+function composeTitles(o) {
+  if (settings.lang === 'es') return { cellar:'Bodega de '+o, stats:'Estadísticas de '+o, wish:'Lista de deseos de '+o };
+  if (settings.lang === 'en') return { cellar:o+"'s Weinkeller", stats:o+"'s Statistics", wish:o+"'s Wishlist" };
+  return { cellar:o+"'s Weinkeller", stats:o+"'s Statistik", wish:o+"'s Wunschliste" };
+}
+function applyOwnerTitles() {
+  const kellerH1 = document.getElementById('title-keller');
+  if (BRAND_TITLE === null && kellerH1) BRAND_TITLE = kellerH1.textContent;
+  const o = (settings.owner || '').trim();
+  const sH1 = document.querySelector('#tab-stats h1');
+  const wH1 = document.querySelector('#tab-wishlist h1');
+  if (!o) {
+    if (kellerH1) kellerH1.textContent = BRAND_TITLE;
+    document.title = BRAND_TITLE || 'Weinkeller';
+    return;
+  }
+  const T = composeTitles(o);
+  if (kellerH1) kellerH1.textContent = T.cellar;
+  if (sH1) sH1.textContent = T.stats;
+  if (wH1) wH1.textContent = T.wish;
+  document.title = T.cellar;
+}
+
 function setCurrency(c) { settings.currency = c; saveSettings(); applyI18n(); }
 function setLanguage(l) { settings.lang = l; saveSettings(); applyI18n(); }
+function setOwner(v) { settings.owner = (v||'').trim(); saveSettings(); applyI18n(); }
 
 // ═══════════════════════════════════════
 // NAV
@@ -1608,6 +1642,7 @@ function showTab(name, btn) {
   if (name === 'racks') renderRacks();
   if (name === 'wishlist') renderWishlist();
   if (name === 'setup') {
+    document.getElementById('setup-owner').value = settings.owner || '';
     document.getElementById('setup-currency').value = settings.currency;
     document.getElementById('setup-lang').value = settings.lang;
     renderRackSetup();
