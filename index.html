@@ -217,6 +217,10 @@ body {
   background: rgba(255,255,255,0.06);
   border: 1px solid var(--border);
 }
+.enrich-prog-head { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.enrich-prog-track { height: 10px; border-radius: 6px; background: rgba(255,255,255,0.08); overflow: hidden; border: 1px solid var(--border); }
+.enrich-prog-bar { height: 100%; width: 0%; border-radius: 6px; background: var(--gold); transition: width .25s ease; }
+.enrich-prog-current { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-top: 6px; min-height: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .image-preview { margin-top: 8px; }
 .image-preview img {
   max-width: 120px; max-height: 160px;
@@ -998,6 +1002,14 @@ input[type="file"] { display: none; }
           <div class="desc" data-i18n="enrich_desc">Fehlende Region, Land, Rebsorte, Trinkfenster & Preis ergänzen und Flaschenbilder erneuern (ersetzt auch tote Bild-Links)</div>
         </div>
       </div>
+      <div id="enrich-progress" style="display:none; margin-top:12px">
+        <div class="enrich-prog-head">
+          <span id="enrich-prog-label">0 / 0</span>
+          <span id="enrich-prog-pct">0%</span>
+        </div>
+        <div class="enrich-prog-track"><div id="enrich-prog-bar" class="enrich-prog-bar"></div></div>
+        <div id="enrich-prog-current" class="enrich-prog-current"></div>
+      </div>
     </div>
     <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border)">
       <div class="stats-title" style="margin-bottom:4px" data-i18n="setup_racks">Regale</div>
@@ -1542,6 +1554,29 @@ async function maybeAutoLookup() {
 }
 function onVintageInput() { autoFillDrinkWindow(); maybeAutoLookup(); }
 
+// Echtzeit-Fortschrittsanzeige der Aktualisierung
+function showEnrichProgress(done, total, name) {
+  const box = document.getElementById('enrich-progress');
+  if (!box) return;
+  box.style.display = total ? 'block' : 'none';
+  const pct = total ? Math.round(done/total*100) : 0;
+  const lab = document.getElementById('enrich-prog-label');
+  const pc = document.getElementById('enrich-prog-pct');
+  const bar = document.getElementById('enrich-prog-bar');
+  const cur = document.getElementById('enrich-prog-current');
+  if (lab) lab.textContent = `${done} / ${total}`;
+  if (pc) pc.textContent = pct + '%';
+  if (bar) bar.style.width = pct + '%';
+  if (cur) cur.textContent = name ? '🔎 ' + name : '';
+}
+function hideEnrichProgress() {
+  const box = document.getElementById('enrich-progress');
+  if (box) box.style.display = 'none';
+}
+// Dem Browser kurz Zeit zum Neuzeichnen geben, damit der Balken live wächst
+// (setTimeout statt requestAnimationFrame, damit es auch läuft, wenn die App im Hintergrund ist)
+function nextFrame() { return new Promise(r => setTimeout(r, 0)); }
+
 let enrichRunning = false;
 async function enrichAllWines() {
   if (enrichRunning) { showToast(t('toast_enrich_busy')); return; }
@@ -1553,10 +1588,13 @@ async function enrichAllWines() {
   const btn = document.getElementById('enrich-btn');
   if (btn) btn.classList.add('is-busy');
   let updated = 0;
+  showEnrichProgress(0, targets.length, targets[0] ? targets[0].name : '');
+  await nextFrame();
   try {
     for (let i = 0; i < targets.length; i++) {
       const w = targets[i];
-      showToast(t('toast_enrich_prog', {done: i+1, total: targets.length}));
+      showEnrichProgress(i, targets.length, w.name);
+      await nextFrame();
       try {
         const info = await lookupWineData(w.name, w.year);
         if (info) {
@@ -1572,6 +1610,8 @@ async function enrichAllWines() {
           if (changed) { updated++; save(); }
         }
       } catch {}
+      showEnrichProgress(i+1, targets.length, w.name);
+      await nextFrame();
     }
   } finally {
     enrichRunning = false;
@@ -1579,6 +1619,7 @@ async function enrichAllWines() {
   }
   renderKeller();
   showToast(t('toast_enrich_done', {n: updated}));
+  setTimeout(hideEnrichProgress, 2500);
 }
 
 // ═══════════════════════════════════════
