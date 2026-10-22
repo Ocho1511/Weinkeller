@@ -201,6 +201,29 @@ body {
 .dot-rosé { background: var(--rose); }
 .dot-sekt { background: var(--sparkling); }
 .dot-other { background: #8a7080; }
+.wine-card-img { flex-shrink: 0; display: block; }
+.wine-card-img img {
+  width: 44px; height: 60px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+}
+.wine-row-img { flex-shrink: 0; display: block; }
+.wine-row-img img {
+  width: 28px; height: 40px;
+  object-fit: contain;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+}
+.image-preview { margin-top: 8px; }
+.image-preview img {
+  max-width: 120px; max-height: 160px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.06);
+}
 .wine-meta { display: flex; gap: 12px; margin-top: 10px; align-items: center; flex-wrap: wrap; }
 .wine-stars { color: var(--gold); font-size: 13px; letter-spacing: 1px; }
 .wine-region { font-size: 11px; font-weight: 600; color: var(--text-muted); }
@@ -1070,6 +1093,11 @@ input[type="file"] { display: none; }
       </div>
     </div>
     <div class="form-group">
+      <label data-i18n="l_image">Flaschenbild (URL aus dem Internet)</label>
+      <input id="f-image" placeholder="https://… .jpg" type="url" oninput="updateImagePreview()">
+      <div id="f-image-preview" class="image-preview" style="display:none"></div>
+    </div>
+    <div class="form-group">
       <label data-i18n="l_rating">Bewertung</label>
       <div class="star-select" id="star-select">
         <button class="star-btn" onclick="setStar(1)">★</button>
@@ -1387,6 +1415,27 @@ function setIfEmpty(id, val) {
   if (el && !el.value && val) el.value = val;
 }
 
+// Plausible, direkte Bild-URL? (http/https, auf Bildendung)
+function isImageUrl(u) {
+  if (!u || typeof u !== 'string') return false;
+  u = u.trim();
+  return /^https?:\/\/\S+\.(jpg|jpeg|png|webp|gif)(\?\S*)?$/i.test(u);
+}
+
+// Bildvorschau im Formular aktualisieren
+function updateImagePreview() {
+  const url = (document.getElementById('f-image').value || '').trim();
+  const box = document.getElementById('f-image-preview');
+  if (!box) return;
+  if (url) {
+    box.innerHTML = `<img src="${esc(url)}" alt="" onerror="this.parentNode.innerHTML='<span style=&quot;color:var(--text-muted);font-size:12px&quot;>${esc(t('img_broken'))}</span>'">`;
+    box.style.display = 'block';
+  } else {
+    box.innerHTML = '';
+    box.style.display = 'none';
+  }
+}
+
 // Reifezeit (Jahre nach Jahrgang) je Rebsorte bzw. Typ → lokale Trinkfenster-Schätzung
 const MATURATION_GRAPE = {
   'barolo':[4,30],'barbaresco':[4,25],'nebbiolo':[4,25],'brunello':[5,30],'sangiovese':[3,15],
@@ -1431,8 +1480,8 @@ async function lookupWineData(name, year) {
       model: 'claude-sonnet-4-6',
       max_tokens: 1200,
       tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 3 }],
-      system: `Du bist ein Wein-Experte. Recherchiere den aktuellen durchschnittlichen Marktpreis (Endverbraucher, 0,75-l-Flasche) mit der Websuche. Antworte am Ende mit GENAU EINEM JSON-Objekt (ohne Markdown) mit den Feldern: type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), land (Herkunftsland auf Deutsch oder null), grape (Hauptrebsorte oder null), drinkFrom (Jahr als Zahl oder null), drinkTo (Jahr als Zahl oder null), price (aktueller Durchschnittspreis pro Flasche in ${currencyName()} als Zahl ohne Währungssymbol, gerundet, oder null). Für Beschreibungsfelder nutze dein Wissen; für den Preis die Websuche. Nutze null nur wenn keine sinnvolle Angabe möglich ist.`,
-      messages: [{ role: 'user', content: `Wein: ${name}${year ? ' (Jahrgang ' + year + ')' : ''}. Nenne Typ, Region, Land, Hauptrebsorte, ein geschätztes Trinkfenster und den aktuellen Durchschnittspreis pro Flasche in ${currencyName()}.` }]
+      system: `Du bist ein Wein-Experte. Recherchiere den aktuellen durchschnittlichen Marktpreis (Endverbraucher, 0,75-l-Flasche) mit der Websuche. Antworte am Ende mit GENAU EINEM JSON-Objekt (ohne Markdown) mit den Feldern: type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), land (Herkunftsland auf Deutsch oder null), grape (Hauptrebsorte oder null), drinkFrom (Jahr als Zahl oder null), drinkTo (Jahr als Zahl oder null), price (aktueller Durchschnittspreis pro Flasche in ${currencyName()} als Zahl ohne Währungssymbol, gerundet, oder null), image (eine direkte, öffentlich erreichbare URL zu einem Foto DER FLASCHE, die direkt auf eine Bilddatei zeigt und auf .jpg/.jpeg/.png/.webp endet – bevorzugt Wikimedia Commons oder die Seite des Weinguts/Händlers; nur eine URL, die du über die Websuche tatsächlich gesehen hast, sonst null). Für Beschreibungsfelder nutze dein Wissen; für Preis und Bild die Websuche. Nutze null nur wenn keine sinnvolle Angabe möglich ist.`,
+      messages: [{ role: 'user', content: `Wein: ${name}${year ? ' (Jahrgang ' + year + ')' : ''}. Nenne Typ, Region, Land, Hauptrebsorte, ein geschätztes Trinkfenster, den aktuellen Durchschnittspreis pro Flasche in ${currencyName()} und eine direkte Bild-URL der Flasche.` }]
     })
   });
   const data = await resp.json();
@@ -1458,6 +1507,7 @@ async function lookupWine() {
     setIfEmpty('f-drink-from', info.drinkFrom);
     setIfEmpty('f-drink-to', info.drinkTo);
     if (info.price != null) setIfEmpty('f-price', info.price);
+    if (isImageUrl(info.image)) { setIfEmpty('f-image', info.image.trim()); updateImagePreview(); }
     const found = info.region || info.land || info.grape || info.drinkFrom || info.drinkTo || info.price != null;
     showToast(found ? t('toast_lookup_ok') : t('toast_lookup_none'));
   } catch {
@@ -1487,6 +1537,7 @@ async function maybeAutoLookup() {
     setIfEmpty('f-drink-from', info.drinkFrom);
     setIfEmpty('f-drink-to', info.drinkTo);
     if (info.price != null) { setIfEmpty('f-price', info.price); showToast(t('toast_price_ok', {p: fmtMoney(Math.round(info.price))})); }
+    if (isImageUrl(info.image)) { setIfEmpty('f-image', info.image.trim()); updateImagePreview(); }
   } catch {}
 }
 function onVintageInput() { autoFillDrinkWindow(); maybeAutoLookup(); }
@@ -1494,7 +1545,7 @@ function onVintageInput() { autoFillDrinkWindow(); maybeAutoLookup(); }
 let enrichRunning = false;
 async function enrichAllWines() {
   if (enrichRunning) { showToast(t('toast_enrich_busy')); return; }
-  const targets = wines.filter(w => !w.region || !w.country || !w.grape || !w.drinkFrom || !w.drinkTo || !w.price);
+  const targets = wines.filter(w => !w.region || !w.country || !w.grape || !w.drinkFrom || !w.drinkTo || !w.price || !w.image);
   if (!targets.length) { showToast(t('toast_enrich_none')); return; }
   if (!confirm(t('confirm_enrich', {n: targets.length}))) return;
   enrichRunning = true;
@@ -1515,6 +1566,7 @@ async function enrichAllWines() {
           if (!w.drinkFrom && info.drinkFrom) { w.drinkFrom = parseInt(info.drinkFrom)||null; changed = true; }
           if (!w.drinkTo && info.drinkTo) { w.drinkTo = parseInt(info.drinkTo)||null; changed = true; }
           if (!w.price && info.price != null) { w.price = parseFloat(info.price)||null; changed = true; }
+          if (!w.image && isImageUrl(info.image)) { w.image = info.image.trim(); changed = true; }
           if (changed) { updated++; save(); }
         }
       } catch {}
@@ -1582,6 +1634,7 @@ de: {
   l_name:'Name / Weingut', l_year:'Jahrgang', l_count:'Flaschen', l_type:'Weintyp', l_region:'Region', l_country:'Land', l_grape:'Rebsorte',
   l_location:'Lagerplatz (Regal · Ebene · Platz von links)', ph_regal:'Regal', ph_ebene:'Ebene', ph_platz:'Platz v.l.',
   l_from:'Trinken ab', l_to:'Trinken bis', l_price:'Preis', l_rating:'Bewertung', l_note:'Notiz',
+  l_image:'Flaschenbild (URL aus dem Internet)', img_open:'Flaschenbild öffnen', img_broken:'Bild nicht verfügbar',
   o_rot:'🔴 Rotwein', o_weiss:'🟡 Weißwein', o_rose:'🌸 Rosé', o_sekt:'✨ Sekt / Champagner', o_other:'◻️ Sonstiges',
   btn_cancel:'Abbrechen', btn_save:'Speichern', btn_add:'Hinzufügen',
   wm_title:'Wunsch hinzufügen', l_wnote:'Notiz / Wo kaufen?', ph_note:'Geschmack, Anlass, Gedanken…', ph_wnote:'Gefunden bei…',
@@ -1650,6 +1703,7 @@ en: {
   l_name:'Name / Winery', l_year:'Vintage', l_count:'Bottles', l_type:'Wine type', l_region:'Region', l_country:'Country', l_grape:'Grape',
   l_location:'Storage (rack · level · slot from left)', ph_regal:'Rack', ph_ebene:'Level', ph_platz:'Slot f.l.',
   l_from:'Drink from', l_to:'Drink until', l_price:'Price', l_rating:'Rating', l_note:'Note',
+  l_image:'Bottle image (URL from the web)', img_open:'Open bottle image', img_broken:'Image unavailable',
   o_rot:'🔴 Red', o_weiss:'🟡 White', o_rose:'🌸 Rosé', o_sekt:'✨ Sparkling / Champagne', o_other:'◻️ Other',
   btn_cancel:'Cancel', btn_save:'Save', btn_add:'Add',
   wm_title:'Add wish', l_wnote:'Note / Where to buy?', ph_note:'Taste, occasion, thoughts…', ph_wnote:'Found at…',
@@ -1718,6 +1772,7 @@ es: {
   l_name:'Nombre / Bodega', l_year:'Añada', l_count:'Botellas', l_type:'Tipo de vino', l_region:'Región', l_country:'País', l_grape:'Uva',
   l_location:'Ubicación (estante · nivel · sitio desde la izq.)', ph_regal:'Estante', ph_ebene:'Nivel', ph_platz:'Sitio izq.',
   l_from:'Beber desde', l_to:'Beber hasta', l_price:'Precio', l_rating:'Valoración', l_note:'Nota',
+  l_image:'Foto de la botella (URL de internet)', img_open:'Abrir foto de la botella', img_broken:'Imagen no disponible',
   o_rot:'🔴 Tinto', o_weiss:'🟡 Blanco', o_rose:'🌸 Rosado', o_sekt:'✨ Espumoso / Champán', o_other:'◻️ Otros',
   btn_cancel:'Cancelar', btn_save:'Guardar', btn_add:'Añadir',
   wm_title:'Añadir deseo', l_wnote:'Nota / ¿Dónde comprar?', ph_note:'Sabor, ocasión, ideas…', ph_wnote:'Encontrado en…',
@@ -1828,6 +1883,13 @@ function formatLocation(w) {
   return parts.length ? parts.join(' · ') : (w.location || '');
 }
 
+// Klickbares Flaschenbild (Link öffnet das Foto); bricht sauber weg, wenn URL tot ist
+function wineImgHtml(w, cls) {
+  if (!w.image) return '';
+  const u = esc(w.image);
+  return `<a class="${cls}" href="${u}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(t('img_open'))}"><img src="${u}" alt="" loading="lazy" onerror="this.closest('a').style.display='none'"></a>`;
+}
+
 function renderKeller() {
   const q = document.getElementById('search-input').value.toLowerCase();
   // stats
@@ -1890,6 +1952,7 @@ function renderKeller() {
     el.innerHTML = list.map(w => `
       <div class="wine-row" data-wine-id="${w.id}">
         <div class="wine-type-dot ${TYPE_COLORS[w.type]||'dot-other'}"></div>
+        ${wineImgHtml(w,'wine-row-img')}
         <div class="wine-row-info">
           <div class="wine-row-name">${esc(w.name)}</div>
           <div class="wine-row-sub">${w.year||'–'} · ${TYPE_LABELS[w.type]||'Sonstiges'}${w.grape?' · '+esc(w.grape):''}${(w.region||w.country)?' · '+esc([w.region,w.country].filter(Boolean).join(', ')):''}${formatLocation(w)?' · 📍 '+esc(formatLocation(w)):''}</div>
@@ -1906,7 +1969,8 @@ function renderKeller() {
     return `
     <div class="wine-card" data-wine-id="${w.id}">
       <div class="wine-card-top">
-        <div>
+        ${wineImgHtml(w,'wine-card-img')}
+        <div style="flex:1;min-width:0">
           <div class="wine-name">${esc(w.name)}</div>
           <div class="wine-year">${w.year||''} ${w.grape?'· '+esc(w.grape):''}</div>
         </div>
@@ -2083,6 +2147,8 @@ function editWine(id) {
   document.getElementById('f-drink-from').value = w.drinkFrom||'';
   document.getElementById('f-drink-to').value = w.drinkTo||'';
   document.getElementById('f-price').value = w.price||'';
+  document.getElementById('f-image').value = w.image||'';
+  updateImagePreview();
   document.getElementById('f-note').value = w.note||'';
   setStar(w.rating||0);
   document.getElementById('modal-title').textContent = t('m_edit_title');
@@ -2096,7 +2162,8 @@ function openAddModal() {
   editId = null;
   autoDrink = { from: null, to: null };
   lastAutoLookupKey = '';
-  ['f-name','f-year','f-region','f-country','f-grape','f-loc-regal','f-loc-ebene','f-loc-platz','f-note','f-drink-from','f-drink-to','f-price'].forEach(id => document.getElementById(id).value = '');
+  ['f-name','f-year','f-region','f-country','f-grape','f-loc-regal','f-loc-ebene','f-loc-platz','f-note','f-drink-from','f-drink-to','f-price','f-image'].forEach(id => document.getElementById(id).value = '');
+  updateImagePreview();
   document.getElementById('f-count').value = 1;
   document.getElementById('f-type').value = 'rot';
   setStar(0);
@@ -2132,6 +2199,7 @@ function saveWine() {
     drinkFrom: parseInt(document.getElementById('f-drink-from').value)||null,
     drinkTo: parseInt(document.getElementById('f-drink-to').value)||null,
     price: parseFloat(document.getElementById('f-price').value)||null,
+    image: document.getElementById('f-image').value.trim()||null,
     rating: currentStar||null,
     note: document.getElementById('f-note').value.trim()||null,
     added: editId ? (wines.find(w=>w.id===editId)||{}).added : new Date().toISOString()
@@ -2144,7 +2212,7 @@ function saveWine() {
     const existing = wines.find(w => norm(w.name) === norm(wine.name) && (w.year||null) === (wine.year||null));
     if (existing) {
       existing.count = (existing.count||1) + (wine.count||1);
-      ['region','country','grape','locRegal','locEbene','locPlatz','drinkFrom','drinkTo','price','rating','note'].forEach(k => {
+      ['region','country','grape','locRegal','locEbene','locPlatz','drinkFrom','drinkTo','price','image','rating','note'].forEach(k => {
         if (!existing[k] && wine[k]) existing[k] = wine[k];
       });
       showToast(t('toast_count', {n: existing.count}));
