@@ -1712,19 +1712,25 @@ async function enrichAllWines() {
       showEnrichProgress(i, targets.length, w.name);
       await nextFrame();
       try {
-        const info = await lookupWineData(w.name, w.year);
         let changed = false;
-        if (info) {
-          if (!w.region && info.region) { w.region = info.region; changed = true; }
-          if (!w.country && info.land) { w.country = info.land; changed = true; }
-          if (!w.grape && info.grape) { w.grape = info.grape; changed = true; }
-          if (!w.drinkFrom && info.drinkFrom) { w.drinkFrom = parseInt(info.drinkFrom)||null; changed = true; }
-          if (!w.drinkTo && info.drinkTo) { w.drinkTo = parseInt(info.drinkTo)||null; changed = true; }
-          if (!w.price && info.price != null) { w.price = parseFloat(info.price)||null; changed = true; }
+        // 1) Flaschenbild zuerst (schnell, Vivino) – damit Bilder zügig für JEDEN Wein erscheinen, sofort speichern
+        const newImg = await resolveWineImage(null, w.name, w.year);
+        if (newImg && newImg !== (w.image||'')) { w.image = newImg; changed = true; save(); }
+        // 2) Langsamen KI-Websuche-Aufruf nur, wenn Textfelder fehlen (sonst überspringen → Lauf bleibt schnell)
+        const needsFields = !w.region || !w.country || !w.grape || !w.drinkFrom || !w.drinkTo || !w.price;
+        if (needsFields) {
+          const info = await lookupWineData(w.name, w.year);
+          if (info) {
+            if (!w.region && info.region) { w.region = info.region; changed = true; }
+            if (!w.country && info.land) { w.country = info.land; changed = true; }
+            if (!w.grape && info.grape) { w.grape = info.grape; changed = true; }
+            if (!w.drinkFrom && info.drinkFrom) { w.drinkFrom = parseInt(info.drinkFrom)||null; changed = true; }
+            if (!w.drinkTo && info.drinkTo) { w.drinkTo = parseInt(info.drinkTo)||null; changed = true; }
+            if (!w.price && info.price != null) { w.price = parseFloat(info.price)||null; changed = true; }
+            // Falls Vivino kein Bild hatte: KI-Direktbild / og:image als Rückfall
+            if (!w.image) { const alt = await resolveWineImage(info, w.name, w.year); if (alt) { w.image = alt; changed = true; } }
+          }
         }
-        // Flaschenbild verifiziert auflösen (Vivino → Direktbild → og:image der Seite); ersetzt auch alte/tote Links, speichert nur ladbare URLs
-        const newImg = await resolveWineImage(info, w.name, w.year);
-        if (newImg && newImg !== (w.image||'')) { w.image = newImg; changed = true; }
         if (changed) { updated++; save(); }
       } catch {}
       showEnrichProgress(i+1, targets.length, w.name);
