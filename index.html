@@ -1188,6 +1188,7 @@ const SETTINGS_KEY = 'weinkeller_v2_settings';
 let wines = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
 let wishes = JSON.parse(localStorage.getItem(WISH_KEY) || '[]');
 let drunkWines = JSON.parse(localStorage.getItem(DRUNK_KEY) || '[]');
+const DEFAULT_OWNER = "Ocho";
 let settings = Object.assign({currency:'€', lang:'de', racks:[], owner:''}, JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'));
 if (!Array.isArray(settings.racks)) settings.racks = [];
 let editId = null;
@@ -1597,24 +1598,17 @@ function applyI18n() {
   }
 }
 
-let BRAND_TITLE = null;
 function composeTitles(o) {
   if (settings.lang === 'es') return { cellar:'Bodega de '+o, stats:'Estadísticas de '+o, wish:'Lista de deseos de '+o };
-  if (settings.lang === 'en') return { cellar:o+"'s Weinkeller", stats:o+"'s Statistics", wish:o+"'s Wishlist" };
+  if (settings.lang === 'en') return { cellar:o+"'s Wine Cellar", stats:o+"'s Statistics", wish:o+"'s Wishlist" };
   return { cellar:o+"'s Weinkeller", stats:o+"'s Statistik", wish:o+"'s Wunschliste" };
 }
 function applyOwnerTitles() {
+  const o = (settings.owner || '').trim() || DEFAULT_OWNER;
+  const T = composeTitles(o);
   const kellerH1 = document.getElementById('title-keller');
-  if (BRAND_TITLE === null && kellerH1) BRAND_TITLE = kellerH1.textContent;
-  const o = (settings.owner || '').trim();
   const sH1 = document.querySelector('#tab-stats h1');
   const wH1 = document.querySelector('#tab-wishlist h1');
-  if (!o) {
-    if (kellerH1) kellerH1.textContent = BRAND_TITLE;
-    document.title = BRAND_TITLE || 'Weinkeller';
-    return;
-  }
-  const T = composeTitles(o);
   if (kellerH1) kellerH1.textContent = T.cellar;
   if (sH1) sH1.textContent = T.stats;
   if (wH1) wH1.textContent = T.wish;
