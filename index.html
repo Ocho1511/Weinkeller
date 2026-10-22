@@ -2097,8 +2097,9 @@ function renderKeller() {
   // stats
   const total = wines.reduce((s,w) => s + (w.count||1), 0);
   const val = wines.reduce((s,w) => s + (w.price||0)*(w.count||1), 0);
-  const avgRating = wines.filter(w=>w.rating).length
-    ? (wines.filter(w=>w.rating).reduce((s,w)=>s+w.rating,0)/wines.filter(w=>w.rating).length).toFixed(1)
+  const rated = wines.filter(w=>w.rating);
+  const avgRating = rated.length
+    ? (rated.reduce((s,w)=>s+w.rating,0)/rated.length).toFixed(1)
     : '–';
   document.getElementById('keller-stats').innerHTML = `
     <div class="stat-pill"><div class="val">${total}</div><div class="lbl">${t('pill_bottles')}</div></div>
@@ -2135,14 +2136,17 @@ function renderKeller() {
   else if (sortMode === 'grape') list.sort(cmpText('grape'));
   else if (sortMode === 'region') list.sort(cmpText('region'));
   else if (sortMode === 'country') list.sort(cmpText('country'));
-  else if (sortMode === 'ripeness') list.sort((a,b) => {
-    const ra = getRipenessInfo(a), rb = getRipenessInfo(b);
-    if (!ra && !rb) return 0;
-    if (!ra) return 1;
-    if (!rb) return -1;
-    if (rb.pct !== ra.pct) return rb.pct - ra.pct;
-    return (a.drinkTo||9999) - (b.drinkTo||9999);
-  });
+  else if (sortMode === 'ripeness') {
+    const rmap = new Map(list.map(w => [w, getRipenessInfo(w)]));
+    list.sort((a,b) => {
+      const ra = rmap.get(a), rb = rmap.get(b);
+      if (!ra && !rb) return 0;
+      if (!ra) return 1;
+      if (!rb) return -1;
+      if (rb.pct !== ra.pct) return rb.pct - ra.pct;
+      return (a.drinkTo||9999) - (b.drinkTo||9999);
+    });
+  }
 
   const el = document.getElementById('wine-list');
   if (!list.length) {
@@ -2151,23 +2155,28 @@ function renderKeller() {
   }
 
   if (viewMode === 'list') {
-    el.innerHTML = list.map(w => `
+    el.innerHTML = list.map(w => {
+      const loc = formatLocation(w);
+      const regionCountry = [w.region, w.country].filter(Boolean).join(', ');
+      return `
       <div class="wine-row" data-wine-id="${w.id}">
         <div class="wine-type-dot ${TYPE_COLORS[w.type]||'dot-other'}"></div>
         ${wineImgHtml(w,'wine-row-img')}
         <div class="wine-row-info">
           <div class="wine-row-name">${esc(w.name)}</div>
-          <div class="wine-row-sub">${w.year||'–'} · ${TYPE_LABELS[w.type]||'Sonstiges'}${w.grape?' · '+esc(w.grape):''}${(w.region||w.country)?' · '+esc([w.region,w.country].filter(Boolean).join(', ')):''}${formatLocation(w)?' · 📍 '+esc(formatLocation(w)):''}</div>
+          <div class="wine-row-sub">${w.year||'–'} · ${TYPE_LABELS[w.type]||'Sonstiges'}${w.grape?' · '+esc(w.grape):''}${regionCountry?' · '+esc(regionCountry):''}${loc?' · 📍 '+esc(loc):''}</div>
         </div>
         <button class="wine-row-delete" onclick="deleteWine('${w.id}')">🗑</button>
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
     return;
   }
 
   el.innerHTML = list.map(w => {
     const stars = w.rating ? '★'.repeat(w.rating) + '☆'.repeat(5-w.rating) : '☆☆☆☆☆';
     const ripe = getRipenessInfo(w);
+    const loc = formatLocation(w);
+    const regionCountry = [w.region, w.country].filter(Boolean).join(', ');
     return `
     <div class="wine-card" data-wine-id="${w.id}">
       <div class="wine-card-top">
@@ -2180,8 +2189,8 @@ function renderKeller() {
       </div>
       <div class="wine-meta">
         <div class="wine-stars">${stars}</div>
-        ${(w.region||w.country)?`<div class="wine-region">${esc([w.region,w.country].filter(Boolean).join(', '))}</div>`:''}
-        ${formatLocation(w)?`<div class="wine-region">📍 ${esc(formatLocation(w))}</div>`:''}
+        ${regionCountry?`<div class="wine-region">${esc(regionCountry)}</div>`:''}
+        ${loc?`<div class="wine-region">📍 ${esc(loc)}</div>`:''}
         <div class="wine-count-badge">${w.count||1} ${t('fl')}</div>
       </div>
       ${ripe ? `
