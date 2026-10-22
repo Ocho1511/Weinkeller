@@ -938,6 +938,35 @@ input[type="file"] { display: none; }
       </select>
     </div>
     <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border)">
+      <div class="stats-title" style="margin-bottom:4px" data-i18n="setup_storage">Speicherort</div>
+      <div style="font-size:12px; font-weight:600; color:var(--text-muted); margin-bottom:12px" data-i18n="setup_storage_desc">Cloud: Daten geräteübergreifend nutzbar (neueste Änderung gewinnt).</div>
+      <div class="filter-scroll" style="padding:0 0 12px 0">
+        <button class="filter-chip" id="storage-local" onclick="setStorage('local')" data-i18n="storage_local">Nur dieses Gerät</button>
+        <button class="filter-chip" id="storage-cloud" onclick="setStorage('cloud')" data-i18n="storage_cloud">Cloud</button>
+      </div>
+      <div id="sync-panel" style="display:none">
+        <div class="rack-add-row">
+          <input id="sync-code-input" type="text" placeholder="Sync-Code" data-i18n-ph="sync_code_ph">
+          <button class="mini-scan-btn" onclick="connectSyncCode()" title="Mit Code verbinden">🔗</button>
+        </div>
+        <div class="export-card" onclick="createSyncCode()" style="margin-top:10px">
+          <div class="export-icon">➕</div>
+          <div class="export-info">
+            <div class="title" data-i18n="sync_create">Neuen Sync-Code erstellen</div>
+            <div class="desc" data-i18n="sync_create_desc">Dieses Gerät als erstes verbinden</div>
+          </div>
+        </div>
+        <div class="export-card" onclick="syncNow()" style="margin-top:10px">
+          <div class="export-icon">🔄</div>
+          <div class="export-info">
+            <div class="title" data-i18n="sync_now">Jetzt synchronisieren</div>
+            <div class="desc" id="sync-status" data-i18n="sync_status_idle">Noch nicht synchronisiert</div>
+          </div>
+        </div>
+        <div id="sync-code-show" style="display:none; font-size:12px; font-weight:600; color:var(--text-muted); margin-top:10px; word-break:break-all"></div>
+      </div>
+    </div>
+    <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border)">
       <div class="stats-title" style="margin-bottom:12px" data-i18n="setup_db">Weindatenbank</div>
       <div class="export-card" id="enrich-btn" onclick="enrichAllWines()">
         <div class="export-icon">🔄</div>
@@ -1189,8 +1218,10 @@ let wines = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
 let wishes = JSON.parse(localStorage.getItem(WISH_KEY) || '[]');
 let drunkWines = JSON.parse(localStorage.getItem(DRUNK_KEY) || '[]');
 const DEFAULT_OWNER = "Ocho";
-let settings = Object.assign({currency:'€', lang:'de', racks:[], owner:''}, JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'));
+const STAMP_KEY = 'weinkeller_v2_stamp';
+let settings = Object.assign({currency:'€', lang:'de', racks:[], owner:'', storage:'local', syncCode:''}, JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'));
 if (!Array.isArray(settings.racks)) settings.racks = [];
+let dataStamp = parseInt(localStorage.getItem(STAMP_KEY) || '0');
 let editId = null;
 let currentStar = 0;
 let activeFilter = 'alle';
@@ -1201,10 +1232,133 @@ let ripeFilterStatus = 'alle';
 let histFilterType = 'alle';
 let histFilterOcc = 'alle';
 
-function save() { localStorage.setItem(STORE_KEY, JSON.stringify(wines)); }
-function saveWishes() { localStorage.setItem(WISH_KEY, JSON.stringify(wishes)); }
-function saveDrunk() { localStorage.setItem(DRUNK_KEY, JSON.stringify(drunkWines)); }
+function save() { localStorage.setItem(STORE_KEY, JSON.stringify(wines)); touchData(); }
+function saveWishes() { localStorage.setItem(WISH_KEY, JSON.stringify(wishes)); touchData(); }
+function saveDrunk() { localStorage.setItem(DRUNK_KEY, JSON.stringify(drunkWines)); touchData(); }
 function saveSettings() { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }
+
+// Daten-Zeitstempel: bei jeder inhaltlichen Änderung neu setzen + (falls Cloud) hochladen
+function touchData() {
+  dataStamp = Date.now();
+  try { localStorage.setItem(STAMP_KEY, String(dataStamp)); } catch(e) {}
+  cloudPushDebounced();
+}
+
+// ═══════════════════════════════════════
+// CLOUD-SYNC (newest wins)
+// ═══════════════════════════════════════
+function collectData() {
+  return { wines, wishes, drunkWines, racks: settings.racks || [], owner: settings.owner || '' };
+}
+function applyData(d) {
+  if (!d) return;
+  wines = Array.isArray(d.wines) ? d.wines : [];
+  wishes = Array.isArray(d.wishes) ? d.wishes : [];
+  drunkWines = Array.isArray(d.drunkWines) ? d.drunkWines : [];
+  settings.racks = Array.isArray(d.racks) ? d.racks : [];
+  settings.owner = d.owner || '';
+  localStorage.setItem(STORE_KEY, JSON.stringify(wines));
+  localStorage.setItem(WISH_KEY, JSON.stringify(wishes));
+  localStorage.setItem(DRUNK_KEY, JSON.stringify(drunkWines));
+  saveSettings();
+}
+async function cloudCall(op, extra) {
+  const resp = await fetch(SCAN_PROXY_URL + '/sync', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(Object.assign({ op, code: settings.syncCode }, extra || {}))
+  });
+  if (!resp.ok) throw new Error('sync_http_' + resp.status);
+  return resp.json();
+}
+let cloudTimer = null, cloudBusy = false;
+function cloudPushDebounced() {
+  if (settings.storage !== 'cloud' || !settings.syncCode) return;
+  clearTimeout(cloudTimer);
+  cloudTimer = setTimeout(cloudPush, 1500);
+}
+async function cloudPush() {
+  if (settings.storage !== 'cloud' || !settings.syncCode || cloudBusy) return;
+  cloudBusy = true;
+  try {
+    const r = await cloudCall('push', { data: collectData(), updatedAt: dataStamp });
+    if (r && r.newer && r.data) {            // Server war neuer → übernehmen
+      applyData(r.data); dataStamp = r.updatedAt;
+      try { localStorage.setItem(STAMP_KEY, String(dataStamp)); } catch(e) {}
+      rerenderActive();
+    }
+    updateSyncStatus();
+  } catch(e) { updateSyncStatus('err'); } finally { cloudBusy = false; }
+}
+async function syncNow(silent) {
+  if (settings.storage !== 'cloud' || !settings.syncCode) return;
+  if (!silent) showToast(t('sync_running'));
+  try {
+    const r = await cloudCall('pull');
+    if (r && r.exists && (r.updatedAt || 0) > dataStamp) {   // Cloud neuer → übernehmen
+      applyData(r.data); dataStamp = r.updatedAt;
+      try { localStorage.setItem(STAMP_KEY, String(dataStamp)); } catch(e) {}
+      rerenderActive();
+    } else {                                                  // lokal neuer/gleich → hochladen
+      await cloudCall('push', { data: collectData(), updatedAt: dataStamp });
+    }
+    updateSyncStatus();
+    if (!silent) showToast(t('sync_done'));
+  } catch(e) { updateSyncStatus('err'); if (!silent) showToast(t('sync_fail')); }
+}
+async function createSyncCode() {
+  const code = (crypto.randomUUID ? crypto.randomUUID() : (Date.now()+''+Math.random())).replace(/-/g,'').slice(0,20);
+  settings.storage = 'cloud'; settings.syncCode = code; saveSettings();
+  if (!dataStamp) { dataStamp = Date.now(); try { localStorage.setItem(STAMP_KEY, String(dataStamp)); } catch(e){} }
+  try { await cloudCall('push', { data: collectData(), updatedAt: dataStamp }); showToast(t('sync_code_created')); }
+  catch(e) { showToast(t('sync_fail')); }
+  renderSetupSync();
+}
+async function connectSyncCode() {
+  const code = (document.getElementById('sync-code-input').value || '').trim();
+  if (code.length < 6) { showToast(t('sync_code_invalid')); return; }
+  settings.storage = 'cloud'; settings.syncCode = code; saveSettings();
+  showToast(t('sync_running'));
+  try {
+    const r = await cloudCall('pull');
+    if (r && r.exists) { applyData(r.data); dataStamp = r.updatedAt; try { localStorage.setItem(STAMP_KEY, String(dataStamp)); } catch(e){} rerenderActive(); showToast(t('sync_connected')); }
+    else { if (!dataStamp){ dataStamp=Date.now(); localStorage.setItem(STAMP_KEY,String(dataStamp)); } await cloudCall('push', { data: collectData(), updatedAt: dataStamp }); showToast(t('sync_connected')); }
+  } catch(e) { showToast(t('sync_fail')); }
+  renderSetupSync();
+}
+function setStorage(mode) {
+  if (mode === 'local') { settings.storage = 'local'; saveSettings(); renderSetupSync(); }
+  else { settings.storage = 'cloud'; saveSettings(); renderSetupSync(); }  // Code via Buttons
+}
+function rerenderActive() {
+  const a = document.querySelector('.tab.active'); if (!a) return;
+  if (a.id === 'tab-keller') renderKeller();
+  else if (a.id === 'tab-stats') renderStats();
+  else if (a.id === 'tab-trinkreife') renderTrinkreife();
+  else if (a.id === 'tab-history') renderHistory();
+  else if (a.id === 'tab-racks') renderRacks();
+  else if (a.id === 'tab-wishlist') renderWishlist();
+}
+function updateSyncStatus(state) {
+  const el = document.getElementById('sync-status'); if (!el) return;
+  if (state === 'err') { el.textContent = t('sync_status_err'); return; }
+  el.textContent = t('sync_status_ok', { t: new Date().toLocaleTimeString(dateLocale(), {hour:'2-digit', minute:'2-digit'}) });
+}
+function renderSetupSync() {
+  const isCloud = settings.storage === 'cloud';
+  const lc = document.getElementById('storage-local'), cc = document.getElementById('storage-cloud');
+  if (lc) lc.classList.toggle('active', !isCloud);
+  if (cc) cc.classList.toggle('active', isCloud);
+  const panel = document.getElementById('sync-panel');
+  if (panel) panel.style.display = isCloud ? 'block' : 'none';
+  const show = document.getElementById('sync-code-show');
+  if (show) {
+    if (isCloud && settings.syncCode) { show.style.display = 'block'; show.textContent = t('sync_code_label') + ' ' + settings.syncCode; }
+    else { show.style.display = 'none'; }
+  }
+}
+async function syncOnLoad() {
+  if (settings.storage === 'cloud' && settings.syncCode) { await syncNow(true); }
+}
 
 function fmtMoney(n) { return settings.currency === 'CHF' ? 'CHF ' + n : settings.currency + n; }
 function dateLocale() { return settings.lang === 'de' ? 'de-DE' : settings.lang === 'es' ? 'es-ES' : 'en-US'; }
@@ -1390,6 +1544,11 @@ de: {
   setup_title:'Setup', setup_sub:'Einstellungen',
   setup_currency:'Währung', setup_lang:'Sprache',
   setup_owner:'Anzeigename (Titel)', setup_owner_ph:'z.B. Peter', setup_owner_desc:'Leer lassen für den Standardtitel. Name → „Name\'s Weinkeller".',
+  setup_storage:'Speicherort', setup_storage_desc:'Cloud: Daten geräteübergreifend nutzbar (neueste Änderung gewinnt).',
+  storage_local:'Nur dieses Gerät', storage_cloud:'Cloud',
+  sync_code_ph:'Sync-Code', sync_create:'Neuen Sync-Code erstellen', sync_create_desc:'Dieses Gerät als erstes verbinden',
+  sync_now:'Jetzt synchronisieren', sync_status_idle:'Noch nicht synchronisiert', sync_status_ok:'Zuletzt synchronisiert: {t}', sync_status_err:'Synchronisierung fehlgeschlagen', sync_code_label:'Dein Sync-Code:',
+  sync_running:'⏳ Synchronisiere…', sync_done:'Synchronisiert ✓', sync_fail:'Synchronisierung fehlgeschlagen', sync_code_created:'Sync-Code erstellt ✓', sync_code_invalid:'Bitte gültigen Code eingeben', sync_connected:'Mit Cloud verbunden ✓',
   search_ph:'🔍  Wein suchen…',
   sort_added:'↕ Sortierung: Neueste zuerst', sort_name:'↕ Name (A–Z)', sort_year:'↕ Jahrgang', sort_grape:'↕ Rebsorte', sort_region:'↕ Region', sort_country:'↕ Land', sort_ripeness:'↕ Trinkreife (dringendste zuerst)',
   t_all:'Alle', t_rot:'Rotwein', t_weiss:'Weißwein', t_rose:'Rosé', t_sekt:'Sekt', t_other:'Sonstiges',
@@ -1453,6 +1612,11 @@ en: {
   setup_title:'Setup', setup_sub:'Settings',
   setup_currency:'Currency', setup_lang:'Language',
   setup_owner:'Display name (title)', setup_owner_ph:'e.g. Peter', setup_owner_desc:'Leave empty for the default title. Name → "Name\'s Weinkeller".',
+  setup_storage:'Storage', setup_storage_desc:'Cloud: use your data across devices (newest change wins).',
+  storage_local:'This device only', storage_cloud:'Cloud',
+  sync_code_ph:'Sync code', sync_create:'Create new sync code', sync_create_desc:'Connect this device first',
+  sync_now:'Sync now', sync_status_idle:'Not synced yet', sync_status_ok:'Last synced: {t}', sync_status_err:'Sync failed', sync_code_label:'Your sync code:',
+  sync_running:'⏳ Syncing…', sync_done:'Synced ✓', sync_fail:'Sync failed', sync_code_created:'Sync code created ✓', sync_code_invalid:'Please enter a valid code', sync_connected:'Connected to cloud ✓',
   search_ph:'🔍  Search wine…',
   sort_added:'↕ Sort: Newest first', sort_name:'↕ Name (A–Z)', sort_year:'↕ Vintage', sort_grape:'↕ Grape', sort_region:'↕ Region', sort_country:'↕ Country', sort_ripeness:'↕ Readiness (most urgent first)',
   t_all:'All', t_rot:'Red', t_weiss:'White', t_rose:'Rosé', t_sekt:'Sparkling', t_other:'Other',
@@ -1516,6 +1680,11 @@ es: {
   setup_title:'Ajustes', setup_sub:'Configuración',
   setup_currency:'Moneda', setup_lang:'Idioma',
   setup_owner:'Nombre (título)', setup_owner_ph:'p.ej. Peter', setup_owner_desc:'Déjalo vacío para el título estándar. Nombre → "Bodega de Nombre".',
+  setup_storage:'Almacenamiento', setup_storage_desc:'Nube: usa tus datos en varios dispositivos (gana el cambio más reciente).',
+  storage_local:'Solo este dispositivo', storage_cloud:'Nube',
+  sync_code_ph:'Código de sync', sync_create:'Crear nuevo código de sync', sync_create_desc:'Conecta este dispositivo primero',
+  sync_now:'Sincronizar ahora', sync_status_idle:'Aún no sincronizado', sync_status_ok:'Última sincronización: {t}', sync_status_err:'Error de sincronización', sync_code_label:'Tu código de sync:',
+  sync_running:'⏳ Sincronizando…', sync_done:'Sincronizado ✓', sync_fail:'Error de sincronización', sync_code_created:'Código creado ✓', sync_code_invalid:'Introduce un código válido', sync_connected:'Conectado a la nube ✓',
   search_ph:'🔍  Buscar vino…',
   sort_added:'↕ Orden: Más recientes primero', sort_name:'↕ Nombre (A–Z)', sort_year:'↕ Añada', sort_grape:'↕ Uva', sort_region:'↕ Región', sort_country:'↕ País', sort_ripeness:'↕ Madurez (más urgentes primero)',
   t_all:'Todos', t_rot:'Tinto', t_weiss:'Blanco', t_rose:'Rosado', t_sekt:'Espumoso', t_other:'Otros',
@@ -1617,7 +1786,7 @@ function applyOwnerTitles() {
 
 function setCurrency(c) { settings.currency = c; saveSettings(); applyI18n(); }
 function setLanguage(l) { settings.lang = l; saveSettings(); applyI18n(); }
-function setOwner(v) { settings.owner = (v||'').trim(); saveSettings(); applyI18n(); }
+function setOwner(v) { settings.owner = (v||'').trim(); saveSettings(); touchData(); applyI18n(); }
 
 // ═══════════════════════════════════════
 // NAV
@@ -1640,6 +1809,7 @@ function showTab(name, btn) {
     document.getElementById('setup-currency').value = settings.currency;
     document.getElementById('setup-lang').value = settings.lang;
     renderRackSetup();
+    renderSetupSync();
   }
 }
 
@@ -2323,7 +2493,7 @@ function addRack() {
   if (!name || !(rows>=1) || !(cols>=1)) { showToast(t('rack_invalid')); return; }
   if (settings.racks.some(r => r.name === name)) { showToast(t('rack_dup')); return; }
   settings.racks.push({ name, rows: Math.min(rows,30), cols: Math.min(cols,40) });
-  saveSettings();
+  saveSettings(); touchData();
   document.getElementById('rack-new-name').value = '';
   document.getElementById('rack-new-rows').value = '';
   document.getElementById('rack-new-cols').value = '';
@@ -2333,7 +2503,7 @@ function addRack() {
 function removeRack(i) {
   if (!confirm(t('rack_del_confirm', {name: settings.racks[i].name}))) return;
   settings.racks.splice(i,1);
-  saveSettings();
+  saveSettings(); touchData();
   renderRackSetup();
 }
 
@@ -2732,6 +2902,7 @@ document.getElementById('f-year').addEventListener('change', onVintageInput);
 document.getElementById('f-name').addEventListener('change', maybeAutoLookup);
 document.getElementById('f-grape').addEventListener('change', autoFillDrinkWindow);
 document.getElementById('f-type').addEventListener('change', autoFillDrinkWindow);
+syncOnLoad();
 </script>
 </body>
 </html>
