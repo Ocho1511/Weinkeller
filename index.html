@@ -217,6 +217,26 @@ body {
   background: rgba(255,255,255,0.06);
   border: 1px solid var(--border);
 }
+/* Globale, überall sichtbare Fortschrittsanzeige (oben fixiert) */
+#global-progress {
+  display: none;
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 4000;
+  padding: 10px 16px calc(10px + env(safe-area-inset-top, 0px));
+  padding-top: calc(10px + env(safe-area-inset-top, 0px));
+  background: var(--card, #241922);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+}
+#global-progress.show { display: block; }
+.gp-row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 7px; }
+.gp-label { font-size: 13px; font-weight: 700; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gp-count { font-size: 12px; font-weight: 700; color: var(--gold); flex-shrink: 0; }
+.gp-track { height: 8px; border-radius: 5px; background: rgba(255,255,255,0.10); overflow: hidden; position: relative; }
+.gp-bar { height: 100%; width: 0%; border-radius: 5px; background: var(--gold); transition: width .25s ease; }
+/* Unbestimmter Modus (Einzel-Nachschlag): laufende Animation */
+.gp-bar.indeterminate { width: 40% !important; position: absolute; left: 0; transition: none; animation: gpSlide 1.1s ease-in-out infinite; }
+@keyframes gpSlide { 0% { left: -40%; } 100% { left: 100%; } }
 .enrich-prog-head { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
 .enrich-prog-track { height: 10px; border-radius: 6px; background: rgba(255,255,255,0.08); overflow: hidden; border: 1px solid var(--border); }
 .enrich-prog-bar { height: 100%; width: 0%; border-radius: 6px; background: var(--gold); transition: width .25s ease; }
@@ -713,6 +733,15 @@ input[type="file"] { display: none; }
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
+
+<!-- GLOBALE FORTSCHRITTSANZEIGE (überall sichtbar, oben fixiert) -->
+<div id="global-progress" role="status" aria-live="polite">
+  <div class="gp-row">
+    <span id="gp-label" class="gp-label"></span>
+    <span id="gp-count" class="gp-count"></span>
+  </div>
+  <div class="gp-track"><div id="gp-bar" class="gp-bar"></div></div>
+</div>
 
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
@@ -1548,6 +1577,7 @@ async function lookupWine() {
   if (!name) { showToast(t('toast_name')); return; }
   const year = document.getElementById('f-year').value.trim();
   showToast(t('toast_lookup'));
+  beginSingleProgress('🔎 ' + name);
   try {
     const info = await lookupWineData(name, year);
     if (!info) { showToast(t('toast_scanfail')); return; }
@@ -1564,6 +1594,8 @@ async function lookupWine() {
     showToast(found ? t('toast_lookup_ok') : t('toast_lookup_none'));
   } catch {
     showToast(t('toast_scanfail'));
+  } finally {
+    endSingleProgress();
   }
 }
 
@@ -1579,6 +1611,7 @@ async function maybeAutoLookup() {
   if (key === lastAutoLookupKey) return;
   lastAutoLookupKey = key;
   showToast(t('toast_price_lookup'));
+  beginSingleProgress('🔎 ' + name);
   try {
     const info = await lookupWineData(name, year);
     if (!info) return;
@@ -1591,28 +1624,70 @@ async function maybeAutoLookup() {
     if (info.price != null) { setIfEmpty('f-price', info.price); showToast(t('toast_price_ok', {p: fmtMoney(Math.round(info.price))})); }
     const img = await resolveWineImage(info, name, year);
     if (img) { setIfEmpty('f-image', img); updateImagePreview(); }
-  } catch {}
+  } catch {} finally {
+    endSingleProgress();
+  }
 }
 function onVintageInput() { autoFillDrinkWindow(); maybeAutoLookup(); }
 
-// Echtzeit-Fortschrittsanzeige der Aktualisierung
+// ── Globale, überall sichtbare Fortschrittsanzeige (oben fixiert) ──
+function showGlobalProgress(opts) {
+  const box = document.getElementById('global-progress');
+  if (!box) return;
+  const { done, total, label, indeterminate } = opts || {};
+  box.classList.add('show');
+  const bar = document.getElementById('gp-bar');
+  const lab = document.getElementById('gp-label');
+  const cnt = document.getElementById('gp-count');
+  if (lab) lab.textContent = label || '';
+  if (indeterminate || !total) {
+    if (bar) bar.classList.add('indeterminate');
+    if (cnt) cnt.textContent = '';
+  } else {
+    const pct = Math.round(done / total * 100);
+    if (bar) { bar.classList.remove('indeterminate'); bar.style.width = pct + '%'; }
+    if (cnt) cnt.textContent = `${done} / ${total} · ${pct}%`;
+  }
+}
+function hideGlobalProgress() {
+  const box = document.getElementById('global-progress');
+  if (box) box.classList.remove('show');
+  const bar = document.getElementById('gp-bar');
+  if (bar) { bar.classList.remove('indeterminate'); bar.style.width = '0%'; }
+}
+// Ref-Zähler, damit gleichzeitige Einzel-Nachschläge die Anzeige nicht zu früh ausblenden
+let gpSingleCount = 0;
+function beginSingleProgress(label) {
+  gpSingleCount++;
+  showGlobalProgress({ indeterminate: true, label: label || t('gp_lookup') });
+}
+function endSingleProgress() {
+  gpSingleCount = Math.max(0, gpSingleCount - 1);
+  if (gpSingleCount === 0) hideGlobalProgress();
+}
+
+// Echtzeit-Fortschrittsanzeige der Aktualisierung (Setup-Karte + globaler Balken)
 function showEnrichProgress(done, total, name) {
   const box = document.getElementById('enrich-progress');
-  if (!box) return;
-  box.style.display = total ? 'block' : 'none';
-  const pct = total ? Math.round(done/total*100) : 0;
-  const lab = document.getElementById('enrich-prog-label');
-  const pc = document.getElementById('enrich-prog-pct');
-  const bar = document.getElementById('enrich-prog-bar');
-  const cur = document.getElementById('enrich-prog-current');
-  if (lab) lab.textContent = `${done} / ${total}`;
-  if (pc) pc.textContent = pct + '%';
-  if (bar) bar.style.width = pct + '%';
-  if (cur) cur.textContent = name ? '🔎 ' + name : '';
+  if (box) {
+    box.style.display = total ? 'block' : 'none';
+    const pct = total ? Math.round(done/total*100) : 0;
+    const lab = document.getElementById('enrich-prog-label');
+    const pc = document.getElementById('enrich-prog-pct');
+    const bar = document.getElementById('enrich-prog-bar');
+    const cur = document.getElementById('enrich-prog-current');
+    if (lab) lab.textContent = `${done} / ${total}`;
+    if (pc) pc.textContent = pct + '%';
+    if (bar) bar.style.width = pct + '%';
+    if (cur) cur.textContent = name ? '🔎 ' + name : '';
+  }
+  // zusätzlich der globale, überall sichtbare Balken
+  showGlobalProgress({ done, total, label: name ? '🔎 ' + name : t('gp_updating') });
 }
 function hideEnrichProgress() {
   const box = document.getElementById('enrich-progress');
   if (box) box.style.display = 'none';
+  hideGlobalProgress();
 }
 // Dem Browser kurz Zeit zum Neuzeichnen geben, damit der Balken live wächst
 // (setTimeout statt requestAnimationFrame, damit es auch läuft, wenn die App im Hintergrund ist)
@@ -1715,7 +1790,7 @@ de: {
   lookup_btn:'🔎  Wein nachschlagen (KI)', toast_lookup:'⏳ Wein wird nachgeschlagen…', toast_lookup_ok:'Wein gefunden ✓', toast_lookup_none:'Keine Daten gefunden',
   toast_price_lookup:'⏳ Aktueller Preis wird gesucht…', toast_price_ok:'Preis gefunden: {p} ✓',
   setup_db:'Weindatenbank', enrich_btn:'Alle Weine aktualisieren (KI)', enrich_desc:'Fehlende Region, Land, Rebsorte, Trinkfenster & Preis ergänzen und Flaschenbilder erneuern (ersetzt auch tote Bild-Links)',
-  confirm_enrich:'{n} Wein(e) werden per KI aktualisiert (fehlende Angaben + Flaschenbild). Fortfahren? (kostet minimal pro Wein)', toast_enrich_none:'Keine Weine vorhanden', toast_enrich_prog:'⏳ Ergänze {done}/{total}…', toast_enrich_done:'{n} Wein(e) ergänzt ✓', toast_enrich_busy:'Aktualisierung läuft bereits…',
+  confirm_enrich:'{n} Wein(e) werden per KI aktualisiert (fehlende Angaben + Flaschenbild). Fortfahren? (kostet minimal pro Wein)', toast_enrich_none:'Keine Weine vorhanden', toast_enrich_prog:'⏳ Ergänze {done}/{total}…', toast_enrich_done:'{n} Wein(e) ergänzt ✓', toast_enrich_busy:'Aktualisierung läuft bereits…', gp_updating:'Weine werden aktualisiert…', gp_lookup:'Wein wird nachgeschlagen…',
   l_name:'Name / Weingut', l_year:'Jahrgang', l_count:'Flaschen', l_type:'Weintyp', l_region:'Region', l_country:'Land', l_grape:'Rebsorte',
   l_location:'Lagerplatz (Regal · Ebene · Platz von links)', ph_regal:'Regal', ph_ebene:'Ebene', ph_platz:'Platz v.l.',
   l_from:'Trinken ab', l_to:'Trinken bis', l_price:'Preis', l_rating:'Bewertung', l_note:'Notiz',
@@ -1784,7 +1859,7 @@ en: {
   lookup_btn:'🔎  Look up wine (AI)', toast_lookup:'⏳ Looking up wine…', toast_lookup_ok:'Wine found ✓', toast_lookup_none:'No data found',
   toast_price_lookup:'⏳ Looking up current price…', toast_price_ok:'Price found: {p} ✓',
   setup_db:'Wine database', enrich_btn:'Update all wines (AI)', enrich_desc:'Fill in missing region, country, grape, drinking window & price and refresh bottle images (also replaces dead image links)',
-  confirm_enrich:'{n} wine(s) will be updated via AI (missing details + bottle image). Continue? (small cost per wine)', toast_enrich_none:'No wines yet', toast_enrich_prog:'⏳ Enriching {done}/{total}…', toast_enrich_done:'{n} wine(s) enriched ✓', toast_enrich_busy:'Update already running…',
+  confirm_enrich:'{n} wine(s) will be updated via AI (missing details + bottle image). Continue? (small cost per wine)', toast_enrich_none:'No wines yet', toast_enrich_prog:'⏳ Enriching {done}/{total}…', toast_enrich_done:'{n} wine(s) enriched ✓', toast_enrich_busy:'Update already running…', gp_updating:'Updating wines…', gp_lookup:'Looking up wine…',
   l_name:'Name / Winery', l_year:'Vintage', l_count:'Bottles', l_type:'Wine type', l_region:'Region', l_country:'Country', l_grape:'Grape',
   l_location:'Storage (rack · level · slot from left)', ph_regal:'Rack', ph_ebene:'Level', ph_platz:'Slot f.l.',
   l_from:'Drink from', l_to:'Drink until', l_price:'Price', l_rating:'Rating', l_note:'Note',
@@ -1853,7 +1928,7 @@ es: {
   lookup_btn:'🔎  Buscar vino (IA)', toast_lookup:'⏳ Buscando vino…', toast_lookup_ok:'Vino encontrado ✓', toast_lookup_none:'Sin datos',
   toast_price_lookup:'⏳ Buscando precio actual…', toast_price_ok:'Precio encontrado: {p} ✓',
   setup_db:'Base de datos de vinos', enrich_btn:'Actualizar todos los vinos (IA)', enrich_desc:'Completar región, país, uva, ventana de consumo y precio faltantes y renovar las fotos de botella (también reemplaza enlaces de imagen rotos)',
-  confirm_enrich:'{n} vino(s) se actualizarán con IA (datos faltantes + foto de botella). ¿Continuar? (coste mínimo por vino)', toast_enrich_none:'Aún no hay vinos', toast_enrich_prog:'⏳ Completando {done}/{total}…', toast_enrich_done:'{n} vino(s) completados ✓', toast_enrich_busy:'La actualización ya está en curso…',
+  confirm_enrich:'{n} vino(s) se actualizarán con IA (datos faltantes + foto de botella). ¿Continuar? (coste mínimo por vino)', toast_enrich_none:'Aún no hay vinos', toast_enrich_prog:'⏳ Completando {done}/{total}…', toast_enrich_done:'{n} vino(s) completados ✓', toast_enrich_busy:'La actualización ya está en curso…', gp_updating:'Actualizando vinos…', gp_lookup:'Buscando vino…',
   l_name:'Nombre / Bodega', l_year:'Añada', l_count:'Botellas', l_type:'Tipo de vino', l_region:'Región', l_country:'País', l_grape:'Uva',
   l_location:'Ubicación (estante · nivel · sitio desde la izq.)', ph_regal:'Estante', ph_ebene:'Nivel', ph_platz:'Sitio izq.',
   l_from:'Beber desde', l_to:'Beber hasta', l_price:'Precio', l_rating:'Valoración', l_note:'Nota',
