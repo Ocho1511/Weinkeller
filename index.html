@@ -241,6 +241,11 @@ body {
 .enrich-prog-track { height: 10px; border-radius: 6px; background: rgba(255,255,255,0.08); overflow: hidden; border: 1px solid var(--border); }
 .enrich-prog-bar { height: 100%; width: 0%; border-radius: 6px; background: var(--gold); transition: width .25s ease; }
 .enrich-prog-current { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-top: 6px; min-height: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Platzhalter, wenn kein Flaschenbild vorhanden ist */
+.wine-img-ph { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; border-radius: 6px; background: rgba(255,255,255,0.05); border: 1px dashed var(--border); color: var(--text-muted); }
+.wine-img-ph svg { width: 55%; height: 55%; opacity: 0.6; }
+.wine-card-img.wine-img-ph { width: 44px; height: 60px; }
+.wine-row-img.wine-img-ph { width: 28px; height: 40px; border-radius: 4px; }
 .image-preview { margin-top: 8px; }
 .image-preview img {
   max-width: 120px; max-height: 160px;
@@ -1485,17 +1490,29 @@ async function ogImageFor(pageUrl) {
     return j && j.image ? j.image : null;
   } catch { return null; }
 }
-// Echtes Flaschenbild über Vivino-Suche (via Worker) – beste Quelle, liefert für fast jeden Wein einen Flaschen-Freisteller
-async function vivinoImageFor(name, year) {
+// Alle Suchkriterien eines Weins bündeln (für die Vivino-Suche)
+function wineCriteria(w) {
+  w = w || {};
+  return { name: w.name || '', year: w.year || '', region: w.region || '', country: w.country || '', grape: w.grape || '' };
+}
+// Dieselben Kriterien aus dem Formular (nutzt die ggf. gerade per KI ergänzten Felder)
+function formCriteria() {
+  const v = id => (document.getElementById(id) ? document.getElementById(id).value.trim() : '');
+  return { name: v('f-name'), year: v('f-year'), region: v('f-region'), country: v('f-country'), grape: v('f-grape') };
+}
+// Echtes Flaschenbild über Vivino-Suche (via Worker) – beste Quelle; es werden ALLE Kriterien gebündelt übergeben
+async function vivinoImageFor(crit) {
+  const c = crit || {};
   try {
-    const r = await fetch(SCAN_PROXY_URL + '/wineimg', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: name || '', year: year || '' }) });
+    const r = await fetch(SCAN_PROXY_URL + '/wineimg', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: c.name || '', year: c.year || '', grape: c.grape || '', region: c.region || '', country: c.country || '' }) });
     const j = await r.json();
     return j && j.image ? j.image : null;
   } catch { return null; }
 }
-// Reihenfolge: Vivino-Flaschenbild → KI-Direktbild → og:image der Wein-Seite. Gibt nur eine NACHWEISLICH ladbare URL zurück (sonst null).
-async function resolveWineImage(info, name, year) {
-  const viv = await vivinoImageFor(name, year);
+// Reihenfolge: Vivino-Flaschenbild (alle Kriterien gebündelt) → KI-Direktbild → og:image der Wein-Seite. Gibt nur eine NACHWEISLICH ladbare URL zurück (sonst null).
+// crit = { name, year, region, country, grape }
+async function resolveWineImage(info, crit) {
+  const viv = await vivinoImageFor(crit);
   if (viv && await verifyImageLoads(viv)) return viv;
   if (info && isImageUrl(info.image) && await verifyImageLoads(info.image.trim())) return info.image.trim();
   if (info && info.page) { const og = await ogImageFor(info.page); if (og && await verifyImageLoads(og)) return og; }
@@ -1588,7 +1605,7 @@ async function lookupWine() {
     setIfEmpty('f-drink-from', info.drinkFrom);
     setIfEmpty('f-drink-to', info.drinkTo);
     if (info.price != null) setIfEmpty('f-price', info.price);
-    const img = await resolveWineImage(info, name, year);
+    const img = await resolveWineImage(info, formCriteria());
     if (img) { setIfEmpty('f-image', img); updateImagePreview(); }
     const found = info.region || info.land || info.grape || info.drinkFrom || info.drinkTo || info.price != null;
     showToast(found ? t('toast_lookup_ok') : t('toast_lookup_none'));
@@ -1622,7 +1639,7 @@ async function maybeAutoLookup() {
     setIfEmpty('f-drink-from', info.drinkFrom);
     setIfEmpty('f-drink-to', info.drinkTo);
     if (info.price != null) { setIfEmpty('f-price', info.price); showToast(t('toast_price_ok', {p: fmtMoney(Math.round(info.price))})); }
-    const img = await resolveWineImage(info, name, year);
+    const img = await resolveWineImage(info, formCriteria());
     if (img) { setIfEmpty('f-image', img); updateImagePreview(); }
   } catch {} finally {
     endSingleProgress();
@@ -1713,8 +1730,8 @@ async function enrichAllWines() {
       await nextFrame();
       try {
         let changed = false;
-        // 1) Flaschenbild zuerst (schnell, Vivino) – damit Bilder zügig für JEDEN Wein erscheinen, sofort speichern
-        const newImg = await resolveWineImage(null, w.name, w.year);
+        // 1) Flaschenbild zuerst (schnell, Vivino; alle Kriterien gebündelt) – damit Bilder zügig für JEDEN Wein erscheinen, sofort speichern
+        const newImg = await resolveWineImage(null, wineCriteria(w));
         if (newImg && newImg !== (w.image||'')) { w.image = newImg; changed = true; save(); }
         // 2) Langsamen KI-Websuche-Aufruf nur, wenn Textfelder fehlen (sonst überspringen → Lauf bleibt schnell)
         const needsFields = !w.region || !w.country || !w.grape || !w.drinkFrom || !w.drinkTo || !w.price;
@@ -1727,8 +1744,8 @@ async function enrichAllWines() {
             if (!w.drinkFrom && info.drinkFrom) { w.drinkFrom = parseInt(info.drinkFrom)||null; changed = true; }
             if (!w.drinkTo && info.drinkTo) { w.drinkTo = parseInt(info.drinkTo)||null; changed = true; }
             if (!w.price && info.price != null) { w.price = parseFloat(info.price)||null; changed = true; }
-            // Falls Vivino kein Bild hatte: KI-Direktbild / og:image als Rückfall
-            if (!w.image) { const alt = await resolveWineImage(info, w.name, w.year); if (alt) { w.image = alt; changed = true; } }
+            // Falls Vivino kein Bild hatte: KI-Direktbild / og:image als Rückfall (mit jetzt ggf. ergänzten Kriterien)
+            if (!w.image) { const alt = await resolveWineImage(info, wineCriteria(w)); if (alt) { w.image = alt; changed = true; } }
           }
         }
         if (changed) { updated++; save(); }
@@ -2050,10 +2067,24 @@ function formatLocation(w) {
 }
 
 // Klickbares Flaschenbild (Link öffnet das Foto); bricht sauber weg, wenn URL tot ist
+// Flaschen-Platzhalter (SVG), wenn kein Bild vorhanden ist oder das Bild nicht lädt
+const BOTTLE_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10.5 2h3a.5.5 0 0 1 .5.5V5c0 .5.1 1 .4 1.5l.9 1.6c.46.8.7 1.7.7 2.6V20a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-9.3c0-.9.24-1.8.7-2.6l.9-1.6c.3-.5.4-1 .4-1.5V2.5a.5.5 0 0 1 .5-.5Z"/></svg>';
+function winePlaceholderHtml(cls) {
+  return `<span class="${cls} wine-img-ph" aria-hidden="true">${BOTTLE_SVG}</span>`;
+}
+function wineImgFallback(img) {
+  const a = img.closest('a');
+  if (!a) return;
+  const span = document.createElement('span');
+  span.className = a.className + ' wine-img-ph';
+  span.setAttribute('aria-hidden', 'true');
+  span.innerHTML = BOTTLE_SVG;
+  a.replaceWith(span);
+}
 function wineImgHtml(w, cls) {
-  if (!w.image) return '';
+  if (!w.image) return winePlaceholderHtml(cls);
   const u = esc(w.image);
-  return `<a class="${cls}" href="${u}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(t('img_open'))}"><img src="${u}" alt="" loading="lazy" onerror="this.closest('a').style.display='none'"></a>`;
+  return `<a class="${cls}" href="${u}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(t('img_open'))}"><img src="${u}" alt="" loading="lazy" onerror="wineImgFallback(this)"></a>`;
 }
 
 function renderKeller() {
