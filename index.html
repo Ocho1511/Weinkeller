@@ -1434,6 +1434,48 @@ function isImageUrl(u) {
   return /^https?:\/\/\S+\.(jpg|jpeg|png|webp|gif)(\?\S*)?$/i.test(u);
 }
 
+// Lädt die Bild-URL tatsächlich? (verhindert, dass tote Links gespeichert werden)
+function verifyImageLoads(url) {
+  return new Promise(res => {
+    if (!url) return res(false);
+    const im = new Image();
+    let done = false;
+    const fin = v => { if (!done) { done = true; res(v); } };
+    im.onload = () => fin(true);
+    im.onerror = () => fin(false);
+    im.src = url;
+    setTimeout(() => fin(false), 7000);
+  });
+}
+// Echtes og:image einer Wein-Seite über den Worker ermitteln
+async function ogImageFor(pageUrl) {
+  if (!/^https?:\/\//i.test(pageUrl || '')) return null;
+  try {
+    const r = await fetch(SCAN_PROXY_URL + '/ogimage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url: pageUrl.trim() }) });
+    const j = await r.json();
+    return j && j.image ? j.image : null;
+  } catch { return null; }
+}
+// Zuverlässiges, ladbares Bild aus der Wikipedia-Bild-API (Fallback für bekannte Weine)
+async function wikiImageFor(name) {
+  try {
+    const api = `https://en.wikipedia.org/w/api.php?action=query&prop=pageimages&piprop=thumbnail&pithumbsize=600&generator=search&gsrsearch=${encodeURIComponent((name||'') + ' wine')}&gsrlimit=1&format=json&origin=*`;
+    const r = await fetch(api);
+    const j = await r.json();
+    const pages = j.query && j.query.pages ? Object.values(j.query.pages) : [];
+    const p = pages[0];
+    return (p && p.thumbnail && p.thumbnail.source) || null;
+  } catch { return null; }
+}
+// Reihenfolge: KI-Direktbild → og:image der Wein-Seite → Wikipedia. Gibt nur eine NACHWEISLICH ladbare URL zurück (sonst null).
+async function resolveWineImage(info, name) {
+  if (info && isImageUrl(info.image) && await verifyImageLoads(info.image.trim())) return info.image.trim();
+  if (info && info.page) { const og = await ogImageFor(info.page); if (og && await verifyImageLoads(og)) return og; }
+  const wiki = await wikiImageFor(name);
+  if (wiki && await verifyImageLoads(wiki)) return wiki;
+  return null;
+}
+
 // Bildvorschau im Formular aktualisieren
 function updateImagePreview() {
   const url = (document.getElementById('f-image').value || '').trim();
@@ -1492,8 +1534,8 @@ async function lookupWineData(name, year) {
       model: 'claude-sonnet-4-6',
       max_tokens: 1200,
       tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 3 }],
-      system: `Du bist ein Wein-Experte. Recherchiere den aktuellen durchschnittlichen Marktpreis (Endverbraucher, 0,75-l-Flasche) mit der Websuche. Antworte am Ende mit GENAU EINEM JSON-Objekt (ohne Markdown) mit den Feldern: type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), land (Herkunftsland auf Deutsch oder null), grape (Hauptrebsorte oder null), drinkFrom (Jahr als Zahl oder null), drinkTo (Jahr als Zahl oder null), price (aktueller Durchschnittspreis pro Flasche in ${currencyName()} als Zahl ohne Währungssymbol, gerundet, oder null), image (eine direkte, öffentlich erreichbare URL zu einem Foto DER FLASCHE, die direkt auf eine Bilddatei zeigt und auf .jpg/.jpeg/.png/.webp endet – bevorzugt Wikimedia Commons oder die Seite des Weinguts/Händlers; nur eine URL, die du über die Websuche tatsächlich gesehen hast, sonst null). Für Beschreibungsfelder nutze dein Wissen; für Preis und Bild die Websuche. Nutze null nur wenn keine sinnvolle Angabe möglich ist.`,
-      messages: [{ role: 'user', content: `Wein: ${name}${year ? ' (Jahrgang ' + year + ')' : ''}. Nenne Typ, Region, Land, Hauptrebsorte, ein geschätztes Trinkfenster, den aktuellen Durchschnittspreis pro Flasche in ${currencyName()} und eine direkte Bild-URL der Flasche.` }]
+      system: `Du bist ein Wein-Experte. Recherchiere den aktuellen durchschnittlichen Marktpreis (Endverbraucher, 0,75-l-Flasche) mit der Websuche. Antworte am Ende mit GENAU EINEM JSON-Objekt (ohne Markdown) mit den Feldern: type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), land (Herkunftsland auf Deutsch oder null), grape (Hauptrebsorte oder null), drinkFrom (Jahr als Zahl oder null), drinkTo (Jahr als Zahl oder null), price (aktueller Durchschnittspreis pro Flasche in ${currencyName()} als Zahl ohne Währungssymbol, gerundet, oder null), image (eine direkte, öffentlich erreichbare URL zu einem Foto DER FLASCHE, die direkt auf eine Bilddatei zeigt und auf .jpg/.jpeg/.png/.webp endet; nur eine URL, die du über die Websuche tatsächlich gesehen hast, sonst null), page (die URL EINER Webseite, auf der die Flasche abgebildet ist – bevorzugt Wikipedia, die Seite des Weinguts oder ein Wein-Shop/Vivino; eine echte, über die Websuche gefundene Seiten-URL, sonst null). Für Beschreibungsfelder nutze dein Wissen; für Preis, Bild und Seite die Websuche. Nutze null nur wenn keine sinnvolle Angabe möglich ist.`,
+      messages: [{ role: 'user', content: `Wein: ${name}${year ? ' (Jahrgang ' + year + ')' : ''}. Nenne Typ, Region, Land, Hauptrebsorte, ein geschätztes Trinkfenster, den aktuellen Durchschnittspreis pro Flasche in ${currencyName()}, eine direkte Bild-URL der Flasche und die URL einer Webseite, auf der die Flasche abgebildet ist.` }]
     })
   });
   const data = await resp.json();
@@ -1519,7 +1561,8 @@ async function lookupWine() {
     setIfEmpty('f-drink-from', info.drinkFrom);
     setIfEmpty('f-drink-to', info.drinkTo);
     if (info.price != null) setIfEmpty('f-price', info.price);
-    if (isImageUrl(info.image)) { setIfEmpty('f-image', info.image.trim()); updateImagePreview(); }
+    const img = await resolveWineImage(info, name);
+    if (img) { setIfEmpty('f-image', img); updateImagePreview(); }
     const found = info.region || info.land || info.grape || info.drinkFrom || info.drinkTo || info.price != null;
     showToast(found ? t('toast_lookup_ok') : t('toast_lookup_none'));
   } catch {
@@ -1549,7 +1592,8 @@ async function maybeAutoLookup() {
     setIfEmpty('f-drink-from', info.drinkFrom);
     setIfEmpty('f-drink-to', info.drinkTo);
     if (info.price != null) { setIfEmpty('f-price', info.price); showToast(t('toast_price_ok', {p: fmtMoney(Math.round(info.price))})); }
-    if (isImageUrl(info.image)) { setIfEmpty('f-image', info.image.trim()); updateImagePreview(); }
+    const img = await resolveWineImage(info, name);
+    if (img) { setIfEmpty('f-image', img); updateImagePreview(); }
   } catch {}
 }
 function onVintageInput() { autoFillDrinkWindow(); maybeAutoLookup(); }
@@ -1597,18 +1641,19 @@ async function enrichAllWines() {
       await nextFrame();
       try {
         const info = await lookupWineData(w.name, w.year);
+        let changed = false;
         if (info) {
-          let changed = false;
           if (!w.region && info.region) { w.region = info.region; changed = true; }
           if (!w.country && info.land) { w.country = info.land; changed = true; }
           if (!w.grape && info.grape) { w.grape = info.grape; changed = true; }
           if (!w.drinkFrom && info.drinkFrom) { w.drinkFrom = parseInt(info.drinkFrom)||null; changed = true; }
           if (!w.drinkTo && info.drinkTo) { w.drinkTo = parseInt(info.drinkTo)||null; changed = true; }
           if (!w.price && info.price != null) { w.price = parseFloat(info.price)||null; changed = true; }
-          // Flaschenbild immer erneuern, wenn eine gültige (neue) URL gefunden wird – ersetzt auch alte/tote Links
-          if (isImageUrl(info.image) && info.image.trim() !== (w.image||'')) { w.image = info.image.trim(); changed = true; }
-          if (changed) { updated++; save(); }
         }
+        // Flaschenbild verifiziert auflösen (Direktbild → og:image der Seite → Wikipedia); ersetzt auch alte/tote Links, speichert nur ladbare URLs
+        const newImg = await resolveWineImage(info, w.name);
+        if (newImg && newImg !== (w.image||'')) { w.image = newImg; changed = true; }
+        if (changed) { updated++; save(); }
       } catch {}
       showEnrichProgress(i+1, targets.length, w.name);
       await nextFrame();
