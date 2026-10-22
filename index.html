@@ -1456,23 +1456,20 @@ async function ogImageFor(pageUrl) {
     return j && j.image ? j.image : null;
   } catch { return null; }
 }
-// Zuverlässiges, ladbares Bild aus der Wikipedia-Bild-API (Fallback für bekannte Weine)
-async function wikiImageFor(name) {
+// Echtes Flaschenbild über Vivino-Suche (via Worker) – beste Quelle, liefert für fast jeden Wein einen Flaschen-Freisteller
+async function vivinoImageFor(name, year) {
   try {
-    const api = `https://en.wikipedia.org/w/api.php?action=query&prop=pageimages&piprop=thumbnail&pithumbsize=600&generator=search&gsrsearch=${encodeURIComponent((name||'') + ' wine')}&gsrlimit=1&format=json&origin=*`;
-    const r = await fetch(api);
+    const r = await fetch(SCAN_PROXY_URL + '/wineimg', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: name || '', year: year || '' }) });
     const j = await r.json();
-    const pages = j.query && j.query.pages ? Object.values(j.query.pages) : [];
-    const p = pages[0];
-    return (p && p.thumbnail && p.thumbnail.source) || null;
+    return j && j.image ? j.image : null;
   } catch { return null; }
 }
-// Reihenfolge: KI-Direktbild → og:image der Wein-Seite → Wikipedia. Gibt nur eine NACHWEISLICH ladbare URL zurück (sonst null).
-async function resolveWineImage(info, name) {
+// Reihenfolge: Vivino-Flaschenbild → KI-Direktbild → og:image der Wein-Seite. Gibt nur eine NACHWEISLICH ladbare URL zurück (sonst null).
+async function resolveWineImage(info, name, year) {
+  const viv = await vivinoImageFor(name, year);
+  if (viv && await verifyImageLoads(viv)) return viv;
   if (info && isImageUrl(info.image) && await verifyImageLoads(info.image.trim())) return info.image.trim();
   if (info && info.page) { const og = await ogImageFor(info.page); if (og && await verifyImageLoads(og)) return og; }
-  const wiki = await wikiImageFor(name);
-  if (wiki && await verifyImageLoads(wiki)) return wiki;
   return null;
 }
 
@@ -1561,7 +1558,7 @@ async function lookupWine() {
     setIfEmpty('f-drink-from', info.drinkFrom);
     setIfEmpty('f-drink-to', info.drinkTo);
     if (info.price != null) setIfEmpty('f-price', info.price);
-    const img = await resolveWineImage(info, name);
+    const img = await resolveWineImage(info, name, year);
     if (img) { setIfEmpty('f-image', img); updateImagePreview(); }
     const found = info.region || info.land || info.grape || info.drinkFrom || info.drinkTo || info.price != null;
     showToast(found ? t('toast_lookup_ok') : t('toast_lookup_none'));
@@ -1592,7 +1589,7 @@ async function maybeAutoLookup() {
     setIfEmpty('f-drink-from', info.drinkFrom);
     setIfEmpty('f-drink-to', info.drinkTo);
     if (info.price != null) { setIfEmpty('f-price', info.price); showToast(t('toast_price_ok', {p: fmtMoney(Math.round(info.price))})); }
-    const img = await resolveWineImage(info, name);
+    const img = await resolveWineImage(info, name, year);
     if (img) { setIfEmpty('f-image', img); updateImagePreview(); }
   } catch {}
 }
@@ -1650,8 +1647,8 @@ async function enrichAllWines() {
           if (!w.drinkTo && info.drinkTo) { w.drinkTo = parseInt(info.drinkTo)||null; changed = true; }
           if (!w.price && info.price != null) { w.price = parseFloat(info.price)||null; changed = true; }
         }
-        // Flaschenbild verifiziert auflösen (Direktbild → og:image der Seite → Wikipedia); ersetzt auch alte/tote Links, speichert nur ladbare URLs
-        const newImg = await resolveWineImage(info, w.name);
+        // Flaschenbild verifiziert auflösen (Vivino → Direktbild → og:image der Seite); ersetzt auch alte/tote Links, speichert nur ladbare URLs
+        const newImg = await resolveWineImage(info, w.name, w.year);
         if (newImg && newImg !== (w.image||'')) { w.image = newImg; changed = true; }
         if (changed) { updated++; save(); }
       } catch {}
