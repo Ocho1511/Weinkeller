@@ -6,6 +6,11 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Weinkeller">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#17120a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <title>Weinkeller</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=UnifrakturMaguntia&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -3168,6 +3173,10 @@ document.getElementById('f-name').addEventListener('change', maybeAutoLookup);
 document.getElementById('f-grape').addEventListener('change', autoFillDrinkWindow);
 document.getElementById('f-type').addEventListener('change', autoFillDrinkWindow);
 syncOnLoad();
+// PWA: Service Worker registrieren (macht die App installierbar + offline-fähig)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+}
 </script>
 </body>
 </html>
