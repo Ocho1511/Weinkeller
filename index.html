@@ -1739,7 +1739,13 @@ async function enrichAllWines() {
         let changed = false;
         // 1) Flaschenbild zuerst (schnell, Vivino; alle Kriterien gebündelt) – damit Bilder zügig für JEDEN Wein erscheinen, sofort speichern
         const newImg = await resolveWineImage(null, wineCriteria(w));
-        if (newImg && newImg !== (w.image||'')) { w.image = newImg; changed = true; save(); }
+        const curIsAuto = (w.image || '').includes('images.vivino.com');
+        if (newImg) {
+          if (newImg !== (w.image||'')) { w.image = newImg; changed = true; save(); }
+        } else if (curIsAuto) {
+          // Altes automatisches (Vivino-)Bild ohne passenden Treffer entfernen → Platzhalter statt falscher Flasche (manuell gesetzte Bilder bleiben)
+          w.image = null; changed = true; save();
+        }
         // 2) Langsamen KI-Websuche-Aufruf nur, wenn Textfelder fehlen (sonst überspringen → Lauf bleibt schnell)
         const needsFields = !w.region || !w.country || !w.grape || !w.drinkFrom || !w.drinkTo || !w.price;
         if (needsFields) {
