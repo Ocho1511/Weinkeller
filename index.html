@@ -1032,6 +1032,16 @@ input[type="file"] { display: none; }
           </div>
         </div>
         <div id="sync-code-show" style="display:none; font-size:13px; font-weight:700; color:var(--red-alert); margin-top:10px; word-break:break-all"></div>
+        <div class="rack-add-row" style="margin-top:10px">
+          <input id="sync-email-input" type="email" placeholder="Deine E-Mail (optional)" data-i18n-ph="sync_email_ph">
+        </div>
+        <div class="export-card" onclick="emailSyncCode()" style="margin-top:10px">
+          <div class="export-icon">📧</div>
+          <div class="export-info">
+            <div class="title" data-i18n="sync_email">Code per E-Mail sichern</div>
+            <div class="desc" data-i18n="sync_email_desc">Öffnet deine Mail-App mit dem Code</div>
+          </div>
+        </div>
       </div>
     </div>
     <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border)">
@@ -1300,7 +1310,7 @@ let wishes = JSON.parse(localStorage.getItem(WISH_KEY) || '[]');
 let drunkWines = JSON.parse(localStorage.getItem(DRUNK_KEY) || '[]');
 const DEFAULT_OWNER = "Ocho";
 const STAMP_KEY = 'weinkeller_v2_stamp';
-let settings = Object.assign({currency:'€', lang:'de', racks:[], owner:'', storage:'local', syncCode:''}, JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'));
+let settings = Object.assign({currency:'€', lang:'de', racks:[], owner:'', storage:'local', syncCode:'', email:''}, JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'));
 if (!Array.isArray(settings.racks)) settings.racks = [];
 let dataStamp = parseInt(localStorage.getItem(STAMP_KEY) || '0');
 let editId = null;
@@ -1394,6 +1404,18 @@ async function createSyncCode() {
   catch(e) { showToast(t('sync_fail')); }
   renderSetupSync();
 }
+// Sync-Code als Sicherung per E-Mail verschicken (öffnet die Mail-App des Nutzers; statische App, kein Mailserver)
+function buildCodeMailto(to) {
+  const subject = encodeURIComponent('Weinkeller Sync-Code');
+  const body = encodeURIComponent(t('sync_email_body_1') + '\n\n' + settings.syncCode + '\n\n' + t('sync_email_body_2'));
+  return 'mailto:' + encodeURIComponent(to || '') + '?subject=' + subject + '&body=' + body;
+}
+function emailSyncCode() {
+  if (!settings.syncCode) { showToast(t('sync_email_nocode')); return; }
+  const to = (document.getElementById('sync-email-input').value || settings.email || '').trim();
+  if (to && to !== settings.email) { settings.email = to; saveSettings(); }
+  window.location.href = buildCodeMailto(to);
+}
 async function connectSyncCode() {
   const code = (document.getElementById('sync-code-input').value || '').trim();
   if (code.length < 6) { showToast(t('sync_code_invalid')); return; }
@@ -1436,6 +1458,8 @@ function renderSetupSync() {
     if (isCloud && settings.syncCode) { show.style.display = 'block'; show.textContent = t('sync_code_label') + ' ' + settings.syncCode; }
     else { show.style.display = 'none'; }
   }
+  const emailIn = document.getElementById('sync-email-input');
+  if (emailIn && !emailIn.value && settings.email) emailIn.value = settings.email;
 }
 async function syncOnLoad() {
   if (settings.storage === 'cloud' && settings.syncCode) { await syncNow(true); }
@@ -1796,6 +1820,8 @@ de: {
   storage_local:'Nur dieses Gerät', storage_cloud:'Cloud',
   sync_code_ph:'Sync-Code', sync_create:'Neuen Sync-Code erstellen', sync_create_desc:'Dieses Gerät als erstes verbinden',
   sync_now:'Jetzt synchronisieren', sync_status_idle:'Noch nicht synchronisiert', sync_status_ok:'Zuletzt synchronisiert: {t}', sync_status_err:'Synchronisierung fehlgeschlagen', sync_code_label:'Dein Sync-Code:',
+  sync_email:'Code per E-Mail sichern', sync_email_desc:'Öffnet deine Mail-App mit dem Code', sync_email_ph:'Deine E-Mail (optional)', sync_email_nocode:'Erst einen Sync-Code erstellen oder verbinden',
+  sync_email_body_1:'Dein Weinkeller Sync-Code (bitte sicher aufbewahren):', sync_email_body_2:'Damit stellst du deinen Keller auf einem anderen Gerät wieder her: Setup → Speicherort → Cloud → Code eingeben → Verbinden.',
   sync_running:'⏳ Synchronisiere…', sync_done:'Synchronisiert ✓', sync_fail:'Synchronisierung fehlgeschlagen', sync_code_created:'Sync-Code erstellt ✓', sync_code_invalid:'Bitte gültigen Code eingeben', sync_connected:'Mit Cloud verbunden ✓',
   search_ph:'🔍  Wein suchen…',
   sort_added:'↕ Sortierung: Neueste zuerst', sort_name:'↕ Name (A–Z)', sort_year:'↕ Jahrgang', sort_grape:'↕ Rebsorte', sort_region:'↕ Region', sort_country:'↕ Land', sort_ripeness:'↕ Trinkreife (dringendste zuerst)',
@@ -1865,6 +1891,8 @@ en: {
   storage_local:'This device only', storage_cloud:'Cloud',
   sync_code_ph:'Sync code', sync_create:'Create new sync code', sync_create_desc:'Connect this device first',
   sync_now:'Sync now', sync_status_idle:'Not synced yet', sync_status_ok:'Last synced: {t}', sync_status_err:'Sync failed', sync_code_label:'Your sync code:',
+  sync_email:'Save code via email', sync_email_desc:'Opens your mail app with the code', sync_email_ph:'Your email (optional)', sync_email_nocode:'Create or connect a sync code first',
+  sync_email_body_1:'Your Weinkeller sync code (please keep it safe):', sync_email_body_2:'Use it to restore your cellar on another device: Setup → Storage → Cloud → enter code → Connect.',
   sync_running:'⏳ Syncing…', sync_done:'Synced ✓', sync_fail:'Sync failed', sync_code_created:'Sync code created ✓', sync_code_invalid:'Please enter a valid code', sync_connected:'Connected to cloud ✓',
   search_ph:'🔍  Search wine…',
   sort_added:'↕ Sort: Newest first', sort_name:'↕ Name (A–Z)', sort_year:'↕ Vintage', sort_grape:'↕ Grape', sort_region:'↕ Region', sort_country:'↕ Country', sort_ripeness:'↕ Readiness (most urgent first)',
@@ -1934,6 +1962,8 @@ es: {
   storage_local:'Solo este dispositivo', storage_cloud:'Nube',
   sync_code_ph:'Código de sync', sync_create:'Crear nuevo código de sync', sync_create_desc:'Conecta este dispositivo primero',
   sync_now:'Sincronizar ahora', sync_status_idle:'Aún no sincronizado', sync_status_ok:'Última sincronización: {t}', sync_status_err:'Error de sincronización', sync_code_label:'Tu código de sync:',
+  sync_email:'Guardar código por email', sync_email_desc:'Abre tu app de correo con el código', sync_email_ph:'Tu email (opcional)', sync_email_nocode:'Primero crea o conecta un código de sync',
+  sync_email_body_1:'Tu código de sync de Weinkeller (guárdalo bien):', sync_email_body_2:'Úsalo para restaurar tu bodega en otro dispositivo: Setup → Almacenamiento → Cloud → introducir código → Conectar.',
   sync_running:'⏳ Sincronizando…', sync_done:'Sincronizado ✓', sync_fail:'Error de sincronización', sync_code_created:'Código creado ✓', sync_code_invalid:'Introduce un código válido', sync_connected:'Conectado a la nube ✓',
   search_ph:'🔍  Buscar vino…',
   sort_added:'↕ Orden: Más recientes primero', sort_name:'↕ Nombre (A–Z)', sort_year:'↕ Añada', sort_grape:'↕ Uva', sort_region:'↕ Región', sort_country:'↕ País', sort_ripeness:'↕ Madurez (más urgentes primero)',
