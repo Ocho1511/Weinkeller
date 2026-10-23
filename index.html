@@ -995,6 +995,13 @@ input[type="file"] { display: none; }
         <option value="$">$ — US-Dollar</option>
         <option value="£">£ — Britisches Pfund (GBP)</option>
         <option value="CHF">CHF — Schweizer Franken</option>
+        <option value="A$">A$ — Australische Dollar</option>
+        <option value="C$">C$ — Kanadische Dollar</option>
+        <option value="SEK">SEK — Schwedische Kronen</option>
+        <option value="NOK">NOK — Norwegische Kronen</option>
+        <option value="DKK">DKK — Dänische Kronen</option>
+        <option value="RUB">₽ — Russische Rubel</option>
+        <option value="PLN">zł — Polnische Złoty</option>
       </select>
     </div>
     <div class="form-group" style="margin-top:14px">
@@ -1480,7 +1487,21 @@ async function syncOnLoad() {
   if (settings.storage === 'cloud' && settings.syncCode) { await syncNow(true); }
 }
 
-function fmtMoney(n) { return settings.currency === 'CHF' ? 'CHF ' + n : settings.currency + n; }
+// Währungen: Wert (in settings.currency) → Anzeigename + Formatierung (Symbol vor/nach dem Betrag)
+const CURRENCIES = {
+  '€':   { name:'Euro',                fmt:n=>'€'+n },
+  '$':   { name:'US-Dollar',           fmt:n=>'$'+n },
+  '£':   { name:'Britische Pfund',     fmt:n=>'£'+n },
+  'CHF': { name:'Schweizer Franken',   fmt:n=>'CHF '+n },
+  'A$':  { name:'Australische Dollar', fmt:n=>'A$'+n },
+  'C$':  { name:'Kanadische Dollar',   fmt:n=>'C$'+n },
+  'SEK': { name:'Schwedische Kronen',  fmt:n=>n+' kr' },
+  'NOK': { name:'Norwegische Kronen',  fmt:n=>n+' kr' },
+  'DKK': { name:'Dänische Kronen',     fmt:n=>n+' kr' },
+  'RUB': { name:'Russische Rubel',     fmt:n=>n+' ₽' },
+  'PLN': { name:'Polnische Złoty',     fmt:n=>n+' zł' }
+};
+function fmtMoney(n) { const c = CURRENCIES[settings.currency]; return c ? c.fmt(n) : settings.currency + n; }
 function dateLocale() {
   const m = { de:'de-DE', en:'en-US', es:'es-ES', sv:'sv-SE', da:'da-DK', fi:'fi-FI', ru:'ru-RU', it:'it-IT', fr:'fr-FR', pl:'pl-PL', hu:'hu-HU', cs:'cs-CZ', sk:'sk-SK', ro:'ro-RO', hr:'hr-HR', pt:'pt-PT', no:'nb-NO', nl:'nl-NL' };
   return m[settings.lang] || 'en-US';
@@ -1614,7 +1635,7 @@ function autoFillDrinkWindow() {
 }
 
 function currencyName() {
-  return { '€':'Euro', '$':'US-Dollar', '£':'Britische Pfund', 'CHF':'Schweizer Franken' }[settings.currency] || 'Euro';
+  return (CURRENCIES[settings.currency] || {}).name || 'Euro';
 }
 
 // KI-Nachschlagen MIT Web-Suche → liefert Beschreibung + aktuellen Durchschnittspreis
