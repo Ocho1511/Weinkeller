@@ -1489,19 +1489,27 @@ async function syncOnLoad() {
 
 // Währungen: Wert (in settings.currency) → Anzeigename + Formatierung (Symbol vor/nach dem Betrag)
 const CURRENCIES = {
-  '€':   { name:'Euro',                fmt:n=>'€'+n },
-  '$':   { name:'US-Dollar',           fmt:n=>'$'+n },
-  '£':   { name:'Britische Pfund',     fmt:n=>'£'+n },
-  'CHF': { name:'Schweizer Franken',   fmt:n=>'CHF '+n },
-  'A$':  { name:'Australische Dollar', fmt:n=>'A$'+n },
-  'C$':  { name:'Kanadische Dollar',   fmt:n=>'C$'+n },
-  'SEK': { name:'Schwedische Kronen',  fmt:n=>n+' kr' },
-  'NOK': { name:'Norwegische Kronen',  fmt:n=>n+' kr' },
-  'DKK': { name:'Dänische Kronen',     fmt:n=>n+' kr' },
-  'RUB': { name:'Russische Rubel',     fmt:n=>n+' ₽' },
-  'PLN': { name:'Polnische Złoty',     fmt:n=>n+' zł' }
+  '€':   { key:'cur_eur', tag:'€',   name:'Euro',                fmt:n=>'€'+n },
+  '$':   { key:'cur_usd', tag:'$',   name:'US-Dollar',           fmt:n=>'$'+n },
+  '£':   { key:'cur_gbp', tag:'£',   name:'Britische Pfund',     fmt:n=>'£'+n },
+  'CHF': { key:'cur_chf', tag:'CHF', name:'Schweizer Franken',   fmt:n=>'CHF '+n },
+  'A$':  { key:'cur_aud', tag:'A$',  name:'Australische Dollar', fmt:n=>'A$'+n },
+  'C$':  { key:'cur_cad', tag:'C$',  name:'Kanadische Dollar',   fmt:n=>'C$'+n },
+  'SEK': { key:'cur_sek', tag:'SEK', name:'Schwedische Kronen',  fmt:n=>n+' kr' },
+  'NOK': { key:'cur_nok', tag:'NOK', name:'Norwegische Kronen',  fmt:n=>n+' kr' },
+  'DKK': { key:'cur_dkk', tag:'DKK', name:'Dänische Kronen',     fmt:n=>n+' kr' },
+  'RUB': { key:'cur_rub', tag:'₽',   name:'Russische Rubel',     fmt:n=>n+' ₽' },
+  'PLN': { key:'cur_pln', tag:'zł',  name:'Polnische Złoty',     fmt:n=>n+' zł' }
 };
 function fmtMoney(n) { const c = CURRENCIES[settings.currency]; return c ? c.fmt(n) : settings.currency + n; }
+// Währungsauswahl mit übersetzten Namen füllen (Auswahl bleibt erhalten)
+function renderCurrencyOptions() {
+  const sel = document.getElementById('setup-currency');
+  if (!sel) return;
+  const cur = settings.currency;
+  sel.innerHTML = Object.keys(CURRENCIES).map(k => `<option value="${k}">${CURRENCIES[k].tag} — ${t(CURRENCIES[k].key)}</option>`).join('');
+  sel.value = cur;
+}
 function dateLocale() {
   const m = { de:'de-DE', en:'en-US', es:'es-ES', sv:'sv-SE', da:'da-DK', fi:'fi-FI', ru:'ru-RU', it:'it-IT', fr:'fr-FR', pl:'pl-PL', hu:'hu-HU', cs:'cs-CZ', sk:'sk-SK', ro:'ro-RO', hr:'hr-HR', pt:'pt-PT', no:'nb-NO', nl:'nl-NL' };
   return m[settings.lang] || 'en-US';
@@ -1843,6 +1851,17 @@ async function enrichAllWines() {
 // ═══════════════════════════════════════
 const I18N = {
 de: {
+  cur_eur: "Euro",
+  cur_usd: "US-Dollar",
+  cur_gbp: "Britisches Pfund",
+  cur_chf: "Schweizer Franken",
+  cur_aud: "Australische Dollar",
+  cur_cad: "Kanadische Dollar",
+  cur_sek: "Schwedische Kronen",
+  cur_nok: "Norwegische Kronen",
+  cur_dkk: "Dänische Kronen",
+  cur_rub: "Russische Rubel",
+  cur_pln: "Polnische Złoty",
   nav_keller: "Keller",
   nav_stats: "Statistik",
   nav_ripe: "Trinkreife",
@@ -2069,6 +2088,17 @@ de: {
   pdf_sub: "{n} Weine · Stand: {d}"
 },
 en: {
+  cur_eur: "Euro",
+  cur_usd: "US dollar",
+  cur_gbp: "British pound",
+  cur_chf: "Swiss franc",
+  cur_aud: "Australian dollar",
+  cur_cad: "Canadian dollar",
+  cur_sek: "Swedish krona",
+  cur_nok: "Norwegian krone",
+  cur_dkk: "Danish krone",
+  cur_rub: "Russian ruble",
+  cur_pln: "Polish złoty",
   nav_keller: "Cellar",
   nav_stats: "Statistics",
   nav_ripe: "Readiness",
@@ -2295,6 +2325,17 @@ en: {
   pdf_sub: "{n} wines · as of {d}"
 },
 es: {
+  cur_eur: "Euro",
+  cur_usd: "Dólar estadounidense",
+  cur_gbp: "Libra esterlina",
+  cur_chf: "Franco suizo",
+  cur_aud: "Dólar australiano",
+  cur_cad: "Dólar canadiense",
+  cur_sek: "Corona sueca",
+  cur_nok: "Corona noruega",
+  cur_dkk: "Corona danesa",
+  cur_rub: "Rublo ruso",
+  cur_pln: "Esloti polaco",
   nav_keller: "Bodega",
   nav_stats: "Estadísticas",
   nav_ripe: "Madurez",
@@ -2521,6 +2562,17 @@ es: {
   pdf_sub: "{n} vinos · a fecha: {d}"
 },
 sv: {
+  cur_eur: "Euro",
+  cur_usd: "US-dollar",
+  cur_gbp: "Brittiskt pund",
+  cur_chf: "Schweizerfranc",
+  cur_aud: "Australisk dollar",
+  cur_cad: "Kanadensisk dollar",
+  cur_sek: "Svensk krona",
+  cur_nok: "Norsk krona",
+  cur_dkk: "Dansk krona",
+  cur_rub: "Rysk rubel",
+  cur_pln: "Polsk zloty",
   nav_keller: "Källare",
   nav_stats: "Statistik",
   nav_ripe: "Dryckesmognad",
@@ -2747,6 +2799,17 @@ sv: {
   pdf_sub: "{n} viner · Datum: {d}"
 },
 da: {
+  cur_eur: "Euro",
+  cur_usd: "Amerikanske dollar",
+  cur_gbp: "Britiske pund",
+  cur_chf: "Schweiziske franc",
+  cur_aud: "Australske dollar",
+  cur_cad: "Canadiske dollar",
+  cur_sek: "Svenske kroner",
+  cur_nok: "Norske kroner",
+  cur_dkk: "Danske kroner",
+  cur_rub: "Russiske rubler",
+  cur_pln: "Polske zloty",
   nav_keller: "Kælder",
   nav_stats: "Statistik",
   nav_ripe: "Drikkemodenhed",
@@ -2973,6 +3036,17 @@ da: {
   pdf_sub: "{n} vine · Dato: {d}"
 },
 fi: {
+  cur_eur: "Euro",
+  cur_usd: "Yhdysvaltain dollari",
+  cur_gbp: "Englannin punta",
+  cur_chf: "Sveitsin frangi",
+  cur_aud: "Australian dollari",
+  cur_cad: "Kanadan dollari",
+  cur_sek: "Ruotsin kruunu",
+  cur_nok: "Norjan kruunu",
+  cur_dkk: "Tanskan kruunu",
+  cur_rub: "Venäjän rupla",
+  cur_pln: "Puolan złoty",
   nav_keller: "Kellari",
   nav_stats: "Tilastot",
   nav_ripe: "Juomakypsyys",
@@ -3199,6 +3273,17 @@ fi: {
   pdf_sub: "{n} viiniä · Päiväys: {d}"
 },
 ru: {
+  cur_eur: "Евро",
+  cur_usd: "Доллар США",
+  cur_gbp: "Фунт стерлингов",
+  cur_chf: "Швейцарский франк",
+  cur_aud: "Австралийский доллар",
+  cur_cad: "Канадский доллар",
+  cur_sek: "Шведская крона",
+  cur_nok: "Норвежская крона",
+  cur_dkk: "Датская крона",
+  cur_rub: "Российский рубль",
+  cur_pln: "Польский злотый",
   nav_keller: "Погреб",
   nav_stats: "Статистика",
   nav_ripe: "Зрелость",
@@ -3425,6 +3510,17 @@ ru: {
   pdf_sub: "{n} вин · Дата: {d}"
 },
 it: {
+  cur_eur: "Euro",
+  cur_usd: "Dollaro USA",
+  cur_gbp: "Sterlina britannica",
+  cur_chf: "Franco svizzero",
+  cur_aud: "Dollaro australiano",
+  cur_cad: "Dollaro canadese",
+  cur_sek: "Corona svedese",
+  cur_nok: "Corona norvegese",
+  cur_dkk: "Corona danese",
+  cur_rub: "Rublo russo",
+  cur_pln: "Złoty polacco",
   nav_keller: "Cantina",
   nav_stats: "Statistiche",
   nav_ripe: "Maturità",
@@ -3651,6 +3747,17 @@ it: {
   pdf_sub: "{n} vini · Data: {d}"
 },
 fr: {
+  cur_eur: "Euro",
+  cur_usd: "Dollar américain",
+  cur_gbp: "Livre sterling",
+  cur_chf: "Franc suisse",
+  cur_aud: "Dollar australien",
+  cur_cad: "Dollar canadien",
+  cur_sek: "Couronne suédoise",
+  cur_nok: "Couronne norvégienne",
+  cur_dkk: "Couronne danoise",
+  cur_rub: "Rouble russe",
+  cur_pln: "Złoty polonais",
   nav_keller: "Cave",
   nav_stats: "Statistiques",
   nav_ripe: "Maturité",
@@ -3877,6 +3984,17 @@ fr: {
   pdf_sub: "{n} vins · Date : {d}"
 },
 pl: {
+  cur_eur: "Euro",
+  cur_usd: "Dolar amerykański",
+  cur_gbp: "Funt brytyjski",
+  cur_chf: "Frank szwajcarski",
+  cur_aud: "Dolar australijski",
+  cur_cad: "Dolar kanadyjski",
+  cur_sek: "Korona szwedzka",
+  cur_nok: "Korona norweska",
+  cur_dkk: "Korona duńska",
+  cur_rub: "Rubel rosyjski",
+  cur_pln: "Złoty polski",
   nav_keller: "Piwnica",
   nav_stats: "Statystyki",
   nav_ripe: "Dojrzałość",
@@ -4103,6 +4221,17 @@ pl: {
   pdf_sub: "{n} win · Data: {d}"
 },
 hu: {
+  cur_eur: "Euró",
+  cur_usd: "Amerikai dollár",
+  cur_gbp: "Brit font",
+  cur_chf: "Svájci frank",
+  cur_aud: "Ausztrál dollár",
+  cur_cad: "Kanadai dollár",
+  cur_sek: "Svéd korona",
+  cur_nok: "Norvég korona",
+  cur_dkk: "Dán korona",
+  cur_rub: "Orosz rubel",
+  cur_pln: "Lengyel złoty",
   nav_keller: "Pince",
   nav_stats: "Statisztika",
   nav_ripe: "Érettség",
@@ -4329,6 +4458,17 @@ hu: {
   pdf_sub: "{n} bor · Dátum: {d}"
 },
 cs: {
+  cur_eur: "Euro",
+  cur_usd: "Americký dolar",
+  cur_gbp: "Britská libra",
+  cur_chf: "Švýcarský frank",
+  cur_aud: "Australský dolar",
+  cur_cad: "Kanadský dolar",
+  cur_sek: "Švédská koruna",
+  cur_nok: "Norská koruna",
+  cur_dkk: "Dánská koruna",
+  cur_rub: "Ruský rubl",
+  cur_pln: "Polský zlotý",
   nav_keller: "Sklep",
   nav_stats: "Statistiky",
   nav_ripe: "Zralost",
@@ -4555,6 +4695,17 @@ cs: {
   pdf_sub: "{n} vín · Datum: {d}"
 },
 sk: {
+  cur_eur: "Euro",
+  cur_usd: "Americký dolár",
+  cur_gbp: "Britská libra",
+  cur_chf: "Švajčiarsky frank",
+  cur_aud: "Austrálsky dolár",
+  cur_cad: "Kanadský dolár",
+  cur_sek: "Švédska koruna",
+  cur_nok: "Nórska koruna",
+  cur_dkk: "Dánska koruna",
+  cur_rub: "Ruský rubeľ",
+  cur_pln: "Poľský zlotý",
   nav_keller: "Pivnica",
   nav_stats: "Štatistiky",
   nav_ripe: "Zrelosť",
@@ -4781,6 +4932,17 @@ sk: {
   pdf_sub: "{n} vín · Dátum: {d}"
 },
 ro: {
+  cur_eur: "Euro",
+  cur_usd: "Dolar american",
+  cur_gbp: "Liră sterlină",
+  cur_chf: "Franc elvețian",
+  cur_aud: "Dolar australian",
+  cur_cad: "Dolar canadian",
+  cur_sek: "Coroană suedeză",
+  cur_nok: "Coroană norvegiană",
+  cur_dkk: "Coroană daneză",
+  cur_rub: "Rublă rusească",
+  cur_pln: "Zlot polonez",
   nav_keller: "Pivniță",
   nav_stats: "Statistici",
   nav_ripe: "Maturitate",
@@ -5007,6 +5169,17 @@ ro: {
   pdf_sub: "{n} vinuri · Data: {d}"
 },
 hr: {
+  cur_eur: "Euro",
+  cur_usd: "Američki dolar",
+  cur_gbp: "Britanska funta",
+  cur_chf: "Švicarski franak",
+  cur_aud: "Australski dolar",
+  cur_cad: "Kanadski dolar",
+  cur_sek: "Švedska kruna",
+  cur_nok: "Norveška kruna",
+  cur_dkk: "Danska kruna",
+  cur_rub: "Ruski rubalj",
+  cur_pln: "Poljski zlot",
   nav_keller: "Podrum",
   nav_stats: "Statistika",
   nav_ripe: "Zrelost",
@@ -5233,6 +5406,17 @@ hr: {
   pdf_sub: "{n} vina · Datum: {d}"
 },
 pt: {
+  cur_eur: "Euro",
+  cur_usd: "Dólar americano",
+  cur_gbp: "Libra esterlina",
+  cur_chf: "Franco suíço",
+  cur_aud: "Dólar australiano",
+  cur_cad: "Dólar canadiano",
+  cur_sek: "Coroa sueca",
+  cur_nok: "Coroa norueguesa",
+  cur_dkk: "Coroa dinamarquesa",
+  cur_rub: "Rublo russo",
+  cur_pln: "Złoty polaco",
   nav_keller: "Adega",
   nav_stats: "Estatísticas",
   nav_ripe: "Maturação",
@@ -5459,6 +5643,17 @@ pt: {
   pdf_sub: "{n} vinhos · Data: {d}"
 },
 no: {
+  cur_eur: "Euro",
+  cur_usd: "Amerikanske dollar",
+  cur_gbp: "Britiske pund",
+  cur_chf: "Sveitsiske franc",
+  cur_aud: "Australske dollar",
+  cur_cad: "Kanadiske dollar",
+  cur_sek: "Svenske kroner",
+  cur_nok: "Norske kroner",
+  cur_dkk: "Danske kroner",
+  cur_rub: "Russiske rubler",
+  cur_pln: "Polske zloty",
   nav_keller: "Kjeller",
   nav_stats: "Statistikk",
   nav_ripe: "Drikkemodning",
@@ -5685,6 +5880,17 @@ no: {
   pdf_sub: "{n} viner · Dato: {d}"
 },
 nl: {
+  cur_eur: "Euro",
+  cur_usd: "Amerikaanse dollar",
+  cur_gbp: "Britse pond",
+  cur_chf: "Zwitserse frank",
+  cur_aud: "Australische dollar",
+  cur_cad: "Canadese dollar",
+  cur_sek: "Zweedse kroon",
+  cur_nok: "Noorse kroon",
+  cur_dkk: "Deense kroon",
+  cur_rub: "Russische roebel",
+  cur_pln: "Poolse zloty",
   nav_keller: "Kelder",
   nav_stats: "Statistieken",
   nav_ripe: "Drinkrijpheid",
@@ -5930,6 +6136,7 @@ function applyI18n() {
   document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.getAttribute('data-i18n-ph')); });
   const priceLabel = document.getElementById('price-label');
   if (priceLabel) priceLabel.textContent = t('l_price') + ' (' + settings.currency + ')';
+  renderCurrencyOptions();
   applyOwnerTitles();
   const active = document.querySelector('.tab.active');
   if (active) {
