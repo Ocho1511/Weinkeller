@@ -782,6 +782,21 @@ input[type="file"] { display: none; }
 </head>
 <body>
 
+<!-- Gemeinsame Verläufe für die Flaschen-Symbole (Regale) -->
+<svg id="bottle-defs" width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="bt-shade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".30"/>
+      <stop offset=".28" stop-color="#fff" stop-opacity=".04"/>
+      <stop offset=".62" stop-color="#000" stop-opacity=".12"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".42"/>
+    </linearGradient>
+    <linearGradient id="bt-foil" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f1dca0"/><stop offset=".5" stop-color="#c9a24a"/><stop offset="1" stop-color="#8f6d27"/>
+    </linearGradient>
+  </defs>
+</svg>
+
 <!-- START-BILDSCHIRM (Splash) – blendet automatisch per CSS aus -->
 <div id="splash">
   <div class="splash-inner">
@@ -7334,12 +7349,21 @@ function placeRackWine(e, p) {
   renderRacks();
   showToast(t('toast_rack_placed', { rack: r.name, e: e, p: p }));
 }
+// Liegende Flasche (Boden links, Hals rechts): Glaskörper in Typ-Farbe mit Schulter, Hals, Folienkapsel,
+// Papieretikett sowie Glanz oben und Schatten unten. Verläufe liegen einmal gemeinsam in #bottle-defs.
+const BOTTLE_BODY = 'M5 3 H33 C40.5 3 42.5 8.5 47 8.5 H53 V13.5 H47 C42.5 13.5 40.5 19 33 19 H5 C2.6 19 1 17 1 14.5 V7.5 C1 5 2.6 3 5 3 Z';
 function bottleSvg(fill) {
   return `<svg width="60" height="22" viewBox="0 0 60 22" aria-hidden="true" style="display:block">
-    <rect x="1" y="4" width="38" height="14" rx="6" fill="${fill}"/>
-    <polygon points="38,4 46,8 46,14 38,18" fill="${fill}"/>
-    <rect x="45" y="8" width="8" height="6" rx="1.5" fill="${fill}"/>
-    <rect x="52" y="7" width="5" height="8" rx="1.5" fill="#c9a66b"/>
+    <path d="${BOTTLE_BODY}" fill="${fill}"/>
+    <path d="${BOTTLE_BODY}" fill="url(#bt-shade)"/>
+    <rect x="11" y="4.6" width="18" height="12.8" rx="1.2" fill="#efe3c8" stroke="#00000030" stroke-width=".5"/>
+    <rect x="13.5" y="7.4" width="13" height="1.1" rx=".5" fill="#8a7448" opacity=".75"/>
+    <rect x="15.5" y="10" width="9" height="1" rx=".5" fill="#a38a58" opacity=".7"/>
+    <rect x="14.5" y="12.3" width="11" height="1" rx=".5" fill="#a38a58" opacity=".6"/>
+    <rect x="51.5" y="7.4" width="6.8" height="7.2" rx="1.6" fill="url(#bt-foil)"/>
+    <rect x="52.3" y="8.1" width="1.4" height="5.8" rx=".7" fill="#fff" opacity=".35"/>
+    <path d="M5.5 5.1 H32" stroke="#fff" stroke-opacity=".5" stroke-width="1.1" stroke-linecap="round" fill="none"/>
+    <path d="M44 9.7 H51" stroke="#fff" stroke-opacity=".4" stroke-width=".9" stroke-linecap="round" fill="none"/>
   </svg>`;
 }
 function wineAt(rackName, e, p) {
