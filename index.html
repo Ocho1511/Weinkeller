@@ -1195,6 +1195,29 @@ input[type="file"] { display: none; }
         </div>
       </div>
     </div>
+    <!-- KI-Guthaben: nur in der nativen App sichtbar -->
+    <div id="credits-card" style="display:none; margin-top:20px; padding-top:20px; border-top:1px solid var(--border)">
+      <div class="stats-title" style="margin-bottom:4px" data-i18n="credits_title">KI-Guthaben</div>
+      <div style="font-size:12px; font-weight:600; color:var(--text-muted); margin-bottom:12px" data-i18n="credits_info">Etikett scannen und Wein nachschlagen verbrauchen je 1 KI-Scan. Zum Start sind 50 inklusive.</div>
+      <div class="export-card" style="cursor:default">
+        <div class="export-icon">✨</div>
+        <div class="export-info">
+          <div class="title" id="credits-count">…</div>
+          <div class="desc" id="credits-device"></div>
+        </div>
+      </div>
+      <div class="export-card" id="credits-topup-card" onclick="topUpCredits()" style="margin-top:10px">
+        <div class="export-icon">🛒</div>
+        <div class="export-info">
+          <div class="title" data-i18n="credits_topup">Guthaben aufladen</div>
+          <div class="desc" data-i18n="credits_topup_desc">Weitere KI-Scans per In-App-Kauf</div>
+        </div>
+      </div>
+      <div class="rack-add-row" id="credits-unlock-row" style="margin-top:10px">
+        <input id="unlock-code" type="password" autocomplete="off" autocapitalize="off" placeholder="Freischaltcode" data-i18n-ph="credits_unlock_ph" onkeydown="if(event.key==='Enter')submitUnlock()">
+        <button class="mini-scan-btn" onclick="submitUnlock()" title="Freischalten">🔓</button>
+      </div>
+    </div>
     <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border)">
       <div class="stats-title" style="margin-bottom:12px" data-i18n="setup_db">Weindatenbank</div>
       <div class="export-card" id="enrich-btn" onclick="enrichAllWines()">
@@ -1330,6 +1353,42 @@ input[type="file"] { display: none; }
       <button class="btn-primary" onclick="saveWine()" data-i18n="btn_save">Speichern</button>
     </div>
   </div>
+</div>
+
+<!-- KI-GUTHABEN AUFGEBRAUCHT -->
+<div class="modal-overlay" id="credits-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2 data-i18n="credits_empty_title">KI-Guthaben aufgebraucht</h2>
+    <p style="font-size:14px; line-height:1.5; color:var(--text-muted); margin:6px 0 14px" data-i18n="credits_empty_text">Deine inklusiven KI-Scans sind verbraucht. Lade Guthaben auf, um weiter Etiketten zu scannen und Weine nachzuschlagen. Alles andere in der App funktioniert weiter.</p>
+    <div class="btn-row" style="flex-direction:column">
+      <button class="btn-primary" onclick="topUpCredits()" data-i18n="credits_topup">Guthaben aufladen</button>
+      <button class="btn-secondary" onclick="goToUnlock()" data-i18n="credits_have_code">Ich habe einen Freischaltcode</button>
+      <button class="btn-secondary" onclick="closeModal('credits-modal')" data-i18n="credits_close">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN (nur für den Betreiber: öffnet sich durch 7× Tippen auf den Titel „Setup", dann Passwort) -->
+<div class="modal-overlay" id="admin-login-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2>Admin</h2>
+    <div class="form-group">
+      <input id="admin-pw" type="password" autocomplete="off" autocapitalize="off" placeholder="Admin-Passwort" onkeydown="if(event.key==='Enter')adminLogin()">
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="closeModal('admin-login-modal')">Abbrechen</button>
+      <button class="btn-primary" onclick="adminLogin()">Anmelden</button>
+    </div>
+  </div>
+</div>
+<div class="tab" id="tab-admin">
+  <div class="page-header">
+    <h1>Admin</h1>
+    <div class="subtitle">Nutzung der App</div>
+  </div>
+  <div id="admin-content" style="padding:0 16px 24px"></div>
 </div>
 
 <!-- WISH MODAL -->
@@ -1796,9 +1855,176 @@ function currencyName() {
   return (CURRENCIES[settings.currency] || {}).name || 'Euro';
 }
 
+// ═══════════════════════════════════════
+// KI-GUTHABEN (nur in der nativen App; die Web-Apps bleiben ungezählt)
+// Das Guthaben liegt serverseitig im Worker (Start: 50 KI-Aufrufe). Die App zeigt es nur an
+// und schickt ihre Installations-ID mit; der Worker zieht pro KI-Aufruf 1 ab und sperrt bei 0.
+// ═══════════════════════════════════════
+const INSTALL_ID_KEY = 'wk_install_id';
+let aiCredits = null;          // Zahl, 'unlimited' oder null (noch unbekannt)
+let aiOutOfCredits = false;
+function getInstallId() {
+  try {
+    let id = localStorage.getItem(INSTALL_ID_KEY);
+    if (!id) {
+      id = ((crypto.randomUUID ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2))) + '').replace(/[^A-Za-z0-9-]/g, '');
+      while (id.length < 16) id += Math.random().toString(36).slice(2);
+      localStorage.setItem(INSTALL_ID_KEY, id);
+    }
+    return id;
+  } catch (e) { return 'session-' + Math.random().toString(36).slice(2) + Date.now().toString(36); }
+}
+function isNativeApp() {
+  try { return !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()); } catch (e) { return false; }
+}
+function updateCreditsUI() {
+  const card = document.getElementById('credits-card');
+  if (!card) return;
+  const native = isNativeApp();
+  card.style.display = native ? 'block' : 'none';
+  if (!native) return;
+  const unl = aiCredits === 'unlimited';
+  const cnt = document.getElementById('credits-count');
+  if (cnt) cnt.textContent = unl ? t('credits_unlimited') : (aiCredits === null ? '…' : t('credits_left', { n: aiCredits }));
+  const top = document.getElementById('credits-topup-card');
+  if (top) top.style.display = unl ? 'none' : 'flex';
+  const unlockRow = document.getElementById('credits-unlock-row');
+  if (unlockRow) unlockRow.style.display = unl ? 'none' : 'flex';
+  const dev = document.getElementById('credits-device');
+  if (dev) dev.textContent = t('credits_device') + ' ' + getInstallId().slice(0, 8);
+}
+function setCredits(v) {
+  aiCredits = v;
+  aiOutOfCredits = (typeof v === 'number' && v <= 0);
+  updateCreditsUI();
+}
+async function refreshCredits() {
+  if (!isNativeApp()) return;
+  try {
+    const r = await fetch(SCAN_PROXY_URL + '/acct/status', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Install-Id': getInstallId() }, body: '{}' });
+    const j = await r.json();
+    if (j && j.gated) setCredits(j.unlimited ? 'unlimited' : j.credits);
+  } catch (e) { /* offline: Anzeige bleibt wie sie ist */ }
+}
+// Wie fetch(), aber für KI-Aufrufe: schickt die Installations-ID, liest das Restguthaben aus der Antwort
+// und meldet "Guthaben aufgebraucht" (HTTP 402) mit einem Hinweisfenster statt mit einem Fehler-Toast.
+async function aiFetch(url, init) {
+  init = init || {};
+  init.headers = Object.assign({}, init.headers, { 'X-Install-Id': getInstallId() });
+  if (isNativeApp() && aiOutOfCredits) { showCreditsModal(); const e0 = new Error('no_credits'); e0.noCredits = true; throw e0; }
+  const resp = await fetch(url, init);
+  const left = resp.headers.get('X-Credits-Left');
+  if (left !== null) { const n = left === 'unlimited' ? 'unlimited' : parseInt(left); if (n === 'unlimited' || !isNaN(n)) setCredits(n); }
+  if (resp.status === 402) { setCredits(0); showCreditsModal(); const e1 = new Error('no_credits'); e1.noCredits = true; throw e1; }
+  return resp;
+}
+function showCreditsModal() { const m = document.getElementById('credits-modal'); if (m) m.classList.add('show'); }
+function topUpCredits() { closeModal('credits-modal'); showToast(t('credits_topup_soon')); }
+function goToUnlock() {
+  closeModal('credits-modal');
+  showTab('setup', document.querySelector("[onclick=\"showTab('setup',this)\"]"));
+  const inp = document.getElementById('unlock-code'); if (inp) setTimeout(() => inp.focus(), 150);
+}
+async function submitUnlock() {
+  const inp = document.getElementById('unlock-code');
+  const code = inp ? inp.value.trim() : '';
+  if (!code) return;
+  try {
+    const r = await fetch(SCAN_PROXY_URL + '/acct/unlock', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Install-Id': getInstallId() }, body: JSON.stringify({ code }) });
+    const j = await r.json().catch(() => ({}));
+    if (r.ok && j.unlimited) { setCredits('unlimited'); if (inp) inp.value = ''; showToast(t('credits_unlock_ok')); return; }
+    if (r.status === 429) showToast(t('credits_unlock_many'));
+    else if (r.status === 503) showToast(t('credits_unlock_unavailable'));
+    else showToast(t('credits_unlock_bad'));
+  } catch (e) { showToast(t('sync_fail')); }
+}
+
+// ═══════════════════════════════════════
+// ADMIN-ÜBERSICHT (nur für den Betreiber; bewusst nicht übersetzt)
+// Zugang: 7× schnell auf den Titel „Setup" tippen, dann das Admin-Passwort eingeben. Das Passwort
+// liegt nur im Worker (Secret ADMIN_PASSWORD), nicht in der App, und wird nie gespeichert.
+// ═══════════════════════════════════════
+let adminPw = '', adminTaps = 0, adminTapTimer = null;
+function adminTap() {
+  adminTaps++;
+  clearTimeout(adminTapTimer);
+  adminTapTimer = setTimeout(() => { adminTaps = 0; }, 3000);
+  if (adminTaps >= 7) {
+    adminTaps = 0;
+    const pw = document.getElementById('admin-pw'); if (pw) pw.value = '';
+    const m = document.getElementById('admin-login-modal'); if (m) m.classList.add('show');
+    if (pw) setTimeout(() => pw.focus(), 150);
+  }
+}
+async function adminLogin() {
+  const pw = (document.getElementById('admin-pw').value || '').trim();
+  if (!pw) return;
+  if (await loadAdminStats(pw)) { adminPw = pw; closeModal('admin-login-modal'); openAdminTab(); }
+}
+async function loadAdminStats(pw) {
+  try {
+    const r = await fetch(SCAN_PROXY_URL + '/admin/stats', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pw }) });
+    const j = await r.json().catch(() => ({}));
+    if (r.status === 403) { showToast('Passwort falsch'); return false; }
+    if (r.status === 429) { showToast('Zu viele Versuche – bitte später erneut'); return false; }
+    if (r.status === 503) { showToast(j.error === 'not_configured' ? 'Admin-Passwort ist im Worker noch nicht gesetzt' : 'Speicher nicht erreichbar'); return false; }
+    if (!r.ok || !j.ok) { showToast('Fehler beim Laden'); return false; }
+    renderAdmin(j);
+    return true;
+  } catch (e) { showToast('Keine Verbindung'); return false; }
+}
+function openAdminTab() {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-admin').classList.add('active');
+  ['fab', 'fab-drink'].forEach(id => { const f = document.getElementById(id); if (f) f.style.display = 'none'; });
+  window.scrollTo(0, 0);
+}
+async function refreshAdmin() { if (adminPw) { showToast('Aktualisiere …'); await loadAdminStats(adminPw); } }
+function closeAdmin() { adminPw = ''; document.getElementById('admin-content').innerHTML = ''; showTab('setup', document.querySelector("[onclick=\"showTab('setup',this)\"]")); }
+function renderAdmin(j) {
+  const tt = j.totals || {};
+  const fmt = ts => ts ? new Date(ts).toLocaleString(dateLocale(), { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '–';
+  const card = (big, label) => `<div class="stats-card"><div class="big">${big}</div><div class="label">${label}</div></div>`;
+  let html = `<div class="stats-grid">
+    ${card(tt.installs ?? 0, 'Installationen')}
+    ${card(tt.active24h ?? 0, 'Aktiv (24 Std.)')}
+    ${card(tt.active7d ?? 0, 'Aktiv (7 Tage)')}
+    ${card(tt.new7d ?? 0, 'Neu (7 Tage)')}
+    ${card(tt.callsTotal ?? 0, 'KI-Aufrufe gesamt')}
+    ${card(tt.outOfCredits ?? 0, 'Ohne Guthaben')}
+    ${card(tt.unlimited ?? 0, 'Freigeschaltet')}
+    ${card((j.globalToday ?? 0) + ' / ' + (j.globalLimit ?? '–'), 'KI heute (ca.)')}
+  </div>`;
+  html += `<div class="stats-title" style="margin-top:6px">Letzte 14 Tage</div>`;
+  const days = j.perDay || [];
+  const max = Math.max(1, ...days.map(d => Math.max(d.newInstalls, d.active)));
+  days.slice().reverse().forEach(d => {
+    html += `<div class="type-bar-row" style="cursor:default">
+      <div class="type-bar-label" style="width:54px">${esc(d.day.slice(5))}</div>
+      <div class="type-bar-track"><div class="type-bar-fill" style="width:${Math.round(d.active / max * 100)}%;background:var(--gold)"></div></div>
+      <div class="type-bar-count" style="width:auto;min-width:96px;text-align:right;font-size:11px;white-space:nowrap">${d.newInstalls} neu · ${d.active} aktiv</div>
+    </div>`;
+  });
+  html += `<div class="stats-title" style="margin-top:18px">Nutzer (zuletzt aktiv)</div>`;
+  const rec = j.recent || [];
+  if (!rec.length) html += `<div class="stats-card" style="color:var(--text-muted);font-size:13px">Noch keine Nutzer.</div>`;
+  rec.forEach(r => {
+    const cr = r.unlimited ? '∞' : (r.credits ?? '–');
+    html += `<div class="stats-card" style="margin-bottom:8px;display:flex;align-items:center;gap:12px">
+      <div style="flex:1;min-width:0"><div style="font-size:13px;font-family:monospace">${esc(r.id)}${r.unlimited ? ' 🔓' : ''}</div>
+      <div style="font-size:11px;color:var(--text-muted)">zuletzt ${fmt(r.lastSeen)} · seit ${fmt(r.createdAt)}</div></div>
+      <div style="text-align:right;white-space:nowrap"><div style="font-size:13px;font-weight:700">Guthaben ${cr}</div><div style="font-size:11px;color:var(--text-muted)">${r.used} genutzt</div></div>
+    </div>`;
+  });
+  html += `<div style="font-size:11px;color:var(--text-muted);margin:10px 0 14px">Anonyme Geräte-IDs (gekürzt). Neue Einträge und Änderungen erscheinen mit bis zu etwa 1 Minute Verzögerung. „Aktiv" und „zuletzt" beruhen auf der letzten KI-Nutzung (reines Öffnen der App wird nicht erfasst).</div>
+    <div class="btn-row"><button class="btn-secondary" onclick="closeAdmin()">Schließen</button><button class="btn-primary" onclick="refreshAdmin()">Aktualisieren</button></div>`;
+  document.getElementById('admin-content').innerHTML = html;
+}
+
 // KI-Nachschlagen MIT Web-Suche → liefert Beschreibung + aktuellen Durchschnittspreis
 async function lookupWineData(name, year) {
-  const resp = await fetch(SCAN_PROXY_URL, {
+  const resp = await aiFetch(SCAN_PROXY_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -1848,6 +2074,7 @@ async function lookupWine() {
 let lastAutoLookupKey = '';
 async function maybeAutoLookup() {
   if (editId) return;
+  if (isNativeApp() && aiOutOfCredits) return;   // Guthaben aufgebraucht: automatisches Nachschlagen still aussetzen
   const name = document.getElementById('f-name').value.trim();
   const year = document.getElementById('f-year').value.trim();
   if (!name || !(parseInt(year) >= 1900)) return;
@@ -1945,6 +2172,11 @@ async function enrichAllWines() {
   const targets = wines.slice();
   if (!targets.length) { showToast(t('toast_enrich_none')); return; }
   if (!confirm(t('confirm_enrich', {n: targets.length}))) return;
+  // Native App: reicht das KI-Guthaben nicht für alle Weine mit fehlenden Angaben, vorher darauf hinweisen
+  if (isNativeApp() && typeof aiCredits === 'number') {
+    const needAi = targets.filter(w => !w.region || !w.country || !w.grape || !w.drinkFrom || !w.drinkTo || !w.price).length;
+    if (needAi > aiCredits && !confirm(t('credits_enrich_warn', { n: needAi, c: aiCredits }))) return;
+  }
   enrichRunning = true;
   const btn = document.getElementById('enrich-btn');
   if (btn) btn.classList.add('is-busy');
@@ -1969,7 +2201,8 @@ async function enrichAllWines() {
         }
         // 2) Langsamen KI-Websuche-Aufruf nur, wenn Textfelder fehlen (sonst überspringen → Lauf bleibt schnell)
         const needsFields = !w.region || !w.country || !w.grape || !w.drinkFrom || !w.drinkTo || !w.price;
-        if (needsFields) {
+        // Ist das KI-Guthaben aufgebraucht, werden die übrigen Weine nur noch mit Bildern bearbeitet (kostenlos)
+        if (needsFields && !(isNativeApp() && aiOutOfCredits)) {
           const info = await lookupWineData(w.name, w.year);
           if (info) {
             if (!w.region && info.region) { w.region = info.region; changed = true; }
@@ -2012,6 +2245,24 @@ de: {
   cur_dkk: "Dänische Kronen",
   cur_rub: "Russische Rubel",
   cur_pln: "Polnische Złoty",
+  credits_title: "KI-Guthaben",
+  credits_info: "Etikett scannen und Wein nachschlagen verbrauchen je 1 KI-Scan. Zum Start sind 50 inklusive.",
+  credits_left: "{n} KI-Scans übrig",
+  credits_unlimited: "Unbegrenzt freigeschaltet",
+  credits_device: "Gerätekennung:",
+  credits_topup: "Guthaben aufladen",
+  credits_topup_desc: "Weitere KI-Scans per In-App-Kauf",
+  credits_topup_soon: "Aufladen per In-App-Kauf folgt mit der App-Store-Version.",
+  credits_unlock_ph: "Freischaltcode",
+  credits_unlock_ok: "Freigeschaltet ✓",
+  credits_unlock_bad: "Code ungültig",
+  credits_unlock_many: "Zu viele Versuche. Bitte später erneut versuchen.",
+  credits_unlock_unavailable: "Freischalten ist gerade nicht verfügbar.",
+  credits_empty_title: "KI-Guthaben aufgebraucht",
+  credits_empty_text: "Deine inklusiven KI-Scans sind verbraucht. Lade Guthaben auf, um weiter Etiketten zu scannen und Weine nachzuschlagen. Alles andere in der App funktioniert weiter.",
+  credits_have_code: "Ich habe einen Freischaltcode",
+  credits_close: "Schließen",
+  credits_enrich_warn: "Für {n} Weine werden KI-Scans benötigt, du hast noch {c}. Es wird nur so weit aktualisiert, wie dein Guthaben reicht (Bilder werden trotzdem für alle geholt). Fortfahren?",
   fav_sort_rating: "★ Bewertung",
   fav_sort_drunk: "🥂 Häufigkeit",
   fav_none: "Keine Weine für diese Auswahl.",
@@ -2261,6 +2512,24 @@ en: {
   cur_dkk: "Danish krone",
   cur_rub: "Russian ruble",
   cur_pln: "Polish złoty",
+  credits_title: "AI credits",
+  credits_info: "Scanning a label and looking up a wine each use 1 AI scan. 50 are included to start.",
+  credits_left: "{n} AI scans left",
+  credits_unlimited: "Unlimited (unlocked)",
+  credits_device: "Device ID:",
+  credits_topup: "Add credits",
+  credits_topup_desc: "More AI scans via in-app purchase",
+  credits_topup_soon: "Top-up via in-app purchase will come with the App Store version.",
+  credits_unlock_ph: "Unlock code",
+  credits_unlock_ok: "Unlocked ✓",
+  credits_unlock_bad: "Invalid code",
+  credits_unlock_many: "Too many attempts. Please try again later.",
+  credits_unlock_unavailable: "Unlocking is not available right now.",
+  credits_empty_title: "AI credits used up",
+  credits_empty_text: "Your included AI scans are used up. Add credits to keep scanning labels and looking up wines. Everything else in the app keeps working.",
+  credits_have_code: "I have an unlock code",
+  credits_close: "Close",
+  credits_enrich_warn: "{n} wines need AI scans but you only have {c} left. Only as many as your credits allow will be updated (images are still fetched for all). Continue?",
   fav_sort_rating: "★ Rating",
   fav_sort_drunk: "🥂 Frequency",
   fav_none: "No wines for this selection.",
@@ -2510,6 +2779,24 @@ es: {
   cur_dkk: "Corona danesa",
   cur_rub: "Rublo ruso",
   cur_pln: "Esloti polaco",
+  credits_title: "Crédito de IA",
+  credits_info: "Escanear una etiqueta y buscar un vino consumen 1 escaneo de IA cada uno. Al empezar hay 50 incluidos.",
+  credits_left: "Quedan {n} escaneos de IA",
+  credits_unlimited: "Ilimitado (desbloqueado)",
+  credits_device: "ID del dispositivo:",
+  credits_topup: "Recargar crédito",
+  credits_topup_desc: "Más escaneos de IA mediante compra dentro de la app",
+  credits_topup_soon: "La recarga mediante compra dentro de la app llegará con la versión de App Store.",
+  credits_unlock_ph: "Código de desbloqueo",
+  credits_unlock_ok: "Desbloqueado ✓",
+  credits_unlock_bad: "Código no válido",
+  credits_unlock_many: "Demasiados intentos. Inténtalo más tarde.",
+  credits_unlock_unavailable: "El desbloqueo no está disponible ahora.",
+  credits_empty_title: "Crédito de IA agotado",
+  credits_empty_text: "Se han agotado tus escaneos de IA incluidos. Recarga crédito para seguir escaneando etiquetas y buscando vinos. Todo lo demás en la app sigue funcionando.",
+  credits_have_code: "Tengo un código de desbloqueo",
+  credits_close: "Cerrar",
+  credits_enrich_warn: "{n} vinos necesitan escaneos de IA, pero solo te quedan {c}. Solo se actualizarán tantos como permita tu crédito (las imágenes se obtienen igualmente para todos). ¿Continuar?",
   fav_sort_rating: "★ Valoración",
   fav_sort_drunk: "🥂 Frecuencia",
   fav_none: "Ningún vino para esta selección.",
@@ -2759,6 +3046,24 @@ sv: {
   cur_dkk: "Dansk krona",
   cur_rub: "Rysk rubel",
   cur_pln: "Polsk zloty",
+  credits_title: "AI-krediter",
+  credits_info: "Att skanna en etikett och att slå upp ett vin kostar 1 AI-skanning var. 50 ingår från start.",
+  credits_left: "{n} AI-skanningar kvar",
+  credits_unlimited: "Obegränsat (upplåst)",
+  credits_device: "Enhets-ID:",
+  credits_topup: "Fyll på krediter",
+  credits_topup_desc: "Fler AI-skanningar via köp i appen",
+  credits_topup_soon: "Påfyllning via köp i appen kommer med App Store-versionen.",
+  credits_unlock_ph: "Upplåsningskod",
+  credits_unlock_ok: "Upplåst ✓",
+  credits_unlock_bad: "Ogiltig kod",
+  credits_unlock_many: "För många försök. Försök igen senare.",
+  credits_unlock_unavailable: "Upplåsning är inte tillgänglig just nu.",
+  credits_empty_title: "AI-skanningarna är slut",
+  credits_empty_text: "Dina inkluderade AI-skanningar är slut. Fyll på för att fortsätta skanna etiketter och slå upp viner. Allt annat i appen fungerar som vanligt.",
+  credits_have_code: "Jag har en upplåsningskod",
+  credits_close: "Stäng",
+  credits_enrich_warn: "{n} viner behöver AI-skanningar men du har bara {c} kvar. Bara så många som dina krediter räcker till uppdateras (bilder hämtas ändå för alla). Fortsätta?",
   fav_sort_rating: "★ Betyg",
   fav_sort_drunk: "🥂 Antal",
   fav_none: "Inga viner för detta urval.",
@@ -3008,6 +3313,24 @@ da: {
   cur_dkk: "Danske kroner",
   cur_rub: "Russiske rubler",
   cur_pln: "Polske zloty",
+  credits_title: "AI-kreditter",
+  credits_info: "At scanne en etiket og at slå en vin op koster 1 AI-scanning hver. 50 er inkluderet fra start.",
+  credits_left: "{n} AI-scanninger tilbage",
+  credits_unlimited: "Ubegrænset (låst op)",
+  credits_device: "Enheds-ID:",
+  credits_topup: "Tilføj kreditter",
+  credits_topup_desc: "Flere AI-scanninger via køb i appen",
+  credits_topup_soon: "Optankning via køb i appen kommer med App Store-versionen.",
+  credits_unlock_ph: "Oplåsningskode",
+  credits_unlock_ok: "Låst op ✓",
+  credits_unlock_bad: "Ugyldig kode",
+  credits_unlock_many: "For mange forsøg. Prøv igen senere.",
+  credits_unlock_unavailable: "Oplåsning er ikke tilgængelig lige nu.",
+  credits_empty_title: "AI-kreditter brugt op",
+  credits_empty_text: "Dine inkluderede AI-scanninger er brugt op. Tilføj kreditter for at fortsætte med at scanne etiketter og slå vine op. Alt andet i appen virker stadig.",
+  credits_have_code: "Jeg har en oplåsningskode",
+  credits_close: "Luk",
+  credits_enrich_warn: "{n} vine kræver AI-scanninger, men du har kun {c} tilbage. Der opdateres kun så mange, som dine kreditter rækker til (billeder hentes stadig til alle). Fortsæt?",
   fav_sort_rating: "★ Bedømmelse",
   fav_sort_drunk: "🥂 Antal",
   fav_none: "Ingen vine for dette valg.",
@@ -3257,6 +3580,24 @@ fi: {
   cur_dkk: "Tanskan kruunu",
   cur_rub: "Venäjän rupla",
   cur_pln: "Puolan złoty",
+  credits_title: "Tekoälykrediitit",
+  credits_info: "Etiketin skannaus ja viinin haku kuluttavat kumpikin 1 tekoälyskannauksen. Alussa mukana on 50.",
+  credits_left: "{n} tekoälyskannausta jäljellä",
+  credits_unlimited: "Rajaton (avattu)",
+  credits_device: "Laitetunnus:",
+  credits_topup: "Lisää krediittejä",
+  credits_topup_desc: "Lisää tekoälyskannauksia sovelluksen sisäisellä ostolla",
+  credits_topup_soon: "Lataus sovelluksen sisäisellä ostolla tulee App Store -version mukana.",
+  credits_unlock_ph: "Avauskoodi",
+  credits_unlock_ok: "Avattu ✓",
+  credits_unlock_bad: "Virheellinen koodi",
+  credits_unlock_many: "Liian monta yritystä. Yritä myöhemmin uudelleen.",
+  credits_unlock_unavailable: "Avaaminen ei ole juuri nyt käytettävissä.",
+  credits_empty_title: "Tekoälykrediitit loppu",
+  credits_empty_text: "Mukana olleet tekoälyskannaukset on käytetty. Lisää krediittejä, jotta voit jatkaa etikettien skannausta ja viinien hakua. Kaikki muu sovelluksessa toimii edelleen.",
+  credits_have_code: "Minulla on avauskoodi",
+  credits_close: "Sulje",
+  credits_enrich_warn: "{n} viiniä tarvitsee tekoälyskannauksia, mutta sinulla on vain {c} jäljellä. Päivitetään vain niin monta kuin krediitit riittävät (kuvat haetaan silti kaikille). Jatketaanko?",
   fav_sort_rating: "★ Arvosana",
   fav_sort_drunk: "🥂 Määrä",
   fav_none: "Ei viinejä tälle valinnalle.",
@@ -3506,6 +3847,24 @@ ru: {
   cur_dkk: "Датская крона",
   cur_rub: "Российский рубль",
   cur_pln: "Польский злотый",
+  credits_title: "ИИ-кредиты",
+  credits_info: "Сканирование этикетки и поиск вина расходуют по 1 ИИ-скану. В начале включено 50.",
+  credits_left: "Осталось ИИ-сканов: {n}",
+  credits_unlimited: "Без ограничений (разблокировано)",
+  credits_device: "ID устройства:",
+  credits_topup: "Пополнить кредиты",
+  credits_topup_desc: "Больше ИИ-сканов через покупку в приложении",
+  credits_topup_soon: "Пополнение через покупку в приложении появится в версии для App Store.",
+  credits_unlock_ph: "Код разблокировки",
+  credits_unlock_ok: "Разблокировано ✓",
+  credits_unlock_bad: "Неверный код",
+  credits_unlock_many: "Слишком много попыток. Повторите позже.",
+  credits_unlock_unavailable: "Разблокировка сейчас недоступна.",
+  credits_empty_title: "ИИ-кредиты закончились",
+  credits_empty_text: "Включённые ИИ-сканы израсходованы. Пополните кредиты, чтобы и дальше сканировать этикетки и искать вина. Всё остальное в приложении работает.",
+  credits_have_code: "У меня есть код разблокировки",
+  credits_close: "Закрыть",
+  credits_enrich_warn: "Для {n} вин нужны ИИ-сканы, а у вас осталось {c}. Будет обновлено только столько, на сколько хватит кредитов (изображения всё равно загрузятся для всех). Продолжить?",
   fav_sort_rating: "★ Оценка",
   fav_sort_drunk: "🥂 Частота",
   fav_none: "Нет вин для этого выбора.",
@@ -3755,6 +4114,24 @@ it: {
   cur_dkk: "Corona danese",
   cur_rub: "Rublo russo",
   cur_pln: "Złoty polacco",
+  credits_title: "Crediti IA",
+  credits_info: "Scansionare un'etichetta e cercare un vino consumano 1 scansione IA ciascuno. All'inizio ne sono incluse 50.",
+  credits_left: "{n} scansioni IA rimaste",
+  credits_unlimited: "Illimitato (sbloccato)",
+  credits_device: "ID dispositivo:",
+  credits_topup: "Ricarica crediti",
+  credits_topup_desc: "Altre scansioni IA con acquisto in-app",
+  credits_topup_soon: "La ricarica tramite acquisto in-app arriverà con la versione per l'App Store.",
+  credits_unlock_ph: "Codice di sblocco",
+  credits_unlock_ok: "Sbloccato ✓",
+  credits_unlock_bad: "Codice non valido",
+  credits_unlock_many: "Troppi tentativi. Riprova più tardi.",
+  credits_unlock_unavailable: "Lo sblocco al momento non è disponibile.",
+  credits_empty_title: "Crediti IA esauriti",
+  credits_empty_text: "Le scansioni IA incluse sono esaurite. Ricarica i crediti per continuare a scansionare etichette e cercare vini. Tutto il resto dell'app continua a funzionare.",
+  credits_have_code: "Ho un codice di sblocco",
+  credits_close: "Chiudi",
+  credits_enrich_warn: "{n} vini richiedono scansioni IA, ma te ne restano solo {c}. Verranno aggiornati solo quanti ne consentono i crediti (le immagini vengono comunque recuperate per tutti). Continuare?",
   fav_sort_rating: "★ Valutazione",
   fav_sort_drunk: "🥂 Frequenza",
   fav_none: "Nessun vino per questa selezione.",
@@ -4004,6 +4381,24 @@ fr: {
   cur_dkk: "Couronne danoise",
   cur_rub: "Rouble russe",
   cur_pln: "Złoty polonais",
+  credits_title: "Crédits IA",
+  credits_info: "Scanner une étiquette et rechercher un vin consomment chacun 1 scan IA. 50 sont inclus au départ.",
+  credits_left: "{n} scans IA restants",
+  credits_unlimited: "Illimité (débloqué)",
+  credits_device: "ID de l'appareil :",
+  credits_topup: "Recharger des crédits",
+  credits_topup_desc: "Plus de scans IA par achat intégré",
+  credits_topup_soon: "La recharge par achat intégré arrivera avec la version App Store.",
+  credits_unlock_ph: "Code de déblocage",
+  credits_unlock_ok: "Débloqué ✓",
+  credits_unlock_bad: "Code invalide",
+  credits_unlock_many: "Trop de tentatives. Réessayez plus tard.",
+  credits_unlock_unavailable: "Le déblocage n'est pas disponible pour le moment.",
+  credits_empty_title: "Crédits IA épuisés",
+  credits_empty_text: "Vos scans IA inclus sont épuisés. Rechargez des crédits pour continuer à scanner des étiquettes et rechercher des vins. Tout le reste de l'application continue de fonctionner.",
+  credits_have_code: "J'ai un code de déblocage",
+  credits_close: "Fermer",
+  credits_enrich_warn: "{n} vins nécessitent des scans IA, mais il ne vous en reste que {c}. Seuls autant que vos crédits le permettent seront mis à jour (les images sont tout de même récupérées pour tous). Continuer ?",
   fav_sort_rating: "★ Note",
   fav_sort_drunk: "🥂 Fréquence",
   fav_none: "Aucun vin pour cette sélection.",
@@ -4253,6 +4648,24 @@ pl: {
   cur_dkk: "Korona duńska",
   cur_rub: "Rubel rosyjski",
   cur_pln: "Złoty polski",
+  credits_title: "Kredyty AI",
+  credits_info: "Skanowanie etykiety i wyszukiwanie wina zużywają po 1 skanie AI. Na start w cenie jest 50.",
+  credits_left: "Pozostało skanów AI: {n}",
+  credits_unlimited: "Bez limitu (odblokowano)",
+  credits_device: "ID urządzenia:",
+  credits_topup: "Doładuj kredyty",
+  credits_topup_desc: "Więcej skanów AI w zakupie w aplikacji",
+  credits_topup_soon: "Doładowanie przez zakup w aplikacji pojawi się w wersji z App Store.",
+  credits_unlock_ph: "Kod odblokowania",
+  credits_unlock_ok: "Odblokowano ✓",
+  credits_unlock_bad: "Nieprawidłowy kod",
+  credits_unlock_many: "Zbyt wiele prób. Spróbuj ponownie później.",
+  credits_unlock_unavailable: "Odblokowanie jest teraz niedostępne.",
+  credits_empty_title: "Kredyty AI wykorzystane",
+  credits_empty_text: "Wliczone skany AI zostały wykorzystane. Doładuj kredyty, aby dalej skanować etykiety i wyszukiwać wina. Wszystko inne w aplikacji działa nadal.",
+  credits_have_code: "Mam kod odblokowania",
+  credits_close: "Zamknij",
+  credits_enrich_warn: "Dla {n} win potrzebne są skany AI, a masz jeszcze {c}. Zaktualizowane zostanie tylko tyle, na ile wystarczą kredyty (obrazy i tak zostaną pobrane dla wszystkich). Kontynuować?",
   fav_sort_rating: "★ Ocena",
   fav_sort_drunk: "🥂 Częstość",
   fav_none: "Brak win dla tego wyboru.",
@@ -4502,6 +4915,24 @@ hu: {
   cur_dkk: "Dán korona",
   cur_rub: "Orosz rubel",
   cur_pln: "Lengyel złoty",
+  credits_title: "MI-kreditek",
+  credits_info: "Egy címke beolvasása és egy bor keresése egyaránt 1 MI-beolvasást fogyaszt. Induláskor 50 jár hozzá.",
+  credits_left: "{n} MI-beolvasás maradt",
+  credits_unlimited: "Korlátlan (feloldva)",
+  credits_device: "Eszközazonosító:",
+  credits_topup: "Kredit feltöltése",
+  credits_topup_desc: "További MI-beolvasások alkalmazáson belüli vásárlással",
+  credits_topup_soon: "Az alkalmazáson belüli vásárlással történő feltöltés az App Store-verzióval érkezik.",
+  credits_unlock_ph: "Feloldó kód",
+  credits_unlock_ok: "Feloldva ✓",
+  credits_unlock_bad: "Érvénytelen kód",
+  credits_unlock_many: "Túl sok próbálkozás. Próbáld újra később.",
+  credits_unlock_unavailable: "A feloldás jelenleg nem érhető el.",
+  credits_empty_title: "Elfogytak az MI-kreditek",
+  credits_empty_text: "A beépített MI-beolvasások elfogytak. Tölts fel kreditet, hogy tovább olvashass be címkéket és kereshess borokat. Az alkalmazásban minden más tovább működik.",
+  credits_have_code: "Van feloldó kódom",
+  credits_close: "Bezárás",
+  credits_enrich_warn: "{n} bornak MI-beolvasás kell, de már csak {c} van hátra. Csak annyit frissítünk, amennyit a kredit enged (a képeket így is mindegyikhez letöltjük). Folytatod?",
   fav_sort_rating: "★ Értékelés",
   fav_sort_drunk: "🥂 Gyakoriság",
   fav_none: "Nincs bor ehhez a választáshoz.",
@@ -4751,6 +5182,24 @@ cs: {
   cur_dkk: "Dánská koruna",
   cur_rub: "Ruský rubl",
   cur_pln: "Polský zlotý",
+  credits_title: "AI kredity",
+  credits_info: "Naskenování etikety i vyhledání vína spotřebují po 1 AI skenu. Na začátku je v ceně 50.",
+  credits_left: "Zbývá AI skenů: {n}",
+  credits_unlimited: "Neomezeně (odemčeno)",
+  credits_device: "ID zařízení:",
+  credits_topup: "Dobít kredity",
+  credits_topup_desc: "Další AI skeny nákupem v aplikaci",
+  credits_topup_soon: "Dobíjení nákupem v aplikaci přijde s verzí pro App Store.",
+  credits_unlock_ph: "Odemykací kód",
+  credits_unlock_ok: "Odemčeno ✓",
+  credits_unlock_bad: "Neplatný kód",
+  credits_unlock_many: "Příliš mnoho pokusů. Zkuste to později.",
+  credits_unlock_unavailable: "Odemčení teď není dostupné.",
+  credits_empty_title: "AI kredity vyčerpány",
+  credits_empty_text: "Zahrnuté AI skeny jsou vyčerpány. Dobijte kredity, abyste mohli dál skenovat etikety a vyhledávat vína. Vše ostatní v aplikaci funguje dál.",
+  credits_have_code: "Mám odemykací kód",
+  credits_close: "Zavřít",
+  credits_enrich_warn: "Pro {n} vín jsou potřeba AI skeny, ale zbývá vám jich {c}. Aktualizuje se jen tolik, kolik kredity stačí (obrázky se stáhnou pro všechna). Pokračovat?",
   fav_sort_rating: "★ Hodnocení",
   fav_sort_drunk: "🥂 Četnost",
   fav_none: "Žádná vína pro tento výběr.",
@@ -5000,6 +5449,24 @@ sk: {
   cur_dkk: "Dánska koruna",
   cur_rub: "Ruský rubeľ",
   cur_pln: "Poľský zlotý",
+  credits_title: "AI kredity",
+  credits_info: "Naskenovanie etikety aj vyhľadanie vína spotrebujú po 1 AI skene. Na začiatku je v cene 50.",
+  credits_left: "Zostáva AI skenov: {n}",
+  credits_unlimited: "Neobmedzene (odomknuté)",
+  credits_device: "ID zariadenia:",
+  credits_topup: "Dobiť kredity",
+  credits_topup_desc: "Ďalšie AI skeny nákupom v aplikácii",
+  credits_topup_soon: "Dobíjanie nákupom v aplikácii príde s verziou pre App Store.",
+  credits_unlock_ph: "Odomykací kód",
+  credits_unlock_ok: "Odomknuté ✓",
+  credits_unlock_bad: "Neplatný kód",
+  credits_unlock_many: "Príliš veľa pokusov. Skúste to neskôr.",
+  credits_unlock_unavailable: "Odomknutie momentálne nie je dostupné.",
+  credits_empty_title: "AI kredity vyčerpané",
+  credits_empty_text: "Zahrnuté AI skeny sú vyčerpané. Dobite kredity, aby ste mohli ďalej skenovať etikety a vyhľadávať vína. Všetko ostatné v aplikácii funguje ďalej.",
+  credits_have_code: "Mám odomykací kód",
+  credits_close: "Zavrieť",
+  credits_enrich_warn: "Pre {n} vín sú potrebné AI skeny, ale zostáva vám ich {c}. Aktualizuje sa len toľko, koľko kredity stačia (obrázky sa stiahnu pre všetky). Pokračovať?",
   fav_sort_rating: "★ Hodnotenie",
   fav_sort_drunk: "🥂 Frekvencia",
   fav_none: "Žiadne vína pre tento výber.",
@@ -5249,6 +5716,24 @@ ro: {
   cur_dkk: "Coroană daneză",
   cur_rub: "Rublă rusească",
   cur_pln: "Zlot polonez",
+  credits_title: "Credite IA",
+  credits_info: "Scanarea unei etichete și căutarea unui vin consumă câte 1 scanare IA. La început sunt incluse 50.",
+  credits_left: "{n} scanări IA rămase",
+  credits_unlimited: "Nelimitat (deblocat)",
+  credits_device: "ID dispozitiv:",
+  credits_topup: "Reîncarcă credite",
+  credits_topup_desc: "Mai multe scanări IA prin achiziție în aplicație",
+  credits_topup_soon: "Reîncărcarea prin achiziție în aplicație va veni cu versiunea pentru App Store.",
+  credits_unlock_ph: "Cod de deblocare",
+  credits_unlock_ok: "Deblocat ✓",
+  credits_unlock_bad: "Cod invalid",
+  credits_unlock_many: "Prea multe încercări. Încearcă mai târziu.",
+  credits_unlock_unavailable: "Deblocarea nu este disponibilă acum.",
+  credits_empty_title: "Creditele IA s-au epuizat",
+  credits_empty_text: "Scanările IA incluse s-au epuizat. Reîncarcă credite pentru a continua să scanezi etichete și să cauți vinuri. Restul aplicației funcționează în continuare.",
+  credits_have_code: "Am un cod de deblocare",
+  credits_close: "Închide",
+  credits_enrich_warn: "Pentru {n} vinuri sunt necesare scanări IA, dar mai ai doar {c}. Se vor actualiza doar atâtea câte permit creditele (imaginile se descarcă oricum pentru toate). Continui?",
   fav_sort_rating: "★ Evaluare",
   fav_sort_drunk: "🥂 Frecvență",
   fav_none: "Niciun vin pentru această selecție.",
@@ -5498,6 +5983,24 @@ hr: {
   cur_dkk: "Danska kruna",
   cur_rub: "Ruski rubalj",
   cur_pln: "Poljski zlot",
+  credits_title: "AI krediti",
+  credits_info: "Skeniranje etikete i traženje vina troše po 1 AI skeniranje. Na početku je uključeno 50.",
+  credits_left: "Preostalo AI skeniranja: {n}",
+  credits_unlimited: "Neograničeno (otključano)",
+  credits_device: "ID uređaja:",
+  credits_topup: "Nadopuni kredite",
+  credits_topup_desc: "Više AI skeniranja kupnjom u aplikaciji",
+  credits_topup_soon: "Nadopuna kupnjom u aplikaciji stiže s verzijom za App Store.",
+  credits_unlock_ph: "Kôd za otključavanje",
+  credits_unlock_ok: "Otključano ✓",
+  credits_unlock_bad: "Neispravan kôd",
+  credits_unlock_many: "Previše pokušaja. Pokušaj ponovno kasnije.",
+  credits_unlock_unavailable: "Otključavanje trenutno nije dostupno.",
+  credits_empty_title: "AI krediti potrošeni",
+  credits_empty_text: "Uključena AI skeniranja su potrošena. Nadopuni kredite kako bi i dalje skenirao etikete i tražio vina. Sve ostalo u aplikaciji i dalje radi.",
+  credits_have_code: "Imam kôd za otključavanje",
+  credits_close: "Zatvori",
+  credits_enrich_warn: "Za {n} vina potrebna su AI skeniranja, a preostalo ti je {c}. Ažurirat će se samo toliko koliko krediti dopuštaju (slike se svejedno dohvaćaju za sva). Nastaviti?",
   fav_sort_rating: "★ Ocjena",
   fav_sort_drunk: "🥂 Učestalost",
   fav_none: "Nema vina za ovaj odabir.",
@@ -5747,6 +6250,24 @@ pt: {
   cur_dkk: "Coroa dinamarquesa",
   cur_rub: "Rublo russo",
   cur_pln: "Złoty polaco",
+  credits_title: "Créditos de IA",
+  credits_info: "Digitalizar um rótulo e pesquisar um vinho consomem 1 digitalização de IA cada. No início estão incluídas 50.",
+  credits_left: "Restam {n} digitalizações de IA",
+  credits_unlimited: "Ilimitado (desbloqueado)",
+  credits_device: "ID do dispositivo:",
+  credits_topup: "Carregar créditos",
+  credits_topup_desc: "Mais digitalizações de IA através de compra na app",
+  credits_topup_soon: "O carregamento através de compra na app chegará com a versão da App Store.",
+  credits_unlock_ph: "Código de desbloqueio",
+  credits_unlock_ok: "Desbloqueado ✓",
+  credits_unlock_bad: "Código inválido",
+  credits_unlock_many: "Demasiadas tentativas. Tente novamente mais tarde.",
+  credits_unlock_unavailable: "O desbloqueio não está disponível neste momento.",
+  credits_empty_title: "Créditos de IA esgotados",
+  credits_empty_text: "As digitalizações de IA incluídas esgotaram-se. Carregue créditos para continuar a digitalizar rótulos e pesquisar vinhos. Tudo o resto na app continua a funcionar.",
+  credits_have_code: "Tenho um código de desbloqueio",
+  credits_close: "Fechar",
+  credits_enrich_warn: "{n} vinhos precisam de digitalizações de IA, mas só lhe restam {c}. Só serão atualizados tantos quantos os créditos permitirem (as imagens são obtidas na mesma para todos). Continuar?",
   fav_sort_rating: "★ Avaliação",
   fav_sort_drunk: "🥂 Frequência",
   fav_none: "Nenhum vinho para esta seleção.",
@@ -5996,6 +6517,24 @@ no: {
   cur_dkk: "Danske kroner",
   cur_rub: "Russiske rubler",
   cur_pln: "Polske zloty",
+  credits_title: "KI-kreditter",
+  credits_info: "Å skanne en etikett og å slå opp en vin koster 1 KI-skanning hver. 50 er inkludert fra start.",
+  credits_left: "{n} KI-skanninger igjen",
+  credits_unlimited: "Ubegrenset (låst opp)",
+  credits_device: "Enhets-ID:",
+  credits_topup: "Legg til kreditter",
+  credits_topup_desc: "Flere KI-skanninger via kjøp i appen",
+  credits_topup_soon: "Påfylling via kjøp i appen kommer med App Store-versjonen.",
+  credits_unlock_ph: "Opplåsingskode",
+  credits_unlock_ok: "Låst opp ✓",
+  credits_unlock_bad: "Ugyldig kode",
+  credits_unlock_many: "For mange forsøk. Prøv igjen senere.",
+  credits_unlock_unavailable: "Opplåsing er ikke tilgjengelig akkurat nå.",
+  credits_empty_title: "KI-kreditter brukt opp",
+  credits_empty_text: "De inkluderte KI-skanningene er brukt opp. Legg til kreditter for å fortsette å skanne etiketter og slå opp viner. Alt annet i appen fungerer som før.",
+  credits_have_code: "Jeg har en opplåsingskode",
+  credits_close: "Lukk",
+  credits_enrich_warn: "{n} viner trenger KI-skanninger, men du har bare {c} igjen. Bare så mange som kredittene rekker til oppdateres (bilder hentes likevel for alle). Fortsette?",
   fav_sort_rating: "★ Vurdering",
   fav_sort_drunk: "🥂 Antall",
   fav_none: "Ingen viner for dette utvalget.",
@@ -6245,6 +6784,24 @@ nl: {
   cur_dkk: "Deense kroon",
   cur_rub: "Russische roebel",
   cur_pln: "Poolse zloty",
+  credits_title: "AI-tegoed",
+  credits_info: "Een etiket scannen en een wijn opzoeken kosten elk 1 AI-scan. Aan het begin zijn er 50 inbegrepen.",
+  credits_left: "Nog {n} AI-scans over",
+  credits_unlimited: "Onbeperkt (ontgrendeld)",
+  credits_device: "Apparaat-ID:",
+  credits_topup: "Tegoed opwaarderen",
+  credits_topup_desc: "Meer AI-scans via in-app-aankoop",
+  credits_topup_soon: "Opwaarderen via in-app-aankoop komt met de App Store-versie.",
+  credits_unlock_ph: "Ontgrendelcode",
+  credits_unlock_ok: "Ontgrendeld ✓",
+  credits_unlock_bad: "Ongeldige code",
+  credits_unlock_many: "Te veel pogingen. Probeer het later opnieuw.",
+  credits_unlock_unavailable: "Ontgrendelen is nu niet beschikbaar.",
+  credits_empty_title: "AI-tegoed op",
+  credits_empty_text: "Je inbegrepen AI-scans zijn op. Waardeer je tegoed op om etiketten te blijven scannen en wijnen op te zoeken. Al het andere in de app blijft werken.",
+  credits_have_code: "Ik heb een ontgrendelcode",
+  credits_close: "Sluiten",
+  credits_enrich_warn: "Voor {n} wijnen zijn AI-scans nodig, maar je hebt er nog {c}. Er worden er alleen zoveel bijgewerkt als je tegoed toelaat (afbeeldingen worden wel voor alle opgehaald). Doorgaan?",
   fav_sort_rating: "★ Beoordeling",
   fav_sort_drunk: "🥂 Frequentie",
   fav_none: "Geen wijnen voor deze selectie.",
@@ -6503,6 +7060,7 @@ function applyI18n() {
   const priceLabel = document.getElementById('price-label');
   if (priceLabel) priceLabel.textContent = t('l_price') + ' (' + settings.currency + ')';
   renderCurrencyOptions();
+  updateCreditsUI();
   applyFont();
   applyOwnerTitles();
   const active = document.querySelector('.tab.active');
@@ -6608,6 +7166,7 @@ function showTab(name, btn) {
     document.getElementById('setup-currency').value = settings.currency;
     document.getElementById('setup-lang').value = settings.lang;
     document.getElementById('setup-font').value = settings.font || 'inter';
+    updateCreditsUI(); refreshCredits();
     renderRackSetup();
     renderSetupSync();
   }
@@ -6895,7 +7454,7 @@ async function handleDrinkScan(e) {
       r.onerror = () => rej();
       r.readAsDataURL(file);
     });
-    const resp = await fetch(SCAN_PROXY_URL, {
+    const resp = await aiFetch(SCAN_PROXY_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -7042,7 +7601,7 @@ async function handleScan(e) {
       r.onerror = () => rej();
       r.readAsDataURL(file);
     });
-    const resp = await fetch(SCAN_PROXY_URL, {
+    const resp = await aiFetch(SCAN_PROXY_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -7087,7 +7646,7 @@ async function handleLocationScan(e) {
       r.onerror = () => rej();
       r.readAsDataURL(file);
     });
-    const resp = await fetch(SCAN_PROXY_URL, {
+    const resp = await aiFetch(SCAN_PROXY_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -7131,7 +7690,7 @@ async function handleWishScan(e) {
       r.onerror = () => rej();
       r.readAsDataURL(file);
     });
-    const resp = await fetch(SCAN_PROXY_URL, {
+    const resp = await aiFetch(SCAN_PROXY_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -7943,6 +8502,9 @@ document.getElementById('f-grape').addEventListener('change', autoFillDrinkWindo
 document.getElementById('f-type').addEventListener('change', autoFillDrinkWindow);
 syncOnLoad();
 splashInit();
+// KI-Guthaben (nur native App) laden; versteckter Admin-Zugang über 7× Tippen auf den Setup-Titel
+refreshCredits();
+(function () { const h = document.querySelector('#tab-setup .page-header h1'); if (h) h.addEventListener('click', adminTap); })();
 // PWA: Service Worker registrieren (macht die App installierbar + offline-fähig)
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
