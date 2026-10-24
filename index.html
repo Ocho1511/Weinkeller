@@ -854,36 +854,27 @@ input[type="file"] { display: none; }
   <div class="page-header">
     <div class="header-lockup">
       <div class="header-barrel" aria-hidden="true">
-        <svg viewBox="0 0 72 72" width="58" height="58">
+        <svg viewBox="0 0 72 72" width="60" height="60">
           <defs>
-            <linearGradient id="hbWood" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" stop-color="#34200f"/><stop offset=".22" stop-color="#6a4325"/><stop offset=".5" stop-color="#9c6a3c"/><stop offset=".78" stop-color="#6a4325"/><stop offset="1" stop-color="#34200f"/>
+            <linearGradient id="hbG" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#f3dfa0"/><stop offset=".5" stop-color="#d4af5a"/><stop offset="1" stop-color="#a98532"/>
             </linearGradient>
-            <linearGradient id="hbSheen" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#ffffff" stop-opacity=".16"/><stop offset=".5" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity=".22"/>
-            </linearGradient>
-            <linearGradient id="hbHoop" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#f6e6ad"/><stop offset=".35" stop-color="#d8b55f"/><stop offset=".55" stop-color="#b8903f"/><stop offset="1" stop-color="#876827"/>
-            </linearGradient>
-            <clipPath id="hbClip"><path d="M20 10 C13 24 13 48 20 62 C31 65 41 65 52 62 C59 48 59 24 52 10 C41 7 31 7 20 10 Z"/></clipPath>
           </defs>
-          <path d="M20 10 C13 24 13 48 20 62 C31 65 41 65 52 62 C59 48 59 24 52 10 C41 7 31 7 20 10 Z" fill="url(#hbWood)" stroke="#241408" stroke-width="1.5"/>
-          <g clip-path="url(#hbClip)">
-            <g stroke="#241408" stroke-opacity=".32" stroke-width="1" fill="none">
-              <path d="M28 7 C24 28 24 44 28 65"/><path d="M36 6 L36 66"/><path d="M44 7 C48 28 48 44 44 65"/>
+          <circle cx="36" cy="36" r="33" fill="rgba(212,175,90,.06)" stroke="url(#hbG)" stroke-width="2"/>
+          <circle cx="36" cy="36" r="29.5" fill="none" stroke="url(#hbG)" stroke-width=".8" opacity=".8"/>
+          <g transform="translate(36 34) scale(.58) translate(-36 -36)">
+            <path d="M19 12 C12 26 12 48 19 62 C31 66 41 66 53 62 C60 48 60 26 53 12 C41 8 31 8 19 12 Z" fill="rgba(212,175,90,.10)" stroke="url(#hbG)" stroke-width="2.4" stroke-linejoin="round"/>
+            <ellipse cx="36" cy="11.5" rx="17" ry="4.4" fill="none" stroke="url(#hbG)" stroke-width="2"/>
+            <g fill="none" stroke="url(#hbG)" stroke-width="2" stroke-linecap="round">
+              <path d="M15.2 24 Q36 31.5 56.8 24"/><path d="M13.4 38 Q36 46.5 58.6 38"/><path d="M15.6 54 Q36 61 56.4 54"/>
             </g>
-            <path d="M20 10 C13 24 13 48 20 62 C31 65 41 65 52 62 C59 48 59 24 52 10 C41 7 31 7 20 10 Z" fill="url(#hbSheen)"/>
-            <rect x="12" y="18" width="48" height="5.6" rx="2.6" fill="url(#hbHoop)"/>
-            <rect x="12" y="18.5" width="48" height="1.2" fill="#fff" opacity=".4"/>
-            <rect x="9" y="33.5" width="54" height="6.6" rx="3" fill="url(#hbHoop)"/>
-            <rect x="9" y="34.1" width="54" height="1.4" fill="#fff" opacity=".4"/>
-            <rect x="12" y="49.4" width="48" height="5.6" rx="2.6" fill="url(#hbHoop)"/>
-            <rect x="12" y="49.9" width="48" height="1.2" fill="#fff" opacity=".4"/>
+            <path d="M36 16 L36 66" stroke="url(#hbG)" stroke-width="1" opacity=".5"/>
           </g>
-          <ellipse cx="36" cy="10" rx="16.5" ry="4.3" fill="#2d1b0d" stroke="#caa24f" stroke-width="1.3"/>
-          <ellipse cx="36" cy="9.3" rx="11.5" ry="2.5" fill="#48301a"/>
-          <ellipse cx="36" cy="37" rx="2.9" ry="3.3" fill="#241408"/>
-          <ellipse cx="36" cy="36.2" rx="1.5" ry="1.5" fill="#6a4726"/>
+          <g fill="url(#hbG)" opacity=".95">
+            <path d="M12 52 C9 46 12 40 17 38 C18 44 16 49 12 52 Z"/><path d="M17 58 C13 55 12 50 14 46 C19 48 20 54 17 58 Z"/>
+            <path d="M60 52 C63 46 60 40 55 38 C54 44 56 49 60 52 Z"/><path d="M55 58 C59 55 60 50 58 46 C53 48 52 54 55 58 Z"/>
+          </g>
+          <g fill="url(#hbG)"><circle cx="31" cy="60" r="2"/><circle cx="36" cy="62" r="2"/><circle cx="41" cy="60" r="2"/><circle cx="36" cy="57" r="1.8" opacity=".9"/></g>
         </svg>
       </div>
       <div class="header-text">
