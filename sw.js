@@ -1,5 +1,5 @@
-/* Weinkeller Service Worker – App-Shell offline, HTML network-first (Updates), Schriften lokal gecacht */
-const CACHE = 'weinkeller-v5';
+﻿/* Weinkeller Service Worker – App-Shell offline, HTML network-first (Updates), Schriften lokal gecacht */
+const CACHE = 'weinkeller-v6';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png',
   './fonts/Inter-latin.woff2', './fonts/PlayfairDisplay-latin.woff2', './fonts/PlayfairDisplay-Italic-latin.woff2', './fonts/UnifrakturMaguntia-latin.woff2',
   './lib/xlsx.full.min.js', './lib/jspdf.umd.min.js', './lib/jspdf.plugin.autotable.min.js'];
