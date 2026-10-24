@@ -509,6 +509,12 @@ body {
 .rack-unassigned { display: flex; flex-wrap: wrap; gap: 8px; }
 .rack-chip-wine { display: flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px 5px 8px; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text); }
 .rack-chip-wine.selected { outline: 2px solid var(--gold); background: var(--card-hover); }
+.rack-slot.filled { cursor: pointer; }
+.rack-slot.filled.picked { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 6px; background: rgba(196,162,74,0.12); }
+.rack-action-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; background: var(--card); border: 1px solid var(--gold); border-radius: 12px; padding: 10px 12px; margin: 4px 0 14px; }
+.rack-action-name { font-size: 13px; font-weight: 700; color: var(--text); min-width: 0; }
+.rack-action-name span { display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); margin-top: 2px; }
+.rack-action-btns { display: flex; gap: 8px; }
 .rack-slot.droppable { outline: 2px dashed var(--gold); outline-offset: 2px; border-radius: 6px; cursor: pointer; }
 .rack-slot.droppable .rack-empty { background: rgba(196,162,74,0.15); }
 .rack-add-row { display: flex; gap: 8px; margin-top: 10px; }
@@ -2001,6 +2007,9 @@ de: {
   rack_assign_hint: "Tippe einen Wein, dann ein freies Fach zum Einsortieren.",
   rack_assign_sel: "„{name}\" gewählt – freies Fach antippen (erneut tippen = abwählen).",
   toast_rack_placed: "In {rack} · E{e} · Platz {p} einsortiert ✓",
+  rack_open_wine: "Wein öffnen",
+  rack_remove: "Aus Fach entfernen",
+  toast_rack_removed: "„{name}\" aus dem Fach entfernt ✓",
   racks_all_placed: "Alle Weine sind einem Fach zugeordnet ✓",
   setup_racks: "Regale",
   setup_racks_desc: "Definiere deine Regale mit Ebenen und Plätzen für den Kellerplan.",
@@ -2247,6 +2256,9 @@ en: {
   rack_assign_hint: "Tap a wine, then a free slot to place it.",
   rack_assign_sel: "\"{name}\" selected – tap a free slot (tap again to deselect).",
   toast_rack_placed: "Placed in {rack} · L{e} · slot {p} ✓",
+  rack_open_wine: "Open wine",
+  rack_remove: "Remove from slot",
+  toast_rack_removed: "\"{name}\" removed from slot ✓",
   racks_all_placed: "All wines are assigned to a slot ✓",
   setup_racks: "Racks",
   setup_racks_desc: "Define your racks with levels and positions for the cellar map.",
@@ -2493,6 +2505,9 @@ es: {
   rack_assign_hint: "Toca un vino y luego un hueco libre para colocarlo.",
   rack_assign_sel: "\"{name}\" seleccionado – toca un hueco libre (toca otra vez para deseleccionar).",
   toast_rack_placed: "Colocado en {rack} · N{e} · hueco {p} ✓",
+  rack_open_wine: "Abrir vino",
+  rack_remove: "Quitar del hueco",
+  toast_rack_removed: "\"{name}\" quitado del hueco ✓",
   racks_all_placed: "Todos los vinos tienen un hueco asignado ✓",
   setup_racks: "Estantes",
   setup_racks_desc: "Define tus estantes con niveles y posiciones para el plano de bodega.",
@@ -2739,6 +2754,9 @@ sv: {
   rack_assign_hint: "Tryck på ett vin och sedan på en ledig plats.",
   rack_assign_sel: "\"{name}\" valt – tryck på en ledig plats (tryck igen för att avmarkera).",
   toast_rack_placed: "Placerat i {rack} · N{e} · plats {p} ✓",
+  rack_open_wine: "Öppna vin",
+  rack_remove: "Ta bort från platsen",
+  toast_rack_removed: "\"{name}\" borttaget från platsen ✓",
   racks_all_placed: "Alla viner är placerade i ett fack ✓",
   setup_racks: "Hyllor",
   setup_racks_desc: "Definiera dina hyllor med hyllplan och platser för källarplanen.",
@@ -2985,6 +3003,9 @@ da: {
   rack_assign_hint: "Tryk på en vin og derefter på en ledig plads.",
   rack_assign_sel: "\"{name}\" valgt – tryk på en ledig plads (tryk igen for at fravælge).",
   toast_rack_placed: "Placeret i {rack} · N{e} · plads {p} ✓",
+  rack_open_wine: "Åbn vin",
+  rack_remove: "Fjern fra pladsen",
+  toast_rack_removed: "\"{name}\" fjernet fra pladsen ✓",
   racks_all_placed: "Alle vine er placeret i et rum ✓",
   setup_racks: "Reoler",
   setup_racks_desc: "Definér dine reoler med hylder og pladser til kælderplanen.",
@@ -3231,6 +3252,9 @@ fi: {
   rack_assign_hint: "Napauta viiniä ja sitten vapaata paikkaa.",
   rack_assign_sel: "\"{name}\" valittu – napauta vapaata paikkaa (napauta uudestaan poistaaksesi valinnan).",
   toast_rack_placed: "Sijoitettu: {rack} · T{e} · paikka {p} ✓",
+  rack_open_wine: "Avaa viini",
+  rack_remove: "Poista paikalta",
+  toast_rack_removed: "\"{name}\" poistettu paikalta ✓",
   racks_all_placed: "Kaikki viinit on sijoitettu paikkaan ✓",
   setup_racks: "Hyllyt",
   setup_racks_desc: "Määritä hyllysi tasoineen ja paikkoineen kellarikarttaa varten.",
@@ -3477,6 +3501,9 @@ ru: {
   rack_assign_hint: "Коснитесь вина, затем свободной ячейки.",
   rack_assign_sel: "«{name}» выбрано – коснитесь свободной ячейки (повторное касание отменяет выбор).",
   toast_rack_placed: "Размещено: {rack} · Я{e} · место {p} ✓",
+  rack_open_wine: "Открыть вино",
+  rack_remove: "Убрать из ячейки",
+  toast_rack_removed: "«{name}» убрано из ячейки ✓",
   racks_all_placed: "Все вина размещены по ячейкам ✓",
   setup_racks: "Полки",
   setup_racks_desc: "Задайте полки с ярусами и местами для плана погреба.",
@@ -3723,6 +3750,9 @@ it: {
   rack_assign_hint: "Tocca un vino, poi uno scomparto libero.",
   rack_assign_sel: "\"{name}\" selezionato – tocca uno scomparto libero (tocca di nuovo per deselezionare).",
   toast_rack_placed: "Posizionato in {rack} · L{e} · posto {p} ✓",
+  rack_open_wine: "Apri vino",
+  rack_remove: "Rimuovi dallo scomparto",
+  toast_rack_removed: "\"{name}\" rimosso dallo scomparto ✓",
   racks_all_placed: "Tutti i vini sono assegnati a uno scomparto ✓",
   setup_racks: "Scaffali",
   setup_racks_desc: "Definisci i tuoi scaffali con ripiani e posti per il piano della cantina.",
@@ -3969,6 +3999,9 @@ fr: {
   rack_assign_hint: "Touchez un vin, puis un emplacement libre.",
   rack_assign_sel: "« {name} » sélectionné – touchez un emplacement libre (touchez à nouveau pour désélectionner).",
   toast_rack_placed: "Placé dans {rack} · N{e} · place {p} ✓",
+  rack_open_wine: "Ouvrir le vin",
+  rack_remove: "Retirer de l'emplacement",
+  toast_rack_removed: "« {name} » retiré de l'emplacement ✓",
   racks_all_placed: "Tous les vins sont placés dans un casier ✓",
   setup_racks: "Casiers",
   setup_racks_desc: "Définissez vos casiers avec niveaux et emplacements pour le plan de cave.",
@@ -4215,6 +4248,9 @@ pl: {
   rack_assign_hint: "Dotknij wino, a potem wolne miejsce.",
   rack_assign_sel: "\"{name}\" wybrane – dotknij wolne miejsce (dotknij ponownie, aby odznaczyć).",
   toast_rack_placed: "Umieszczono w {rack} · P{e} · miejsce {p} ✓",
+  rack_open_wine: "Otwórz wino",
+  rack_remove: "Usuń z miejsca",
+  toast_rack_removed: "\"{name}\" usunięto z miejsca ✓",
   racks_all_placed: "Wszystkie wina są przypisane do miejsca ✓",
   setup_racks: "Regały",
   setup_racks_desc: "Zdefiniuj regały z poziomami i miejscami dla planu piwnicy.",
@@ -4461,6 +4497,9 @@ hu: {
   rack_assign_hint: "Koppints egy borra, majd egy szabad helyre.",
   rack_assign_sel: "\"{name}\" kiválasztva – koppints egy szabad helyre (újra koppintva megszünteted).",
   toast_rack_placed: "Elhelyezve: {rack} · {e}. szint · {p}. hely ✓",
+  rack_open_wine: "Bor megnyitása",
+  rack_remove: "Eltávolítás a helyről",
+  toast_rack_removed: "\"{name}\" eltávolítva a helyről ✓",
   racks_all_placed: "Minden bor rekeszbe van rendezve ✓",
   setup_racks: "Polcok",
   setup_racks_desc: "Add meg a polcokat szintekkel és helyekkel a pincetérképhez.",
@@ -4707,6 +4746,9 @@ cs: {
   rack_assign_hint: "Klepni na víno a poté na volné místo.",
   rack_assign_sel: "\"{name}\" vybráno – klepni na volné místo (dalším klepnutím zrušíš výběr).",
   toast_rack_placed: "Umístěno v {rack} · Ú{e} · místo {p} ✓",
+  rack_open_wine: "Otevřít víno",
+  rack_remove: "Odebrat z místa",
+  toast_rack_removed: "\"{name}\" odebráno z místa ✓",
   racks_all_placed: "Všechna vína jsou zařazena do přihrádky ✓",
   setup_racks: "Regály",
   setup_racks_desc: "Definujte regály s úrovněmi a místy pro plán sklepa.",
@@ -4953,6 +4995,9 @@ sk: {
   rack_assign_hint: "Ťukni na víno a potom na voľné miesto.",
   rack_assign_sel: "\"{name}\" vybrané – ťukni na voľné miesto (opätovným ťuknutím zrušíš výber).",
   toast_rack_placed: "Umiestnené v {rack} · Ú{e} · miesto {p} ✓",
+  rack_open_wine: "Otvoriť víno",
+  rack_remove: "Odobrať z miesta",
+  toast_rack_removed: "\"{name}\" odobrané z miesta ✓",
   racks_all_placed: "Všetky vína sú zaradené do priehradky ✓",
   setup_racks: "Regály",
   setup_racks_desc: "Definujte regály s úrovňami a miestami pre plán pivnice.",
@@ -5199,6 +5244,9 @@ ro: {
   rack_assign_hint: "Atinge un vin, apoi un loc liber.",
   rack_assign_sel: "\"{name}\" selectat – atinge un loc liber (atinge din nou pentru a deselecta).",
   toast_rack_placed: "Plasat în {rack} · N{e} · loc {p} ✓",
+  rack_open_wine: "Deschide vinul",
+  rack_remove: "Elimină din loc",
+  toast_rack_removed: "\"{name}\" eliminat din loc ✓",
   racks_all_placed: "Toate vinurile sunt plasate într-un compartiment ✓",
   setup_racks: "Rafturi",
   setup_racks_desc: "Definește rafturile cu niveluri și locuri pentru planul pivniței.",
@@ -5445,6 +5493,9 @@ hr: {
   rack_assign_hint: "Dodirni vino, zatim slobodno mjesto.",
   rack_assign_sel: "\"{name}\" odabrano – dodirni slobodno mjesto (ponovni dodir poništava odabir).",
   toast_rack_placed: "Smješteno u {rack} · R{e} · mjesto {p} ✓",
+  rack_open_wine: "Otvori vino",
+  rack_remove: "Ukloni s mjesta",
+  toast_rack_removed: "\"{name}\" uklonjeno s mjesta ✓",
   racks_all_placed: "Sva su vina raspoređena u pretinac ✓",
   setup_racks: "Police",
   setup_racks_desc: "Definirajte police s razinama i mjestima za plan podruma.",
@@ -5691,6 +5742,9 @@ pt: {
   rack_assign_hint: "Toca num vinho e depois num lugar livre.",
   rack_assign_sel: "\"{name}\" selecionado – toca num lugar livre (toca novamente para desmarcar).",
   toast_rack_placed: "Colocado em {rack} · N{e} · lugar {p} ✓",
+  rack_open_wine: "Abrir vinho",
+  rack_remove: "Remover do lugar",
+  toast_rack_removed: "\"{name}\" removido do lugar ✓",
   racks_all_placed: "Todos os vinhos estão colocados num compartimento ✓",
   setup_racks: "Prateleiras",
   setup_racks_desc: "Defina as prateleiras com níveis e lugares para a planta da adega.",
@@ -5937,6 +5991,9 @@ no: {
   rack_assign_hint: "Trykk på en vin og deretter på en ledig plass.",
   rack_assign_sel: "\"{name}\" valgt – trykk på en ledig plass (trykk igjen for å velge bort).",
   toast_rack_placed: "Plassert i {rack} · N{e} · plass {p} ✓",
+  rack_open_wine: "Åpne vin",
+  rack_remove: "Fjern fra plassen",
+  toast_rack_removed: "\"{name}\" fjernet fra plassen ✓",
   racks_all_placed: "Alle viner er plassert i et rom ✓",
   setup_racks: "Hyller",
   setup_racks_desc: "Definer hyllene dine med nivåer og plasser for kjellerplanen.",
@@ -6183,6 +6240,9 @@ nl: {
   rack_assign_hint: "Tik op een wijn en daarna op een vrij vak.",
   rack_assign_sel: "\"{name}\" geselecteerd – tik op een vrij vak (tik nogmaals om te deselecteren).",
   toast_rack_placed: "Geplaatst in {rack} · N{e} · plek {p} ✓",
+  rack_open_wine: "Wijn openen",
+  rack_remove: "Uit vak verwijderen",
+  toast_rack_removed: "\"{name}\" uit vak verwijderd ✓",
   racks_all_placed: "Alle wijnen zijn in een vak geplaatst ✓",
   setup_racks: "Rekken",
   setup_racks_desc: "Definieer je rekken met niveaus en plaatsen voor het kelderplan.",
@@ -7240,9 +7300,27 @@ function saveHistoryEdit() {
 const TYPE_FILL = { rot:'var(--wine-light)', 'weiß':'var(--white-wine)', 'rosé':'var(--rose)', sekt:'var(--sparkling)', other:'var(--text-muted)' };
 let rackActive = 0;
 let rackSelectedWineId = null;  // für „Tippen zum Platzieren"
+let rackFilledWineId = null;    // belegtes Fach, das gerade markiert ist (zum Entfernen)
 function selectRackWine(id) {
   rackSelectedWineId = (rackSelectedWineId === id) ? null : id;
+  rackFilledWineId = null;
   renderRacks();
+}
+// Belegtes Fach antippen: markieren / Markierung aufheben
+function selectFilledSlot(id) {
+  rackFilledWineId = (rackFilledWineId === id) ? null : id;
+  rackSelectedWineId = null;
+  renderRacks();
+}
+// Wein wieder aus seinem Fach nehmen (landet zurück bei „Nicht zugeordnet")
+function removeFromRack(id) {
+  const w = wines.find(x => x.id === id);
+  if (!w) { rackFilledWineId = null; renderRacks(); return; }
+  w.locRegal = null; w.locEbene = null; w.locPlatz = null; w.location = null;
+  save();
+  rackFilledWineId = null;
+  renderRacks();
+  showToast(t('toast_rack_removed', { name: w.name }));
 }
 function placeRackWine(e, p) {
   if (!rackSelectedWineId) return;
@@ -7302,11 +7380,24 @@ function renderRacks() {
     html += `<div class="rack-elabel">E${e}</div>`;
     for (let p=1;p<=r.cols;p++) {
       const w = wineAt(r.name, e, p);
-      if (w) html += `<div class="rack-slot filled" onclick="goToWine('${w.id}')" title="${esc(w.name)}${w.year?' · '+w.year:''}">${bottleSvg(TYPE_FILL[w.type]||TYPE_FILL.other)}</div>`;
+      if (w) html += `<div class="rack-slot filled${w.id===rackFilledWineId?' picked':''}" onclick="selectFilledSlot('${w.id}')" title="${esc(w.name)}${w.year?' · '+w.year:''}">${bottleSvg(TYPE_FILL[w.type]||TYPE_FILL.other)}</div>`;
       else html += `<div class="rack-slot${rackSelectedWineId?' droppable':''}" onclick="placeRackWine(${e},${p})"><div class="rack-empty"></div></div>`;
     }
   }
   html += `</div></div>`;
+
+  // Aktionsleiste für das markierte belegte Fach: öffnen oder aus dem Fach entfernen
+  const pickedW = rackFilledWineId ? wines.find(x => x.id === rackFilledWineId && wineAt(r.name, parseInt(x.locEbene), parseInt(x.locPlatz)) === x) : null;
+  if (rackFilledWineId && !pickedW) rackFilledWineId = null;
+  if (pickedW) {
+    html += `<div class="rack-action-bar">
+      <div class="rack-action-name">${esc(pickedW.name)}${pickedW.year?' · '+pickedW.year:''}<span>${esc(formatLocation(pickedW))}</span></div>
+      <div class="rack-action-btns">
+        <button class="wine-btn" onclick="goToWine('${pickedW.id}')">${t('rack_open_wine')}</button>
+        <button class="wine-btn danger" onclick="removeFromRack('${pickedW.id}')">${t('rack_remove')}</button>
+      </div>
+    </div>`;
+  }
 
   // Nicht zugeordnet – Tippen zum Platzieren
   const unplaced = wines.filter(w => !isPlaced(w));
@@ -7323,7 +7414,7 @@ function renderRacks() {
   }
   el.innerHTML = html;
 }
-function setRackActive(i) { rackActive = i; renderRacks(); }
+function setRackActive(i) { rackActive = i; rackFilledWineId = null; renderRacks(); }
 
 // Setup: Regale verwalten
 function renderRackSetup() {
