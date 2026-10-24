@@ -284,6 +284,7 @@ body {
 .wine-meta { display: flex; gap: 12px; margin-top: 10px; align-items: center; flex-wrap: wrap; }
 .wine-stars { color: var(--gold); font-size: 13px; letter-spacing: 1px; }
 .wine-region { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+.wine-map-link { text-decoration: none; font-size: 12px; margin-left: 2px; }
 .wine-row {
   background: var(--card);
   border: 1px solid var(--border);
@@ -2102,6 +2103,7 @@ de: {
   l_note: "Notiz",
   l_image: "Flaschenbild (URL aus dem Internet)",
   img_open: "Flaschenbild öffnen",
+  map_open: "Region auf Karte",
   img_broken: "Bild nicht verfügbar",
   o_rot: "🔴 Rotwein",
   o_weiss: "🟡 Weißwein",
@@ -2343,6 +2345,7 @@ en: {
   l_note: "Note",
   l_image: "Bottle image (URL from the web)",
   img_open: "Open bottle image",
+  map_open: "Region on map",
   img_broken: "Image unavailable",
   o_rot: "🔴 Red",
   o_weiss: "🟡 White",
@@ -2584,6 +2587,7 @@ es: {
   l_note: "Nota",
   l_image: "Foto de la botella (URL de internet)",
   img_open: "Abrir foto de la botella",
+  map_open: "Región en el mapa",
   img_broken: "Imagen no disponible",
   o_rot: "🔴 Tinto",
   o_weiss: "🟡 Blanco",
@@ -2825,6 +2829,7 @@ sv: {
   l_note: "Anteckning",
   l_image: "Flaskbild (URL från internet)",
   img_open: "Öppna flaskbild",
+  map_open: "Region på kartan",
   img_broken: "Bilden är inte tillgänglig",
   o_rot: "🔴 Rödvin",
   o_weiss: "🟡 Vitt vin",
@@ -3066,6 +3071,7 @@ da: {
   l_note: "Note",
   l_image: "Flaskebillede (URL fra internettet)",
   img_open: "Åbn flaskebillede",
+  map_open: "Region på kortet",
   img_broken: "Billedet er ikke tilgængeligt",
   o_rot: "🔴 Rødvin",
   o_weiss: "🟡 Hvidvin",
@@ -3307,6 +3313,7 @@ fi: {
   l_note: "Muistiinpano",
   l_image: "Pullokuva (URL internetistä)",
   img_open: "Avaa pullokuva",
+  map_open: "Alue kartalla",
   img_broken: "Kuva ei ole saatavilla",
   o_rot: "🔴 Punaviini",
   o_weiss: "🟡 Valkoviini",
@@ -3548,6 +3555,7 @@ ru: {
   l_note: "Заметка",
   l_image: "Фото бутылки (URL из интернета)",
   img_open: "Открыть фото бутылки",
+  map_open: "Регион на карте",
   img_broken: "Изображение недоступно",
   o_rot: "🔴 Красное",
   o_weiss: "🟡 Белое",
@@ -3789,6 +3797,7 @@ it: {
   l_note: "Nota",
   l_image: "Immagine bottiglia (URL da internet)",
   img_open: "Apri immagine bottiglia",
+  map_open: "Regione sulla mappa",
   img_broken: "Immagine non disponibile",
   o_rot: "🔴 Rosso",
   o_weiss: "🟡 Bianco",
@@ -4030,6 +4039,7 @@ fr: {
   l_note: "Remarque",
   l_image: "Photo de bouteille (URL d'internet)",
   img_open: "Ouvrir la photo de bouteille",
+  map_open: "Région sur la carte",
   img_broken: "Image indisponible",
   o_rot: "🔴 Rouge",
   o_weiss: "🟡 Blanc",
@@ -4271,6 +4281,7 @@ pl: {
   l_note: "Notatka",
   l_image: "Zdjęcie butelki (URL z internetu)",
   img_open: "Otwórz zdjęcie butelki",
+  map_open: "Region na mapie",
   img_broken: "Obraz niedostępny",
   o_rot: "🔴 Czerwone",
   o_weiss: "🟡 Białe",
@@ -4512,6 +4523,7 @@ hu: {
   l_note: "Megjegyzés",
   l_image: "Palackkép (URL az internetről)",
   img_open: "Palackkép megnyitása",
+  map_open: "Régió a térképen",
   img_broken: "A kép nem érhető el",
   o_rot: "🔴 Vörös",
   o_weiss: "🟡 Fehér",
@@ -4753,6 +4765,7 @@ cs: {
   l_note: "Poznámka",
   l_image: "Foto lahve (URL z internetu)",
   img_open: "Otevřít foto lahve",
+  map_open: "Region na mapě",
   img_broken: "Obrázek není dostupný",
   o_rot: "🔴 Červené",
   o_weiss: "🟡 Bílé",
@@ -4994,6 +5007,7 @@ sk: {
   l_note: "Poznámka",
   l_image: "Foto fľaše (URL z internetu)",
   img_open: "Otvoriť foto fľaše",
+  map_open: "Región na mape",
   img_broken: "Obrázok nie je dostupný",
   o_rot: "🔴 Červené",
   o_weiss: "🟡 Biele",
@@ -5235,6 +5249,7 @@ ro: {
   l_note: "Notă",
   l_image: "Imaginea sticlei (URL de pe internet)",
   img_open: "Deschide imaginea sticlei",
+  map_open: "Regiunea pe hartă",
   img_broken: "Imagine indisponibilă",
   o_rot: "🔴 Roșu",
   o_weiss: "🟡 Alb",
@@ -5476,6 +5491,7 @@ hr: {
   l_note: "Bilješka",
   l_image: "Slika boce (URL s interneta)",
   img_open: "Otvori sliku boce",
+  map_open: "Regija na karti",
   img_broken: "Slika nije dostupna",
   o_rot: "🔴 Crno",
   o_weiss: "🟡 Bijelo",
@@ -5717,6 +5733,7 @@ pt: {
   l_note: "Nota",
   l_image: "Imagem da garrafa (URL da internet)",
   img_open: "Abrir imagem da garrafa",
+  map_open: "Região no mapa",
   img_broken: "Imagem indisponível",
   o_rot: "🔴 Tinto",
   o_weiss: "🟡 Branco",
@@ -5958,6 +5975,7 @@ no: {
   l_note: "Notat",
   l_image: "Flaskebilde (URL fra internett)",
   img_open: "Åpne flaskebilde",
+  map_open: "Region på kartet",
   img_broken: "Bildet er ikke tilgjengelig",
   o_rot: "🔴 Rødvin",
   o_weiss: "🟡 Hvitvin",
@@ -6199,6 +6217,7 @@ nl: {
   l_note: "Notitie",
   l_image: "Flesfoto (URL van internet)",
   img_open: "Flesfoto openen",
+  map_open: "Regio op de kaart",
   img_broken: "Afbeelding niet beschikbaar",
   o_rot: "🔴 Rood",
   o_weiss: "🟡 Wit",
@@ -6422,6 +6441,15 @@ function wineImgHtml(w, cls) {
   const u = esc(w.image);
   return `<a class="${cls}" href="${u}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(t('img_open'))}"><img src="${u}" alt="" loading="lazy" onerror="wineImgFallback(this)"></a>`;
 }
+// Karten-Link zur Weinregion (öffnet Karten-Suche nach "Region, Land")
+function mapUrl(w) {
+  const q = [w.region, w.country].filter(Boolean).join(', ');
+  return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
+}
+function wineMapLink(w) {
+  if (!w.region && !w.country) return '';
+  return ` <a class="wine-map-link" href="${mapUrl(w)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(t('map_open'))}">🗺️</a>`;
+}
 
 function renderKeller() {
   const q = document.getElementById('search-input').value.toLowerCase();
@@ -6520,7 +6548,7 @@ function renderKeller() {
       </div>
       <div class="wine-meta">
         <div class="wine-stars">${stars}</div>
-        ${regionCountry?`<div class="wine-region">${esc(regionCountry)}</div>`:''}
+        ${regionCountry?`<div class="wine-region">${esc(regionCountry)}${wineMapLink(w)}</div>`:''}
         ${loc?`<div class="wine-region">📍 ${esc(loc)}</div>`:''}
         <div class="wine-count-badge">${w.count||1} ${t('fl')}</div>
       </div>
