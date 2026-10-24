@@ -224,6 +224,28 @@ body {
   background: rgba(255,255,255,0.06);
   border: 1px solid var(--border);
 }
+/* Start-Bildschirm (Splash) */
+#splash {
+  position: fixed; inset: 0; z-index: 6000;
+  display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 50% 38%, #2c1f27 0%, #17120a 72%);
+  animation: splashOut 0.7s ease 1.9s forwards; /* Failsafe: blendet immer aus */
+}
+.splash-inner { text-align: center; animation: splashIn 0.9s cubic-bezier(.2,.8,.2,1) both; }
+.splash-logo svg { filter: drop-shadow(0 0 26px rgba(196,162,74,0.45)); animation: splashPop 1s cubic-bezier(.2,.8,.2,1) both; }
+.splash-title {
+  margin-top: 16px;
+  font-family: 'UnifrakturMaguntia', 'Playfair Display', serif;
+  font-size: 32px; line-height: 1.15; color: #3fc3b1;
+  text-shadow: 0 2px 18px rgba(63,195,177,0.35);
+  padding: 0 24px;
+}
+.splash-tagline { margin-top: 10px; font-size: 22px; opacity: 0.85; animation: splashIn 1.1s ease 0.2s both; }
+@keyframes splashIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes splashPop { 0% { opacity: 0; transform: scale(0.7); } 60% { opacity: 1; } 100% { transform: scale(1); } }
+@keyframes splashOut { to { opacity: 0; visibility: hidden; } }
+@media (prefers-reduced-motion: reduce) { .splash-inner, .splash-logo svg, .splash-tagline { animation: none; } }
+
 /* Globale, überall sichtbare Fortschrittsanzeige (oben fixiert) */
 #global-progress {
   display: none;
@@ -745,6 +767,23 @@ input[type="file"] { display: none; }
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
+
+<!-- START-BILDSCHIRM (Splash) – blendet automatisch per CSS aus -->
+<div id="splash">
+  <div class="splash-inner">
+    <div class="splash-logo">
+      <svg viewBox="0 0 512 512" width="128" height="128" aria-hidden="true">
+        <defs>
+          <linearGradient id="splashGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dfc06e"/><stop offset="1" stop-color="#c4a24a"/></linearGradient>
+        </defs>
+        <path fill="url(#splashGold)" d="M174 150 h164 a9 9 0 0 1 9 10 c-7 72 -42 121 -91 131 v97 h46 a15 15 0 0 1 0 30 h-124 a15 15 0 0 1 0 -30 h46 v-97 c-49 -10 -84 -59 -91 -131 a9 9 0 0 1 9 -10 z"/>
+        <path fill="#8b1a2e" d="M192 170 h128 c-7 43 -30 72 -64 79 c-34 -7 -57 -36 -64 -79 z"/>
+      </svg>
+    </div>
+    <div class="splash-title" id="splash-title">Weinkeller</div>
+    <div class="splash-tagline">🍷</div>
+  </div>
+</div>
 
 <!-- GLOBALE FORTSCHRITTSANZEIGE (überall sichtbar, oben fixiert) -->
 <div id="global-progress" role="status" aria-live="polite">
@@ -1518,16 +1557,37 @@ function dateLocale() {
 // ═══════════════════════════════════════
 // WEINDATENBANK (Autovervollständigung + KI-Nachschlagen)
 // ═══════════════════════════════════════
-const DB_GRAPES = ['Cabernet Sauvignon','Cabernet Franc','Merlot','Pinot Noir','Spätburgunder','Syrah','Shiraz','Nebbiolo','Sangiovese','Tempranillo','Grenache','Garnacha','Zinfandel','Primitivo','Malbec','Carmenère','Barbera','Montepulciano','Nero d\'Avola','Gamay','Petit Verdot','Touriga Nacional','Dornfelder','Zweigelt','Blaufränkisch','Portugieser','Trollinger','Lemberger',
-'Riesling','Chardonnay','Sauvignon Blanc','Grauburgunder','Pinot Gris','Weißburgunder','Pinot Blanc','Chenin Blanc','Gewürztraminer','Grüner Veltliner','Silvaner','Müller-Thurgau','Viognier','Sémillon','Muskateller','Verdejo','Albariño','Vermentino','Garganega','Trebbiano','Furmint','Scheurebe','Kerner','Bacchus'];
-const DB_REGIONS = ['Bordeaux','Bourgogne','Champagne','Rhône','Loire','Alsace','Beaujolais','Languedoc','Provence','Toscana','Piemonte','Veneto','Alto Adige','Friuli','Sicilia','Puglia','Rioja','Ribera del Duero','Priorat','Rías Baixas','Rueda','Mosel','Rheingau','Rheinhessen','Pfalz','Baden','Württemberg','Nahe','Franken','Ahr','Wachau','Kamptal','Burgenland','Steiermark','Douro','Alentejo','Vinho Verde','Napa Valley','Sonoma','Willamette Valley','Mendoza','Maipo','Colchagua','Barossa Valley','McLaren Vale','Marlborough','Central Otago','Stellenbosch','Swartland'];
+const DB_GRAPES = [
+'Cabernet Sauvignon','Cabernet Franc','Merlot','Pinot Noir','Spätburgunder','Syrah','Shiraz','Grenache','Garnacha','Mourvèdre','Monastrell','Cinsault','Carignan','Mazuelo',
+'Nebbiolo','Barbera','Dolcetto','Sangiovese','Montepulciano','Aglianico','Nero d\'Avola','Nerello Mascalese','Primitivo','Negroamaro','Sagrantino','Corvina','Lagrein','Teroldego','Frappato',
+'Tempranillo','Tinta Roriz','Touriga Nacional','Touriga Franca','Baga','Castelão','Mencía','Bobal','Graciano','Cariñena','Monastrell',
+'Malbec','Carmenère','Tannat','Zinfandel','Petite Sirah','Petit Verdot','Gamay','Pinotage',
+'Dornfelder','Zweigelt','Blaufränkisch','Lemberger','St. Laurent','Portugieser','Trollinger','Trousseau','Regent',
+'Riesling','Chardonnay','Sauvignon Blanc','Sauvignon Gris','Chenin Blanc','Grauburgunder','Pinot Gris','Weißburgunder','Pinot Blanc','Gewürztraminer','Traminer',
+'Grüner Veltliner','Roter Veltliner','Welschriesling','Silvaner','Müller-Thurgau','Scheurebe','Kerner','Bacchus','Morio-Muskat','Muskateller','Elbling',
+'Viognier','Roussanne','Marsanne','Sémillon','Aligoté','Melon de Bourgogne','Picpoul','Colombard','Ugni Blanc',
+'Verdejo','Albariño','Alvarinho','Godello','Macabeo','Xarel·lo','Parellada','Palomino','Pedro Ximénez',
+'Verdicchio','Vermentino','Garganega','Trebbiano','Cortese','Arneis','Fiano','Falanghina','Greco','Grillo','Catarratto','Malvasia','Vernaccia',
+'Furmint','Hárslevelű','Assyrtiko','Moschofilero','Torrontés','Rkatsiteli','Saperavi'];
+const DB_REGIONS = [
+'Bordeaux','Médoc','Margaux','Pauillac','Saint-Émilion','Pomerol','Graves','Sauternes','Bourgogne','Chablis','Côte de Nuits','Côte de Beaune','Champagne','Rhône','Côtes du Rhône','Châteauneuf-du-Pape','Hermitage','Côte-Rôtie','Loire','Sancerre','Pouilly-Fumé','Vouvray','Muscadet','Alsace','Beaujolais','Languedoc','Roussillon','Provence','Cahors','Madiran','Jura','Savoie','Corse',
+'Toscana','Chianti','Chianti Classico','Montalcino','Montepulciano','Bolgheri','Maremma','Piemonte','Barolo','Barbaresco','Langhe','Veneto','Valpolicella','Soave','Prosecco','Lugana','Franciacorta','Alto Adige','Trentino','Friuli','Lombardia','Emilia-Romagna','Marche','Abruzzo','Campania','Puglia','Basilicata','Calabria','Sicilia','Etna','Sardegna','Umbria',
+'Rioja','Ribera del Duero','Priorat','Montsant','Penedès','Cava','Rías Baixas','Rueda','Toro','Bierzo','Valdeorras','Navarra','Jumilla','Yecla','La Mancha','Jerez','Calatayud','Campo de Borja',
+'Mosel','Rheingau','Rheinhessen','Pfalz','Baden','Württemberg','Nahe','Franken','Ahr','Mittelrhein','Saale-Unstrut','Sachsen','Hessische Bergstraße',
+'Wachau','Kamptal','Kremstal','Weinviertel','Burgenland','Neusiedlersee','Thermenregion','Carnuntum','Steiermark',
+'Douro','Dão','Bairrada','Alentejo','Vinho Verde','Lisboa','Setúbal','Madeira',
+'Napa Valley','Sonoma','Russian River Valley','Paso Robles','Santa Barbara','Willamette Valley','Columbia Valley','Walla Walla','Finger Lakes',
+'Okanagan Valley','Niagara Peninsula','Mendoza','Uco Valley','Salta','Maipo','Colchagua','Casablanca Valley','Maule',
+'Barossa Valley','McLaren Vale','Clare Valley','Eden Valley','Coonawarra','Yarra Valley','Margaret River','Hunter Valley','Marlborough','Central Otago','Hawke\'s Bay',
+'Stellenbosch','Swartland','Walker Bay','Constantia','Tokaj','Eger','Villány','Santorini','Nemea','Naoussa','Kakheti','Bekaa Valley'];
 const DB_COUNTRIES = {
-  de: ['Frankreich','Italien','Spanien','Deutschland','Portugal','Österreich','Schweiz','USA','Argentinien','Chile','Australien','Neuseeland','Südafrika','Griechenland','Ungarn','Kroatien','Georgien','Kanada','Libanon','Israel','Slowenien','Rumänien','Bulgarien','Uruguay','Brasilien','Moldau','England'],
-  en: ['France','Italy','Spain','Germany','Portugal','Austria','Switzerland','USA','Argentina','Chile','Australia','New Zealand','South Africa','Greece','Hungary','Croatia','Georgia','Canada','Lebanon','Israel','Slovenia','Romania','Bulgaria','Uruguay','Brazil','Moldova','England'],
-  es: ['Francia','Italia','España','Alemania','Portugal','Austria','Suiza','EE.UU.','Argentina','Chile','Australia','Nueva Zelanda','Sudáfrica','Grecia','Hungría','Croacia','Georgia','Canadá','Líbano','Israel','Eslovenia','Rumanía','Bulgaria','Uruguay','Brasil','Moldavia','Inglaterra']
+  de: ['Frankreich','Italien','Spanien','Deutschland','Portugal','Österreich','Schweiz','USA','Argentinien','Chile','Australien','Neuseeland','Südafrika','Griechenland','Ungarn','Kroatien','Slowenien','Slowakei','Tschechien','Rumänien','Bulgarien','Serbien','Nordmazedonien','Georgien','Armenien','Moldau','Ukraine','Russland','Polen','Luxemburg','England','Kanada','Mexiko','Uruguay','Brasilien','Libanon','Israel','Türkei','Zypern','China','Japan','Marokko'],
+  en: ['France','Italy','Spain','Germany','Portugal','Austria','Switzerland','USA','Argentina','Chile','Australia','New Zealand','South Africa','Greece','Hungary','Croatia','Slovenia','Slovakia','Czechia','Romania','Bulgaria','Serbia','North Macedonia','Georgia','Armenia','Moldova','Ukraine','Russia','Poland','Luxembourg','England','Canada','Mexico','Uruguay','Brazil','Lebanon','Israel','Turkey','Cyprus','China','Japan','Morocco'],
+  es: ['Francia','Italia','España','Alemania','Portugal','Austria','Suiza','EE.UU.','Argentina','Chile','Australia','Nueva Zelanda','Sudáfrica','Grecia','Hungría','Croacia','Eslovenia','Eslovaquia','Chequia','Rumanía','Bulgaria','Serbia','Macedonia del Norte','Georgia','Armenia','Moldavia','Ucrania','Rusia','Polonia','Luxemburgo','Inglaterra','Canadá','México','Uruguay','Brasil','Líbano','Israel','Turquía','Chipre','China','Japón','Marruecos']
 };
 function fillDatalist(id, items) {
-  document.getElementById(id).innerHTML = items.map(v => `<option value="${v.replace(/"/g,'&quot;')}"></option>`).join('');
+  const uniq = [...new Set(items)].sort((a,b) => a.localeCompare(b, 'de'));
+  document.getElementById(id).innerHTML = uniq.map(v => `<option value="${v.replace(/"/g,'&quot;')}"></option>`).join('');
 }
 function buildWineData() {
   fillDatalist('dl-grape', DB_GRAPES);
@@ -1862,6 +1922,9 @@ de: {
   cur_dkk: "Dänische Kronen",
   cur_rub: "Russische Rubel",
   cur_pln: "Polnische Złoty",
+  fav_sort_rating: "★ Bewertung",
+  fav_sort_drunk: "🥂 Häufigkeit",
+  fav_none: "Keine Weine für diese Auswahl.",
   nav_keller: "Keller",
   nav_stats: "Statistik",
   nav_ripe: "Trinkreife",
@@ -2099,6 +2162,9 @@ en: {
   cur_dkk: "Danish krone",
   cur_rub: "Russian ruble",
   cur_pln: "Polish złoty",
+  fav_sort_rating: "★ Rating",
+  fav_sort_drunk: "🥂 Frequency",
+  fav_none: "No wines for this selection.",
   nav_keller: "Cellar",
   nav_stats: "Statistics",
   nav_ripe: "Readiness",
@@ -2336,6 +2402,9 @@ es: {
   cur_dkk: "Corona danesa",
   cur_rub: "Rublo ruso",
   cur_pln: "Esloti polaco",
+  fav_sort_rating: "★ Valoración",
+  fav_sort_drunk: "🥂 Frecuencia",
+  fav_none: "Ningún vino para esta selección.",
   nav_keller: "Bodega",
   nav_stats: "Estadísticas",
   nav_ripe: "Madurez",
@@ -2573,6 +2642,9 @@ sv: {
   cur_dkk: "Dansk krona",
   cur_rub: "Rysk rubel",
   cur_pln: "Polsk zloty",
+  fav_sort_rating: "★ Betyg",
+  fav_sort_drunk: "🥂 Antal",
+  fav_none: "Inga viner för detta urval.",
   nav_keller: "Källare",
   nav_stats: "Statistik",
   nav_ripe: "Dryckesmognad",
@@ -2810,6 +2882,9 @@ da: {
   cur_dkk: "Danske kroner",
   cur_rub: "Russiske rubler",
   cur_pln: "Polske zloty",
+  fav_sort_rating: "★ Bedømmelse",
+  fav_sort_drunk: "🥂 Antal",
+  fav_none: "Ingen vine for dette valg.",
   nav_keller: "Kælder",
   nav_stats: "Statistik",
   nav_ripe: "Drikkemodenhed",
@@ -3047,6 +3122,9 @@ fi: {
   cur_dkk: "Tanskan kruunu",
   cur_rub: "Venäjän rupla",
   cur_pln: "Puolan złoty",
+  fav_sort_rating: "★ Arvosana",
+  fav_sort_drunk: "🥂 Määrä",
+  fav_none: "Ei viinejä tälle valinnalle.",
   nav_keller: "Kellari",
   nav_stats: "Tilastot",
   nav_ripe: "Juomakypsyys",
@@ -3284,6 +3362,9 @@ ru: {
   cur_dkk: "Датская крона",
   cur_rub: "Российский рубль",
   cur_pln: "Польский злотый",
+  fav_sort_rating: "★ Оценка",
+  fav_sort_drunk: "🥂 Частота",
+  fav_none: "Нет вин для этого выбора.",
   nav_keller: "Погреб",
   nav_stats: "Статистика",
   nav_ripe: "Зрелость",
@@ -3521,6 +3602,9 @@ it: {
   cur_dkk: "Corona danese",
   cur_rub: "Rublo russo",
   cur_pln: "Złoty polacco",
+  fav_sort_rating: "★ Valutazione",
+  fav_sort_drunk: "🥂 Frequenza",
+  fav_none: "Nessun vino per questa selezione.",
   nav_keller: "Cantina",
   nav_stats: "Statistiche",
   nav_ripe: "Maturità",
@@ -3758,6 +3842,9 @@ fr: {
   cur_dkk: "Couronne danoise",
   cur_rub: "Rouble russe",
   cur_pln: "Złoty polonais",
+  fav_sort_rating: "★ Note",
+  fav_sort_drunk: "🥂 Fréquence",
+  fav_none: "Aucun vin pour cette sélection.",
   nav_keller: "Cave",
   nav_stats: "Statistiques",
   nav_ripe: "Maturité",
@@ -3995,6 +4082,9 @@ pl: {
   cur_dkk: "Korona duńska",
   cur_rub: "Rubel rosyjski",
   cur_pln: "Złoty polski",
+  fav_sort_rating: "★ Ocena",
+  fav_sort_drunk: "🥂 Częstość",
+  fav_none: "Brak win dla tego wyboru.",
   nav_keller: "Piwnica",
   nav_stats: "Statystyki",
   nav_ripe: "Dojrzałość",
@@ -4232,6 +4322,9 @@ hu: {
   cur_dkk: "Dán korona",
   cur_rub: "Orosz rubel",
   cur_pln: "Lengyel złoty",
+  fav_sort_rating: "★ Értékelés",
+  fav_sort_drunk: "🥂 Gyakoriság",
+  fav_none: "Nincs bor ehhez a választáshoz.",
   nav_keller: "Pince",
   nav_stats: "Statisztika",
   nav_ripe: "Érettség",
@@ -4469,6 +4562,9 @@ cs: {
   cur_dkk: "Dánská koruna",
   cur_rub: "Ruský rubl",
   cur_pln: "Polský zlotý",
+  fav_sort_rating: "★ Hodnocení",
+  fav_sort_drunk: "🥂 Četnost",
+  fav_none: "Žádná vína pro tento výběr.",
   nav_keller: "Sklep",
   nav_stats: "Statistiky",
   nav_ripe: "Zralost",
@@ -4706,6 +4802,9 @@ sk: {
   cur_dkk: "Dánska koruna",
   cur_rub: "Ruský rubeľ",
   cur_pln: "Poľský zlotý",
+  fav_sort_rating: "★ Hodnotenie",
+  fav_sort_drunk: "🥂 Frekvencia",
+  fav_none: "Žiadne vína pre tento výber.",
   nav_keller: "Pivnica",
   nav_stats: "Štatistiky",
   nav_ripe: "Zrelosť",
@@ -4943,6 +5042,9 @@ ro: {
   cur_dkk: "Coroană daneză",
   cur_rub: "Rublă rusească",
   cur_pln: "Zlot polonez",
+  fav_sort_rating: "★ Evaluare",
+  fav_sort_drunk: "🥂 Frecvență",
+  fav_none: "Niciun vin pentru această selecție.",
   nav_keller: "Pivniță",
   nav_stats: "Statistici",
   nav_ripe: "Maturitate",
@@ -5180,6 +5282,9 @@ hr: {
   cur_dkk: "Danska kruna",
   cur_rub: "Ruski rubalj",
   cur_pln: "Poljski zlot",
+  fav_sort_rating: "★ Ocjena",
+  fav_sort_drunk: "🥂 Učestalost",
+  fav_none: "Nema vina za ovaj odabir.",
   nav_keller: "Podrum",
   nav_stats: "Statistika",
   nav_ripe: "Zrelost",
@@ -5417,6 +5522,9 @@ pt: {
   cur_dkk: "Coroa dinamarquesa",
   cur_rub: "Rublo russo",
   cur_pln: "Złoty polaco",
+  fav_sort_rating: "★ Avaliação",
+  fav_sort_drunk: "🥂 Frequência",
+  fav_none: "Nenhum vinho para esta seleção.",
   nav_keller: "Adega",
   nav_stats: "Estatísticas",
   nav_ripe: "Maturação",
@@ -5654,6 +5762,9 @@ no: {
   cur_dkk: "Danske kroner",
   cur_rub: "Russiske rubler",
   cur_pln: "Polske zloty",
+  fav_sort_rating: "★ Vurdering",
+  fav_sort_drunk: "🥂 Antall",
+  fav_none: "Ingen viner for dette utvalget.",
   nav_keller: "Kjeller",
   nav_stats: "Statistikk",
   nav_ripe: "Drikkemodning",
@@ -5891,6 +6002,9 @@ nl: {
   cur_dkk: "Deense kroon",
   cur_rub: "Russische roebel",
   cur_pln: "Poolse zloty",
+  fav_sort_rating: "★ Beoordeling",
+  fav_sort_drunk: "🥂 Frequentie",
+  fav_none: "Geen wijnen voor deze selectie.",
   nav_keller: "Kelder",
   nav_stats: "Statistieken",
   nav_ripe: "Drinkrijpheid",
@@ -6184,6 +6298,18 @@ function applyOwnerTitles() {
   if (sH1) sH1.textContent = T.stats;
   if (wH1) wH1.textContent = T.wish;
   document.title = T.cellar;
+}
+
+// Start-Bildschirm: lokalisierten Titel setzen; Ausblenden läuft per CSS (Failsafe), danach aus dem DOM entfernen
+function splashInit() {
+  const s = document.getElementById('splash');
+  if (!s) return;
+  try {
+    const o = (settings.owner || '').trim() || DEFAULT_OWNER;
+    const el = document.getElementById('splash-title');
+    if (el) el.textContent = composeTitles(o).cellar;
+  } catch (e) {}
+  setTimeout(() => { if (s && s.parentNode) s.parentNode.removeChild(s); }, 3000);
 }
 
 function setCurrency(c) { settings.currency = c; saveSettings(); applyI18n(); }
@@ -6735,6 +6861,21 @@ async function handleWishScan(e) {
 // ═══════════════════════════════════════
 // STATS
 // ═══════════════════════════════════════
+let statRatingFilter = [];   // gewählte Sterne-Stufen (leer = alle)
+let statSort = 'rating';     // 'rating' oder 'drunk'
+const _nn = s => String(s||'').toLowerCase().replace(/\s+/g,' ').trim();
+function drunkCountFor(w) {
+  const n = _nn(w.name), y = w.year||null;
+  return drunkWines.reduce((c,d) => c + ((_nn(d.name)===n && (d.year||null)===y) ? 1 : 0), 0);
+}
+function toggleStatRating(n) {
+  const i = statRatingFilter.indexOf(n);
+  if (i >= 0) statRatingFilter.splice(i,1); else statRatingFilter.push(n);
+  renderStats();
+}
+function setStatRatingAll() { statRatingFilter = []; renderStats(); }
+function setStatSort(m) { statSort = m; renderStats(); }
+
 function renderStats() {
   const total = wines.reduce((s,w) => s+(w.count||1),0);
   const val = wines.reduce((s,w) => s+(w.price||0)*(w.count||1),0);
@@ -6763,16 +6904,43 @@ function renderStats() {
     </div>`;
   });
 
-  // top rated
-  const top = [...wines].filter(w=>w.rating).sort((a,b)=>b.rating-a.rating).slice(0,3);
-  if (top.length) {
+  // Favoriten: bewertete Weine mit Sterne-Filter + Trink-Häufigkeit
+  const ratedAll = wines.filter(w => w.rating);
+  if (ratedAll.length) {
     html += `<div class="stats-title" style="margin-top:20px">${t('s_top')}</div>`;
-    top.forEach((w,i) => {
-      html += `<div class="stats-card" onclick="goToWine('${w.id}')" style="margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer">
-        <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--gold)">${i+1}</div>
-        <div><div style="font-size:13px">${esc(w.name)}</div><div style="font-size:11px;color:var(--text-muted)">${'★'.repeat(w.rating)} ${w.year||''}</div></div>
-      </div>`;
+    // Sterne-Filter-Chips (nur vorhandene Stufen), mehrfach wählbar
+    const levels = [5,4,3,2,1].filter(n => ratedAll.some(w => w.rating === n));
+    html += `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px">`;
+    html += `<button class="filter-chip ${statRatingFilter.length===0?'active':''}" onclick="setStatRatingAll()">${t('t_all')}</button>`;
+    levels.forEach(n => {
+      const cnt = ratedAll.filter(w => w.rating === n).length;
+      html += `<button class="filter-chip ${statRatingFilter.includes(n)?'active':''}" onclick="toggleStatRating(${n})">${'★'.repeat(n)} (${cnt})</button>`;
     });
+    html += `</div>`;
+    // Sortier-Umschalter: Bewertung / Häufigkeit
+    html += `<div style="display:flex;gap:8px;margin-bottom:12px">
+      <button class="filter-chip ${statSort==='rating'?'active':''}" onclick="setStatSort('rating')">${t('fav_sort_rating')}</button>
+      <button class="filter-chip ${statSort==='drunk'?'active':''}" onclick="setStatSort('drunk')">${t('fav_sort_drunk')}</button>
+    </div>`;
+    // Liste aufbauen
+    const cmpName = (a,b) => String(a.name||'').localeCompare(String(b.name||''), dateLocale());
+    let fav = ratedAll
+      .filter(w => statRatingFilter.length === 0 || statRatingFilter.includes(w.rating))
+      .map(w => ({ w, drunk: drunkCountFor(w) }));
+    if (statSort === 'drunk') fav.sort((a,b) => b.drunk - a.drunk || b.w.rating - a.w.rating || cmpName(a.w, b.w));
+    else fav.sort((a,b) => b.w.rating - a.w.rating || b.drunk - a.drunk || cmpName(a.w, b.w));
+    if (statRatingFilter.length === 0) fav = fav.slice(0, 10); // ohne Filter: Top 10
+    if (!fav.length) {
+      html += `<div class="stats-card" style="color:var(--text-muted);font-size:13px">${t('fav_none')}</div>`;
+    } else {
+      fav.forEach(({w, drunk}, i) => {
+        html += `<div class="stats-card" onclick="goToWine('${w.id}')" style="margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--gold)">${i+1}</div>
+          <div style="flex:1;min-width:0"><div style="font-size:13px">${esc(w.name)}</div><div style="font-size:11px;color:var(--text-muted)">${'★'.repeat(w.rating)} ${w.year||''}</div></div>
+          <div style="font-size:12px;color:var(--text-muted);white-space:nowrap">🥂 ${drunk}×</div>
+        </div>`;
+      });
+    }
   }
 
   document.getElementById('stats-content').innerHTML = html;
@@ -7341,6 +7509,7 @@ document.getElementById('f-name').addEventListener('change', maybeAutoLookup);
 document.getElementById('f-grape').addEventListener('change', autoFillDrinkWindow);
 document.getElementById('f-type').addEventListener('change', autoFillDrinkWindow);
 syncOnLoad();
+splashInit();
 // PWA: Service Worker registrieren (macht die App installierbar + offline-fähig)
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
