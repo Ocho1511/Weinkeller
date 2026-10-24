@@ -240,11 +240,10 @@ body {
   text-shadow: 0 2px 18px rgba(63,195,177,0.35);
   padding: 0 24px;
 }
-.splash-tagline { margin-top: 10px; font-size: 22px; opacity: 0.85; animation: splashIn 1.1s ease 0.2s both; }
 @keyframes splashIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 @keyframes splashPop { 0% { opacity: 0; transform: scale(0.7); } 60% { opacity: 1; } 100% { transform: scale(1); } }
 @keyframes splashOut { to { opacity: 0; visibility: hidden; } }
-@media (prefers-reduced-motion: reduce) { .splash-inner, .splash-logo svg, .splash-tagline { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .splash-inner, .splash-logo svg { animation: none; } }
 
 /* Globale, überall sichtbare Fortschrittsanzeige (oben fixiert) */
 #global-progress {
@@ -781,7 +780,6 @@ input[type="file"] { display: none; }
       </svg>
     </div>
     <div class="splash-title" id="splash-title">Weinkeller</div>
-    <div class="splash-tagline">🍷</div>
   </div>
 </div>
 
