@@ -515,7 +515,11 @@ body {
 .bottle-photo { position: relative; display: block; flex-shrink: 0; }
 .bottle-photo img { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(90deg); object-fit: contain; filter: drop-shadow(0 1.5px 1.5px rgba(0,0,0,0.55)); }
 .bottle-year { position: absolute; right: 0; bottom: -1px; font-size: 9px; font-weight: 800; line-height: 1; color: #f4e6bd; background: rgba(23,18,10,0.82); border: 1px solid rgba(196,162,74,0.55); border-radius: 4px; padding: 1px 3px; }
-.rack-preview { flex-basis: 100%; display: flex; justify-content: center; padding: 6px 0 4px; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.35)); }
+.bottle-cap { text-align: center; margin-top: 6px; }
+.bottle-cap strong { display: block; font-size: 14px; font-weight: 700; color: var(--text); }
+.bottle-cap span { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-top: 2px; }
+.rack-preview { flex-basis: 100%; display: flex; flex-direction: column; align-items: center; padding: 6px 0 4px; }
+.rack-preview > svg, .rack-preview > .bottle-photo { filter: drop-shadow(0 6px 10px rgba(0,0,0,0.35)); }
 .rack-preview.solo { margin: 0 0 10px; }
 .rack-action-name { font-size: 13px; font-weight: 700; color: var(--text); min-width: 0; }
 .rack-action-name span { display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); margin-top: 2px; }
@@ -7422,7 +7426,15 @@ function bottleVisual(w, W, mode) {
   const badge = (mode === 'year' && w.year) ? `<span class="bottle-year" style="display:none">${esc(String(w.year))}</span>` : '';
   return `<span class="bottle-photo" style="width:${W}px;height:${H}px">${svg}`
     + `<img src="${esc(w.image)}" alt="" style="width:${H}px;height:${W}px" `
-    + `onload="var p=this.parentNode;p.firstElementChild.style.visibility='hidden';var b=p.querySelector('.bottle-year');if(b)b.style.display='block'" onerror="this.remove()">${badge}</span>`;
+    + `onload="var p=this.parentNode;p.firstElementChild.style.visibility='hidden';var b=p.querySelector('.bottle-year');if(b)b.style.display='block';var c=p.parentNode.querySelector('.bottle-cap');if(c)c.style.display='block'" onerror="this.remove()">${badge}</span>`;
+}
+// Große Flasche für die Vorschau (Antippen): echtes Foto, wenn vorhanden – mit Name/Jahrgang/Traube darunter
+// (auf dem Foto ist kein lesbarer Text); sonst die gezeichnete Flasche mit beschriftetem Etikett.
+function bottlePreviewHtml(w) {
+  const vis = bottleVisual(w, 232, 'full');
+  if (!isBottleCutout(w.image)) return vis;
+  const sub = [w.year, w.grape].filter(Boolean).join(' · ');
+  return vis + `<div class="bottle-cap" style="display:none"><strong>${esc(w.name)}</strong>${sub ? `<span>${esc(sub)}</span>` : ''}</div>`;
 }
 function wineAt(rackName, e, p) {
   return wines.find(w => (w.locRegal||'') === rackName && String(w.locEbene) === String(e) && String(w.locPlatz) === String(p));
@@ -7478,8 +7490,8 @@ function renderRacks() {
   if (rackFilledWineId && !pickedW) rackFilledWineId = null;
   if (pickedW) {
     html += `<div class="rack-action-bar">
-      <div class="rack-preview">${bottleSvg(TYPE_FILL[pickedW.type]||TYPE_FILL.other, 232, pickedW, 'full')}</div>
-      <div class="rack-action-name">${esc(pickedW.name)}${pickedW.year?' · '+pickedW.year:''}<span>${esc(formatLocation(pickedW))}</span></div>
+      <div class="rack-preview">${bottlePreviewHtml(pickedW)}</div>
+      <div class="rack-action-name">${isBottleCutout(pickedW.image) ? '' : esc(pickedW.name) + (pickedW.year ? ' · ' + pickedW.year : '')}<span${isBottleCutout(pickedW.image) ? ' style="margin-top:0;font-size:12px"' : ''}>${esc(formatLocation(pickedW))}</span></div>
       <div class="rack-action-btns">
         <button class="wine-btn" onclick="goToWine('${pickedW.id}')">${t('rack_open_wine')}</button>
         <button class="wine-btn danger" onclick="removeFromRack('${pickedW.id}')">${t('rack_remove')}</button>
@@ -7493,7 +7505,7 @@ function renderRacks() {
   html += `<div class="stats-title" style="margin:8px 0 10px">${t('racks_unassigned')} (${unplaced.length})</div>`;
   if (unplaced.length) {
     const selW = unplaced.find(w => w.id === rackSelectedWineId);
-    if (selW) html += `<div class="rack-preview solo">${bottleSvg(TYPE_FILL[selW.type]||TYPE_FILL.other, 232, selW, 'full')}</div>`;
+    if (selW) html += `<div class="rack-preview solo">${bottlePreviewHtml(selW)}</div>`;
     html += `<div style="font-size:12px;color:${selW?'var(--gold)':'var(--text-muted)'};margin-bottom:10px">${selW ? esc(t('rack_assign_sel', {name: selW.name})) : t('rack_assign_hint')}</div>`;
     html += `<div class="rack-unassigned">` + unplaced.map(w =>
       `<div class="rack-chip-wine${w.id===rackSelectedWineId?' selected':''}" onclick="selectRackWine('${w.id}')">${bottleVisual(w, 60, 'none')}<span>${esc(w.name)}${w.year?' · '+w.year:''}</span></div>`
