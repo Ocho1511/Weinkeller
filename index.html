@@ -512,6 +512,9 @@ body {
 .rack-slot.filled { cursor: pointer; }
 .rack-slot.filled.picked { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 6px; background: rgba(196,162,74,0.12); }
 .rack-action-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; background: var(--card); border: 1px solid var(--gold); border-radius: 12px; padding: 10px 12px; margin: 4px 0 14px; }
+.bottle-photo { position: relative; display: block; flex-shrink: 0; }
+.bottle-photo img { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(90deg); object-fit: contain; filter: drop-shadow(0 1.5px 1.5px rgba(0,0,0,0.55)); }
+.bottle-year { position: absolute; right: 0; bottom: -1px; font-size: 9px; font-weight: 800; line-height: 1; color: #f4e6bd; background: rgba(23,18,10,0.82); border: 1px solid rgba(196,162,74,0.55); border-radius: 4px; padding: 1px 3px; }
 .rack-preview { flex-basis: 100%; display: flex; justify-content: center; padding: 6px 0 4px; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.35)); }
 .rack-preview.solo { margin: 0 0 10px; }
 .rack-action-name { font-size: 13px; font-weight: 700; color: var(--text); min-width: 0; }
@@ -7408,6 +7411,19 @@ function bottleSvg(fill, W, wine, mode) {
     <path d="M44 9.7 H51" stroke="#fff" stroke-opacity=".4" stroke-width=".9" stroke-linecap="round" fill="none"/>
   </svg>`;
 }
+// Nur echte Flaschen-Freisteller (Vivino "_pb_") eignen sich zum Drehen; andere Bilder bleiben außen vor.
+function isBottleCutout(u) { return /images\.vivino\.com\/thumbs\/[^"'\s]*_pb_/i.test(u || ''); }
+// Flasche fürs Regal: echtes Flaschenfoto (um 90° gedreht, Hals nach rechts), sonst die gezeichnete Flasche.
+// Die gezeichnete liegt als Rückfall darunter und wird erst ausgeblendet, wenn das Foto geladen ist.
+function bottleVisual(w, W, mode) {
+  const svg = bottleSvg(TYPE_FILL[w.type] || TYPE_FILL.other, W, w, mode);
+  if (!isBottleCutout(w.image)) return svg;
+  const H = Math.round(W * 22 / 60);
+  const badge = (mode === 'year' && w.year) ? `<span class="bottle-year" style="display:none">${esc(String(w.year))}</span>` : '';
+  return `<span class="bottle-photo" style="width:${W}px;height:${H}px">${svg}`
+    + `<img src="${esc(w.image)}" alt="" style="width:${H}px;height:${W}px" `
+    + `onload="var p=this.parentNode;p.firstElementChild.style.visibility='hidden';var b=p.querySelector('.bottle-year');if(b)b.style.display='block'" onerror="this.remove()">${badge}</span>`;
+}
 function wineAt(rackName, e, p) {
   return wines.find(w => (w.locRegal||'') === rackName && String(w.locEbene) === String(e) && String(w.locPlatz) === String(p));
 }
@@ -7451,7 +7467,7 @@ function renderRacks() {
     html += `<div class="rack-elabel">E${e}</div>`;
     for (let p=1;p<=r.cols;p++) {
       const w = wineAt(r.name, e, p);
-      if (w) html += `<div class="rack-slot filled${w.id===rackFilledWineId?' picked':''}" style="width:${slotW}px;height:${slotH}px" onclick="selectFilledSlot('${w.id}')" title="${esc(w.name)}${w.year?' · '+w.year:''}">${bottleSvg(TYPE_FILL[w.type]||TYPE_FILL.other, slotW, w, slotMode)}</div>`;
+      if (w) html += `<div class="rack-slot filled${w.id===rackFilledWineId?' picked':''}" style="width:${slotW}px;height:${slotH}px" onclick="selectFilledSlot('${w.id}')" title="${esc(w.name)}${w.year?' · '+w.year:''}">${bottleVisual(w, slotW, slotMode)}</div>`;
       else html += `<div class="rack-slot${rackSelectedWineId?' droppable':''}" style="width:${slotW}px;height:${slotH}px" onclick="placeRackWine(${e},${p})"><div class="rack-empty" style="height:${Math.max(15, slotH-7)}px"></div></div>`;
     }
   }
@@ -7480,7 +7496,7 @@ function renderRacks() {
     if (selW) html += `<div class="rack-preview solo">${bottleSvg(TYPE_FILL[selW.type]||TYPE_FILL.other, 232, selW, 'full')}</div>`;
     html += `<div style="font-size:12px;color:${selW?'var(--gold)':'var(--text-muted)'};margin-bottom:10px">${selW ? esc(t('rack_assign_sel', {name: selW.name})) : t('rack_assign_hint')}</div>`;
     html += `<div class="rack-unassigned">` + unplaced.map(w =>
-      `<div class="rack-chip-wine${w.id===rackSelectedWineId?' selected':''}" onclick="selectRackWine('${w.id}')">${bottleSvg(TYPE_FILL[w.type]||TYPE_FILL.other)}<span>${esc(w.name)}${w.year?' · '+w.year:''}</span></div>`
+      `<div class="rack-chip-wine${w.id===rackSelectedWineId?' selected':''}" onclick="selectRackWine('${w.id}')">${bottleVisual(w, 60, 'none')}<span>${esc(w.name)}${w.year?' · '+w.year:''}</span></div>`
     ).join('') + `</div>`;
   } else {
     html += `<div style="font-size:13px;color:var(--text-muted)">${t('racks_all_placed')}</div>`;
