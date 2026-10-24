@@ -91,6 +91,9 @@ body {
   background: linear-gradient(180deg, #120a10 0%, var(--bg) 100%);
   position: sticky; top: 0; z-index: 50;
 }
+.header-lockup { display: flex; align-items: center; gap: 14px; }
+.header-barrel { flex-shrink: 0; line-height: 0; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4)); }
+.header-text { min-width: 0; }
 .page-header h1 {
   font-family: var(--heading-font, 'UnifrakturMaguntia', serif);
   font-size: 32px;
@@ -849,8 +852,28 @@ input[type="file"] { display: none; }
 ════════════════════════════════════════ -->
 <div class="tab active" id="tab-keller">
   <div class="page-header">
-    <h1 id="title-keller">Ocho's Weinkeller</h1>
-    <div class="subtitle" id="keller-subtitle">Meine Sammlung</div>
+    <div class="header-lockup">
+      <div class="header-barrel" aria-hidden="true">
+        <svg viewBox="0 0 64 64" width="54" height="54">
+          <defs>
+            <linearGradient id="hbWood" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4e331e"/><stop offset=".5" stop-color="#8a5a34"/><stop offset="1" stop-color="#4e331e"/></linearGradient>
+            <linearGradient id="hbHoop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6cc82"/><stop offset="1" stop-color="#a9842f"/></linearGradient>
+          </defs>
+          <path d="M18 8 C11 22 11 42 18 56 C28 59 36 59 46 56 C53 42 53 22 46 8 C36 5 28 5 18 8 Z" fill="url(#hbWood)" stroke="#2f1d10" stroke-width="1.5"/>
+          <g stroke="#2f1d10" stroke-width="1" opacity=".45" fill="none">
+            <path d="M25 6.5 C21 24 21 40 25 57.5"/><path d="M32 5.5 L32 58.5"/><path d="M39 6.5 C43 24 43 40 39 57.5"/>
+          </g>
+          <rect x="14.5" y="15" width="35" height="4.5" rx="2.25" fill="url(#hbHoop)"/>
+          <rect x="10.5" y="29" width="43" height="5.5" rx="2.75" fill="url(#hbHoop)"/>
+          <rect x="14.5" y="44.5" width="35" height="4.5" rx="2.25" fill="url(#hbHoop)"/>
+          <ellipse cx="32" cy="32" rx="2.6" ry="3" fill="#2f1d10"/>
+        </svg>
+      </div>
+      <div class="header-text">
+        <h1 id="title-keller">Ocho's Weinkeller</h1>
+        <div class="subtitle" id="keller-subtitle">Meine Sammlung</div>
+      </div>
+    </div>
   </div>
   <div class="keller-stats" id="keller-stats"></div>
   <div class="search-filter">
