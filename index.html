@@ -1064,6 +1064,16 @@ input[type="file"] { display: none; }
         <option value="sv">🇸🇪 Svenska</option>
       </select>
     </div>
+    <div class="form-group" style="margin-top:14px">
+      <label data-i18n="setup_font">Schriftart</label>
+      <select id="setup-font" onchange="setFont(this.value)">
+        <option value="inter" style="font-family:'Inter',sans-serif">Standard</option>
+        <option value="system" style="font-family:system-ui,sans-serif">System</option>
+        <option value="serif" style="font-family:'Playfair Display',Georgia,serif">Serif</option>
+        <option value="mono" style="font-family:'SF Mono',Menlo,Consolas,monospace">Monospace</option>
+        <option value="oldenglish" style="font-family:'UnifrakturMaguntia',cursive">Old English</option>
+      </select>
+    </div>
     <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border)">
       <div class="stats-title" style="margin-bottom:4px" data-i18n="setup_storage">Speicherort</div>
       <div style="font-size:12px; font-weight:600; color:var(--text-muted); margin-bottom:12px" data-i18n="setup_storage_desc">Cloud: Daten geräteübergreifend nutzbar (neueste Änderung gewinnt).</div>
@@ -1369,7 +1379,7 @@ let wishes = JSON.parse(localStorage.getItem(WISH_KEY) || '[]');
 let drunkWines = JSON.parse(localStorage.getItem(DRUNK_KEY) || '[]');
 const DEFAULT_OWNER = "Ocho";
 const STAMP_KEY = 'weinkeller_v2_stamp';
-let settings = Object.assign({currency:'€', lang:'de', racks:[], owner:'', storage:'local', syncCode:'', email:''}, JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'));
+let settings = Object.assign({currency:'€', lang:'de', racks:[], owner:'', storage:'local', syncCode:'', email:'', font:'inter'}, JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'));
 if (!Array.isArray(settings.racks)) settings.racks = [];
 let dataStamp = parseInt(localStorage.getItem(STAMP_KEY) || '0');
 let editId = null;
@@ -1961,6 +1971,7 @@ de: {
   setup_sub: "Einstellungen",
   setup_currency: "Währung",
   setup_lang: "Sprache",
+  setup_font: "Schriftart",
   setup_owner: "Anzeigename (Titel)",
   setup_owner_ph: "z.B. Peter",
   setup_owner_desc: "Leer lassen für den Standardtitel. Name → „Name's Weinkeller\".",
@@ -2201,6 +2212,7 @@ en: {
   setup_sub: "Settings",
   setup_currency: "Currency",
   setup_lang: "Language",
+  setup_font: "Font",
   setup_owner: "Display name (title)",
   setup_owner_ph: "e.g. Peter",
   setup_owner_desc: "Leave empty for the default title. Name → \"Name's Weinkeller\".",
@@ -2441,6 +2453,7 @@ es: {
   setup_sub: "Configuración",
   setup_currency: "Moneda",
   setup_lang: "Idioma",
+  setup_font: "Fuente",
   setup_owner: "Nombre (título)",
   setup_owner_ph: "p.ej. Peter",
   setup_owner_desc: "Déjalo vacío para el título estándar. Nombre → \"Bodega de Nombre\".",
@@ -2681,6 +2694,7 @@ sv: {
   setup_sub: "Inställningar",
   setup_currency: "Valuta",
   setup_lang: "Språk",
+  setup_font: "Teckensnitt",
   setup_owner: "Visningsnamn (titel)",
   setup_owner_ph: "t.ex. Peter",
   setup_owner_desc: "Lämna tomt för standardtiteln. Namn → „Namns vinkällare\".",
@@ -2921,6 +2935,7 @@ da: {
   setup_sub: "Indstillinger",
   setup_currency: "Valuta",
   setup_lang: "Sprog",
+  setup_font: "Skrifttype",
   setup_owner: "Visningsnavn (titel)",
   setup_owner_ph: "f.eks. Peter",
   setup_owner_desc: "Lad være tom for standardtitlen. Navn → „Navns vinkælder\".",
@@ -3161,6 +3176,7 @@ fi: {
   setup_sub: "Asetukset",
   setup_currency: "Valuutta",
   setup_lang: "Kieli",
+  setup_font: "Fontti",
   setup_owner: "Näyttönimi (otsikko)",
   setup_owner_ph: "esim. Peter",
   setup_owner_desc: "Jätä tyhjäksi oletusotsikkoa varten. Nimi → „Nimen viinikellari\".",
@@ -3401,6 +3417,7 @@ ru: {
   setup_sub: "Настройки",
   setup_currency: "Валюта",
   setup_lang: "Язык",
+  setup_font: "Шрифт",
   setup_owner: "Отображаемое имя (заголовок)",
   setup_owner_ph: "напр. Peter",
   setup_owner_desc: "Оставьте пустым для стандартного заголовка. Имя → „Погреб имени\".",
@@ -3641,6 +3658,7 @@ it: {
   setup_sub: "Impostazioni",
   setup_currency: "Valuta",
   setup_lang: "Lingua",
+  setup_font: "Carattere",
   setup_owner: "Nome visualizzato (titolo)",
   setup_owner_ph: "es. Peter",
   setup_owner_desc: "Lascia vuoto per il titolo predefinito. Nome → „Cantina di Nome\".",
@@ -3881,6 +3899,7 @@ fr: {
   setup_sub: "Réglages",
   setup_currency: "Devise",
   setup_lang: "Langue",
+  setup_font: "Police",
   setup_owner: "Nom affiché (titre)",
   setup_owner_ph: "ex. Peter",
   setup_owner_desc: "Laissez vide pour le titre par défaut. Nom → « Cave de Nom ».",
@@ -4121,6 +4140,7 @@ pl: {
   setup_sub: "Ustawienia",
   setup_currency: "Waluta",
   setup_lang: "Język",
+  setup_font: "Czcionka",
   setup_owner: "Nazwa wyświetlana (tytuł)",
   setup_owner_ph: "np. Peter",
   setup_owner_desc: "Pozostaw puste dla domyślnego tytułu. Nazwa → „Piwnica: Nazwa\".",
@@ -4361,6 +4381,7 @@ hu: {
   setup_sub: "Beállítások",
   setup_currency: "Pénznem",
   setup_lang: "Nyelv",
+  setup_font: "Betűtípus",
   setup_owner: "Megjelenített név (cím)",
   setup_owner_ph: "pl. Peter",
   setup_owner_desc: "Hagyd üresen az alapértelmezett címhez. Név → „Név pincéje\".",
@@ -4601,6 +4622,7 @@ cs: {
   setup_sub: "Nastavení",
   setup_currency: "Měna",
   setup_lang: "Jazyk",
+  setup_font: "Písmo",
   setup_owner: "Zobrazované jméno (název)",
   setup_owner_ph: "např. Peter",
   setup_owner_desc: "Nechte prázdné pro výchozí název. Jméno → „Sklep: Jméno\".",
@@ -4841,6 +4863,7 @@ sk: {
   setup_sub: "Nastavenia",
   setup_currency: "Mena",
   setup_lang: "Jazyk",
+  setup_font: "Písmo",
   setup_owner: "Zobrazované meno (názov)",
   setup_owner_ph: "napr. Peter",
   setup_owner_desc: "Nechajte prázdne pre predvolený názov. Meno → „Pivnica: Meno\".",
@@ -5081,6 +5104,7 @@ ro: {
   setup_sub: "Setări",
   setup_currency: "Monedă",
   setup_lang: "Limbă",
+  setup_font: "Font",
   setup_owner: "Nume afișat (titlu)",
   setup_owner_ph: "ex. Peter",
   setup_owner_desc: "Lasă gol pentru titlul implicit. Nume → „Pivnița lui Nume\".",
@@ -5321,6 +5345,7 @@ hr: {
   setup_sub: "Postavke",
   setup_currency: "Valuta",
   setup_lang: "Jezik",
+  setup_font: "Font",
   setup_owner: "Prikazano ime (naslov)",
   setup_owner_ph: "npr. Peter",
   setup_owner_desc: "Ostavite prazno za zadani naslov. Ime → „Podrum: Ime\".",
@@ -5561,6 +5586,7 @@ pt: {
   setup_sub: "Definições",
   setup_currency: "Moeda",
   setup_lang: "Idioma",
+  setup_font: "Tipo de letra",
   setup_owner: "Nome a apresentar (título)",
   setup_owner_ph: "ex. Peter",
   setup_owner_desc: "Deixe vazio para o título padrão. Nome → „Adega de Nome\".",
@@ -5801,6 +5827,7 @@ no: {
   setup_sub: "Innstillinger",
   setup_currency: "Valuta",
   setup_lang: "Språk",
+  setup_font: "Skrifttype",
   setup_owner: "Visningsnavn (tittel)",
   setup_owner_ph: "f.eks. Peter",
   setup_owner_desc: "La stå tomt for standardtittelen. Navn → „Navns vinkjeller\".",
@@ -6041,6 +6068,7 @@ nl: {
   setup_sub: "Instellingen",
   setup_currency: "Valuta",
   setup_lang: "Taal",
+  setup_font: "Lettertype",
   setup_owner: "Weergavenaam (titel)",
   setup_owner_ph: "bijv. Peter",
   setup_owner_desc: "Laat leeg voor de standaardtitel. Naam → „Wijnkelder van Naam\".",
@@ -6249,6 +6277,7 @@ function applyI18n() {
   const priceLabel = document.getElementById('price-label');
   if (priceLabel) priceLabel.textContent = t('l_price') + ' (' + settings.currency + ')';
   renderCurrencyOptions();
+  applyFont();
   applyOwnerTitles();
   const active = document.querySelector('.tab.active');
   if (active) {
@@ -6310,6 +6339,17 @@ function splashInit() {
   setTimeout(() => { if (s && s.parentNode) s.parentNode.removeChild(s); }, 3000);
 }
 
+// Wählbare App-Schriftart (betrifft den allgemeinen Text; Titel bleiben in ihrer Zierschrift)
+const FONTS = {
+  inter: "'Inter', sans-serif",
+  system: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+  serif: "'Playfair Display', Georgia, serif",
+  mono: "'SF Mono', Menlo, Consolas, monospace",
+  oldenglish: "'UnifrakturMaguntia', 'UnifrakturCook', cursive"
+};
+function applyFont() { document.body.style.fontFamily = FONTS[settings.font] || FONTS.inter; }
+function setFont(f) { settings.font = f; saveSettings(); applyFont(); }
+
 function setCurrency(c) { settings.currency = c; saveSettings(); applyI18n(); }
 function setLanguage(l) { settings.lang = l; saveSettings(); applyI18n(); }
 function setOwner(v) { settings.owner = (v||'').trim(); saveSettings(); touchData(); applyI18n(); }
@@ -6334,6 +6374,7 @@ function showTab(name, btn) {
     document.getElementById('setup-owner').value = settings.owner || '';
     document.getElementById('setup-currency').value = settings.currency;
     document.getElementById('setup-lang').value = settings.lang;
+    document.getElementById('setup-font').value = settings.font || 'inter';
     renderRackSetup();
     renderSetupSync();
   }
