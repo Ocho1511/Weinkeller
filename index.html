@@ -780,12 +780,27 @@ input[type="file"] { display: none; }
 <div id="splash">
   <div class="splash-inner">
     <div class="splash-logo">
-      <svg viewBox="0 0 512 512" width="128" height="128" aria-hidden="true">
+      <svg viewBox="0 0 72 72" width="150" height="150" aria-hidden="true">
         <defs>
-          <linearGradient id="splashGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dfc06e"/><stop offset="1" stop-color="#c4a24a"/></linearGradient>
+          <linearGradient id="spG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#f3dfa0"/><stop offset=".5" stop-color="#d4af5a"/><stop offset="1" stop-color="#a98532"/>
+          </linearGradient>
         </defs>
-        <path fill="url(#splashGold)" d="M174 150 h164 a9 9 0 0 1 9 10 c-7 72 -42 121 -91 131 v97 h46 a15 15 0 0 1 0 30 h-124 a15 15 0 0 1 0 -30 h46 v-97 c-49 -10 -84 -59 -91 -131 a9 9 0 0 1 9 -10 z"/>
-        <path fill="#8b1a2e" d="M192 170 h128 c-7 43 -30 72 -64 79 c-34 -7 -57 -36 -64 -79 z"/>
+        <circle cx="36" cy="36" r="33" fill="rgba(212,175,90,.06)" stroke="url(#spG)" stroke-width="2"/>
+        <circle cx="36" cy="36" r="29.5" fill="none" stroke="url(#spG)" stroke-width=".8" opacity=".8"/>
+        <g transform="translate(36 34) scale(.58) translate(-36 -36)">
+          <path d="M19 12 C12 26 12 48 19 62 C31 66 41 66 53 62 C60 48 60 26 53 12 C41 8 31 8 19 12 Z" fill="rgba(212,175,90,.10)" stroke="url(#spG)" stroke-width="2.4" stroke-linejoin="round"/>
+          <ellipse cx="36" cy="11.5" rx="17" ry="4.4" fill="none" stroke="url(#spG)" stroke-width="2"/>
+          <g fill="none" stroke="url(#spG)" stroke-width="2" stroke-linecap="round">
+            <path d="M15.2 24 Q36 31.5 56.8 24"/><path d="M13.4 38 Q36 46.5 58.6 38"/><path d="M15.6 54 Q36 61 56.4 54"/>
+          </g>
+          <path d="M36 16 L36 66" stroke="url(#spG)" stroke-width="1" opacity=".5"/>
+        </g>
+        <g fill="url(#spG)" opacity=".95">
+          <path d="M12 52 C9 46 12 40 17 38 C18 44 16 49 12 52 Z"/><path d="M17 58 C13 55 12 50 14 46 C19 48 20 54 17 58 Z"/>
+          <path d="M60 52 C63 46 60 40 55 38 C54 44 56 49 60 52 Z"/><path d="M55 58 C59 55 60 50 58 46 C53 48 52 54 55 58 Z"/>
+        </g>
+        <g fill="url(#spG)"><circle cx="31" cy="60" r="2"/><circle cx="36" cy="62" r="2"/><circle cx="41" cy="60" r="2"/><circle cx="36" cy="57" r="1.8" opacity=".9"/></g>
       </svg>
     </div>
     <div class="splash-title" id="splash-title">Weinkeller</div>
