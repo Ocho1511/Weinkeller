@@ -1,5 +1,5 @@
 /* Weinkeller Service Worker – App-Shell offline, HTML network-first (Updates), Google Fonts gecacht */
-const CACHE = 'weinkeller-v2';
+const CACHE = 'weinkeller-v3';
 const FONT_CACHE = 'weinkeller-fonts-v1';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
