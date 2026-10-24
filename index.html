@@ -854,19 +854,36 @@ input[type="file"] { display: none; }
   <div class="page-header">
     <div class="header-lockup">
       <div class="header-barrel" aria-hidden="true">
-        <svg viewBox="0 0 64 64" width="54" height="54">
+        <svg viewBox="0 0 72 72" width="58" height="58">
           <defs>
-            <linearGradient id="hbWood" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4e331e"/><stop offset=".5" stop-color="#8a5a34"/><stop offset="1" stop-color="#4e331e"/></linearGradient>
-            <linearGradient id="hbHoop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6cc82"/><stop offset="1" stop-color="#a9842f"/></linearGradient>
+            <linearGradient id="hbWood" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#34200f"/><stop offset=".22" stop-color="#6a4325"/><stop offset=".5" stop-color="#9c6a3c"/><stop offset=".78" stop-color="#6a4325"/><stop offset="1" stop-color="#34200f"/>
+            </linearGradient>
+            <linearGradient id="hbSheen" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#ffffff" stop-opacity=".16"/><stop offset=".5" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity=".22"/>
+            </linearGradient>
+            <linearGradient id="hbHoop" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#f6e6ad"/><stop offset=".35" stop-color="#d8b55f"/><stop offset=".55" stop-color="#b8903f"/><stop offset="1" stop-color="#876827"/>
+            </linearGradient>
+            <clipPath id="hbClip"><path d="M20 10 C13 24 13 48 20 62 C31 65 41 65 52 62 C59 48 59 24 52 10 C41 7 31 7 20 10 Z"/></clipPath>
           </defs>
-          <path d="M18 8 C11 22 11 42 18 56 C28 59 36 59 46 56 C53 42 53 22 46 8 C36 5 28 5 18 8 Z" fill="url(#hbWood)" stroke="#2f1d10" stroke-width="1.5"/>
-          <g stroke="#2f1d10" stroke-width="1" opacity=".45" fill="none">
-            <path d="M25 6.5 C21 24 21 40 25 57.5"/><path d="M32 5.5 L32 58.5"/><path d="M39 6.5 C43 24 43 40 39 57.5"/>
+          <path d="M20 10 C13 24 13 48 20 62 C31 65 41 65 52 62 C59 48 59 24 52 10 C41 7 31 7 20 10 Z" fill="url(#hbWood)" stroke="#241408" stroke-width="1.5"/>
+          <g clip-path="url(#hbClip)">
+            <g stroke="#241408" stroke-opacity=".32" stroke-width="1" fill="none">
+              <path d="M28 7 C24 28 24 44 28 65"/><path d="M36 6 L36 66"/><path d="M44 7 C48 28 48 44 44 65"/>
+            </g>
+            <path d="M20 10 C13 24 13 48 20 62 C31 65 41 65 52 62 C59 48 59 24 52 10 C41 7 31 7 20 10 Z" fill="url(#hbSheen)"/>
+            <rect x="12" y="18" width="48" height="5.6" rx="2.6" fill="url(#hbHoop)"/>
+            <rect x="12" y="18.5" width="48" height="1.2" fill="#fff" opacity=".4"/>
+            <rect x="9" y="33.5" width="54" height="6.6" rx="3" fill="url(#hbHoop)"/>
+            <rect x="9" y="34.1" width="54" height="1.4" fill="#fff" opacity=".4"/>
+            <rect x="12" y="49.4" width="48" height="5.6" rx="2.6" fill="url(#hbHoop)"/>
+            <rect x="12" y="49.9" width="48" height="1.2" fill="#fff" opacity=".4"/>
           </g>
-          <rect x="14.5" y="15" width="35" height="4.5" rx="2.25" fill="url(#hbHoop)"/>
-          <rect x="10.5" y="29" width="43" height="5.5" rx="2.75" fill="url(#hbHoop)"/>
-          <rect x="14.5" y="44.5" width="35" height="4.5" rx="2.25" fill="url(#hbHoop)"/>
-          <ellipse cx="32" cy="32" rx="2.6" ry="3" fill="#2f1d10"/>
+          <ellipse cx="36" cy="10" rx="16.5" ry="4.3" fill="#2d1b0d" stroke="#caa24f" stroke-width="1.3"/>
+          <ellipse cx="36" cy="9.3" rx="11.5" ry="2.5" fill="#48301a"/>
+          <ellipse cx="36" cy="37" rx="2.9" ry="3.3" fill="#241408"/>
+          <ellipse cx="36" cy="36.2" rx="1.5" ry="1.5" fill="#6a4726"/>
         </svg>
       </div>
       <div class="header-text">
