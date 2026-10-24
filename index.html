@@ -797,9 +797,6 @@ input[type="file"] { display: none; }
   margin-top: 12px;
 }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
 
@@ -2494,6 +2491,7 @@ de: {
   toast_import_fail: "Fehler beim Import",
   toast_csvfail: "Fehler beim CSV-Import",
   toast_xlsxfail: "Fehler beim Excel-Import",
+  toast_exportfail: "Export fehlgeschlagen",
   toast_moved: "In Keller verschoben ✓",
   confirm_last: "Letzte Flasche von \"{name}\" als getrunken markieren und entfernen?",
   confirm_del: "Wein entfernen?",
@@ -2761,6 +2759,7 @@ en: {
   toast_import_fail: "Import failed",
   toast_csvfail: "CSV import failed",
   toast_xlsxfail: "Excel import failed",
+  toast_exportfail: "Export failed",
   toast_moved: "Moved to cellar ✓",
   confirm_last: "Mark the last bottle of \"{name}\" as drunk and remove it?",
   confirm_del: "Remove wine?",
@@ -3028,6 +3027,7 @@ es: {
   toast_import_fail: "Error al importar",
   toast_csvfail: "Error al importar CSV",
   toast_xlsxfail: "Error al importar Excel",
+  toast_exportfail: "Error al exportar",
   toast_moved: "Movido a la bodega ✓",
   confirm_last: "¿Marcar la última botella de \"{name}\" como bebida y eliminarla?",
   confirm_del: "¿Eliminar vino?",
@@ -3295,6 +3295,7 @@ sv: {
   toast_import_fail: "Import misslyckades",
   toast_csvfail: "CSV-import misslyckades",
   toast_xlsxfail: "Excel-import misslyckades",
+  toast_exportfail: "Exporten misslyckades",
   toast_moved: "Flyttad till källaren ✓",
   confirm_last: "Markera sista flaskan av \"{name}\" som drucken och ta bort?",
   confirm_del: "Ta bort vin?",
@@ -3562,6 +3563,7 @@ da: {
   toast_import_fail: "Fejl ved import",
   toast_csvfail: "Fejl ved CSV-import",
   toast_xlsxfail: "Fejl ved Excel-import",
+  toast_exportfail: "Eksport mislykkedes",
   toast_moved: "Flyttet til kælderen ✓",
   confirm_last: "Markér sidste flaske af \"{name}\" som drukket og fjern?",
   confirm_del: "Fjern vin?",
@@ -3829,6 +3831,7 @@ fi: {
   toast_import_fail: "Tuonti epäonnistui",
   toast_csvfail: "CSV-tuonti epäonnistui",
   toast_xlsxfail: "Excel-tuonti epäonnistui",
+  toast_exportfail: "Vienti epäonnistui",
   toast_moved: "Siirretty kellariin ✓",
   confirm_last: "Merkitäänkö viinin \"{name}\" viimeinen pullo juoduksi ja poistetaanko?",
   confirm_del: "Poistetaanko viini?",
@@ -4096,6 +4099,7 @@ ru: {
   toast_import_fail: "Ошибка импорта",
   toast_csvfail: "Ошибка импорта CSV",
   toast_xlsxfail: "Ошибка импорта Excel",
+  toast_exportfail: "Ошибка экспорта",
   toast_moved: "Перемещено в погреб ✓",
   confirm_last: "Отметить последнюю бутылку \"{name}\" как выпитую и удалить?",
   confirm_del: "Удалить вино?",
@@ -4363,6 +4367,7 @@ it: {
   toast_import_fail: "Errore nell'importazione",
   toast_csvfail: "Errore nell'importazione CSV",
   toast_xlsxfail: "Errore nell'importazione Excel",
+  toast_exportfail: "Esportazione non riuscita",
   toast_moved: "Spostato in cantina ✓",
   confirm_last: "Segnare l'ultima bottiglia di \"{name}\" come bevuta e rimuoverla?",
   confirm_del: "Rimuovere il vino?",
@@ -4630,6 +4635,7 @@ fr: {
   toast_import_fail: "Erreur lors de l'import",
   toast_csvfail: "Erreur lors de l'import CSV",
   toast_xlsxfail: "Erreur lors de l'import Excel",
+  toast_exportfail: "Échec de l'exportation",
   toast_moved: "Déplacé vers la cave ✓",
   confirm_last: "Marquer la dernière bouteille de « {name} » comme bue et la supprimer ?",
   confirm_del: "Supprimer le vin ?",
@@ -4897,6 +4903,7 @@ pl: {
   toast_import_fail: "Błąd importu",
   toast_csvfail: "Błąd importu CSV",
   toast_xlsxfail: "Błąd importu Excel",
+  toast_exportfail: "Eksport nie powiódł się",
   toast_moved: "Przeniesiono do piwnicy ✓",
   confirm_last: "Oznaczyć ostatnią butelkę \"{name}\" jako wypitą i usunąć?",
   confirm_del: "Usunąć wino?",
@@ -5164,6 +5171,7 @@ hu: {
   toast_import_fail: "Hiba az importnál",
   toast_csvfail: "Hiba a CSV-importnál",
   toast_xlsxfail: "Hiba az Excel-importnál",
+  toast_exportfail: "Az exportálás sikertelen",
   toast_moved: "Áthelyezve a pincébe ✓",
   confirm_last: "A(z) \"{name}\" utolsó palackját megivottként jelölöd és eltávolítod?",
   confirm_del: "Törlöd a bort?",
@@ -5431,6 +5439,7 @@ cs: {
   toast_import_fail: "Chyba při importu",
   toast_csvfail: "Chyba při importu CSV",
   toast_xlsxfail: "Chyba při importu Excelu",
+  toast_exportfail: "Export se nezdařil",
   toast_moved: "Přesunuto do sklepa ✓",
   confirm_last: "Označit poslední lahev \"{name}\" jako vypitou a odstranit?",
   confirm_del: "Odstranit víno?",
@@ -5698,6 +5707,7 @@ sk: {
   toast_import_fail: "Chyba pri importe",
   toast_csvfail: "Chyba pri importe CSV",
   toast_xlsxfail: "Chyba pri importe Excelu",
+  toast_exportfail: "Export zlyhal",
   toast_moved: "Presunuté do pivnice ✓",
   confirm_last: "Označiť poslednú fľašu \"{name}\" ako vypitú a odstrániť?",
   confirm_del: "Odstrániť víno?",
@@ -5965,6 +5975,7 @@ ro: {
   toast_import_fail: "Eroare la import",
   toast_csvfail: "Eroare la importul CSV",
   toast_xlsxfail: "Eroare la importul Excel",
+  toast_exportfail: "Exportul a eșuat",
   toast_moved: "Mutat în pivniță ✓",
   confirm_last: "Marchezi ultima sticlă de \"{name}\" ca băută și o elimini?",
   confirm_del: "Elimini vinul?",
@@ -6232,6 +6243,7 @@ hr: {
   toast_import_fail: "Pogreška pri uvozu",
   toast_csvfail: "Pogreška pri uvozu CSV-a",
   toast_xlsxfail: "Pogreška pri uvozu Excela",
+  toast_exportfail: "Izvoz nije uspio",
   toast_moved: "Premješteno u podrum ✓",
   confirm_last: "Označiti posljednju bocu \"{name}\" kao popijenu i ukloniti?",
   confirm_del: "Ukloniti vino?",
@@ -6499,6 +6511,7 @@ pt: {
   toast_import_fail: "Erro na importação",
   toast_csvfail: "Erro na importação CSV",
   toast_xlsxfail: "Erro na importação Excel",
+  toast_exportfail: "Falha na exportação",
   toast_moved: "Movido para a adega ✓",
   confirm_last: "Marcar a última garrafa de \"{name}\" como bebida e remover?",
   confirm_del: "Remover o vinho?",
@@ -6766,6 +6779,7 @@ no: {
   toast_import_fail: "Feil ved import",
   toast_csvfail: "Feil ved CSV-import",
   toast_xlsxfail: "Feil ved Excel-import",
+  toast_exportfail: "Eksporten mislyktes",
   toast_moved: "Flyttet til kjelleren ✓",
   confirm_last: "Markere siste flaske av \"{name}\" som drukket og fjerne?",
   confirm_del: "Fjerne vin?",
@@ -7033,6 +7047,7 @@ nl: {
   toast_import_fail: "Fout bij importeren",
   toast_csvfail: "Fout bij CSV-import",
   toast_xlsxfail: "Fout bij Excel-import",
+  toast_exportfail: "Exporteren mislukt",
   toast_moved: "Verplaatst naar de kelder ✓",
   confirm_last: "Laatste fles van \"{name}\" als gedronken markeren en verwijderen?",
   confirm_del: "Wijn verwijderen?",
@@ -8319,7 +8334,27 @@ function exportCSV() {
   showToast(t('toast_csv'));
 }
 
-function exportExcel() {
+// Export-Bibliotheken liegen lokal in lib/ und werden erst bei Bedarf geladen (kein CDN, offline nutzbar, schnellerer Start)
+const LIB_FILES = { xlsx: ['lib/xlsx.full.min.js'], pdf: ['lib/jspdf.umd.min.js', 'lib/jspdf.plugin.autotable.min.js'] };
+const libPromises = {};
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src; s.onload = resolve; s.onerror = () => reject(new Error('load ' + src));
+    document.head.appendChild(s);
+  });
+}
+function loadLib(name) {
+  if (!libPromises[name]) {
+    // Reihenfolge einhalten (autotable braucht jsPDF); bei Fehler erneuten Versuch erlauben
+    libPromises[name] = LIB_FILES[name].reduce((p, src) => p.then(() => loadScript(src)), Promise.resolve())
+      .catch((err) => { delete libPromises[name]; throw err; });
+  }
+  return libPromises[name];
+}
+
+async function exportExcel() {
+  try { await loadLib('xlsx'); } catch { showToast(t('toast_exportfail')); return; }
   const ws = XLSX.utils.aoa_to_sheet([EXPORT_HEADERS, ...exportRows()]);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Weinkeller');
@@ -8331,8 +8366,9 @@ function importExcel(e) {
   const file = e.target.files[0];
   if (!file) return;
   const r = new FileReader();
-  r.onload = ev => {
+  r.onload = async ev => {
     try {
+      await loadLib('xlsx');
       const wb = XLSX.read(new Uint8Array(ev.target.result), { type: 'array' });
       const sheet = wb.Sheets[wb.SheetNames[0]];
       const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
@@ -8349,7 +8385,8 @@ function importExcel(e) {
   r.readAsArrayBuffer(file);
 }
 
-function exportPDF() {
+async function exportPDF() {
+  try { await loadLib('pdf'); } catch { showToast(t('toast_exportfail')); return; }
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
   doc.setFontSize(18);
