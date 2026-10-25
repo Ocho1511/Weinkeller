@@ -1380,7 +1380,7 @@ input[type="file"] { display: none; }
     <p style="font-size:14px; line-height:1.5; color:var(--text-muted); margin:6px 0 14px" data-i18n="credits_empty_text">Deine inklusiven KI-Scans sind verbraucht. Lade Guthaben auf, um weiter Etiketten zu scannen und Weine nachzuschlagen. Alles andere in der App funktioniert weiter.</p>
     <div class="btn-row" style="flex-direction:column">
       <button class="btn-primary" id="credits-modal-topup" onclick="topUpCredits()" data-i18n="credits_topup">Guthaben aufladen</button>
-      <button class="btn-secondary" onclick="goToUnlock()" data-i18n="credits_have_code">Ich habe einen Freischaltcode</button>
+      <button class="btn-secondary" id="credits-modal-code" onclick="goToUnlock()" data-i18n="credits_have_code">Ich habe einen Freischaltcode</button>
       <button class="btn-secondary" onclick="closeModal('credits-modal')" data-i18n="credits_close">Schließen</button>
     </div>
   </div>
@@ -2069,6 +2069,11 @@ function isNativeApp() {
   try { return !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()); } catch (e) { return false; }
 }
 const IAP_ENABLED = false;   // auf true setzen, sobald der In-App-Kauf (StoreKit + /credits/redeem) in der App angebunden ist
+// Freischaltcode und versteckter Admin-Zugang in der NATIVEN App. Auf false setzen, falls Apple sie ablehnt
+// (Richtlinie 3.1.1 Freischaltmechanismen bzw. 2.3.1 versteckte Funktionen): dann verschwinden beide aus der Store-Version.
+// Die Web-Apps behalten beides immer.
+const NATIVE_UNLOCK_ADMIN = true;
+const unlockAdminAllowed = () => !isNativeApp() || NATIVE_UNLOCK_ADMIN;
 function updateCreditsUI() {
   const card = document.getElementById('credits-card');
   if (!card) return;
@@ -2081,7 +2086,7 @@ function updateCreditsUI() {
   const top = document.getElementById('credits-topup-card');
   if (top) top.style.display = (unl || !IAP_ENABLED) ? 'none' : 'flex';
   const unlockRow = document.getElementById('credits-unlock-row');
-  if (unlockRow) unlockRow.style.display = unl ? 'none' : 'flex';
+  if (unlockRow) unlockRow.style.display = (unl || !unlockAdminAllowed()) ? 'none' : 'flex';
   const dev = document.getElementById('credits-device');
   if (dev) dev.textContent = t('credits_device') + ' ' + getInstallId().slice(0, 8);
 }
@@ -2149,6 +2154,7 @@ async function aiFetch(url, init) {
 }
 function showCreditsModal() {
   const b = document.getElementById('credits-modal-topup'); if (b) b.style.display = IAP_ENABLED ? '' : 'none';
+  const cb = document.getElementById('credits-modal-code'); if (cb) cb.style.display = unlockAdminAllowed() ? '' : 'none';
   const m = document.getElementById('credits-modal'); if (m) m.classList.add('show');
 }
 function topUpCredits() { closeModal('credits-modal'); showToast(t('credits_topup_soon')); }
@@ -2178,6 +2184,7 @@ async function submitUnlock() {
 // ═══════════════════════════════════════
 let adminPw = '', adminTaps = 0, adminTapTimer = null;
 function adminTap() {
+  if (!unlockAdminAllowed()) return;
   adminTaps++;
   clearTimeout(adminTapTimer);
   adminTapTimer = setTimeout(() => { adminTaps = 0; }, 3000);
