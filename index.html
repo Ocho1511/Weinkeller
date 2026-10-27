@@ -1600,7 +1600,7 @@ function cleanWine(w, used) {
     locRegal: cleanText(w.locRegal, 60), locEbene: cleanSlot(w.locEbene), locPlatz: cleanSlot(w.locPlatz),
     location: cleanText(w.location, 200),
     drinkFrom: cleanInt(w.drinkFrom, 1000, 2300), drinkTo: cleanInt(w.drinkTo, 1000, 2300),
-    price: parsePrice(w.price), image: cleanImage(w.image),
+    price: parsePrice(w.price), image: cleanImage(w.image), imageUser: !!w.imageUser,
     rating: Math.min(5, Math.max(0, parseInt(w.rating) || 0)) || null,
     note: cleanText(w.note, 5000),
     added: /^\d{4}-\d\d-\d\dT[\d:.]+Z$/.test(String(w.added)) ? String(w.added) : new Date().toISOString()
@@ -2010,6 +2010,7 @@ async function vivinoImageFor(crit) {
 // Reihenfolge: Vivino-Flaschenbild (alle Kriterien gebündelt) → KI-Direktbild → og:image der Wein-Seite. Gibt nur eine NACHWEISLICH ladbare URL zurück (sonst null).
 // crit = { name, year, region, country, grape }
 async function resolveWineImage(info, crit) {
+  if (autoImagesOff()) return null;   // Store-Version: keine automatischen Fremdbilder
   const viv = await vivinoImageFor(crit);
   if (viv && await verifyImageLoads(viv)) return viv;
   if (info && isImageUrl(info.image) && await verifyImageLoads(info.image.trim())) return info.image.trim();
@@ -2186,6 +2187,16 @@ const iapAvailable = () => IAP_ENABLED && isNativeApp() && !!IAP_PLUGIN();
 // Preis schon in der Paketliste zeigen? In TestFlight/Sandbox lieferte Apple die Liste in US-Dollar (3,99 $), der Kaufdialog dann in Euro.
 // Solange das nicht in der echten App-Store-Version geprüft ist, zeigt die Liste keinen Preis; verbindlich ist der Apple-Kaufdialog.
 const IAP_SHOW_PRICE = false;
+// Automatisch gefundene Flaschenbilder (Vivino, KI-Bildsuche, Webseiten) gehören Dritten: in der bezahlten Store-Version werden sie weder geholt noch gezeigt.
+// Gezeigt werden dort nur Bilder, die der Nutzer selbst gesetzt hat (eigene Bild-Adresse oder Foto). Die Web-Apps bleiben unverändert.
+const NATIVE_FETCH_IMAGES = false;
+const autoImagesOff = () => isNativeApp() && !NATIVE_FETCH_IMAGES;
+function shownImage(w) {
+  const u = w && w.image;
+  if (!u) return '';
+  if (autoImagesOff() && !w.imageUser && !/^data:/i.test(u)) return '';
+  return u;
+}
 // Apple verlangt für appAccountToken eine UUID; unsere Installations-ID ist normalerweise eine. Sonst ohne Token kaufen (der Server akzeptiert beides).
 const appAccountTokenFor = (id) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id || '') ? id : null;
 let iapBusy = false, iapReadyPromise = null, lastIapRecover = 0;
@@ -2577,14 +2588,16 @@ async function enrichAllWines() {
       try {
         let changed = false;
         // 1) Flaschenbild zuerst (schnell, Vivino; alle Kriterien gebündelt) – damit Bilder zügig für JEDEN Wein erscheinen, sofort speichern
-        const newImg = await resolveWineImage(null, wineCriteria(w));
-        const curIsAuto = (w.image || '').includes('images.vivino.com');
-        if (newImg) {
-          if (newImg !== (w.image||'')) { w.image = newImg; changed = true; save(); }
-        } else if (curIsAuto) {
-          // Altes automatisches (Vivino-)Bild ohne passenden Treffer entfernen → Platzhalter statt falscher Flasche (manuell gesetzte Bilder bleiben)
-          w.image = null; changed = true; save();
-        }
+        if (!autoImagesOff()) {
+          const newImg = await resolveWineImage(null, wineCriteria(w));
+          const curIsAuto = (w.image || '').includes('images.vivino.com');
+          if (newImg) {
+            if (newImg !== (w.image||'')) { w.image = newImg; changed = true; save(); }
+          } else if (curIsAuto) {
+            // Altes automatisches (Vivino-)Bild ohne passenden Treffer entfernen → Platzhalter statt falscher Flasche (manuell gesetzte Bilder bleiben)
+            w.image = null; changed = true; save();
+          }
+        }   // Store-Version: Bilder bleiben unangetastet (auch von der Web-App synchronisierte)
         // 2) Langsamen KI-Websuche-Aufruf nur, wenn Textfelder fehlen (sonst überspringen → Lauf bleibt schnell)
         const needsFields = !w.region || !w.country || !w.grape || !w.drinkFrom || !w.drinkTo || !w.price;
         // Ist das KI-Guthaben aufgebraucht, werden die übrigen Weine nur noch mit Bildern bearbeitet (kostenlos)
@@ -2598,7 +2611,7 @@ async function enrichAllWines() {
             if (!w.drinkTo && info.drinkTo) { w.drinkTo = parseInt(info.drinkTo)||null; changed = true; }
             if (!w.price && info.price != null) { w.price = parseFloat(info.price)||null; changed = true; }
             // Falls Vivino kein Bild hatte: KI-Direktbild / og:image als Rückfall (mit jetzt ggf. ergänzten Kriterien)
-            if (!w.image) { const alt = await resolveWineImage(info, wineCriteria(w)); if (alt) { w.image = alt; changed = true; } }
+            if (!w.image && !autoImagesOff()) { const alt = await resolveWineImage(info, wineCriteria(w)); if (alt) { w.image = alt; changed = true; } }
           }
         }
         if (changed) { updated++; save(); }
@@ -7955,8 +7968,8 @@ function wineImgFallback(img) {
   a.replaceWith(span);
 }
 function wineImgHtml(w, cls) {
-  if (!w.image) return winePlaceholderHtml(cls);
-  const u = esc(w.image);
+  if (!shownImage(w)) return winePlaceholderHtml(cls);
+  const u = esc(shownImage(w));
   return `<a class="${cls}" href="${u}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(t('img_open'))}"><img src="${u}" alt="" loading="lazy" onerror="wineImgFallback(this)"></a>`;
 }
 // Karten-Link zur Weinregion (öffnet Karten-Suche nach "Region, Land")
@@ -8241,7 +8254,7 @@ function editWine(id) {
   document.getElementById('f-drink-from').value = w.drinkFrom||'';
   document.getElementById('f-drink-to').value = w.drinkTo||'';
   document.getElementById('f-price').value = w.price||'';
-  document.getElementById('f-image').value = w.image||'';
+  document.getElementById('f-image').value = shownImage(w) || '';
   updateImagePreview();
   document.getElementById('f-note').value = w.note||'';
   setStar(w.rating||0);
@@ -8278,6 +8291,13 @@ function setStar(n) {
 function saveWine() {
   const name = document.getElementById('f-name').value.trim();
   if (!name) { showToast(t('toast_name')); return; }
+  // Bild: in der Store-Version zählt nur, was der Nutzer selbst einträgt; ein dort ausgeblendetes (von der Web-App stammendes) Bild bleibt beim Speichern erhalten
+  let imgVal = document.getElementById('f-image').value.trim() || null, imgUser = false;
+  if (autoImagesOff()) {
+    const old = editId ? wines.find(w => w.id === editId) : null;
+    if (imgVal) imgUser = true;
+    else if (old && old.image) { imgVal = old.image; imgUser = !!old.imageUser; }
+  }
   const wine = cleanWine({
     id: editId || Date.now().toString(),
     name,
@@ -8294,7 +8314,8 @@ function saveWine() {
     drinkFrom: parseInt(document.getElementById('f-drink-from').value)||null,
     drinkTo: parseInt(document.getElementById('f-drink-to').value)||null,
     price: parseFloat(document.getElementById('f-price').value)||null,
-    image: document.getElementById('f-image').value.trim()||null,
+    image: imgVal,
+    imageUser: imgUser,
     rating: currentStar||null,
     note: document.getElementById('f-note').value.trim()||null,
     added: editId ? (wines.find(w=>w.id===editId)||{}).added : new Date().toISOString()
@@ -8707,18 +8728,18 @@ function isBottleCutout(u) { return /images\.vivino\.com\/thumbs\/[^"'\s]*_pb_/i
 // Die gezeichnete liegt als Rückfall darunter und wird erst ausgeblendet, wenn das Foto geladen ist.
 function bottleVisual(w, W, mode) {
   const svg = bottleSvg(TYPE_FILL[w.type] || TYPE_FILL.other, W, w, mode);
-  if (!isBottleCutout(w.image)) return svg;
+  if (!isBottleCutout(shownImage(w))) return svg;
   const H = Math.round(W * 22 / 60);
   const badge = (mode === 'year' && w.year) ? `<span class="bottle-year" style="display:none">${esc(String(w.year))}</span>` : '';
   return `<span class="bottle-photo" style="width:${W}px;height:${H}px">${svg}`
-    + `<img src="${esc(w.image)}" alt="" style="width:${H}px;height:${W}px" `
+    + `<img src="${esc(shownImage(w))}" alt="" style="width:${H}px;height:${W}px" `
     + `onload="var p=this.parentNode;p.firstElementChild.style.visibility='hidden';var b=p.querySelector('.bottle-year');if(b)b.style.display='block';var c=p.parentNode.querySelector('.bottle-cap');if(c)c.style.display='block'" onerror="this.remove()">${badge}</span>`;
 }
 // Große Flasche für die Vorschau (Antippen): echtes Foto, wenn vorhanden – mit Name/Jahrgang/Traube darunter
 // (auf dem Foto ist kein lesbarer Text); sonst die gezeichnete Flasche mit beschriftetem Etikett.
 function bottlePreviewHtml(w) {
   const vis = bottleVisual(w, 232, 'full');
-  if (!isBottleCutout(w.image)) return vis;
+  if (!isBottleCutout(shownImage(w))) return vis;
   const sub = [w.year, w.grape].filter(Boolean).join(' · ');
   return vis + `<div class="bottle-cap" style="display:none"><strong>${esc(w.name)}</strong>${sub ? `<span>${esc(sub)}</span>` : ''}</div>`;
 }
@@ -8780,7 +8801,7 @@ function renderRacks() {
   if (pickedW) {
     html += `<div class="rack-action-bar">
       <div class="rack-preview">${bottlePreviewHtml(pickedW)}</div>
-      <div class="rack-action-name">${isBottleCutout(pickedW.image) ? '' : esc(pickedW.name) + (pickedW.year ? ' · ' + pickedW.year : '')}<span${isBottleCutout(pickedW.image) ? ' style="margin-top:0;font-size:12px"' : ''}>${esc(formatLocation(pickedW))}</span></div>
+      <div class="rack-action-name">${isBottleCutout(shownImage(pickedW)) ? '' : esc(pickedW.name) + (pickedW.year ? ' · ' + pickedW.year : '')}<span${isBottleCutout(shownImage(pickedW)) ? ' style="margin-top:0;font-size:12px"' : ''}>${esc(formatLocation(pickedW))}</span></div>
       <div class="rack-action-btns">
         <button class="wine-btn" onclick="goToWine('${pickedW.id}')">${t('rack_open_wine')}</button>
         <button class="wine-btn danger" onclick="removeFromRack('${pickedW.id}')">${t('rack_remove')}</button>
