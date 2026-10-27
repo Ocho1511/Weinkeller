@@ -6,7 +6,9 @@
   h1{font-size:26px} h2{font-size:18px;margin-top:28px} small{color:#666}
   details{border:1px solid #ddd;border-radius:8px;padding:8px 12px;margin:8px 0} summary{cursor:pointer;font-weight:600}
   a{color:#0a58ca}
+  .back{display:none;margin:0 0 12px} @media (display-mode: standalone){.back{display:block}}
 </style></head><body>
+<p class="back"><a href="index.html" onclick="if(history.length>1){history.back();return false}">← Zurück zur App / Back to the app</a></p>
 
 <h1>Support – Weinkeller</h1>
 <p><small>Support for the Weinkeller app · Stand / Updated: 25. Oktober 2026</small></p>
@@ -44,4 +46,5 @@ Please include the app version and your device (e.g. iPhone 15, iOS 18). I usual
 <p><strong>Delete my data.</strong> Local data is removed when you delete the app. For cloud data or the AI credit record, email us with your sync code or the device ID from Setup → AI credits. See the <a href="datenschutz.html">privacy policy</a> (German).</p>
 
 <p style="margin-top:36px"><small>Weinkeller · Thomas Knecht · Scheidemannstr. 29 · 42781 Haan · Deutschland</small></p>
+<script>if(window.navigator.standalone){var b=document.querySelector(".back");if(b)b.style.display="block"}</script>
 </body></html>

@@ -5,7 +5,9 @@
   body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:720px;margin:0 auto;padding:24px 18px 60px;line-height:1.55;color:#222;background:#fff}
   h1{font-size:26px} h2{font-size:18px;margin-top:28px} .todo{background:#fff3cd;padding:2px 5px;border-radius:4px}
   small{color:#666}
+  .back{display:none;margin:0 0 12px} @media (display-mode: standalone){.back{display:block}}
 </style></head><body>
+<p class="back"><a href="index.html" onclick="if(history.length>1){history.back();return false}">← Zurück zur App / Back to the app</a></p>
 
 <h1>Datenschutzerklärung – Weinkeller</h1>
 <p><small>Stand: 25. Oktober 2026</small></p>
@@ -55,4 +57,5 @@ E-Mail: <a href="mailto:t.knecht@web.de">t.knecht@web.de</a></p>
 <h2>12. Änderungen</h2>
 <p>Wir passen diese Erklärung an, wenn sich die App ändert. Die aktuelle Fassung findest du unter dieser Adresse.</p>
 
+<script>if(window.navigator.standalone){var b=document.querySelector(".back");if(b)b.style.display="block"}</script>
 </body></html>
