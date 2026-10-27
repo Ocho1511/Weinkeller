@@ -2211,6 +2211,7 @@ async function loadAdminStats(pw) {
     if (r.status === 503) { showToast(j.error === 'not_configured' ? 'Admin-Passwort ist im Worker noch nicht gesetzt' : 'Speicher nicht erreichbar'); return false; }
     if (!r.ok || !j.ok) { showToast('Fehler beim Laden'); return false; }
     renderAdmin(j);
+    if (j.cost && j.cost.level && j.cost.level !== 'ok') showToast('Kostenwarnung: ≈ ' + j.cost.usd.toFixed(0) + ' $ von ' + j.cost.budgetUsd + ' $');
     return true;
   } catch (e) { showToast('Keine Verbindung'); return false; }
 }
@@ -2227,7 +2228,18 @@ function renderAdmin(j) {
   const tt = j.totals || {};
   const fmt = ts => ts ? new Date(ts).toLocaleString(dateLocale(), { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '–';
   const card = (big, label) => `<div class="stats-card"><div class="big">${big}</div><div class="label">${label}</div></div>`;
-  let html = `<div class="stats-grid">
+  // Kostenschätzung der KI für den laufenden Monat (aus den Antworten des Servers hochgerechnet; maßgeblich ist die Anthropic-Abrechnung)
+  let costHtml = '';
+  const cs = j.cost;
+  if (cs && typeof cs.usd === 'number') {
+    const col = cs.level === 'limit' ? '#c0392b' : cs.level === 'warn' ? '#e67e22' : 'var(--text-muted)';
+    const msg = cs.level === 'limit' ? 'Budget laut Schätzung erreicht: die KI kann jederzeit gesperrt werden.'
+      : cs.level === 'warn' ? 'Warnung: die Schätzung hat ' + cs.warnUsd + ' $ erreicht.' : '';
+    costHtml = '<div class="stats-card" style="border:1px solid ' + col + ';margin-bottom:10px"><div class="big" style="color:' + col + '">≈ ' + cs.usd.toFixed(2) + ' $</div>'
+      + '<div class="label">KI-Kosten ' + esc(cs.month) + ' (Schätzung, Budget ' + esc(cs.budgetUsd) + ' $; Vormonat ≈ ' + ((cs.previous && cs.previous.usd) || 0).toFixed(2) + ' $)</div>'
+      + (msg ? '<div style="margin-top:6px;font-weight:600;color:' + col + '">' + esc(msg) + '</div>' : '') + '</div>';
+  }
+  let html = costHtml + `<div class="stats-grid">
     ${card(tt.installs ?? 0, 'Installationen')}
     ${card(tt.active24h ?? 0, 'Aktiv (24 Std.)')}
     ${card(tt.active7d ?? 0, 'Aktiv (7 Tage)')}
