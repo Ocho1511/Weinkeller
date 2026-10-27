@@ -2183,6 +2183,9 @@ function showCreditsModal() {
 // fehl (offline, Serverfehler), bleibt der Kauf offen und wird beim nächsten Start bzw. beim Zurückkehren in die App nachgeholt.
 const IAP_PLUGIN = () => (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.NativePurchases) || null;
 const iapAvailable = () => IAP_ENABLED && isNativeApp() && !!IAP_PLUGIN();
+// Preis schon in der Paketliste zeigen? In TestFlight/Sandbox lieferte Apple die Liste in US-Dollar (3,99 $), der Kaufdialog dann in Euro.
+// Solange das nicht in der echten App-Store-Version geprüft ist, zeigt die Liste keinen Preis; verbindlich ist der Apple-Kaufdialog.
+const IAP_SHOW_PRICE = false;
 // Apple verlangt für appAccountToken eine UUID; unsere Installations-ID ist normalerweise eine. Sonst ohne Token kaufen (der Server akzeptiert beides).
 const appAccountTokenFor = (id) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id || '') ? id : null;
 let iapBusy = false, iapReadyPromise = null, lastIapRecover = 0;
@@ -2214,7 +2217,7 @@ async function topUpCredits() {
     const rows = (pk.products || []).filter((p) => byId[p.id]);
     if (!rows.length) throw new Error('no_products');
     list.innerHTML = rows.map((p) =>
-      '<button class="btn-primary iap-pkg" data-pid="' + esc(p.id) + '"><span>' + esc(t('iap_pkg', { n: p.credits })) + '</span><strong>' + esc(byId[p.id].priceString) + '</strong></button>').join('');
+      '<button class="btn-primary iap-pkg" data-pid="' + esc(p.id) + '"><span>' + esc(t('iap_pkg', { n: p.credits })) + '</span><strong>' + (IAP_SHOW_PRICE ? esc(byId[p.id].priceString) : '›') + '</strong></button>').join('');
     list.querySelectorAll('button[data-pid]').forEach((b) => { b.onclick = () => buyCredits(b.getAttribute('data-pid')); });
   } catch (e) {
     list.innerHTML = '<div class="iap-note">' + esc(t('iap_unavailable')) + '</div>';
