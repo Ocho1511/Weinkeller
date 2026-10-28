@@ -91,7 +91,7 @@ body {
   cursor: pointer;
   transition: color .2s;
 }
-.nav-btn > span:last-child { line-height: 1.15; word-break: break-word; }
+.nav-btn > span:last-child { line-height: 1.15; max-width: 100%; word-break: normal; overflow-wrap: normal; }
 .nav-btn.active { color: var(--gold); }
 .nav-icon { font-size: 19px; line-height: 1; }
 /* ── TABS ── */
@@ -3236,7 +3236,7 @@ es: {
   fav_sort_drunk: "🥂 Frecuencia",
   fav_none: "Ningún vino para esta selección.",
   nav_keller: "Bodega",
-  nav_stats: "Estadísticas",
+  nav_stats: "Datos",
   nav_ripe: "Madurez",
   nav_history: "Historial",
   nav_racks: "Estantes",
@@ -3522,12 +3522,12 @@ sv: {
   fav_none: "Inga viner för detta urval.",
   nav_keller: "Källare",
   nav_stats: "Statistik",
-  nav_ripe: "Dryckesmognad",
+  nav_ripe: "Mognad",
   nav_history: "Historik",
   nav_racks: "Hyllor",
   nav_wish: "Önskelista",
   nav_export: "Export/Import",
-  nav_setup: "Inställningar",
+  nav_setup: "Setup",
   racks_title: "Hyllor",
   racks_sub: "Källarplan",
   racks_none: "Inga hyllor definierade ännu.<br>Lägg till en under Inställningar → „Hyllor\".",
@@ -3807,12 +3807,12 @@ da: {
   fav_none: "Ingen vine for dette valg.",
   nav_keller: "Kælder",
   nav_stats: "Statistik",
-  nav_ripe: "Drikkemodenhed",
+  nav_ripe: "Modenhed",
   nav_history: "Historik",
   nav_racks: "Reoler",
   nav_wish: "Ønskeliste",
   nav_export: "Eksport/Import",
-  nav_setup: "Indstillinger",
+  nav_setup: "Opsætning",
   racks_title: "Reoler",
   racks_sub: "Kælderplan",
   racks_none: "Ingen reoler defineret endnu.<br>Tilføj en under Indstillinger → „Reoler\".",
@@ -4092,7 +4092,7 @@ fi: {
   fav_none: "Ei viinejä tälle valinnalle.",
   nav_keller: "Kellari",
   nav_stats: "Tilastot",
-  nav_ripe: "Juomakypsyys",
+  nav_ripe: "Kypsyys",
   nav_history: "Historia",
   nav_racks: "Hyllyt",
   nav_wish: "Toivelista",
@@ -4376,7 +4376,7 @@ ru: {
   fav_sort_drunk: "🥂 Частота",
   fav_none: "Нет вин для этого выбора.",
   nav_keller: "Погреб",
-  nav_stats: "Статистика",
+  nav_stats: "Итоги",
   nav_ripe: "Зрелость",
   nav_history: "История",
   nav_racks: "Полки",
@@ -4667,7 +4667,7 @@ it: {
   nav_racks: "Scaffali",
   nav_wish: "Lista desideri",
   nav_export: "Esporta/Importa",
-  nav_setup: "Impostazioni",
+  nav_setup: "Opzioni",
   racks_title: "Scaffali",
   racks_sub: "Piano cantina",
   racks_none: "Nessuno scaffale definito.<br>Aggiungine uno in Impostazioni → „Scaffali\".",
@@ -4946,7 +4946,7 @@ fr: {
   fav_sort_drunk: "🥂 Fréquence",
   fav_none: "Aucun vin pour cette sélection.",
   nav_keller: "Cave",
-  nav_stats: "Statistiques",
+  nav_stats: "Stats",
   nav_ripe: "Maturité",
   nav_history: "Historique",
   nav_racks: "Casiers",
@@ -5518,9 +5518,9 @@ hu: {
   nav_keller: "Pince",
   nav_stats: "Statisztika",
   nav_ripe: "Érettség",
-  nav_history: "Előzmények",
+  nav_history: "Napló",
   nav_racks: "Polcok",
-  nav_wish: "Kívánságlista",
+  nav_wish: "Kívánság",
   nav_export: "Export/Import",
   nav_setup: "Beállítások",
   racks_title: "Polcok",
@@ -6941,7 +6941,7 @@ pt: {
   fav_sort_drunk: "🥂 Frequência",
   fav_none: "Nenhum vinho para esta seleção.",
   nav_keller: "Adega",
-  nav_stats: "Estatísticas",
+  nav_stats: "Dados",
   nav_ripe: "Maturação",
   nav_history: "Histórico",
   nav_racks: "Prateleiras",
@@ -7227,12 +7227,12 @@ no: {
   fav_none: "Ingen viner for dette utvalget.",
   nav_keller: "Kjeller",
   nav_stats: "Statistikk",
-  nav_ripe: "Drikkemodning",
+  nav_ripe: "Modning",
   nav_history: "Historikk",
   nav_racks: "Hyller",
   nav_wish: "Ønskeliste",
   nav_export: "Eksport/Import",
-  nav_setup: "Innstillinger",
+  nav_setup: "Oppsett",
   racks_title: "Hyller",
   racks_sub: "Kjellerplan",
   racks_none: "Ingen hyller definert ennå.<br>Legg til én under Innstillinger → „Hyller\".",
@@ -7511,13 +7511,13 @@ nl: {
   fav_sort_drunk: "🥂 Frequentie",
   fav_none: "Geen wijnen voor deze selectie.",
   nav_keller: "Kelder",
-  nav_stats: "Statistieken",
-  nav_ripe: "Drinkrijpheid",
-  nav_history: "Geschiedenis",
+  nav_stats: "Cijfers",
+  nav_ripe: "Rijpheid",
+  nav_history: "Historie",
   nav_racks: "Rekken",
   nav_wish: "Verlanglijst",
   nav_export: "Export/Import",
-  nav_setup: "Instellingen",
+  nav_setup: "Opties",
   racks_title: "Rekken",
   racks_sub: "Kelderplan",
   racks_none: "Nog geen rekken gedefinieerd.<br>Voeg er een toe in Instellingen → „Rekken\".",
@@ -7774,6 +7774,20 @@ function buildTypeLabels() {
   return { alle:t('t_all'), rot:t('t_rot'), weiß:t('t_weiss'), rosé:t('t_rose'), sekt:t('t_sekt'), other:t('t_other') };
 }
 
+// Untere Leiste: Beschriftungen nie mitten im Wort umbrechen; zu lange Wörter (z. B. "Статистика", "Export/Import") werden verkleinert, bis sie passen
+function fitNavLabels() {
+  document.querySelectorAll('.nav-btn').forEach((btn) => {
+    const el = btn.querySelector('span:last-child');
+    if (!el) return;
+    el.style.fontSize = '';
+    el.textContent = el.textContent.replace(/\u200B/g, '').replace(/\//g, '/\u200B');   // nach "/" darf umbrochen werden ("Export/" + "Import")
+    let size = parseFloat(getComputedStyle(el).fontSize) || 9, guard = 0;
+    const room = () => btn.clientWidth - 4;
+    while (el.scrollWidth > room() && size > 8 && guard++ < 6) { size -= 0.5; el.style.fontSize = size + 'px'; }
+  });
+}
+window.addEventListener('resize', fitNavLabels);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitNavLabels);
 function applyI18n() {
   document.documentElement.lang = settings.lang;
   TYPE_LABELS = buildTypeLabels();
@@ -7786,6 +7800,7 @@ function applyI18n() {
   updateCreditsUI();
   applyFont();
   applyOwnerTitles();
+  fitNavLabels();
   const active = document.querySelector('.tab.active');
   if (active) {
     if (active.id === 'tab-keller') renderKeller();
