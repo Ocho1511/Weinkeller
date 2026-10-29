@@ -1,0 +1,23 @@
+Copyright (c) 2026 Thomas Knecht. All rights reserved.
+
+This software ("Weinkeller", including its source code, design, texts, icons
+and other assets) is proprietary. No licence is granted to copy, modify,
+merge, publish, distribute, sublicense, sell, or create derivative works of
+it, in whole or in part, without the prior written permission of the
+copyright holder.
+
+Viewing the source code in a web browser, which is technically possible
+because the web version is served publicly, does not grant any right to use
+it. The use of the Weinkeller name, logo and icons in other apps or
+publications is not permitted.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM THE
+USE OF THE SOFTWARE.
+
+Third-party components (for example the bundled fonts and libraries in the
+"fonts" and "lib" folders) remain under their own licences.
+
+Contact: Thomas Knecht, t.knecht@web.de
