@@ -515,7 +515,8 @@ body {
 .rack-grid { display: inline-grid; gap: 7px; }
 .rack-elabel { font-size: 10px; color: var(--text-dim); display: flex; align-items: center; justify-content: flex-end; padding-right: 4px; }
 .rack-collabel { font-size: 10px; color: var(--text-dim); text-align: center; }
-.rack-slot { width: 60px; height: 22px; }
+.rack-slot { width: 60px; height: 22px; position: relative; }
+.rack-slot-count { position: absolute; right: 2px; bottom: 1px; padding: 0 5px; border-radius: 7px; background: rgba(0,0,0,.7); color: #fff; font-size: 10px; font-weight: 700; line-height: 15px; pointer-events: none; }
 .rack-slot.filled { cursor: pointer; }
 .rack-empty { height: 15px; margin: 3px 0; border: 1.5px dashed var(--border); border-radius: 8px; }
 .rack-unassigned { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -538,7 +539,8 @@ body {
 .rack-action-btns { display: flex; gap: 8px; }
 .rack-slot.droppable { outline: 2px dashed var(--gold); outline-offset: 2px; border-radius: 6px; cursor: pointer; }
 .rack-slot.droppable .rack-empty { background: rgba(196,162,74,0.15); }
-.rack-add-row { display: flex; gap: 8px; margin-top: 10px; }
+.rack-add-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.rack-add-row #rack-new-cap { order: 2; flex: 1 1 100%; }
 .rack-add-row input { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 9px 10px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px; outline: none; min-width: 0; }
 .rack-add-row #rack-new-name { flex: 2; }
 .rack-add-row #rack-new-rows, .rack-add-row #rack-new-cols { flex: 1; }
@@ -1256,6 +1258,7 @@ input[type="file"] { display: none; }
         <input id="rack-new-name" type="text" placeholder="Regal-Name" data-i18n-ph="rack_ph_name">
         <input id="rack-new-rows" type="number" min="1" max="30" placeholder="Ebenen" data-i18n-ph="rack_ph_rows">
         <input id="rack-new-cols" type="number" min="1" max="40" placeholder="Plätze" data-i18n-ph="rack_ph_cols">
+        <input id="rack-new-cap" type="number" min="1" max="500" placeholder="Flaschen/Platz" data-i18n-ph="rack_ph_cap">
         <button class="mini-scan-btn" onclick="addRack()" title="Regal hinzufügen">＋</button>
       </div>
     </div>
@@ -1587,17 +1590,56 @@ function cleanSlot(v) {
   const n = parseInt(s);
   return /^\d+$/.test(s) && n >= 1 ? String(n) : s;
 }
+// ── Lagerplätze ──
+// Eine Flasche = ein Platz (Weinregal). Ein Platz kann mehrere Flaschen fassen, wenn das Regal eine Kapazität > 1 hat (Boden, Kiste).
+// Derselbe Wein darf an mehreren Orten liegen: `placements` hat einen Eintrag je eingelagerter Flasche {rack: Regal-ID, e: Ebene, p: Platz};
+// die Felder locRegal/locEbene/locPlatz spiegeln die erste Flasche (ältere App-Versionen und Exporte lesen nur diese).
+const DEFAULT_CELLAR_ID = 'c1';
+const ID_RE = /^[A-Za-z0-9_-]{1,40}$/;
+// Regal-ID aus dem Namen abgeleitet: alle Geräte (auch ältere Versionen ohne ID) kommen ohne Absprache auf dieselbe ID
+function rackIdFor(name) {
+  let h = 5381; const s = String(name || '');
+  for (let i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0;
+  return 'r' + h.toString(36);
+}
+function cleanPlacements(w, count) {
+  const out = [];
+  const add = (rack, e, p) => {
+    rack = cleanStr(rack, 40).trim(); e = parseInt(e); p = parseInt(p);
+    if (ID_RE.test(rack) && e >= 1 && e <= 999 && p >= 1 && p <= 999) out.push({ rack, e, p });
+  };
+  if (Array.isArray(w.placements)) {
+    w.placements.slice(0, 10000).forEach(x => { if (x && typeof x === 'object') add(x.rack, x.e, x.p); });
+  } else {
+    // Ältere Daten: nur der Lagerort der ersten Flasche, falls er ein echtes Regalfach bezeichnet
+    const name = cleanStr(w.locRegal, 60).trim(), e = cleanSlot(w.locEbene), p = cleanSlot(w.locPlatz);
+    if (name && /^\d+$/.test(e || '') && /^\d+$/.test(p || '')) add(rackIdFor(name), e, p);
+  }
+  return out.slice(0, count);
+}
+function cleanCellars(arr) {
+  const out = [], ids = new Set();
+  if (Array.isArray(arr)) arr.forEach(c => {
+    if (!c || typeof c !== 'object') return;
+    const id = cleanStr(c.id, 40).trim(), name = cleanStr(c.name, 60).trim();
+    if (ID_RE.test(id) && name && !ids.has(id)) { ids.add(id); out.push({ id, name }); }
+  });
+  if (!ids.has(DEFAULT_CELLAR_ID)) out.unshift({ id: DEFAULT_CELLAR_ID, name: 'Keller' });
+  return out;
+}
 function cleanWine(w, used) {
   if (!w || typeof w !== 'object' || Array.isArray(w)) return null;
   const name = cleanStr(w.name, 200).trim();
   if (!name) return null;
+  const count = Math.max(1, Math.min(9999, parseInt(w.count) || 1));
   return {
     id: cleanId(w.id, used), name,
     year: cleanInt(w.year, 1000, 2200),
-    count: Math.max(1, Math.min(9999, parseInt(w.count) || 1)),
+    count,
     type: VALID_TYPES.includes(w.type) ? w.type : 'other',
     region: cleanText(w.region, 120), country: cleanText(w.country, 120), grape: cleanText(w.grape, 120),
     locRegal: cleanText(w.locRegal, 60), locEbene: cleanSlot(w.locEbene), locPlatz: cleanSlot(w.locPlatz),
+    placements: cleanPlacements(w, count),
     location: cleanText(w.location, 200),
     drinkFrom: cleanInt(w.drinkFrom, 1000, 2300), drinkTo: cleanInt(w.drinkTo, 1000, 2300),
     price: parsePrice(w.price), image: cleanImage(w.image), imageUser: !!w.imageUser,
@@ -1637,14 +1679,34 @@ function cleanDrunk(arr) {
 }
 function cleanRacks(arr) {
   if (!Array.isArray(arr)) return [];
-  const names = new Set();
+  const names = new Set(), ids = new Set();
   return arr.map(r => {
     if (!r || typeof r !== 'object') return null;
     const name = cleanStr(r.name, 60).trim(), rows = cleanInt(r.rows, 1, 30), cols = cleanInt(r.cols, 1, 40);
     if (!name || !rows || !cols || names.has(name)) return null;
-    names.add(name);
-    return { name, rows, cols };
+    let id = cleanStr(r.id, 40).trim();
+    if (!ID_RE.test(id) || ids.has(id)) id = rackIdFor(name);
+    while (ids.has(id)) id += 'x';
+    names.add(name); ids.add(id);
+    const cellarId = cleanStr(r.cellarId, 40).trim();
+    const cap = cleanInt(r.cap, 1, 500) || 1;
+    // Einzelne Ebenen dürfen von den Standardwerten abweichen (z. B. unten Kisten mit Platz für 6, darüber einzelne Flaschen)
+    const lv = {};
+    if (r.lv && typeof r.lv === 'object' && !Array.isArray(r.lv)) {
+      Object.keys(r.lv).slice(0, 60).forEach(k => {
+        const e = parseInt(k), o = r.lv[k];
+        if (!(e >= 1 && e <= rows) || !o || typeof o !== 'object') return;
+        const c = cleanInt(o.cols, 1, 40) || cols, cp = cleanInt(o.cap, 1, 500) || cap;
+        if (c !== cols || cp !== cap) lv[e] = { cols: c, cap: cp };
+      });
+    }
+    return { id, name, rows, cols, cap, lv, cellarId: ID_RE.test(cellarId) ? cellarId : DEFAULT_CELLAR_ID };
   }).filter(Boolean);
+}
+// Jedes Regal gehört zu einem vorhandenen Keller (ein Keller = ein Raum mit mehreren Regalen)
+function fixRackCellars() {
+  const ids = new Set(settings.cellars.map(c => c.id));
+  settings.racks.forEach(r => { if (!ids.has(r.cellarId)) r.cellarId = DEFAULT_CELLAR_ID; });
 }
 // Gespeicherte Daten robust laden: beschädigter Speicher oder falsche Typen dürfen die App nicht lahmlegen.
 // Unlesbare Rohdaten bleiben unter "<Schlüssel>_corrupt" erhalten, damit sie sich retten lassen.
@@ -1672,8 +1734,10 @@ let drunkWines = cleanDrunk(safeParse(DRUNK_KEY, []));
 const DEFAULT_OWNER = "Ocho";
 const STAMP_KEY = 'weinkeller_v2_stamp';
 const SYNCBASE_KEY = 'weinkeller_v2_syncbase';
-let settings = Object.assign({currency:'€', lang:'de', racks:[], owner:'', storage:'local', syncCode:'', email:'', font:'inter'}, safeParse(SETTINGS_KEY, {}));
+let settings = Object.assign({currency:'€', lang:'de', racks:[], cellars:[], owner:'', storage:'local', syncCode:'', email:'', font:'inter'}, safeParse(SETTINGS_KEY, {}));
+settings.cellars = cleanCellars(settings.cellars);
 settings.racks = cleanRacks(settings.racks);
+fixRackCellars();
 let dataStamp = parseInt(localStorage.getItem(STAMP_KEY) || '0') || 0;    // Zeitpunkt der letzten Änderung hier
 let syncBase = parseInt(localStorage.getItem(SYNCBASE_KEY) || '0') || 0;  // Stand der Cloud beim letzten Abgleich
 let editId = null;
@@ -1702,7 +1766,7 @@ function touchData() {
 // CLOUD-SYNC (newest wins)
 // ═══════════════════════════════════════
 function collectData() {
-  return { wines, wishes, drunkWines, racks: settings.racks || [], owner: settings.owner || '' };
+  return { dv: 2, wines, wishes, drunkWines, racks: settings.racks || [], cellars: settings.cellars || [], owner: settings.owner || '' };
 }
 function persistAll() {
   safeSet(STORE_KEY, JSON.stringify(wines));
@@ -1714,7 +1778,9 @@ function persistAll() {
 function applyData(d) {
   if (!d || typeof d !== 'object') return;
   wines = cleanWines(d.wines); wishes = cleanWishes(d.wishes); drunkWines = cleanDrunk(d.drunkWines);
+  settings.cellars = cleanCellars(d.cellars);
   settings.racks = cleanRacks(d.racks);
+  fixRackCellars();
   settings.owner = cleanStr(d.owner, 60);
   persistAll();
 }
@@ -1728,8 +1794,11 @@ function mergeData(d) {
   wines = mergeById(wines, cleanWines(d.wines));
   wishes = mergeById(wishes, cleanWishes(d.wishes));
   drunkWines = mergeById(drunkWines, cleanDrunk(d.drunkWines));
-  const have = new Set(settings.racks.map(r => r.name));
-  settings.racks = settings.racks.concat(cleanRacks(d.racks).filter(r => !have.has(r.name)));
+  const haveN = new Set(settings.racks.map(r => r.name)), haveI = new Set(settings.racks.map(r => r.id));
+  settings.racks = settings.racks.concat(cleanRacks(d.racks).filter(r => !haveN.has(r.name) && !haveI.has(r.id)));
+  const haveC = new Set(settings.cellars.map(c => c.id));
+  settings.cellars = settings.cellars.concat(cleanCellars(d.cellars).filter(c => !haveC.has(c.id)));
+  fixRackCellars();
   if (!settings.owner && d.owner) settings.owner = cleanStr(d.owner, 60);
   persistAll();
 }
@@ -2884,6 +2953,10 @@ de: {
   toast_exportfail: "Export fehlgeschlagen",
   setup_privacy: "Datenschutzerklärung",
   setup_support: "Support & Hilfe",
+  rack_move: "Umlagern",
+  rack_move_hint: "Tippe ein freies Fach, um die Flasche dorthin zu legen.",
+  loc_open: "{n} nicht eingelagert",
+  rack_ph_cap: "Flaschen/Platz",
   sync_code_notfound: "Code nicht gefunden – bitte prüfen",
   toast_storage_full: "Speicher voll – Änderung konnte nicht gesichert werden",
   sync_merge_confirm: "Dieses Gerät enthält bereits {n} Weine. Mit den Cloud-Daten zusammenführen? (Abbrechen = nicht verbinden)",
@@ -3169,6 +3242,10 @@ en: {
   toast_exportfail: "Export failed",
   setup_privacy: "Privacy policy",
   setup_support: "Support & help",
+  rack_move: "Move",
+  rack_move_hint: "Tap a free slot to move the bottle there.",
+  loc_open: "{n} not stored",
+  rack_ph_cap: "Bottles/slot",
   sync_code_notfound: "Code not found – please check it",
   toast_storage_full: "Storage full – change could not be saved",
   sync_merge_confirm: "This device already has {n} wines. Merge them with the cloud data? (Cancel = do not connect)",
@@ -3454,6 +3531,10 @@ es: {
   toast_exportfail: "Error al exportar",
   setup_privacy: "Política de privacidad",
   setup_support: "Soporte y ayuda",
+  rack_move: "Mover",
+  rack_move_hint: "Toca un hueco libre para mover la botella.",
+  loc_open: "{n} sin colocar",
+  rack_ph_cap: "Botellas/hueco",
   sync_code_notfound: "Código no encontrado: compruébalo",
   toast_storage_full: "Almacenamiento lleno: no se pudo guardar el cambio",
   sync_merge_confirm: "Este dispositivo ya tiene {n} vinos. ¿Combinarlos con los datos de la nube? (Cancelar = no conectar)",
@@ -3739,6 +3820,10 @@ sv: {
   toast_exportfail: "Exporten misslyckades",
   setup_privacy: "Integritetspolicy",
   setup_support: "Support och hjälp",
+  rack_move: "Flytta",
+  rack_move_hint: "Tryck på ett ledigt fack för att flytta flaskan dit.",
+  loc_open: "{n} ej placerade",
+  rack_ph_cap: "Flaskor/plats",
   sync_code_notfound: "Koden hittades inte – kontrollera den",
   toast_storage_full: "Lagringsutrymmet är fullt – ändringen kunde inte sparas",
   sync_merge_confirm: "Den här enheten har redan {n} viner. Slå ihop med molndata? (Avbryt = anslut inte)",
@@ -4024,6 +4109,10 @@ da: {
   toast_exportfail: "Eksport mislykkedes",
   setup_privacy: "Privatlivspolitik",
   setup_support: "Support og hjælp",
+  rack_move: "Flyt",
+  rack_move_hint: "Tryk på et ledigt felt for at flytte flasken dertil.",
+  loc_open: "{n} ikke placeret",
+  rack_ph_cap: "Flasker/plads",
   sync_code_notfound: "Koden blev ikke fundet – tjek den",
   toast_storage_full: "Lageret er fuldt – ændringen kunne ikke gemmes",
   sync_merge_confirm: "Denne enhed har allerede {n} vine. Flet med clouddata? (Annuller = opret ikke forbindelse)",
@@ -4309,6 +4398,10 @@ fi: {
   toast_exportfail: "Vienti epäonnistui",
   setup_privacy: "Tietosuojaseloste",
   setup_support: "Tuki ja ohje",
+  rack_move: "Siirrä",
+  rack_move_hint: "Napauta vapaata paikkaa siirtääksesi pullon sinne.",
+  loc_open: "{n} sijoittamatta",
+  rack_ph_cap: "Pulloa/paikka",
   sync_code_notfound: "Koodia ei löytynyt – tarkista se",
   toast_storage_full: "Tallennustila täynnä – muutosta ei voitu tallentaa",
   sync_merge_confirm: "Tällä laitteella on jo {n} viiniä. Yhdistetäänkö pilvidataan? (Peruuta = älä yhdistä)",
@@ -4594,6 +4687,10 @@ ru: {
   toast_exportfail: "Ошибка экспорта",
   setup_privacy: "Политика конфиденциальности",
   setup_support: "Поддержка и помощь",
+  rack_move: "Переместить",
+  rack_move_hint: "Нажмите на свободное место, чтобы переложить бутылку.",
+  loc_open: "{n} не размещено",
+  rack_ph_cap: "Бутылок/место",
   sync_code_notfound: "Код не найден – проверьте его",
   toast_storage_full: "Память заполнена – изменение не сохранено",
   sync_merge_confirm: "На этом устройстве уже {n} вин. Объединить с данными облака? (Отмена = не подключать)",
@@ -4879,6 +4976,10 @@ it: {
   toast_exportfail: "Esportazione non riuscita",
   setup_privacy: "Informativa sulla privacy",
   setup_support: "Supporto e assistenza",
+  rack_move: "Sposta",
+  rack_move_hint: "Tocca un posto libero per spostare la bottiglia.",
+  loc_open: "{n} non riposte",
+  rack_ph_cap: "Bottiglie/posto",
   sync_code_notfound: "Codice non trovato – controllalo",
   toast_storage_full: "Memoria piena: impossibile salvare la modifica",
   sync_merge_confirm: "Questo dispositivo contiene già {n} vini. Unirli ai dati cloud? (Annulla = non collegare)",
@@ -5164,6 +5265,10 @@ fr: {
   toast_exportfail: "Échec de l'exportation",
   setup_privacy: "Politique de confidentialité",
   setup_support: "Assistance et aide",
+  rack_move: "Déplacer",
+  rack_move_hint: "Touchez un emplacement libre pour y déplacer la bouteille.",
+  loc_open: "{n} non rangées",
+  rack_ph_cap: "Bouteilles/empl.",
   sync_code_notfound: "Code introuvable – vérifiez-le",
   toast_storage_full: "Stockage plein : la modification n'a pas pu être enregistrée",
   sync_merge_confirm: "Cet appareil contient déjà {n} vins. Fusionner avec les données du cloud ? (Annuler = ne pas connecter)",
@@ -5449,6 +5554,10 @@ pl: {
   toast_exportfail: "Eksport nie powiódł się",
   setup_privacy: "Polityka prywatności",
   setup_support: "Wsparcie i pomoc",
+  rack_move: "Przenieś",
+  rack_move_hint: "Dotknij wolnego miejsca, aby przenieść butelkę.",
+  loc_open: "{n} nieułożone",
+  rack_ph_cap: "Butelek/miejsce",
   sync_code_notfound: "Nie znaleziono kodu – sprawdź go",
   toast_storage_full: "Pamięć pełna – nie udało się zapisać zmiany",
   sync_merge_confirm: "To urządzenie ma już {n} win. Połączyć z danymi z chmury? (Anuluj = nie łącz)",
@@ -5734,6 +5843,10 @@ hu: {
   toast_exportfail: "Az exportálás sikertelen",
   setup_privacy: "Adatvédelmi nyilatkozat",
   setup_support: "Támogatás és súgó",
+  rack_move: "Áthelyez",
+  rack_move_hint: "Érintsen meg egy szabad helyet, hogy oda tegye az üveget.",
+  loc_open: "{n} nincs elhelyezve",
+  rack_ph_cap: "Üveg/hely",
   sync_code_notfound: "A kód nem található – ellenőrizd",
   toast_storage_full: "A tárhely megtelt – a módosítást nem sikerült menteni",
   sync_merge_confirm: "Ezen az eszközön már {n} bor van. Egyesíted a felhőadatokkal? (Mégse = ne kapcsolódjon)",
@@ -6019,6 +6132,10 @@ cs: {
   toast_exportfail: "Export se nezdařil",
   setup_privacy: "Zásady ochrany osobních údajů",
   setup_support: "Podpora a nápověda",
+  rack_move: "Přesunout",
+  rack_move_hint: "Klepněte na volné místo a láhev se tam přesune.",
+  loc_open: "{n} neuloženo",
+  rack_ph_cap: "Lahví/místo",
   sync_code_notfound: "Kód nebyl nalezen – zkontrolujte jej",
   toast_storage_full: "Úložiště je plné – změnu se nepodařilo uložit",
   sync_merge_confirm: "Toto zařízení už obsahuje {n} vín. Sloučit s daty v cloudu? (Zrušit = nepřipojovat)",
@@ -6304,6 +6421,10 @@ sk: {
   toast_exportfail: "Export zlyhal",
   setup_privacy: "Zásady ochrany osobných údajov",
   setup_support: "Podpora a pomoc",
+  rack_move: "Presunúť",
+  rack_move_hint: "Ťuknite na voľné miesto a fľaša sa tam presunie.",
+  loc_open: "{n} neuložených",
+  rack_ph_cap: "Fliaš/miesto",
   sync_code_notfound: "Kód sa nenašiel – skontrolujte ho",
   toast_storage_full: "Úložisko je plné – zmenu sa nepodarilo uložiť",
   sync_merge_confirm: "Toto zariadenie už obsahuje {n} vín. Zlúčiť s údajmi v cloude? (Zrušiť = nepripájať)",
@@ -6589,6 +6710,10 @@ ro: {
   toast_exportfail: "Exportul a eșuat",
   setup_privacy: "Politica de confidențialitate",
   setup_support: "Asistență și ajutor",
+  rack_move: "Mută",
+  rack_move_hint: "Atinge un loc liber pentru a muta sticla acolo.",
+  loc_open: "{n} neașezate",
+  rack_ph_cap: "Sticle/loc",
   sync_code_notfound: "Codul nu a fost găsit – verifică-l",
   toast_storage_full: "Spațiu plin – modificarea nu a putut fi salvată",
   sync_merge_confirm: "Acest dispozitiv conține deja {n} vinuri. Le combini cu datele din cloud? (Anulare = nu conecta)",
@@ -6874,6 +6999,10 @@ hr: {
   toast_exportfail: "Izvoz nije uspio",
   setup_privacy: "Pravila privatnosti",
   setup_support: "Podrška i pomoć",
+  rack_move: "Premjesti",
+  rack_move_hint: "Dodirni slobodno mjesto da premjestiš bocu.",
+  loc_open: "{n} nije pohranjeno",
+  rack_ph_cap: "Boca/mjesto",
   sync_code_notfound: "Kod nije pronađen – provjerite ga",
   toast_storage_full: "Pohrana je puna – promjena nije spremljena",
   sync_merge_confirm: "Ovaj uređaj već ima {n} vina. Spojiti s podacima iz oblaka? (Odustani = ne povezuj)",
@@ -7159,6 +7288,10 @@ pt: {
   toast_exportfail: "Falha na exportação",
   setup_privacy: "Política de privacidade",
   setup_support: "Suporte e ajuda",
+  rack_move: "Mover",
+  rack_move_hint: "Toque num lugar livre para mover a garrafa.",
+  loc_open: "{n} por arrumar",
+  rack_ph_cap: "Garrafas/lugar",
   sync_code_notfound: "Código não encontrado – verifique-o",
   toast_storage_full: "Armazenamento cheio – não foi possível guardar a alteração",
   sync_merge_confirm: "Este dispositivo já tem {n} vinhos. Combinar com os dados da nuvem? (Cancelar = não ligar)",
@@ -7444,6 +7577,10 @@ no: {
   toast_exportfail: "Eksporten mislyktes",
   setup_privacy: "Personvernerklæring",
   setup_support: "Support og hjelp",
+  rack_move: "Flytt",
+  rack_move_hint: "Trykk på en ledig plass for å flytte flasken dit.",
+  loc_open: "{n} ikke plassert",
+  rack_ph_cap: "Flasker/plass",
   sync_code_notfound: "Koden ble ikke funnet – sjekk den",
   toast_storage_full: "Lagringen er full – endringen kunne ikke lagres",
   sync_merge_confirm: "Denne enheten har allerede {n} viner. Slå sammen med skydata? (Avbryt = ikke koble til)",
@@ -7729,6 +7866,10 @@ nl: {
   toast_exportfail: "Exporteren mislukt",
   setup_privacy: "Privacybeleid",
   setup_support: "Support en hulp",
+  rack_move: "Verplaats",
+  rack_move_hint: "Tik op een vrije plek om de fles daarheen te verplaatsen.",
+  loc_open: "{n} niet opgeborgen",
+  rack_ph_cap: "Flessen/plek",
   sync_code_notfound: "Code niet gevonden – controleer hem",
   toast_storage_full: "Opslag vol – wijziging kon niet worden opgeslagen",
   sync_merge_confirm: "Dit apparaat bevat al {n} wijnen. Samenvoegen met de clouddata? (Annuleren = niet verbinden)",
@@ -7765,7 +7906,7 @@ nl: {
 };
 
 function t(key, vars) {
-  let s = (I18N[settings.lang] && I18N[settings.lang][key]) ?? I18N.de[key] ?? key;
+  let s = (I18N[settings.lang] && I18N[settings.lang][key]) ?? (I18N.en && I18N.en[key]) ?? I18N.de[key] ?? key;
   if (vars) Object.entries(vars).forEach(([k,v]) => { s = s.split('{'+k+'}').join(v); });
   return s;
 }
@@ -7960,11 +8101,21 @@ function typeGrape(w) { return `<span class="wine-type-grape" title="${esc(TYPE_
 let TYPE_LABELS = buildTypeLabels();
 
 function formatLocation(w) {
+  const vp = validPlacements(w), open = unplacedCount(w);
+  const suffix = vp.length && open > 0 ? ' · ' + t('loc_open', { n: open }) : '';
+  if (vp.length > 1) {
+    const byRack = new Map();
+    vp.forEach(x => {
+      const name = rackById(x.rack).name, m = byRack.get(name) || new Map(), k = 'E' + x.e + '/P' + x.p;
+      m.set(k, (m.get(k) || 0) + 1); byRack.set(name, m);
+    });
+    return [...byRack].map(([name, m]) => 'Regal ' + name + ': ' + [...m].map(([k, n]) => k + (n > 1 ? ' ×' + n : '')).join(', ')).join(' · ') + suffix;
+  }
   const parts = [];
   if (w.locRegal) parts.push('Regal ' + w.locRegal);
   if (w.locEbene) parts.push('Ebene ' + w.locEbene);
   if (w.locPlatz) parts.push('Platz ' + w.locPlatz);
-  return parts.length ? parts.join(' · ') : (w.location || '');
+  return (parts.length ? parts.join(' · ') : (w.location || '')) + suffix;
 }
 
 // Klickbares Flaschenbild (Link öffnet das Foto); bricht sauber weg, wenn URL tot ist
@@ -8164,7 +8315,7 @@ function confirmDrink() {
   const companions = document.getElementById('drink-with').value.trim();
   const occasions = [...document.querySelectorAll('#drink-occasions .occ-chip.active')].map(c => c.getAttribute('data-occ'));
   if ((w.count||1) <= 1) wines = wines.filter(x => x.id !== drinkId);
-  else w.count = (w.count||1) - 1;
+  else { w.count = (w.count||1) - 1; if ((w.placements||[]).length > w.count) setPlacements(w, validPlacements(w)); }
   recordDrunk(w, companions, occasions);
   save(); saveDrunk();
   closeModal('drink-modal');
@@ -8335,12 +8486,31 @@ function saveWine() {
     note: document.getElementById('f-note').value.trim()||null,
     added: editId ? (wines.find(w=>w.id===editId)||{}).added : new Date().toISOString()
   });
-  // Ein Lagerplatz darf nur einen Wein tragen (sonst verschwindet einer der beiden im Regal)
-  if (wine.locRegal && wine.locEbene && wine.locPlatz && settings.racks.some(r => r.name === wine.locRegal)) {
-    const clash = wineAt(wine.locRegal, wine.locEbene, wine.locPlatz);
-    if (clash && clash.id !== wine.id && !(!editId && clash.name.toLowerCase().trim() === wine.name.toLowerCase().trim() && (clash.year||null) === (wine.year||null))) {
-      showToast(t('toast_slot_taken', { w: clash.name })); return;
+  // Ort der ersten Flasche kommt aus dem Formular; weitere Flaschen (placements) bleiben beim Bearbeiten erhalten.
+  // Ein Platz fasst so viele Flaschen, wie das Regal erlaubt (Weinregal: 1, Boden/Kiste: mehr).
+  const oldWine = editId ? wines.find(w => w.id === editId) : null;
+  const sameWineName = (a, b) => a.name.toLowerCase().trim() === b.name.toLowerCase().trim() && (a.year||null) === (b.year||null);
+  const sameSlot = (a, b) => !!a && !!b && a.rack === b.rack && a.e === b.e && a.p === b.p;
+  const nz = v => v || null;
+  const locUnchanged = !!oldWine && nz(wine.locRegal) === nz(oldWine.locRegal) && nz(wine.locEbene) === nz(oldWine.locEbene) && nz(wine.locPlatz) === nz(oldWine.locPlatz);
+  let list = oldWine ? validPlacements(oldWine) : [];
+  if (locUnchanged) {
+    wine.placements = (oldWine.placements || []).slice(0, wine.count);
+  } else {
+    const typedRack = settings.racks.find(r => r.name === wine.locRegal);
+    const te = parseInt(wine.locEbene), tp = parseInt(wine.locPlatz);
+    const typed = typedRack && te >= 1 && te <= typedRack.rows && tp >= 1 && tp <= rackCols(typedRack, te) ? { rack: typedRack.id, e: te, p: tp } : null;
+    if (typed && !sameSlot(typed, list[0])) {
+      const entries = slotMapFor(typed.rack).get(typed.e + '|' + typed.p) || [];
+      const used = entries.filter(x => x.w.id !== wine.id).length + list.slice(1).filter(x => sameSlot(x, typed)).length;
+      if (used >= rackCap(typedRack, typed.e)) {
+        const clash = (entries.find(x => x.w.id !== wine.id) || entries[0] || {}).w;
+        // Neuer Eintrag desselben Weins darf sich den Platz teilen (wird unten zusammengeführt)
+        if (!(clash && !editId && sameWineName(clash, wine))) { showToast(t('toast_slot_taken', { w: clash ? clash.name : '' })); return; }
+      }
     }
+    list = typed ? [typed].concat(list.slice(1)) : list.slice(1);
+    if (list.length) setPlacements(wine, list); else wine.placements = [];
   }
   if (editId) {
     wines = wines.map(w => w.id === editId ? wine : w);
@@ -8353,6 +8523,8 @@ function saveWine() {
       ['region','country','grape','locRegal','locEbene','locPlatz','drinkFrom','drinkTo','price','image','rating','note'].forEach(k => {
         if (!existing[k] && wine[k]) existing[k] = wine[k];
       });
+      const addPl = (wine.placements || []).filter(x => { const rr = rackById(x.rack); return rr && (slotMapFor(x.rack).get(x.e + '|' + x.p) || []).length < rackCap(rr, x.e); });
+      if (addPl.length) setPlacements(existing, validPlacements(existing).concat(addPl));
       showToast(t('toast_count', {n: existing.count}));
     } else {
       wines.push(wine);
@@ -8645,41 +8817,108 @@ function saveHistoryEdit() {
 // ═══════════════════════════════════════
 const TYPE_FILL = { rot:'var(--wine-light)', 'weiß':'var(--white-wine)', 'rosé':'var(--rose)', sekt:'var(--sparkling)', other:'var(--text-muted)' };
 let rackActive = 0;
-let rackSelectedWineId = null;  // für „Tippen zum Platzieren"
-let rackFilledWineId = null;    // belegtes Fach, das gerade markiert ist (zum Entfernen)
+let rackSelectedWineId = null;  // Wein aus „Nicht zugeordnet", der gerade eingeräumt wird
+let rackFilledSlot = null;      // markiertes belegtes Fach {rack, e, p}
+let rackMove = null;            // Flasche, die gerade umgelagert wird {id, rack, e, p}
+function rackById(id) { return settings.racks.find(r => r.id === id) || null; }
+// Plätze pro Ebene und Flaschen pro Platz: Standard des Regals, je Ebene überschreibbar (r.lv[Ebene])
+function rackCols(r, e) { return (r.lv && r.lv[e] && r.lv[e].cols) || r.cols; }
+function rackCap(r, e) { return (r && ((r.lv && r.lv[e] && r.lv[e].cap) || r.cap)) || 1; }
+function rackMaxCols(r) { let m = r.cols; for (let e = 1; e <= r.rows; e++) m = Math.max(m, rackCols(r, e)); return m; }
+// Plätze eines Weins, die es wirklich gibt (Regal vorhanden, Fach liegt im Regal)
+function validPlacements(w) {
+  return (w.placements || []).filter(x => { const r = rackById(x.rack); return r && x.e <= r.rows && x.p <= rackCols(r, x.e); });
+}
+function unplacedCount(w) { return Math.max(0, (w.count || 1) - validPlacements(w).length); }
+// Belegung eines Regals: "Ebene|Platz" -> [{w, i}], ein Eintrag je Flasche
+function slotMapFor(rackId) {
+  const m = new Map();
+  wines.forEach(w => (w.placements || []).forEach((x, i) => {
+    if (x.rack !== rackId) return;
+    const k = x.e + '|' + x.p;
+    if (!m.has(k)) m.set(k, []);
+    m.get(k).push({ w, i });
+  }));
+  return m;
+}
+// Plätze setzen und die Altfelder (erste Flasche) mitführen
+function setPlacements(w, list) {
+  w.placements = list.slice(0, Math.max(1, w.count || 1));
+  const f = w.placements[0], r = f && rackById(f.rack);
+  if (r) { w.locRegal = r.name; w.locEbene = String(f.e); w.locPlatz = String(f.p); }
+  else if (!f) { w.locRegal = null; w.locEbene = null; w.locPlatz = null; w.location = null; }
+}
 function selectRackWine(id) {
   rackSelectedWineId = (rackSelectedWineId === id) ? null : id;
-  rackFilledWineId = null;
+  rackFilledSlot = null; rackMove = null;
   renderRacks();
 }
 // Belegtes Fach antippen: markieren / Markierung aufheben
-function selectFilledSlot(id) {
-  rackFilledWineId = (rackFilledWineId === id) ? null : id;
-  rackSelectedWineId = null;
+function selectFilledSlot(e, p) {
+  const r = settings.racks[rackActive];
+  if (!r) return;
+  const same = rackFilledSlot && rackFilledSlot.rack === r.id && rackFilledSlot.e === e && rackFilledSlot.p === p;
+  rackFilledSlot = same ? null : { rack: r.id, e, p };
+  rackSelectedWineId = null; rackMove = null;
   renderRacks();
 }
-// Wein wieder aus seinem Fach nehmen (landet zurück bei „Nicht zugeordnet")
+// Eine Flasche des Weins aus dem markierten Fach nehmen (landet zurück bei „Nicht zugeordnet")
 function removeFromRack(id) {
-  const w = wines.find(x => x.id === id);
-  if (!w) { rackFilledWineId = null; renderRacks(); return; }
-  w.locRegal = null; w.locEbene = null; w.locPlatz = null; w.location = null;
+  const w = wines.find(x => x.id === id), s = rackFilledSlot;
+  if (!w || !s) { rackFilledSlot = null; renderRacks(); return; }
+  const list = validPlacements(w);
+  const i = list.findIndex(x => x.rack === s.rack && x.e === s.e && x.p === s.p);
+  if (i >= 0) list.splice(i, 1);
+  setPlacements(w, list);
   save();
-  rackFilledWineId = null;
+  rackFilledSlot = null;
   renderRacks();
   showToast(t('toast_rack_removed', { name: w.name }));
 }
-function placeRackWine(e, p) {
-  if (!rackSelectedWineId) return;
-  const r = settings.racks[rackActive];
-  if (!r || wineAt(r.name, e, p)) return;   // nur freie Fächer
-  const w = wines.find(x => x.id === rackSelectedWineId);
-  if (!w) { rackSelectedWineId = null; renderRacks(); return; }
-  w.locRegal = r.name; w.locEbene = String(e); w.locPlatz = String(p);
-  save();
-  rackSelectedWineId = null;
+// Umlagern: erst die Flasche im Fach wählen („Umlagern"), dann ein freies Fach (auch in einem anderen Regal) antippen
+function startMove(id) {
+  if (!rackFilledSlot) return;
+  rackMove = { id, rack: rackFilledSlot.rack, e: rackFilledSlot.e, p: rackFilledSlot.p };
+  rackFilledSlot = null;
   renderRacks();
-  showToast(t('toast_rack_placed', { rack: r.name, e: e, p: p }));
 }
+function cancelMove() { rackMove = null; renderRacks(); }
+// Fach antippen: umlagern, einräumen oder (belegt) markieren
+function slotClick(e, p) {
+  const r = settings.racks[rackActive];
+  if (!r) return;
+  const entries = slotMapFor(r.id).get(e + '|' + p) || [];
+  if (p > rackCols(r, e)) return;
+  const free = rackCap(r, e) - entries.length;
+  if (rackMove) {
+    if (rackMove.rack === r.id && rackMove.e === e && rackMove.p === p) { cancelMove(); return; }
+    if (free < 1) return;
+    const m = rackMove, w = wines.find(x => x.id === m.id);
+    rackMove = null;
+    if (w) {
+      const list = validPlacements(w);
+      const i = list.findIndex(x => x.rack === m.rack && x.e === m.e && x.p === m.p);
+      if (i >= 0) { list[i] = { rack: r.id, e, p }; setPlacements(w, list); save(); showToast(t('toast_rack_placed', { rack: r.name, e: e, p: p })); }
+    }
+    renderRacks();
+    return;
+  }
+  if (rackSelectedWineId && free > 0) {
+    const w = wines.find(x => x.id === rackSelectedWineId);
+    const n = w ? Math.min(free, unplacedCount(w)) : 0;
+    if (!w || n < 1) { rackSelectedWineId = null; renderRacks(); return; }
+    const list = validPlacements(w);
+    for (let k = 0; k < n; k++) list.push({ rack: r.id, e, p });   // Kiste/Boden: so viele Flaschen wie passen
+    setPlacements(w, list);
+    save();
+    if (unplacedCount(w) < 1) rackSelectedWineId = null;
+    renderRacks();
+    showToast(t('toast_rack_placed', { rack: r.name, e: e, p: p }));
+    return;
+  }
+  if (entries.length) selectFilledSlot(e, p);
+}
+
 // Liegende Flasche (Boden links, Hals rechts): Glaskörper in Typ-Farbe mit Schulter, Hals, Folienkapsel,
 // Papieretikett sowie Glanz oben und Schatten unten. Verläufe liegen einmal gemeinsam in #bottle-defs.
 const BOTTLE_BODY = 'M5 3 H33 C40.5 3 42.5 8.5 47 8.5 H53 V13.5 H47 C42.5 13.5 40.5 19 33 19 H5 C2.6 19 1 17 1 14.5 V7.5 C1 5 2.6 3 5 3 Z';
@@ -8758,17 +8997,6 @@ function bottlePreviewHtml(w) {
   const sub = [w.year, w.grape].filter(Boolean).join(' · ');
   return vis + `<div class="bottle-cap" style="display:none"><strong>${esc(w.name)}</strong>${sub ? `<span>${esc(sub)}</span>` : ''}</div>`;
 }
-function wineAt(rackName, e, p) {
-  return wines.find(w => (w.locRegal||'') === rackName && parseInt(w.locEbene) === parseInt(e) && parseInt(w.locPlatz) === parseInt(p));
-}
-function isPlaced(w) {
-  if (!w.locRegal || !w.locEbene || !w.locPlatz) return false;
-  const r = settings.racks.find(r => r.name === w.locRegal);
-  if (!r) return false;
-  const e = parseInt(w.locEbene), p = parseInt(w.locPlatz);
-  return e >= 1 && e <= r.rows && p >= 1 && p <= r.cols;
-}
-
 function renderRacks() {
   const chips = document.getElementById('rack-chips');
   const el = document.getElementById('racks-content');
@@ -8782,9 +9010,11 @@ function renderRacks() {
   chips.innerHTML = racks.map((r,i) => `<button class="filter-chip ${i===rackActive?'active':''}" onclick="setRackActive(${i})">${esc(r.name)}</button>`).join('');
 
   const r = racks[rackActive];
-  const total = r.rows * r.cols;
-  let filled = 0;
-  for (let e=1;e<=r.rows;e++) for (let p=1;p<=r.cols;p++) if (wineAt(r.name,e,p)) filled++;
+  const maxCols = rackMaxCols(r);
+  const map = slotMapFor(r.id);
+  let total = 0, filled = 0;
+  for (let e = 1; e <= r.rows; e++) total += rackCols(r, e) * rackCap(r, e);
+  map.forEach((v, k) => { const [e, p] = k.split('|'); if (+e <= r.rows && +p <= rackCols(r, +e)) filled += v.length; });
 
   let html = `<div class="rack-box"><div class="rack-box-title">${esc(r.name)}</div><div class="rack-box-sub">${filled} / ${total} ${t('racks_filled')}</div>`;
   // Flaschengröße an die Spaltenzahl anpassen (60–96 px); ab 76 px steht der Jahrgang auf dem Etikett
@@ -8792,75 +9022,102 @@ function renderRacks() {
   const elCs = getComputedStyle(el);
   const innerW = (el.clientWidth || 360) - (parseFloat(elCs.paddingLeft) || 0) - (parseFloat(elCs.paddingRight) || 0);
   const availW = Math.max(240, innerW - 2 - 28 - 28);
-  const slotW = Math.max(60, Math.min(96, Math.floor((availW - 7 * r.cols) / r.cols)));
+  const slotW = Math.max(60, Math.min(96, Math.floor((availW - 7 * maxCols) / maxCols)));
   const slotH = Math.round(slotW * 22 / 60);
   const slotMode = slotW >= 76 ? 'year' : 'none';
-  const colTmpl = `28px repeat(${r.cols}, ${slotW}px)`;
+  const colTmpl = `28px repeat(${maxCols}, ${slotW}px)`;
+  const dropping = !!(rackSelectedWineId || rackMove);
   // Kopfzeile mit Platz-Nummern
   html += `<div class="rack-grid" style="grid-template-columns:${colTmpl}"><div></div>`;
-  for (let p=1;p<=r.cols;p++) html += `<div class="rack-collabel">${p}</div>`;
-  // Ebenen von oben (höchste) nach unten (Ebene 1)
+  for (let p=1;p<=maxCols;p++) html += `<div class="rack-collabel">${p}</div>`;
+  // Ebenen von oben (höchste) nach unten (Ebene 1); Ebenen mit weniger Plätzen lassen den Rest leer
   for (let e=r.rows; e>=1; e--) {
     html += `<div class="rack-elabel">E${e}</div>`;
-    for (let p=1;p<=r.cols;p++) {
-      const w = wineAt(r.name, e, p);
-      if (w) html += `<div class="rack-slot filled${w.id===rackFilledWineId?' picked':''}" style="width:${slotW}px;height:${slotH}px" onclick="selectFilledSlot('${w.id}')" title="${esc(w.name)}${w.year?' · '+w.year:''}">${bottleVisual(w, slotW, slotMode)}</div>`;
-      else html += `<div class="rack-slot${rackSelectedWineId?' droppable':''}" style="width:${slotW}px;height:${slotH}px" onclick="placeRackWine(${e},${p})"><div class="rack-empty" style="height:${Math.max(15, slotH-7)}px"></div></div>`;
+    const cap = rackCap(r, e), cols = rackCols(r, e);
+    for (let p=1;p<=maxCols;p++) {
+      if (p > cols) { html += '<div></div>'; continue; }
+      const entries = map.get(e + '|' + p);
+      if (entries) {
+        const w = entries[0].w;
+        const picked = rackFilledSlot && rackFilledSlot.rack === r.id && rackFilledSlot.e === e && rackFilledSlot.p === p;
+        const badge = cap > 1 ? `<span class="rack-slot-count">${entries.length}/${cap}</span>` : '';
+        html += `<div class="rack-slot filled${picked?' picked':''}${dropping && entries.length < cap ? ' droppable' : ''}" style="width:${slotW}px;height:${slotH}px" onclick="slotClick(${e},${p})" title="${esc(w.name)}${w.year?' · '+w.year:''}">${bottleVisual(w, slotW, slotMode)}${badge}</div>`;
+      } else html += `<div class="rack-slot${dropping?' droppable':''}" style="width:${slotW}px;height:${slotH}px" onclick="slotClick(${e},${p})"><div class="rack-empty" style="height:${Math.max(15, slotH-7)}px"></div></div>`;
     }
   }
   html += `</div></div>`;
 
-  // Aktionsleiste für das markierte belegte Fach: öffnen oder aus dem Fach entfernen
-  const pickedW = rackFilledWineId ? wines.find(x => x.id === rackFilledWineId && wineAt(r.name, parseInt(x.locEbene), parseInt(x.locPlatz)) === x) : null;
-  if (rackFilledWineId && !pickedW) rackFilledWineId = null;
-  if (pickedW) {
-    html += `<div class="rack-action-bar">
-      <div class="rack-preview">${bottlePreviewHtml(pickedW)}</div>
-      <div class="rack-action-name">${isBottleCutout(shownImage(pickedW)) ? '' : esc(pickedW.name) + (pickedW.year ? ' · ' + pickedW.year : '')}<span${isBottleCutout(shownImage(pickedW)) ? ' style="margin-top:0;font-size:12px"' : ''}>${esc(formatLocation(pickedW))}</span></div>
-      <div class="rack-action-btns">
-        <button class="wine-btn" onclick="goToWine('${pickedW.id}')">${t('rack_open_wine')}</button>
-        <button class="wine-btn danger" onclick="removeFromRack('${pickedW.id}')">${t('rack_remove')}</button>
-      </div>
+  // Umlagern: Hinweis mit Abbrechen
+  if (rackMove) {
+    const mw = wines.find(x => x.id === rackMove.id);
+    if (!mw) rackMove = null;
+    else html += `<div class="rack-action-bar">
+      <div class="rack-preview">${bottlePreviewHtml(mw)}</div>
+      <div class="rack-action-name">${esc(mw.name) + (mw.year ? ' · ' + mw.year : '')}<span>${t('rack_move_hint')}</span></div>
+      <div class="rack-action-btns"><button class="wine-btn" onclick="cancelMove()">${t('btn_cancel')}</button></div>
     </div>`;
   }
 
+  // Aktionsleiste für das markierte belegte Fach: je Wein im Fach öffnen, umlagern oder aus dem Fach entfernen
+  const pickedEntries = rackFilledSlot && rackFilledSlot.rack === r.id ? (map.get(rackFilledSlot.e + '|' + rackFilledSlot.p) || []) : [];
+  if (rackFilledSlot && !pickedEntries.length) rackFilledSlot = null;
+  const groups = [];
+  pickedEntries.forEach(x => { const g = groups.find(g => g.w === x.w); if (g) g.n++; else groups.push({ w: x.w, n: 1 }); });
+  groups.forEach(g => {
+    const pw = g.w, cut = isBottleCutout(shownImage(pw));
+    html += `<div class="rack-action-bar">
+      <div class="rack-preview">${bottlePreviewHtml(pw)}</div>
+      <div class="rack-action-name">${cut ? '' : esc(pw.name) + (pw.year ? ' · ' + pw.year : '') + (g.n > 1 ? ' ×' + g.n : '')}<span${cut ? ' style="margin-top:0;font-size:12px"' : ''}>${esc(formatLocation(pw))}</span></div>
+      <div class="rack-action-btns">
+        <button class="wine-btn" onclick="goToWine('${pw.id}')">${t('rack_open_wine')}</button>
+        <button class="wine-btn" onclick="startMove('${pw.id}')">${t('rack_move')}</button>
+        <button class="wine-btn danger" onclick="removeFromRack('${pw.id}')">${t('rack_remove')}</button>
+      </div>
+    </div>`;
+  });
+
   // Nicht zugeordnet – Tippen zum Platzieren
-  const unplaced = wines.filter(w => !isPlaced(w));
+  const unplaced = wines.filter(w => unplacedCount(w) > 0);
   if (rackSelectedWineId && !unplaced.some(w => w.id === rackSelectedWineId)) rackSelectedWineId = null;
   html += `<div class="stats-title" style="margin:8px 0 10px">${t('racks_unassigned')} (${unplaced.length})</div>`;
   if (unplaced.length) {
     const selW = unplaced.find(w => w.id === rackSelectedWineId);
     if (selW) html += `<div class="rack-preview solo">${bottlePreviewHtml(selW)}</div>`;
     html += `<div style="font-size:12px;color:${selW?'var(--gold)':'var(--text-muted)'};margin-bottom:10px">${selW ? esc(t('rack_assign_sel', {name: selW.name})) : t('rack_assign_hint')}</div>`;
-    html += `<div class="rack-unassigned">` + unplaced.map(w =>
-      `<div class="rack-chip-wine${w.id===rackSelectedWineId?' selected':''}" onclick="selectRackWine('${w.id}')">${bottleVisual(w, 60, 'none')}<span>${esc(w.name)}${w.year?' · '+w.year:''}</span></div>`
-    ).join('') + `</div>`;
+    html += `<div class="rack-unassigned">` + unplaced.map(w => {
+      const n = unplacedCount(w);
+      return `<div class="rack-chip-wine${w.id===rackSelectedWineId?' selected':''}" onclick="selectRackWine('${w.id}')">${bottleVisual(w, 60, 'none')}<span>${esc(w.name)}${w.year?' · '+w.year:''}${n > 1 ? ' ×' + n : ''}</span></div>`;
+    }).join('') + `</div>`;
   } else {
     html += `<div style="font-size:13px;color:var(--text-muted)">${t('racks_all_placed')}</div>`;
   }
   el.innerHTML = html;
 }
-function setRackActive(i) { rackActive = i; rackFilledWineId = null; renderRacks(); }
+function setRackActive(i) { rackActive = i; rackFilledSlot = null; renderRacks(); }
 
 // Setup: Regale verwalten
 function renderRackSetup() {
   const list = document.getElementById('rack-setup-list');
   if (!list) return;
   list.innerHTML = settings.racks.map((r,i) =>
-    `<div class="rack-setup-item"><span class="n">${esc(r.name)}</span><span class="d">${r.rows} × ${r.cols}</span><button class="rack-setup-del" onclick="removeRack(${i})">🗑</button></div>`
+    `<div class="rack-setup-item"><span class="n">${esc(r.name)}</span><span class="d">${r.rows} × ${r.cols}${r.cap > 1 ? ' · ×' + r.cap : ''}${Object.keys(r.lv || {}).length ? ' *' : ''}</span><button class="rack-setup-del" onclick="removeRack(${i})">🗑</button></div>`
   ).join('');
 }
 function addRack() {
   const name = document.getElementById('rack-new-name').value.trim();
   const rows = parseInt(document.getElementById('rack-new-rows').value);
   const cols = parseInt(document.getElementById('rack-new-cols').value);
+  const cap = Math.max(1, Math.min(500, parseInt(document.getElementById('rack-new-cap').value) || 1));
   if (!name || !(rows>=1) || !(cols>=1)) { showToast(t('rack_invalid')); return; }
   if (settings.racks.some(r => r.name === name)) { showToast(t('rack_dup')); return; }
-  settings.racks.push({ name, rows: Math.min(rows,30), cols: Math.min(cols,40) });
+  let id = rackIdFor(name);
+  while (settings.racks.some(x => x.id === id)) id += 'x';
+  settings.racks.push({ id, name, rows: Math.min(rows,30), cols: Math.min(cols,40), cap, cellarId: (settings.cellars[0] || {}).id || DEFAULT_CELLAR_ID });
   saveSettings(); touchData();
   document.getElementById('rack-new-name').value = '';
   document.getElementById('rack-new-rows').value = '';
   document.getElementById('rack-new-cols').value = '';
+  document.getElementById('rack-new-cap').value = '';
   renderRackSetup();
   showToast(t('rack_added'));
 }
@@ -9156,7 +9413,7 @@ async function exportPDF() {
 }
 
 async function exportJSON() {
-  const backup = { app: 'weinkeller', version: 2, exportedAt: new Date().toISOString(), wines, wishes, drunkWines, racks: settings.racks || [], owner: settings.owner || '' };
+  const backup = { app: 'weinkeller', version: 2, dv: 2, exportedAt: new Date().toISOString(), wines, wishes, drunkWines, racks: settings.racks || [], cellars: settings.cellars || [], owner: settings.owner || '' };
   try {
     await saveFile('weinkeller_backup.json', new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json;charset=utf-8' }));
     showToast(t('toast_backup'));
@@ -9186,7 +9443,7 @@ function importJSON(e) {
       if (nw) { wines = nw; save(); }
       if (nwish) { wishes = nwish; saveWishes(); }
       if (nd) { drunkWines = nd; saveDrunk(); }
-      if (Array.isArray(data.racks)) { settings.racks = cleanRacks(data.racks); saveSettings(); }
+      if (Array.isArray(data.racks)) { settings.cellars = cleanCellars(data.cellars); settings.racks = cleanRacks(data.racks); fixRackCellars(); saveSettings(); }
       if (typeof data.owner === 'string') { settings.owner = cleanStr(data.owner, 60); saveSettings(); }
       renderKeller();
       showToast(t('toast_import_ok'));
