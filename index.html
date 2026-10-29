@@ -547,6 +547,11 @@ body {
 .rack-setup-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
 .rack-setup-item .n { flex: 1; font-size: 13px; font-weight: 600; color: var(--text); }
 .rack-setup-item .d { font-size: 12px; color: var(--text-muted); }
+.rack-setup-edit { flex-shrink: 0; width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); font-size: 13px; cursor: pointer; }
+.rack-level-editor { margin: 4px 0 10px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--card); }
+.rack-level-editor .rle-title { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+.rack-level-editor .rle-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 4px 0; font-size: 13px; color: var(--text); }
+.rack-level-editor .rle-row input { width: 80px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px; color: var(--text); font-size: 13px; text-align: right; }
 .rack-setup-del { flex-shrink: 0; width: 30px; height: 30px; border-radius: 8px; border: none; background: var(--red-alert); color: #fff; font-size: 13px; cursor: pointer; }
 .input-with-scan { display: flex; gap: 8px; }
 .input-with-scan input { flex: 1; min-width: 0; }
@@ -1690,14 +1695,14 @@ function cleanRacks(arr) {
     names.add(name); ids.add(id);
     const cellarId = cleanStr(r.cellarId, 40).trim();
     const cap = cleanInt(r.cap, 1, 500) || 1;
-    // Einzelne Ebenen dürfen von den Standardwerten abweichen (z. B. unten Kisten mit Platz für 6, darüber einzelne Flaschen)
+    // Einzelne Ebenen dürfen eine andere Kapazität haben (z. B. unten Kisten mit Platz für 6, darüber einzelne Flaschen)
     const lv = {};
     if (r.lv && typeof r.lv === 'object' && !Array.isArray(r.lv)) {
       Object.keys(r.lv).slice(0, 60).forEach(k => {
         const e = parseInt(k), o = r.lv[k];
         if (!(e >= 1 && e <= rows) || !o || typeof o !== 'object') return;
-        const c = cleanInt(o.cols, 1, 40) || cols, cp = cleanInt(o.cap, 1, 500) || cap;
-        if (c !== cols || cp !== cap) lv[e] = { cols: c, cap: cp };
+        const cp = cleanInt(o.cap, 1, 500) || cap;
+        if (cp !== cap) lv[e] = { cap: cp };
       });
     }
     return { id, name, rows, cols, cap, lv, cellarId: ID_RE.test(cellarId) ? cellarId : DEFAULT_CELLAR_ID };
@@ -2957,6 +2962,8 @@ de: {
   rack_move_hint: "Tippe ein freies Fach, um die Flasche dorthin zu legen.",
   loc_open: "{n} nicht eingelagert",
   rack_ph_cap: "Flaschen/Platz",
+  rack_caps_title: "Flaschen pro Platz je Ebene",
+  rack_cap_low: "Auf dieser Ebene liegen bis zu {n} Flaschen in einem Platz.",
   sync_code_notfound: "Code nicht gefunden – bitte prüfen",
   toast_storage_full: "Speicher voll – Änderung konnte nicht gesichert werden",
   sync_merge_confirm: "Dieses Gerät enthält bereits {n} Weine. Mit den Cloud-Daten zusammenführen? (Abbrechen = nicht verbinden)",
@@ -3246,6 +3253,8 @@ en: {
   rack_move_hint: "Tap a free slot to move the bottle there.",
   loc_open: "{n} not stored",
   rack_ph_cap: "Bottles/slot",
+  rack_caps_title: "Bottles per slot, by level",
+  rack_cap_low: "Up to {n} bottles are stored in one slot on this level.",
   sync_code_notfound: "Code not found – please check it",
   toast_storage_full: "Storage full – change could not be saved",
   sync_merge_confirm: "This device already has {n} wines. Merge them with the cloud data? (Cancel = do not connect)",
@@ -3535,6 +3544,8 @@ es: {
   rack_move_hint: "Toca un hueco libre para mover la botella.",
   loc_open: "{n} sin colocar",
   rack_ph_cap: "Botellas/hueco",
+  rack_caps_title: "Botellas por hueco, por nivel",
+  rack_cap_low: "En este nivel hay hasta {n} botellas en un hueco.",
   sync_code_notfound: "Código no encontrado: compruébalo",
   toast_storage_full: "Almacenamiento lleno: no se pudo guardar el cambio",
   sync_merge_confirm: "Este dispositivo ya tiene {n} vinos. ¿Combinarlos con los datos de la nube? (Cancelar = no conectar)",
@@ -3824,6 +3835,8 @@ sv: {
   rack_move_hint: "Tryck på ett ledigt fack för att flytta flaskan dit.",
   loc_open: "{n} ej placerade",
   rack_ph_cap: "Flaskor/plats",
+  rack_caps_title: "Flaskor per plats, per hylla",
+  rack_cap_low: "På den här hyllan finns upp till {n} flaskor på en plats.",
   sync_code_notfound: "Koden hittades inte – kontrollera den",
   toast_storage_full: "Lagringsutrymmet är fullt – ändringen kunde inte sparas",
   sync_merge_confirm: "Den här enheten har redan {n} viner. Slå ihop med molndata? (Avbryt = anslut inte)",
@@ -4113,6 +4126,8 @@ da: {
   rack_move_hint: "Tryk på et ledigt felt for at flytte flasken dertil.",
   loc_open: "{n} ikke placeret",
   rack_ph_cap: "Flasker/plads",
+  rack_caps_title: "Flasker pr. plads, pr. hylde",
+  rack_cap_low: "På denne hylde ligger op til {n} flasker på én plads.",
   sync_code_notfound: "Koden blev ikke fundet – tjek den",
   toast_storage_full: "Lageret er fuldt – ændringen kunne ikke gemmes",
   sync_merge_confirm: "Denne enhed har allerede {n} vine. Flet med clouddata? (Annuller = opret ikke forbindelse)",
@@ -4402,6 +4417,8 @@ fi: {
   rack_move_hint: "Napauta vapaata paikkaa siirtääksesi pullon sinne.",
   loc_open: "{n} sijoittamatta",
   rack_ph_cap: "Pulloa/paikka",
+  rack_caps_title: "Pulloja per paikka, tasoittain",
+  rack_cap_low: "Tällä tasolla yhdellä paikalla on jopa {n} pulloa.",
   sync_code_notfound: "Koodia ei löytynyt – tarkista se",
   toast_storage_full: "Tallennustila täynnä – muutosta ei voitu tallentaa",
   sync_merge_confirm: "Tällä laitteella on jo {n} viiniä. Yhdistetäänkö pilvidataan? (Peruuta = älä yhdistä)",
@@ -4691,6 +4708,8 @@ ru: {
   rack_move_hint: "Нажмите на свободное место, чтобы переложить бутылку.",
   loc_open: "{n} не размещено",
   rack_ph_cap: "Бутылок/место",
+  rack_caps_title: "Бутылок на место, по ярусам",
+  rack_cap_low: "На этом ярусе в одном месте лежит до {n} бутылок.",
   sync_code_notfound: "Код не найден – проверьте его",
   toast_storage_full: "Память заполнена – изменение не сохранено",
   sync_merge_confirm: "На этом устройстве уже {n} вин. Объединить с данными облака? (Отмена = не подключать)",
@@ -4980,6 +4999,8 @@ it: {
   rack_move_hint: "Tocca un posto libero per spostare la bottiglia.",
   loc_open: "{n} non riposte",
   rack_ph_cap: "Bottiglie/posto",
+  rack_caps_title: "Bottiglie per posto, per ripiano",
+  rack_cap_low: "Su questo ripiano ci sono fino a {n} bottiglie in un posto.",
   sync_code_notfound: "Codice non trovato – controllalo",
   toast_storage_full: "Memoria piena: impossibile salvare la modifica",
   sync_merge_confirm: "Questo dispositivo contiene già {n} vini. Unirli ai dati cloud? (Annulla = non collegare)",
@@ -5269,6 +5290,8 @@ fr: {
   rack_move_hint: "Touchez un emplacement libre pour y déplacer la bouteille.",
   loc_open: "{n} non rangées",
   rack_ph_cap: "Bouteilles/empl.",
+  rack_caps_title: "Bouteilles par emplacement, par niveau",
+  rack_cap_low: "Sur ce niveau, jusqu'à {n} bouteilles sont rangées dans un emplacement.",
   sync_code_notfound: "Code introuvable – vérifiez-le",
   toast_storage_full: "Stockage plein : la modification n'a pas pu être enregistrée",
   sync_merge_confirm: "Cet appareil contient déjà {n} vins. Fusionner avec les données du cloud ? (Annuler = ne pas connecter)",
@@ -5558,6 +5581,8 @@ pl: {
   rack_move_hint: "Dotknij wolnego miejsca, aby przenieść butelkę.",
   loc_open: "{n} nieułożone",
   rack_ph_cap: "Butelek/miejsce",
+  rack_caps_title: "Butelek na miejsce, wg poziomów",
+  rack_cap_low: "Na tym poziomie w jednym miejscu leży do {n} butelek.",
   sync_code_notfound: "Nie znaleziono kodu – sprawdź go",
   toast_storage_full: "Pamięć pełna – nie udało się zapisać zmiany",
   sync_merge_confirm: "To urządzenie ma już {n} win. Połączyć z danymi z chmury? (Anuluj = nie łącz)",
@@ -5847,6 +5872,8 @@ hu: {
   rack_move_hint: "Érintsen meg egy szabad helyet, hogy oda tegye az üveget.",
   loc_open: "{n} nincs elhelyezve",
   rack_ph_cap: "Üveg/hely",
+  rack_caps_title: "Üveg helyenként, szintenként",
+  rack_cap_low: "Ezen a szinten egy helyen legfeljebb {n} üveg van.",
   sync_code_notfound: "A kód nem található – ellenőrizd",
   toast_storage_full: "A tárhely megtelt – a módosítást nem sikerült menteni",
   sync_merge_confirm: "Ezen az eszközön már {n} bor van. Egyesíted a felhőadatokkal? (Mégse = ne kapcsolódjon)",
@@ -6136,6 +6163,8 @@ cs: {
   rack_move_hint: "Klepněte na volné místo a láhev se tam přesune.",
   loc_open: "{n} neuloženo",
   rack_ph_cap: "Lahví/místo",
+  rack_caps_title: "Lahví na místo, podle úrovní",
+  rack_cap_low: "Na této úrovni je na jednom místě až {n} lahví.",
   sync_code_notfound: "Kód nebyl nalezen – zkontrolujte jej",
   toast_storage_full: "Úložiště je plné – změnu se nepodařilo uložit",
   sync_merge_confirm: "Toto zařízení už obsahuje {n} vín. Sloučit s daty v cloudu? (Zrušit = nepřipojovat)",
@@ -6425,6 +6454,8 @@ sk: {
   rack_move_hint: "Ťuknite na voľné miesto a fľaša sa tam presunie.",
   loc_open: "{n} neuložených",
   rack_ph_cap: "Fliaš/miesto",
+  rack_caps_title: "Fliaš na miesto, podľa úrovní",
+  rack_cap_low: "Na tejto úrovni je na jednom mieste až {n} fliaš.",
   sync_code_notfound: "Kód sa nenašiel – skontrolujte ho",
   toast_storage_full: "Úložisko je plné – zmenu sa nepodarilo uložiť",
   sync_merge_confirm: "Toto zariadenie už obsahuje {n} vín. Zlúčiť s údajmi v cloude? (Zrušiť = nepripájať)",
@@ -6714,6 +6745,8 @@ ro: {
   rack_move_hint: "Atinge un loc liber pentru a muta sticla acolo.",
   loc_open: "{n} neașezate",
   rack_ph_cap: "Sticle/loc",
+  rack_caps_title: "Sticle pe loc, pe nivel",
+  rack_cap_low: "Pe acest nivel, într-un loc sunt până la {n} sticle.",
   sync_code_notfound: "Codul nu a fost găsit – verifică-l",
   toast_storage_full: "Spațiu plin – modificarea nu a putut fi salvată",
   sync_merge_confirm: "Acest dispozitiv conține deja {n} vinuri. Le combini cu datele din cloud? (Anulare = nu conecta)",
@@ -7003,6 +7036,8 @@ hr: {
   rack_move_hint: "Dodirni slobodno mjesto da premjestiš bocu.",
   loc_open: "{n} nije pohranjeno",
   rack_ph_cap: "Boca/mjesto",
+  rack_caps_title: "Boca po mjestu, po razini",
+  rack_cap_low: "Na ovoj razini u jednom je mjestu do {n} boca.",
   sync_code_notfound: "Kod nije pronađen – provjerite ga",
   toast_storage_full: "Pohrana je puna – promjena nije spremljena",
   sync_merge_confirm: "Ovaj uređaj već ima {n} vina. Spojiti s podacima iz oblaka? (Odustani = ne povezuj)",
@@ -7292,6 +7327,8 @@ pt: {
   rack_move_hint: "Toque num lugar livre para mover a garrafa.",
   loc_open: "{n} por arrumar",
   rack_ph_cap: "Garrafas/lugar",
+  rack_caps_title: "Garrafas por lugar, por nível",
+  rack_cap_low: "Neste nível há até {n} garrafas num lugar.",
   sync_code_notfound: "Código não encontrado – verifique-o",
   toast_storage_full: "Armazenamento cheio – não foi possível guardar a alteração",
   sync_merge_confirm: "Este dispositivo já tem {n} vinhos. Combinar com os dados da nuvem? (Cancelar = não ligar)",
@@ -7581,6 +7618,8 @@ no: {
   rack_move_hint: "Trykk på en ledig plass for å flytte flasken dit.",
   loc_open: "{n} ikke plassert",
   rack_ph_cap: "Flasker/plass",
+  rack_caps_title: "Flasker per plass, per hylle",
+  rack_cap_low: "På denne hyllen ligger opptil {n} flasker på én plass.",
   sync_code_notfound: "Koden ble ikke funnet – sjekk den",
   toast_storage_full: "Lagringen er full – endringen kunne ikke lagres",
   sync_merge_confirm: "Denne enheten har allerede {n} viner. Slå sammen med skydata? (Avbryt = ikke koble til)",
@@ -7870,6 +7909,8 @@ nl: {
   rack_move_hint: "Tik op een vrije plek om de fles daarheen te verplaatsen.",
   loc_open: "{n} niet opgeborgen",
   rack_ph_cap: "Flessen/plek",
+  rack_caps_title: "Flessen per plek, per niveau",
+  rack_cap_low: "Op dit niveau liggen tot {n} flessen op één plek.",
   sync_code_notfound: "Code niet gevonden – controleer hem",
   toast_storage_full: "Opslag vol – wijziging kon niet worden opgeslagen",
   sync_merge_confirm: "Dit apparaat bevat al {n} wijnen. Samenvoegen met de clouddata? (Annuleren = niet verbinden)",
@@ -8821,10 +8862,10 @@ let rackSelectedWineId = null;  // Wein aus „Nicht zugeordnet", der gerade ein
 let rackFilledSlot = null;      // markiertes belegtes Fach {rack, e, p}
 let rackMove = null;            // Flasche, die gerade umgelagert wird {id, rack, e, p}
 function rackById(id) { return settings.racks.find(r => r.id === id) || null; }
-// Plätze pro Ebene und Flaschen pro Platz: Standard des Regals, je Ebene überschreibbar (r.lv[Ebene])
-function rackCols(r, e) { return (r.lv && r.lv[e] && r.lv[e].cols) || r.cols; }
+// Alle Ebenen haben gleich viele Plätze; Flaschen pro Platz: Standard des Regals, je Ebene überschreibbar (r.lv[Ebene].cap)
+function rackCols(r) { return r.cols; }
 function rackCap(r, e) { return (r && ((r.lv && r.lv[e] && r.lv[e].cap) || r.cap)) || 1; }
-function rackMaxCols(r) { let m = r.cols; for (let e = 1; e <= r.rows; e++) m = Math.max(m, rackCols(r, e)); return m; }
+function rackMaxCols(r) { return r.cols; }
 // Plätze eines Weins, die es wirklich gibt (Regal vorhanden, Fach liegt im Regal)
 function validPlacements(w) {
   return (w.placements || []).filter(x => { const r = rackById(x.rack); return r && x.e <= r.rows && x.p <= rackCols(r, x.e); });
@@ -9096,12 +9137,33 @@ function renderRacks() {
 function setRackActive(i) { rackActive = i; rackFilledSlot = null; renderRacks(); }
 
 // Setup: Regale verwalten
+let rackEditIdx = -1;   // Regal, dessen Ebenen gerade bearbeitet werden
 function renderRackSetup() {
   const list = document.getElementById('rack-setup-list');
   if (!list) return;
-  list.innerHTML = settings.racks.map((r,i) =>
-    `<div class="rack-setup-item"><span class="n">${esc(r.name)}</span><span class="d">${r.rows} × ${r.cols}${r.cap > 1 ? ' · ×' + r.cap : ''}${Object.keys(r.lv || {}).length ? ' *' : ''}</span><button class="rack-setup-del" onclick="removeRack(${i})">🗑</button></div>`
-  ).join('');
+  list.innerHTML = settings.racks.map((r,i) => {
+    let h = `<div class="rack-setup-item"><span class="n">${esc(r.name)}</span><span class="d">${r.rows} × ${r.cols}${r.cap > 1 ? ' · ×' + r.cap : ''}${Object.keys(r.lv || {}).length ? ' *' : ''}</span><button class="rack-setup-edit" onclick="editRackLevels(${i})">✏️</button><button class="rack-setup-del" onclick="removeRack(${i})">🗑</button></div>`;
+    if (i === rackEditIdx) {
+      h += `<div class="rack-level-editor"><div class="rle-title">${t('rack_caps_title')}</div>`;
+      for (let e = r.rows; e >= 1; e--) h += `<label class="rle-row"><span>E${e}</span><input type="number" min="1" max="500" value="${rackCap(r, e)}" onchange="setLevelCap(${i},${e},this.value)"></label>`;
+      h += '</div>';
+    }
+    return h;
+  }).join('');
+}
+function editRackLevels(i) { rackEditIdx = rackEditIdx === i ? -1 : i; renderRackSetup(); }
+// Flaschen pro Platz für eine Ebene setzen (nicht unter die aktuell dort vorhandene Belegung)
+function setLevelCap(i, e, v) {
+  const r = settings.racks[i];
+  if (!r) return;
+  const cap = Math.max(1, Math.min(500, parseInt(v) || 1));
+  let most = 0;
+  slotMapFor(r.id).forEach((arr, k) => { if (+k.split('|')[0] === e) most = Math.max(most, arr.length); });
+  if (cap < most) { showToast(t('rack_cap_low', { n: most })); renderRackSetup(); return; }
+  r.lv = r.lv || {};
+  if (cap === r.cap) delete r.lv[e]; else r.lv[e] = { cap };
+  saveSettings(); touchData();
+  renderRackSetup();
 }
 function addRack() {
   const name = document.getElementById('rack-new-name').value.trim();
