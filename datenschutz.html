@@ -10,7 +10,7 @@
 <p class="back"><a href="index.html" onclick="if(history.length>1){history.back();return false}">← Zurück zur App / Back to the app</a></p>
 
 <h1>Datenschutzerklärung – Weinkeller</h1>
-<p><small>Stand: 27. Oktober 2026</small></p>
+<p><small>Stand: 31. Oktober 2026</small></p>
 
 <h2>1. Verantwortlicher</h2>
 <p>Thomas Knecht<br>
@@ -30,6 +30,9 @@ E-Mail: <a href="mailto:t.knecht@web.de">t.knecht@web.de</a></p>
 <h2>5. KI-Funktionen (Etikett scannen, Wein nachschlagen)</h2>
 <p>Wenn du „Etikett scannen" oder „Wein nachschlagen" nutzt, wird das <strong>Foto des Etiketts</strong> bzw. der <strong>eingegebene Weinname</strong> über unseren Server (Cloudflare Worker) an <strong>Anthropic (Claude)</strong> zur Auswertung gesendet, um Weindaten zu erkennen und zu ergänzen. Das Ergebnis wird an die App zurückgegeben. Fotos werden von uns nicht gespeichert. Bevor du eine KI-Funktion zum ersten Mal nutzt, fragt dich die App um deine Einwilligung; ohne Einwilligung wird nichts gesendet. Anthropic verarbeitet die Daten nach den Bedingungen seiner Programmierschnittstelle. Bitte fotografiere keine Personen. Die Nutzung ist freiwillig.</p>
 
+<h2>5a. Barcode-Suche (Flaschen-Barcode scannen)</h2>
+<p>Beim Scannen eines Flaschen-Barcodes (EAN) bleibt das Kamerabild <strong>auf deinem Gerät</strong>; es wird nicht gespeichert und nicht gesendet. Nur die gelesene <strong>Nummer</strong> geht über unseren Server (Cloudflare Worker) an die freie Produktdatenbank <strong>Open Food Facts</strong> (gemeinnützig, Frankreich), um Name und Marke des Weins zu finden. Die Anfrage stellt unser Server; deine IP-Adresse wird nicht an Open Food Facts weitergegeben. Zum Schonen der Datenbank merkt sich unser Server Treffer 30 Tage und unbekannte Nummern 1 Tag, ohne Bezug zu dir. Die Suche verbraucht kein KI-Guthaben. Die Daten von Open Food Facts stehen unter der Lizenz ODbL (<a href="https://world.openfoodfacts.org">openfoodfacts.org</a>, © Mitwirkende von Open Food Facts). Eine Barcode-Nummer ist kein personenbezogenes Datum.</p>
+
 <h2>6. KI-Guthaben und Installations-Kennung</h2>
 <p>Die KI-Funktionen sind mengenmäßig begrenzt: Im Kaufpreis der App sind 50 KI-Aufrufe je Installation enthalten, weitere Aufrufe können per In-App-Kauf erworben werden. Damit der Server das Guthaben zählen kann, erzeugt die App beim ersten Start eine <strong>zufällige Installations-Kennung</strong> (keine Verbindung zu deinem Namen, deiner Apple-ID oder deiner Telefonnummer) und sendet sie bei jedem KI-Aufruf mit. Der Server speichert zu dieser Kennung den Guthaben-Stand, die Zahl der KI-Aufrufe sowie Zeitpunkt der Erstellung und der letzten Nutzung (so lange das Guthaben-Konto besteht; auf Anfrage löschen wir es). Aus diesen Zahlen erstellen wir anonyme Gesamtübersichten, zum Beispiel wie viele Installationen es gibt. Zum Schutz vor Missbrauch wird die <strong>IP-Adresse</strong> in gekürzter Form höchstens zwei Tage lang für ein Limit neuer Installationen und für Fehlversuchszähler verarbeitet; sie wird nicht mit deinem Konto verknüpft. Gibst du einen Freischaltcode ein, wird davon nur ein Prüfwert (Hash) gespeichert. Rechtsgrundlage ist die Bereitstellung der von dir genutzten Funktion (Art. 6 Abs. 1 lit. b DSGVO) und unser berechtigtes Interesse am Schutz vor Missbrauch und Kostenkontrolle (lit. f).</p>
 
@@ -40,16 +43,16 @@ E-Mail: <a href="mailto:t.knecht@web.de">t.knecht@web.de</a></p>
 <p>Die App lädt <strong>keine Flaschenbilder von Dritten</strong>. Im Kellerplan und in der Weinliste werden gezeichnete Flaschen angezeigt. Gibst du selbst eine Bild-Adresse bei einem Wein ein, lädt dein Gerät das Bild direkt vom jeweiligen Server; dabei wird technisch bedingt deine IP-Adresse an dessen Betreiber übertragen.</p>
 
 <h2>8. Kamera und Fotos</h2>
-<p>Die App fragt den Zugriff auf Kamera bzw. Fotomediathek nur an, wenn du ein Etikett oder einen Lagerplatz fotografieren möchtest. Die Aufnahmen werden nur für die jeweilige Erkennung verwendet (siehe Punkt 5).</p>
+<p>Die App fragt den Zugriff auf Kamera bzw. Fotomediathek nur an, wenn du ein Etikett oder einen Lagerplatz fotografieren oder einen Barcode bzw. QR-Code scannen möchtest. Fotos von Etiketten und Lagerplätzen werden nur für die jeweilige Erkennung verwendet (siehe Punkt 5); beim Scannen von Barcodes und QR-Codes wird das Kamerabild nur auf deinem Gerät ausgewertet (siehe Punkt 5a).</p>
 
 <h2>9. Externe Links</h2>
-<p>Die Symbole „Region auf Karte" und „Wikipedia" öffnen externe Webseiten (Google Maps bzw. Wikipedia) in deinem Browser. Für deren Datenverarbeitung sind die jeweiligen Betreiber verantwortlich.</p>
+<p>Die Region eines Weins (Karte) und das Traubensymbol (Wikipedia) öffnen externe Webseiten (Google Maps bzw. Wikipedia) in deinem Browser. Für deren Datenverarbeitung sind die jeweiligen Betreiber verantwortlich.</p>
 
 <h2>10. Schriftarten und Bibliotheken</h2>
 <p>Die verwendeten Schriftarten (Inter, Playfair Display, UnifrakturMaguntia) und die Programmbibliotheken für den PDF- und Excel-Export sind in die App eingebunden und werden <strong>nicht</strong> von externen Servern geladen.</p>
 
 <h2>10a. Empfänger und Drittländer</h2>
-<p>Empfänger von Daten sind <strong>Cloudflare, Inc.</strong> (Hosting unseres Servers und des Speichers) und <strong>Anthropic</strong> (KI-Auswertung, nur nach deiner Einwilligung). Dabei kann eine Übermittlung in die USA stattfinden. Die Anbieter sichern den Datenschutz vertraglich zu, zum Beispiel durch EU-Standardvertragsklauseln; Näheres steht in deren Datenschutzhinweisen.</p>
+<p>Empfänger von Daten sind <strong>Cloudflare, Inc.</strong> (Hosting unseres Servers und des Speichers) , <strong>Anthropic</strong> (KI-Auswertung, nur nach deiner Einwilligung) und <strong>Open Food Facts</strong> (Barcode-Suche, nur die Nummer). Dabei kann eine Übermittlung in die USA stattfinden. Die Anbieter sichern den Datenschutz vertraglich zu, zum Beispiel durch EU-Standardvertragsklauseln; Näheres steht in deren Datenschutzhinweisen.</p>
 
 <h2>11. Deine Rechte</h2>
 <p>Du hast das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch sowie das Recht, dich bei einer Datenschutz-Aufsichtsbehörde zu beschweren. Schreibe dazu an die oben genannte E-Mail-Adresse.</p>

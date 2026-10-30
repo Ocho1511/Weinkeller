@@ -520,6 +520,12 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .rack-collabel { font-size: 10px; color: var(--text-dim); text-align: center; }
 .rack-slot { width: 60px; height: 22px; position: relative; display: flex; align-items: center; }
 .rack-slot .rack-empty { flex: 1; }
+#scan-overlay { display: none; position: fixed; inset: 0; z-index: 400; background: #000; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 20px; }
+#scan-overlay.show { display: flex; }
+#scan-hint { color: #fff; font-weight: 600; font-size: 15px; text-align: center; }
+#scan-reader { width: 100%; max-width: 480px; }
+#scan-reader video { border-radius: 12px; }
+#scan-cancel { min-width: 160px; }
 .rack-ripe { position: absolute; left: 1px; top: 1px; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.9); box-shadow: 0 0 0 1px rgba(0,0,0,.45); pointer-events: none; z-index: 2; }
 .rack-slot.tiny .rack-ripe { width: 7px; height: 7px; border-width: 1px; }
 .ripeness-loc { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: -6px 0 10px; }
@@ -1339,6 +1345,8 @@ input[type="file"] { display: none; }
 <!-- ════════════════════════════════════════
      ADD WINE MODAL
 ════════════════════════════════════════ -->
+<div id="scan-overlay"><div id="scan-hint"></div><div id="scan-reader"></div><button id="scan-cancel" class="btn-secondary" data-i18n="btn_cancel">Abbrechen</button></div>
+
 <div class="modal-overlay" id="add-modal">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -1349,6 +1357,10 @@ input[type="file"] { display: none; }
     <div id="scan-loading" style="display:none;text-align:center;padding:12px;color:var(--text-muted);font-size:13px" data-i18n="m_scanning">
       ⏳ Etikett wird analysiert…
     </div>
+    <button class="scan-btn" onclick="scanBarcodeForWine()" data-i18n="m_barcode" style="margin-top:2px">
+      🔖  Barcode scannen
+    </button>
+    <input type="hidden" id="f-ean">
     <div class="form-group">
       <label data-i18n="l_name">Name / Weingut</label>
       <input id="f-name" placeholder="" type="text">
@@ -1701,6 +1713,7 @@ function cleanWine(w, used) {
     region: cleanText(w.region, 120), country: cleanText(w.country, 120), grape: cleanText(w.grape, 120),
     locRegal: cleanText(w.locRegal, 60), locEbene: cleanSlot(w.locEbene), locPlatz: cleanSlot(w.locPlatz),
     placements: cleanPlacements(w, count),
+    ean: /^\d{8,14}$/.test(String(w.ean || '')) ? String(w.ean) : null,
     location: cleanText(w.location, 200),
     drinkFrom: cleanInt(w.drinkFrom, 1000, 2300), drinkTo: cleanInt(w.drinkTo, 1000, 2300),
     price: parsePrice(w.price), image: cleanImage(w.image), imageUser: !!w.imageUser,
@@ -3039,6 +3052,19 @@ de: {
   rack_delete: "Wein löschen",
   dm_slot: "Aus welchem Platz genommen?",
   dm_slot_none: "Nicht eingelagerte Flasche",
+  m_barcode: "🔖  Barcode scannen",
+  scan_hint_barcode: "Halte den Barcode der Flasche in den Rahmen",
+  scan_hint_qr: "Halte den QR-Code in den Rahmen",
+  scan_no_camera: "Kamera nicht verfügbar oder Zugriff verweigert",
+  barcode_invalid: "Das ist kein gültiger Flaschen-Barcode",
+  barcode_looking: "Barcode wird gesucht…",
+  barcode_found: "Gefunden: {name}",
+  barcode_notfound: "Barcode nicht in der Datenbank – Namen eintragen oder Etikett scannen",
+  barcode_notwine: "Dieser Barcode gehört nicht zu einem Wein",
+  barcode_year: "Bitte den Jahrgang eintragen",
+  barcode_known: "{name} ist schon im Keller. Noch eine Flasche hinzufügen?",
+  barcode_added: "Flasche hinzugefügt – jetzt {n} Stück",
+  barcode_error: "Abfrage fehlgeschlagen (keine Verbindung?)",
   loc_slot: "Platz",
   rack_cap_low: "Auf dieser Ebene liegen bis zu {n} Flaschen in einem Platz.",
   sync_code_notfound: "Code nicht gefunden – bitte prüfen",
@@ -3344,6 +3370,19 @@ en: {
   rack_delete: "Delete wine",
   dm_slot: "Taken from which slot?",
   dm_slot_none: "Bottle not in a slot",
+  m_barcode: "🔖  Scan barcode",
+  scan_hint_barcode: "Hold the bottle's barcode inside the frame",
+  scan_hint_qr: "Hold the QR code inside the frame",
+  scan_no_camera: "Camera not available or access denied",
+  barcode_invalid: "That is not a valid bottle barcode",
+  barcode_looking: "Looking up barcode…",
+  barcode_found: "Found: {name}",
+  barcode_notfound: "Barcode not in the database – enter the name or scan the label",
+  barcode_notwine: "This barcode does not belong to a wine",
+  barcode_year: "Please enter the vintage",
+  barcode_known: "{name} is already in your cellar. Add one more bottle?",
+  barcode_added: "Bottle added – now {n} in stock",
+  barcode_error: "Lookup failed (no connection?)",
   loc_slot: "Slot",
   rack_cap_low: "Up to {n} bottles are stored in one slot on this level.",
   sync_code_notfound: "Code not found – please check it",
@@ -3649,6 +3688,19 @@ es: {
   rack_delete: "Eliminar vino",
   dm_slot: "¿De qué hueco se sacó?",
   dm_slot_none: "Botella sin colocar",
+  m_barcode: "🔖  Escanear código de barras",
+  scan_hint_barcode: "Coloca el código de barras de la botella dentro del marco",
+  scan_hint_qr: "Coloca el código QR dentro del marco",
+  scan_no_camera: "Cámara no disponible o acceso denegado",
+  barcode_invalid: "Este no es un código de barras de botella válido",
+  barcode_looking: "Buscando código de barras…",
+  barcode_found: "Encontrado: {name}",
+  barcode_notfound: "Código de barras no encontrado en la base de datos – escribe el nombre o escanea la etiqueta",
+  barcode_notwine: "Este código de barras no corresponde a un vino",
+  barcode_year: "Introduce la añada",
+  barcode_known: "{name} ya está en tu bodega. ¿Añadir una botella más?",
+  barcode_added: "Botella añadida – ahora hay {n} en stock",
+  barcode_error: "Error en la consulta (¿sin conexión?)",
   loc_slot: "Sitio",
   rack_cap_low: "En este nivel hay hasta {n} botellas en un hueco.",
   sync_code_notfound: "Código no encontrado: compruébalo",
@@ -3954,6 +4006,19 @@ sv: {
   rack_delete: "Ta bort vin",
   dm_slot: "Från vilken plats togs den?",
   dm_slot_none: "Flaska utan plats",
+  m_barcode: "🔖  Skanna streckkod",
+  scan_hint_barcode: "Håll flaskans streckkod inom ramen",
+  scan_hint_qr: "Håll QR-koden inom ramen",
+  scan_no_camera: "Kameran är inte tillgänglig eller åtkomst nekades",
+  barcode_invalid: "Det där är inte en giltig flaskstreckkod",
+  barcode_looking: "Söker efter streckkod…",
+  barcode_found: "Hittad: {name}",
+  barcode_notfound: "Streckkoden finns inte i databasen – ange namnet eller skanna etiketten",
+  barcode_notwine: "Den här streckkoden tillhör inget vin",
+  barcode_year: "Ange årgång",
+  barcode_known: "{name} finns redan i din vinkällare. Lägga till en flaska till?",
+  barcode_added: "Flaska tillagd – nu {n} i lager",
+  barcode_error: "Sökningen misslyckades (ingen anslutning?)",
   loc_slot: "Plats",
   rack_cap_low: "På den här hyllan finns upp till {n} flaskor på en plats.",
   sync_code_notfound: "Koden hittades inte – kontrollera den",
@@ -4259,6 +4324,19 @@ da: {
   rack_delete: "Slet vin",
   dm_slot: "Fra hvilken plads blev den taget?",
   dm_slot_none: "Flaske uden plads",
+  m_barcode: "🔖  Scan stregkode",
+  scan_hint_barcode: "Hold flaskens stregkode inden for rammen",
+  scan_hint_qr: "Hold QR-koden inden for rammen",
+  scan_no_camera: "Kameraet er ikke tilgængeligt, eller adgang blev nægtet",
+  barcode_invalid: "Det er ikke en gyldig flaskestregkode",
+  barcode_looking: "Søger efter stregkode…",
+  barcode_found: "Fundet: {name}",
+  barcode_notfound: "Stregkoden findes ikke i databasen – indtast navnet eller scan etiketten",
+  barcode_notwine: "Denne stregkode hører ikke til en vin",
+  barcode_year: "Indtast årgang",
+  barcode_known: "{name} er allerede i din vinkælder. Tilføj endnu en flaske?",
+  barcode_added: "Flaske tilføjet – nu {n} på lager",
+  barcode_error: "Opslaget mislykkedes (ingen forbindelse?)",
   loc_slot: "Plads",
   rack_cap_low: "På denne hylde ligger op til {n} flasker på én plads.",
   sync_code_notfound: "Koden blev ikke fundet – tjek den",
@@ -4564,6 +4642,19 @@ fi: {
   rack_delete: "Poista viini",
   dm_slot: "Miltä paikalta otettu?",
   dm_slot_none: "Pullo ilman paikkaa",
+  m_barcode: "🔖  Skannaa viivakoodi",
+  scan_hint_barcode: "Pidä pullon viivakoodi kehyksen sisällä",
+  scan_hint_qr: "Pidä QR-koodi kehyksen sisällä",
+  scan_no_camera: "Kamera ei ole käytettävissä tai käyttö estettiin",
+  barcode_invalid: "Tämä ei ole kelvollinen pullon viivakoodi",
+  barcode_looking: "Haetaan viivakoodia…",
+  barcode_found: "Löytyi: {name}",
+  barcode_notfound: "Viivakoodia ei ole tietokannassa – kirjoita nimi tai skannaa etiketti",
+  barcode_notwine: "Tämä viivakoodi ei kuulu viinille",
+  barcode_year: "Anna vuosikerta",
+  barcode_known: "{name} on jo kellarissasi. Lisätäänkö vielä yksi pullo?",
+  barcode_added: "Pullo lisätty – nyt {n} kpl",
+  barcode_error: "Haku epäonnistui (ei yhteyttä?)",
   loc_slot: "Paikka",
   rack_cap_low: "Tällä tasolla yhdellä paikalla on jopa {n} pulloa.",
   sync_code_notfound: "Koodia ei löytynyt – tarkista se",
@@ -4869,6 +4960,19 @@ ru: {
   rack_delete: "Удалить вино",
   dm_slot: "Из какого места взята?",
   dm_slot_none: "Бутылка без места",
+  m_barcode: "🔖  Сканировать штрихкод",
+  scan_hint_barcode: "Поместите штрихкод бутылки в рамку",
+  scan_hint_qr: "Поместите QR-код в рамку",
+  scan_no_camera: "Камера недоступна или доступ запрещён",
+  barcode_invalid: "Это недействительный штрихкод бутылки",
+  barcode_looking: "Поиск штрихкода…",
+  barcode_found: "Найдено: {name}",
+  barcode_notfound: "Штрихкода нет в базе данных – введите название или отсканируйте этикетку",
+  barcode_notwine: "Этот штрихкод не относится к вину",
+  barcode_year: "Укажите год урожая",
+  barcode_known: "{name} уже есть в вашем погребе. Добавить ещё одну бутылку?",
+  barcode_added: "Бутылка добавлена – теперь в наличии {n}",
+  barcode_error: "Не удалось выполнить поиск (нет соединения?)",
   loc_slot: "Место",
   rack_cap_low: "На этом ярусе в одном месте лежит до {n} бутылок.",
   sync_code_notfound: "Код не найден – проверьте его",
@@ -5174,6 +5278,19 @@ it: {
   rack_delete: "Elimina vino",
   dm_slot: "Da quale posto è stata presa?",
   dm_slot_none: "Bottiglia non riposta",
+  m_barcode: "🔖  Scansiona codice a barre",
+  scan_hint_barcode: "Inquadra il codice a barre della bottiglia nel riquadro",
+  scan_hint_qr: "Inquadra il codice QR nel riquadro",
+  scan_no_camera: "Fotocamera non disponibile o accesso negato",
+  barcode_invalid: "Questo non è un codice a barre valido per una bottiglia",
+  barcode_looking: "Ricerca del codice a barre…",
+  barcode_found: "Trovato: {name}",
+  barcode_notfound: "Codice a barre non presente nel database – inserisci il nome o scansiona l'etichetta",
+  barcode_notwine: "Questo codice a barre non appartiene a un vino",
+  barcode_year: "Inserisci l'annata",
+  barcode_known: "{name} è già in cantina. Aggiungere un'altra bottiglia?",
+  barcode_added: "Bottiglia aggiunta – ora ne hai {n}",
+  barcode_error: "Ricerca non riuscita (nessuna connessione?)",
   loc_slot: "Posto",
   rack_cap_low: "Su questo ripiano ci sono fino a {n} bottiglie in un posto.",
   sync_code_notfound: "Codice non trovato – controllalo",
@@ -5479,6 +5596,19 @@ fr: {
   rack_delete: "Supprimer le vin",
   dm_slot: "Prise de quel emplacement ?",
   dm_slot_none: "Bouteille non rangée",
+  m_barcode: "🔖  Scanner le code-barres",
+  scan_hint_barcode: "Placez le code-barres de la bouteille dans le cadre",
+  scan_hint_qr: "Placez le code QR dans le cadre",
+  scan_no_camera: "Caméra indisponible ou accès refusé",
+  barcode_invalid: "Ce n'est pas un code-barres de bouteille valide",
+  barcode_looking: "Recherche du code-barres…",
+  barcode_found: "Trouvé : {name}",
+  barcode_notfound: "Code-barres absent de la base de données – saisissez le nom ou scannez l'étiquette",
+  barcode_notwine: "Ce code-barres n'appartient pas à un vin",
+  barcode_year: "Veuillez saisir le millésime",
+  barcode_known: "{name} est déjà dans votre cave. Ajouter une bouteille de plus ?",
+  barcode_added: "Bouteille ajoutée – {n} en stock désormais",
+  barcode_error: "Échec de la recherche (pas de connexion ?)",
   loc_slot: "Place",
   rack_cap_low: "Sur ce niveau, jusqu'à {n} bouteilles sont rangées dans un emplacement.",
   sync_code_notfound: "Code introuvable – vérifiez-le",
@@ -5784,6 +5914,19 @@ pl: {
   rack_delete: "Usuń wino",
   dm_slot: "Z którego miejsca zabrano?",
   dm_slot_none: "Butelka bez miejsca",
+  m_barcode: "🔖  Skanuj kod kreskowy",
+  scan_hint_barcode: "Umieść kod kreskowy butelki w ramce",
+  scan_hint_qr: "Umieść kod QR w ramce",
+  scan_no_camera: "Aparat niedostępny lub odmowa dostępu",
+  barcode_invalid: "To nie jest prawidłowy kod kreskowy butelki",
+  barcode_looking: "Wyszukiwanie kodu kreskowego…",
+  barcode_found: "Znaleziono: {name}",
+  barcode_notfound: "Kodu kreskowego nie ma w bazie – wpisz nazwę lub zeskanuj etykietę",
+  barcode_notwine: "Ten kod kreskowy nie należy do wina",
+  barcode_year: "Wpisz rocznik",
+  barcode_known: "{name} jest już w Twojej piwniczce. Dodać jeszcze jedną butelkę?",
+  barcode_added: "Dodano butelkę – teraz w zapasie: {n}",
+  barcode_error: "Wyszukiwanie nie powiodło się (brak połączenia?)",
   loc_slot: "Miejsce",
   rack_cap_low: "Na tym poziomie w jednym miejscu leży do {n} butelek.",
   sync_code_notfound: "Nie znaleziono kodu – sprawdź go",
@@ -6089,6 +6232,19 @@ hu: {
   rack_delete: "Bor törlése",
   dm_slot: "Melyik helyről vették ki?",
   dm_slot_none: "Elhelyezetlen üveg",
+  m_barcode: "🔖  Vonalkód beolvasása",
+  scan_hint_barcode: "Tartsd a palack vonalkódját a keretbe",
+  scan_hint_qr: "Tartsd a QR-kódot a keretbe",
+  scan_no_camera: "A kamera nem érhető el, vagy a hozzáférés megtagadva",
+  barcode_invalid: "Ez nem érvényes palackvonalkód",
+  barcode_looking: "Vonalkód keresése…",
+  barcode_found: "Megtalálva: {name}",
+  barcode_notfound: "A vonalkód nincs az adatbázisban – add meg a nevet, vagy olvasd be a címkét",
+  barcode_notwine: "Ez a vonalkód nem borhoz tartozik",
+  barcode_year: "Kérjük, add meg az évjáratot",
+  barcode_known: "A(z) {name} már a pincédben van. Hozzáadsz még egy palackot?",
+  barcode_added: "Palack hozzáadva – most {n} db van készleten",
+  barcode_error: "A lekérdezés sikertelen (nincs kapcsolat?)",
   loc_slot: "Hely",
   rack_cap_low: "Ezen a szinten egy helyen legfeljebb {n} üveg van.",
   sync_code_notfound: "A kód nem található – ellenőrizd",
@@ -6394,6 +6550,19 @@ cs: {
   rack_delete: "Smazat víno",
   dm_slot: "Z kterého místa byla vzata?",
   dm_slot_none: "Láhev bez místa",
+  m_barcode: "🔖  Naskenovat čárový kód",
+  scan_hint_barcode: "Umístěte čárový kód lahve do rámečku",
+  scan_hint_qr: "Umístěte QR kód do rámečku",
+  scan_no_camera: "Fotoaparát není dostupný nebo byl přístup odepřen",
+  barcode_invalid: "Toto není platný čárový kód lahve",
+  barcode_looking: "Vyhledávání čárového kódu…",
+  barcode_found: "Nalezeno: {name}",
+  barcode_notfound: "Čárový kód není v databázi – zadejte název nebo naskenujte etiketu",
+  barcode_notwine: "Tento čárový kód nepatří k vínu",
+  barcode_year: "Zadejte prosím ročník",
+  barcode_known: "{name} už ve sklípku je. Přidat ještě jednu lahev?",
+  barcode_added: "Lahev přidána – nyní {n} ks",
+  barcode_error: "Dotaz se nezdařil (bez připojení?)",
   loc_slot: "Místo",
   rack_cap_low: "Na této úrovni je na jednom místě až {n} lahví.",
   sync_code_notfound: "Kód nebyl nalezen – zkontrolujte jej",
@@ -6699,6 +6868,19 @@ sk: {
   rack_delete: "Zmazať víno",
   dm_slot: "Z ktorého miesta bola vzatá?",
   dm_slot_none: "Fľaša bez miesta",
+  m_barcode: "🔖  Naskenovať čiarový kód",
+  scan_hint_barcode: "Umiestnite čiarový kód fľaše do rámika",
+  scan_hint_qr: "Umiestnite QR kód do rámika",
+  scan_no_camera: "Fotoaparát nie je dostupný alebo bol prístup zamietnutý",
+  barcode_invalid: "Toto nie je platný čiarový kód fľaše",
+  barcode_looking: "Vyhľadáva sa čiarový kód…",
+  barcode_found: "Nájdené: {name}",
+  barcode_notfound: "Čiarový kód nie je v databáze – zadajte názov alebo naskenujte etiketu",
+  barcode_notwine: "Tento čiarový kód nepatrí vínu",
+  barcode_year: "Zadajte prosím ročník",
+  barcode_known: "{name} je už vo vašej pivnici. Pridať ešte jednu fľašu?",
+  barcode_added: "Fľaša pridaná – teraz {n} ks",
+  barcode_error: "Dotaz zlyhal (bez pripojenia?)",
   loc_slot: "Miesto",
   rack_cap_low: "Na tejto úrovni je na jednom mieste až {n} fliaš.",
   sync_code_notfound: "Kód sa nenašiel – skontrolujte ho",
@@ -7004,6 +7186,19 @@ ro: {
   rack_delete: "Șterge vinul",
   dm_slot: "Din ce loc a fost luată?",
   dm_slot_none: "Sticlă fără loc",
+  m_barcode: "🔖  Scanează codul de bare",
+  scan_hint_barcode: "Ține codul de bare al sticlei în cadru",
+  scan_hint_qr: "Ține codul QR în cadru",
+  scan_no_camera: "Camera nu este disponibilă sau accesul a fost refuzat",
+  barcode_invalid: "Acesta nu este un cod de bare valid pentru sticlă",
+  barcode_looking: "Se caută codul de bare…",
+  barcode_found: "Găsit: {name}",
+  barcode_notfound: "Codul de bare nu este în baza de date – introdu numele sau scanează eticheta",
+  barcode_notwine: "Acest cod de bare nu aparține unui vin",
+  barcode_year: "Te rugăm să introduci anul recoltei",
+  barcode_known: "{name} este deja în pivniță. Adaugi încă o sticlă?",
+  barcode_added: "Sticlă adăugată – acum {n} în stoc",
+  barcode_error: "Căutarea a eșuat (fără conexiune?)",
   loc_slot: "Loc",
   rack_cap_low: "Pe acest nivel, într-un loc sunt până la {n} sticle.",
   sync_code_notfound: "Codul nu a fost găsit – verifică-l",
@@ -7309,6 +7504,19 @@ hr: {
   rack_delete: "Izbriši vino",
   dm_slot: "Iz kojeg je mjesta uzeta?",
   dm_slot_none: "Boca bez mjesta",
+  m_barcode: "🔖  Skeniraj barkod",
+  scan_hint_barcode: "Drži barkod boce unutar okvira",
+  scan_hint_qr: "Drži QR kod unutar okvira",
+  scan_no_camera: "Kamera nije dostupna ili je pristup odbijen",
+  barcode_invalid: "Ovo nije valjan barkod boce",
+  barcode_looking: "Traženje barkoda…",
+  barcode_found: "Pronađeno: {name}",
+  barcode_notfound: "Barkod nije u bazi podataka – upiši naziv ili skeniraj etiketu",
+  barcode_notwine: "Ovaj barkod ne pripada vinu",
+  barcode_year: "Upiši berbu",
+  barcode_known: "{name} je već u tvom podrumu. Dodati još jednu bocu?",
+  barcode_added: "Boca dodana – sada ih je {n} na zalihi",
+  barcode_error: "Upit nije uspio (nema veze?)",
   loc_slot: "Mjesto",
   rack_cap_low: "Na ovoj razini u jednom je mjestu do {n} boca.",
   sync_code_notfound: "Kod nije pronađen – provjerite ga",
@@ -7614,6 +7822,19 @@ pt: {
   rack_delete: "Eliminar vinho",
   dm_slot: "De que lugar foi retirada?",
   dm_slot_none: "Garrafa sem lugar",
+  m_barcode: "🔖  Ler código de barras",
+  scan_hint_barcode: "Coloque o código de barras da garrafa na moldura",
+  scan_hint_qr: "Coloque o código QR na moldura",
+  scan_no_camera: "Câmara indisponível ou acesso negado",
+  barcode_invalid: "Este não é um código de barras de garrafa válido",
+  barcode_looking: "A procurar o código de barras…",
+  barcode_found: "Encontrado: {name}",
+  barcode_notfound: "Código de barras não está na base de dados – introduza o nome ou leia o rótulo",
+  barcode_notwine: "Este código de barras não pertence a um vinho",
+  barcode_year: "Introduza o ano da colheita",
+  barcode_known: "{name} já está na adega. Adicionar mais uma garrafa?",
+  barcode_added: "Garrafa adicionada – agora {n} em stock",
+  barcode_error: "Falha na consulta (sem ligação?)",
   loc_slot: "Lugar",
   rack_cap_low: "Neste nível há até {n} garrafas num lugar.",
   sync_code_notfound: "Código não encontrado – verifique-o",
@@ -7919,6 +8140,19 @@ no: {
   rack_delete: "Slett vin",
   dm_slot: "Fra hvilken plass ble den tatt?",
   dm_slot_none: "Flaske uten plass",
+  m_barcode: "🔖  Skann strekkode",
+  scan_hint_barcode: "Hold flaskens strekkode innenfor rammen",
+  scan_hint_qr: "Hold QR-koden innenfor rammen",
+  scan_no_camera: "Kameraet er ikke tilgjengelig, eller tilgang ble nektet",
+  barcode_invalid: "Dette er ikke en gyldig flaskestrekkode",
+  barcode_looking: "Søker etter strekkode…",
+  barcode_found: "Funnet: {name}",
+  barcode_notfound: "Strekkoden finnes ikke i databasen – skriv inn navnet eller skann etiketten",
+  barcode_notwine: "Denne strekkoden hører ikke til en vin",
+  barcode_year: "Skriv inn årgang",
+  barcode_known: "{name} er allerede i vinkjelleren din. Legge til en flaske til?",
+  barcode_added: "Flaske lagt til – nå {n} på lager",
+  barcode_error: "Oppslaget mislyktes (ingen tilkobling?)",
   loc_slot: "Plass",
   rack_cap_low: "På denne hyllen ligger opptil {n} flasker på én plass.",
   sync_code_notfound: "Koden ble ikke funnet – sjekk den",
@@ -8224,6 +8458,19 @@ nl: {
   rack_delete: "Wijn verwijderen",
   dm_slot: "Uit welke plek genomen?",
   dm_slot_none: "Fles zonder plek",
+  m_barcode: "🔖  Barcode scannen",
+  scan_hint_barcode: "Houd de barcode van de fles binnen het kader",
+  scan_hint_qr: "Houd de QR-code binnen het kader",
+  scan_no_camera: "Camera niet beschikbaar of toegang geweigerd",
+  barcode_invalid: "Dit is geen geldige flessenbarcode",
+  barcode_looking: "Barcode wordt gezocht…",
+  barcode_found: "Gevonden: {name}",
+  barcode_notfound: "Barcode staat niet in de database – voer de naam in of scan het etiket",
+  barcode_notwine: "Deze barcode hoort niet bij een wijn",
+  barcode_year: "Voer de jaargang in",
+  barcode_known: "{name} staat al in je kelder. Nog een fles toevoegen?",
+  barcode_added: "Fles toegevoegd – nu {n} op voorraad",
+  barcode_error: "Opzoeken mislukt (geen verbinding?)",
   loc_slot: "Plaats",
   rack_cap_low: "Op dit niveau liggen tot {n} flessen op één plek.",
   sync_code_notfound: "Code niet gevonden – controleer hem",
@@ -8529,6 +8776,19 @@ el: {
   rack_delete: "Διαγραφή κρασιού",
   dm_slot: "Από ποια θέση πάρθηκε;",
   dm_slot_none: "Η φιάλη δεν είναι σε θέση",
+  m_barcode: "🔖  Σάρωση γραμμωτού κώδικα",
+  scan_hint_barcode: "Κρατήστε τον γραμμωτό κώδικα του μπουκαλιού μέσα στο πλαίσιο",
+  scan_hint_qr: "Κρατήστε τον κωδικό QR μέσα στο πλαίσιο",
+  scan_no_camera: "Η κάμερα δεν είναι διαθέσιμη ή η πρόσβαση απορρίφθηκε",
+  barcode_invalid: "Αυτός δεν είναι έγκυρος γραμμωτός κώδικας μπουκαλιού",
+  barcode_looking: "Αναζήτηση γραμμωτού κώδικα…",
+  barcode_found: "Βρέθηκε: {name}",
+  barcode_notfound: "Ο γραμμωτός κώδικας δεν υπάρχει στη βάση δεδομένων – πληκτρολογήστε το όνομα ή σαρώστε την ετικέτα",
+  barcode_notwine: "Αυτός ο γραμμωτός κώδικας δεν ανήκει σε κρασί",
+  barcode_year: "Συμπληρώστε τη χρονιά",
+  barcode_known: "Το {name} υπάρχει ήδη στο κελάρι σας. Να προστεθεί ένα ακόμη μπουκάλι;",
+  barcode_added: "Το μπουκάλι προστέθηκε – τώρα {n} σε απόθεμα",
+  barcode_error: "Η αναζήτηση απέτυχε (δεν υπάρχει σύνδεση;)",
   loc_slot: "Θέση",
   rack_cap_low: "Σε αυτό το επίπεδο αποθηκεύονται έως {n} φιάλες σε μία θέση.",
   sync_code_notfound: "Ο κωδικός δεν βρέθηκε – ελέγξτε τον",
@@ -8834,6 +9094,19 @@ uk: {
   rack_delete: "Видалити вино",
   dm_slot: "З якого місця взято?",
   dm_slot_none: "Пляшка не на місці",
+  m_barcode: "🔖  Сканувати штрихкод",
+  scan_hint_barcode: "Помістіть штрихкод пляшки в рамку",
+  scan_hint_qr: "Помістіть QR-код у рамку",
+  scan_no_camera: "Камера недоступна або доступ заборонено",
+  barcode_invalid: "Це недійсний штрихкод пляшки",
+  barcode_looking: "Пошук штрихкоду…",
+  barcode_found: "Знайдено: {name}",
+  barcode_notfound: "Штрихкоду немає в базі даних – введіть назву або відскануйте етикетку",
+  barcode_notwine: "Цей штрихкод не належить вину",
+  barcode_year: "Вкажіть рік врожаю",
+  barcode_known: "{name} уже є у вашому погребі. Додати ще одну пляшку?",
+  barcode_added: "Пляшку додано – тепер у наявності {n}",
+  barcode_error: "Не вдалося виконати пошук (немає з'єднання?)",
   loc_slot: "Місце",
   rack_cap_low: "На цьому рівні в одному місці зберігається до {n} пляшок.",
   sync_code_notfound: "Код не знайдено – перевірте його",
@@ -9139,6 +9412,19 @@ ja: {
   rack_delete: "ワインを削除",
   dm_slot: "どの場所から取り出しましたか？",
   dm_slot_none: "場所に置かれていないボトル",
+  m_barcode: "🔖  バーコードをスキャン",
+  scan_hint_barcode: "ボトルのバーコードを枠内に合わせてください",
+  scan_hint_qr: "QRコードを枠内に合わせてください",
+  scan_no_camera: "カメラを利用できないか、アクセスが拒否されました",
+  barcode_invalid: "有効なボトルのバーコードではありません",
+  barcode_looking: "バーコードを検索しています…",
+  barcode_found: "見つかりました：{name}",
+  barcode_notfound: "バーコードがデータベースにありません – 名前を入力するか、ラベルをスキャンしてください",
+  barcode_notwine: "このバーコードはワインのものではありません",
+  barcode_year: "ヴィンテージ（年）を入力してください",
+  barcode_known: "{name} はすでにセラーにあります。もう1本追加しますか？",
+  barcode_added: "ボトルを追加しました – 現在 {n} 本",
+  barcode_error: "検索に失敗しました（接続を確認してください）",
   loc_slot: "場所",
   rack_cap_low: "この段では、1か所に最大{n}本まで保管されます。",
   sync_code_notfound: "コードが見つかりません – ご確認ください",
@@ -9444,6 +9730,19 @@ ko: {
   rack_delete: "와인 삭제",
   dm_slot: "어느 칸에서 꺼냈나요?",
   dm_slot_none: "칸에 없는 병",
+  m_barcode: "🔖  바코드 스캔",
+  scan_hint_barcode: "병의 바코드를 프레임 안에 맞춰 주세요",
+  scan_hint_qr: "QR 코드를 프레임 안에 맞춰 주세요",
+  scan_no_camera: "카메라를 사용할 수 없거나 접근이 거부되었습니다",
+  barcode_invalid: "유효한 병 바코드가 아닙니다",
+  barcode_looking: "바코드를 검색하는 중…",
+  barcode_found: "찾음: {name}",
+  barcode_notfound: "데이터베이스에 없는 바코드입니다 – 이름을 입력하거나 라벨을 스캔해 주세요",
+  barcode_notwine: "이 바코드는 와인의 것이 아닙니다",
+  barcode_year: "빈티지를 입력해 주세요",
+  barcode_known: "{name}이(가) 이미 셀러에 있습니다. 한 병 더 추가할까요?",
+  barcode_added: "병이 추가되었습니다 – 현재 {n}병",
+  barcode_error: "조회에 실패했습니다 (연결을 확인해 주세요)",
   loc_slot: "칸",
   rack_cap_low: "이 단에서는 한 칸에 최대 {n}병이 보관돼요.",
   sync_code_notfound: "코드를 찾을 수 없어요 – 확인해 주세요",
@@ -9749,6 +10048,19 @@ zh: {
   rack_delete: "删除葡萄酒",
   dm_slot: "从哪个位置取出？",
   dm_slot_none: "酒瓶不在任何位置",
+  m_barcode: "🔖  扫描条形码",
+  scan_hint_barcode: "请将酒瓶条形码对准框内",
+  scan_hint_qr: "请将二维码对准框内",
+  scan_no_camera: "相机不可用或访问被拒绝",
+  barcode_invalid: "这不是有效的酒瓶条形码",
+  barcode_looking: "正在查询条形码…",
+  barcode_found: "已找到：{name}",
+  barcode_notfound: "数据库中没有该条形码 – 请输入名称或扫描酒标",
+  barcode_notwine: "此条形码不属于葡萄酒",
+  barcode_year: "请输入年份",
+  barcode_known: "{name} 已在您的酒窖中。再添加一瓶吗？",
+  barcode_added: "已添加酒瓶 – 现有 {n} 瓶",
+  barcode_error: "查询失败（无网络连接？）",
   loc_slot: "位",
   rack_cap_low: "此层每个位最多存放 {n} 瓶。",
   sync_code_notfound: "未找到同步码 – 请检查",
@@ -10054,6 +10366,19 @@ hi: {
   rack_delete: "वाइन हटाएँ",
   dm_slot: "किस स्थान से निकाली गई?",
   dm_slot_none: "बोतल किसी स्थान पर नहीं है",
+  m_barcode: "🔖  बारकोड स्कैन करें",
+  scan_hint_barcode: "बोतल के बारकोड को फ़्रेम के अंदर रखें",
+  scan_hint_qr: "QR कोड को फ़्रेम के अंदर रखें",
+  scan_no_camera: "कैमरा उपलब्ध नहीं है या एक्सेस अस्वीकार किया गया",
+  barcode_invalid: "यह मान्य बोतल बारकोड नहीं है",
+  barcode_looking: "बारकोड खोजा जा रहा है…",
+  barcode_found: "मिला: {name}",
+  barcode_notfound: "बारकोड डेटाबेस में नहीं है – नाम दर्ज करें या लेबल स्कैन करें",
+  barcode_notwine: "यह बारकोड किसी वाइन का नहीं है",
+  barcode_year: "कृपया विंटेज (वर्ष) दर्ज करें",
+  barcode_known: "{name} पहले से आपके सेलर में है। एक और बोतल जोड़ें?",
+  barcode_added: "बोतल जोड़ी गई – अब स्टॉक में {n} हैं",
+  barcode_error: "खोज विफल रही (कनेक्शन नहीं है?)",
   loc_slot: "स्थान",
   rack_cap_low: "इस स्तर पर एक स्थान में अधिकतम {n} बोतलें रखी जाती हैं।",
   sync_code_notfound: "कोड नहीं मिला – कृपया जाँच लें",
@@ -10666,6 +10991,7 @@ function editWine(id) {
   document.getElementById('f-drink-to').value = w.drinkTo||'';
   document.getElementById('f-price').value = w.price||'';
   document.getElementById('f-image').value = shownImage(w) || '';
+  document.getElementById('f-ean').value = w.ean || '';
   updateImagePreview();
   document.getElementById('f-note').value = w.note||'';
   setStar(w.rating||0);
@@ -10681,7 +11007,7 @@ function openAddModal() {
   editId = null;
   autoDrink = { from: null, to: null };
   lastAutoLookupKey = '';
-  ['f-name','f-year','f-region','f-country','f-grape','f-loc-regal','f-loc-ebene','f-loc-platz','f-note','f-drink-from','f-drink-to','f-price','f-image'].forEach(id => document.getElementById(id).value = '');
+  ['f-name','f-year','f-region','f-country','f-grape','f-loc-regal','f-loc-ebene','f-loc-platz','f-note','f-drink-from','f-drink-to','f-price','f-image','f-ean'].forEach(id => document.getElementById(id).value = '');
   updateImagePreview();
   document.getElementById('f-count').value = 1;
   document.getElementById('f-type').value = 'rot';
@@ -10729,6 +11055,7 @@ function saveWine() {
     imageUser: imgUser,
     rating: currentStar||null,
     note: document.getElementById('f-note').value.trim()||null,
+    ean: document.getElementById('f-ean').value || null,
     added: editId ? (wines.find(w=>w.id===editId)||{}).added : new Date().toISOString()
   });
   // Ort der ersten Flasche kommt aus dem Formular; weitere Flaschen (placements) bleiben beim Bearbeiten erhalten.
@@ -10765,7 +11092,7 @@ function saveWine() {
     const existing = wines.find(w => norm(w.name) === norm(wine.name) && (w.year||null) === (wine.year||null));
     if (existing) {
       existing.count = (existing.count||1) + (wine.count||1);
-      ['region','country','grape','locRegal','locEbene','locPlatz','drinkFrom','drinkTo','price','image','rating','note'].forEach(k => {
+      ['region','country','grape','locRegal','locEbene','locPlatz','drinkFrom','drinkTo','price','image','rating','note','ean'].forEach(k => {
         if (!existing[k] && wine[k]) existing[k] = wine[k];
       });
       const addPl = (wine.placements || []).filter(x => { const rr = rackById(x.rack); return rr && (slotMapFor(x.rack).get(x.e + '|' + x.p) || []).length < rackCap(rr, x.e); });
@@ -10823,6 +11150,107 @@ async function handleScan(e) {
     loading.style.display = 'none';
     e.target.value = '';
   }
+}
+
+// ═══════════════════════════════════════
+// CODE-SCANNER (Barcode der Flasche; QR-Codes am Regal)
+// Store-App: Plugin CapacitorBarcodeScanner (Apple-Kamera). Web: html5-qrcode (lokal, wird erst beim ersten Scan geladen).
+// ═══════════════════════════════════════
+// EAN-8 / UPC-A / EAN-13 / GTIN-14 mit Prüfziffer (GS1)
+function validEan(s) {
+  if (!/^\d+$/.test(s) || ![8, 12, 13, 14].includes(s.length)) return false;
+  const d = s.split('').map(Number), check = d.pop();
+  let sum = 0;
+  for (let i = d.length - 1, w = 3; i >= 0; i--, w = 4 - w) sum += d[i] * w;
+  return (10 - (sum % 10)) % 10 === check;
+}
+function loadScriptOnce(src) {
+  return new Promise((resolve, reject) => {
+    if (loadScriptOnce.done && loadScriptOnce.done[src]) return resolve();
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = () => { (loadScriptOnce.done = loadScriptOnce.done || {})[src] = true; resolve(); };
+    s.onerror = () => reject(new Error('script ' + src));
+    document.head.appendChild(s);
+  });
+}
+let scanBusy = false;
+// kind: 'barcode' | 'qr'  →  { text, format } oder null (abgebrochen / keine Kamera)
+async function scanCode(kind) {
+  if (scanBusy) return null;
+  scanBusy = true;
+  try {
+    const P = window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.CapacitorBarcodeScanner;
+    if (isNativeApp() && P) {
+      const r = await P.scanBarcode({ hint: 17, scanInstructions: t(kind === 'qr' ? 'scan_hint_qr' : 'scan_hint_barcode'), scanButton: false, scanText: ' ', cameraDirection: 1, scanOrientation: 1 });
+      return r && r.ScanResult ? { text: String(r.ScanResult).trim(), format: r.format } : null;
+    }
+    return await scanWeb(kind);
+  } catch (e) {
+    // Abbrechen ist kein Fehler; nur fehlende Berechtigung/Kamera melden
+    if (/permission|denied|camera|access|not ?allowed|notfound/i.test(String((e && (e.message || e.name)) || e))) showToast(t('scan_no_camera'));
+    return null;
+  } finally { scanBusy = false; }
+}
+async function scanWeb(kind) {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { showToast(t('scan_no_camera')); return null; }
+  await loadScriptOnce('lib/html5-qrcode.min.js');
+  const ov = document.getElementById('scan-overlay');
+  document.getElementById('scan-hint').textContent = t(kind === 'qr' ? 'scan_hint_qr' : 'scan_hint_barcode');
+  ov.classList.add('show');
+  const F = Html5QrcodeSupportedFormats;
+  const h = new Html5Qrcode('scan-reader', { formatsToSupport: kind === 'qr' ? [F.QR_CODE] : [F.EAN_13, F.EAN_8, F.UPC_A, F.UPC_E], useBarCodeDetectorIfSupported: true, verbose: false });
+  return new Promise((resolve) => {
+    let done = false;
+    const finish = async (v) => {
+      if (done) return; done = true;
+      try { await h.stop(); } catch (e) {}
+      try { h.clear(); } catch (e) {}
+      ov.classList.remove('show');
+      resolve(v);
+    };
+    document.getElementById('scan-cancel').onclick = () => finish(null);
+    h.start({ facingMode: 'environment' }, { fps: 10, qrbox: kind === 'qr' ? { width: 240, height: 240 } : { width: 300, height: 140 } },
+      (text) => finish({ text: String(text).trim(), format: kind }), () => {})
+      .catch(() => { done = true; ov.classList.remove('show'); showToast(t('scan_no_camera')); resolve(null); });
+  });
+}
+// Wein hinzufügen per Flaschen-Barcode: Name/Marke/Typ aus Open Food Facts (über unseren Server, kostenlos);
+// Region, Rebsorte, Trinkfenster und Preis ergänzt danach wie gewohnt die KI.
+async function scanBarcodeForWine() {
+  const r = await scanCode('barcode');
+  if (!r) return;
+  const ean = r.text.replace(/\s+/g, '');
+  if (!validEan(ean)) { showToast(t('barcode_invalid')); return; }
+  const have = editId ? null : wines.find(w => w.ean === ean);
+  if (have && confirm(t('barcode_known', { name: have.name + (have.year && !have.name.includes(String(have.year)) ? ' ' + have.year : '') }))) {
+    have.count = (have.count || 1) + 1;
+    save(); closeModal('add-modal'); renderKeller();
+    showToast(t('barcode_added', { n: have.count }));
+    return;
+  }
+  document.getElementById('f-ean').value = ean;   // wird mit dem Wein gespeichert: beim nächsten Scan kennt die App die Flasche
+  const tok = formToken;
+  beginSingleProgress(t('barcode_looking'));
+  try {
+    const resp = await fetch(SCAN_PROXY_URL + '/barcode', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ean }) });
+    if (!resp.ok) throw new Error('http ' + resp.status);
+    const d = await resp.json();
+    if (tok !== formToken) return;
+    if (!d.found) { showToast(t('barcode_notfound')); return; }
+    if (d.notWine) { document.getElementById('f-ean').value = ''; showToast(t('barcode_notwine')); return; }
+    let name = d.name || d.brand || '';
+    if (d.brand && d.name && !d.name.toLowerCase().includes(d.brand.toLowerCase())) name = d.brand + ' – ' + d.name;
+    if (!document.getElementById('f-name').value.trim()) document.getElementById('f-name').value = name;
+    const ym = /\b(19[5-9]\d|20[0-4]\d)\b/.exec(d.name || '');
+    if (ym && !document.getElementById('f-year').value) document.getElementById('f-year').value = ym[1];
+    if (d.type) document.getElementById('f-type').value = d.type;
+    showToast(t('barcode_found', { name }));
+    if (document.getElementById('f-year').value) maybeAutoLookup();
+    else { showToast(t('barcode_year')); document.getElementById('f-year').focus(); }
+  } catch (e) {
+    showToast(t('barcode_error'));
+  } finally { endSingleProgress(); }
 }
 
 async function handleLocationScan(e) {

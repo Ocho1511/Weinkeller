@@ -1,11 +1,11 @@
-﻿/* Weinkeller Service Worker – App-Shell offline, HTML network-first (Updates), Schriften und Bibliotheken lokal gecacht */
+/* Weinkeller Service Worker – App-Shell offline, HTML network-first (Updates), Schriften und Bibliotheken lokal gecacht */
 // Mehrere Weinkeller-Apps liegen unter derselben Herkunft (…github.io/<Repo>/). Jede bekommt deshalb einen eigenen Cache
 // (Version + Pfad), und beim Aufräumen werden nur die eigenen alten Caches gelöscht, nicht die der anderen Apps.
 const SCOPE = new URL(self.registration.scope).pathname;
-const CACHE = 'weinkeller-v7:' + SCOPE;
+const CACHE = 'weinkeller-v8:' + SCOPE;
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png',
   './fonts/Inter-latin.woff2', './fonts/PlayfairDisplay-latin.woff2', './fonts/PlayfairDisplay-Italic-latin.woff2', './fonts/UnifrakturMaguntia-latin.woff2',
-  './lib/xlsx.full.min.js', './lib/jspdf.umd.min.js', './lib/jspdf.plugin.autotable.min.js'];
+  './lib/xlsx.full.min.js', './lib/jspdf.umd.min.js', './lib/jspdf.plugin.autotable.min.js', './lib/html5-qrcode.min.js'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()).catch(() => {}));
