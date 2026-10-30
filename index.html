@@ -531,6 +531,15 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .qr-hint { font-size: 12px; color: var(--text-muted); }
 .qr-cuts { display: flex; align-items: center; gap: 8px; font-size: 13px; margin-bottom: 12px; }
 .rack-qr-all { margin-top: 10px; }
+.rack-scanbar { margin-bottom: 10px; }
+#lvl-body .lvl-h { font-size: 12px; font-weight: 700; color: var(--gold-light); letter-spacing: .06em; text-transform: uppercase; margin: 16px 0 8px; }
+.lvl-row { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; }
+.lvl-top { display: flex; gap: 10px; align-items: baseline; margin-bottom: 8px; }
+.lvl-slot { font-weight: 700; color: var(--gold); min-width: 34px; }
+.lvl-name { font-weight: 600; color: var(--text); font-size: 13px; }
+.lvl-btns, .lvl-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.lvl-empty { font-size: 12px; color: var(--text-muted); }
+.lvl-foot { flex-wrap: wrap; gap: 8px; }
 #qr-print-sheet { display: none; }
 @media print {
   body.qr-printing > *:not(#qr-print-sheet) { display: none !important; }
@@ -1438,6 +1447,7 @@ input[type="file"] { display: none; }
         <input id="f-loc-ebene" placeholder="Ebene" data-i18n-ph="ph_ebene" type="text">
         <input id="f-loc-platz" placeholder="Platz v.l." data-i18n-ph="ph_platz" type="text">
         <button type="button" class="mini-scan-btn" onclick="document.getElementById('location-camera-input').click()" title="Lagerplatz scannen">📷</button>
+        <button type="button" class="mini-scan-btn" onclick="scanShelfForForm()" title="QR">▦</button>
       </div>
     </div>
     <div class="form-row">
@@ -1586,6 +1596,20 @@ input[type="file"] { display: none; }
 </div>
 
 <!-- DRINK MODAL -->
+<div class="modal-overlay" id="lvl-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2 id="lvl-title"></h2>
+    <div class="qr-hint" id="lvl-sub"></div>
+    <div id="lvl-body"></div>
+    <div class="btn-row lvl-foot">
+      <button class="btn-secondary" onclick="closeLevelSheet()" data-i18n="qr_close">Schließen</button>
+      <button class="btn-secondary" onclick="lvlNext()" data-i18n="shelf_next">Nächste Ebene scannen</button>
+      <button class="btn-primary" onclick="lvlMoveAll()" data-i18n="shelf_moveall">Ganze Ebene verschieben</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="drink-modal">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -3102,6 +3126,24 @@ de: {
   qr_print: "Drucken",
   qr_close: "Schließen",
   qr_cuts: "Schnittlinien",
+  shelf_scan: "▦  Ebene scannen",
+  shelf_unknown: "QR-Code nicht erkannt – er gehört zu keinem Regal dieses Kellers",
+  shelf_rack_only: "{rack}: bitte das Etikett einer Ebene scannen",
+  shelf_need_level: "Bitte das Etikett einer Ebene scannen (nicht das Regal-Etikett)",
+  shelf_on_level: "Auf dieser Ebene",
+  shelf_empty: "Auf dieser Ebene liegt noch nichts",
+  shelf_store: "Hier einlagern",
+  shelf_store_none: "Keine Weine zum Einlagern",
+  shelf_slots: "{n} von {m} Plätzen belegt",
+  shelf_full: "Kein freier Platz auf dieser Ebene",
+  shelf_take: "Entnehmen",
+  shelf_same: "Das ist dieselbe Ebene",
+  shelf_next: "Nächste Ebene scannen",
+  shelf_how_many: "Wie viele Flaschen von „{name}“ einlagern?",
+  shelf_moveall: "Ganze Ebene verschieben",
+  shelf_moveall_confirm: "{n} Flasche(n) von {from} nach {to} verschieben?",
+  shelf_moveall_rest: "{n} finden dort keinen Platz und bleiben liegen.",
+  shelf_moveall_done: "{n} Flasche(n) verschoben ✓",
   loc_slot: "Platz",
   rack_cap_low: "Auf dieser Ebene liegen bis zu {n} Flaschen in einem Platz.",
   sync_code_notfound: "Code nicht gefunden – bitte prüfen",
@@ -3428,6 +3470,24 @@ en: {
   qr_print: "Print",
   qr_close: "Close",
   qr_cuts: "Cut lines",
+  shelf_scan: "▦  Scan level",
+  shelf_unknown: "QR code not recognized – it does not belong to a rack of this cellar",
+  shelf_rack_only: "{rack}: please scan the label of a level",
+  shelf_need_level: "Please scan the label of a level (not the rack label)",
+  shelf_on_level: "On this level",
+  shelf_empty: "Nothing on this level yet",
+  shelf_store: "Store here",
+  shelf_store_none: "No wines waiting to be stored",
+  shelf_slots: "{n} of {m} slots in use",
+  shelf_full: "No free slot on this level",
+  shelf_take: "Take out",
+  shelf_same: "That is the same level",
+  shelf_next: "Scan next level",
+  shelf_how_many: "How many bottles of “{name}” to store?",
+  shelf_moveall: "Move whole level",
+  shelf_moveall_confirm: "Move {n} bottle(s) from {from} to {to}?",
+  shelf_moveall_rest: "{n} do not fit there and stay where they are.",
+  shelf_moveall_done: "{n} bottle(s) moved ✓",
   loc_slot: "Slot",
   rack_cap_low: "Up to {n} bottles are stored in one slot on this level.",
   sync_code_notfound: "Code not found – please check it",
@@ -3754,6 +3814,24 @@ es: {
   qr_print: "Imprimir",
   qr_close: "Cerrar",
   qr_cuts: "Líneas de corte",
+  shelf_scan: "▦  Escanear nivel",
+  shelf_unknown: "Código QR no reconocido: no pertenece a ningún estante de esta bodega",
+  shelf_rack_only: "{rack}: escanea la etiqueta de un nivel",
+  shelf_need_level: "Escanea la etiqueta de un nivel (no la del estante)",
+  shelf_on_level: "En este nivel",
+  shelf_empty: "Todavía no hay nada en este nivel",
+  shelf_store: "Guardar aquí",
+  shelf_store_none: "No hay vinos pendientes de guardar",
+  shelf_slots: "{n} de {m} sitios ocupados",
+  shelf_full: "No hay ningún sitio libre en este nivel",
+  shelf_take: "Sacar",
+  shelf_same: "Es el mismo nivel",
+  shelf_next: "Escanear siguiente nivel",
+  shelf_how_many: "¿Cuántas botellas de “{name}” guardar?",
+  shelf_moveall: "Mover todo el nivel",
+  shelf_moveall_confirm: "¿Mover {n} botella(s) de {from} a {to}?",
+  shelf_moveall_rest: "{n} no caben allí y se quedan donde están.",
+  shelf_moveall_done: "{n} botella(s) movida(s) ✓",
   loc_slot: "Sitio",
   rack_cap_low: "En este nivel hay hasta {n} botellas en un hueco.",
   sync_code_notfound: "Código no encontrado: compruébalo",
@@ -4080,6 +4158,24 @@ sv: {
   qr_print: "Skriv ut",
   qr_close: "Stäng",
   qr_cuts: "Skärlinjer",
+  shelf_scan: "▦  Skanna hyllplan",
+  shelf_unknown: "QR-koden känns inte igen – den tillhör ingen hylla i den här källaren",
+  shelf_rack_only: "{rack}: skanna etiketten för ett hyllplan",
+  shelf_need_level: "Skanna etiketten för ett hyllplan (inte hyllans etikett)",
+  shelf_on_level: "På detta hyllplan",
+  shelf_empty: "Inget ligger på detta hyllplan ännu",
+  shelf_store: "Lägg in här",
+  shelf_store_none: "Inga viner att lägga in",
+  shelf_slots: "{n} av {m} platser används",
+  shelf_full: "Ingen ledig plats på detta hyllplan",
+  shelf_take: "Ta ut",
+  shelf_same: "Det är samma hyllplan",
+  shelf_next: "Skanna nästa hyllplan",
+  shelf_how_many: "Hur många flaskor av ”{name}” ska läggas in?",
+  shelf_moveall: "Flytta hela hyllplanet",
+  shelf_moveall_confirm: "Flytta {n} flaska/flaskor från {from} till {to}?",
+  shelf_moveall_rest: "{n} får inte plats där och blir kvar.",
+  shelf_moveall_done: "{n} flaska/flaskor flyttade ✓",
   loc_slot: "Plats",
   rack_cap_low: "På den här hyllan finns upp till {n} flaskor på en plats.",
   sync_code_notfound: "Koden hittades inte – kontrollera den",
@@ -4406,6 +4502,24 @@ da: {
   qr_print: "Udskriv",
   qr_close: "Luk",
   qr_cuts: "Skærelinjer",
+  shelf_scan: "▦  Scan hylde",
+  shelf_unknown: "QR-koden blev ikke genkendt – den hører ikke til en reol i denne kælder",
+  shelf_rack_only: "{rack}: scan etiketten på en hylde",
+  shelf_need_level: "Scan etiketten på en hylde (ikke reoletiketten)",
+  shelf_on_level: "På denne hylde",
+  shelf_empty: "Der ligger endnu ikke noget på denne hylde",
+  shelf_store: "Læg ind her",
+  shelf_store_none: "Ingen vine at lægge ind",
+  shelf_slots: "{n} af {m} pladser er i brug",
+  shelf_full: "Ingen ledig plads på denne hylde",
+  shelf_take: "Tag ud",
+  shelf_same: "Det er den samme hylde",
+  shelf_next: "Scan næste hylde",
+  shelf_how_many: "Hvor mange flasker af »{name}« skal lægges ind?",
+  shelf_moveall: "Flyt hele hylden",
+  shelf_moveall_confirm: "Flyt {n} flaske(r) fra {from} til {to}?",
+  shelf_moveall_rest: "{n} kan ikke være der og bliver liggende.",
+  shelf_moveall_done: "{n} flaske(r) flyttet ✓",
   loc_slot: "Plads",
   rack_cap_low: "På denne hylde ligger op til {n} flasker på én plads.",
   sync_code_notfound: "Koden blev ikke fundet – tjek den",
@@ -4732,6 +4846,24 @@ fi: {
   qr_print: "Tulosta",
   qr_close: "Sulje",
   qr_cuts: "Leikkuuviivat",
+  shelf_scan: "▦  Skannaa taso",
+  shelf_unknown: "QR-koodia ei tunnistettu – se ei kuulu tämän kellarin hyllyyn",
+  shelf_rack_only: "{rack}: skannaa jonkin tason tarra",
+  shelf_need_level: "Skannaa jonkin tason tarra (ei hyllyn tarraa)",
+  shelf_on_level: "Tällä tasolla",
+  shelf_empty: "Tällä tasolla ei ole vielä mitään",
+  shelf_store: "Varastoi tähän",
+  shelf_store_none: "Ei varastoitavia viinejä",
+  shelf_slots: "{n} / {m} paikkaa käytössä",
+  shelf_full: "Tällä tasolla ei ole vapaata paikkaa",
+  shelf_take: "Ota pois",
+  shelf_same: "Se on sama taso",
+  shelf_next: "Skannaa seuraava taso",
+  shelf_how_many: "Kuinka monta pulloa viiniä ”{name}” varastoidaan?",
+  shelf_moveall: "Siirrä koko taso",
+  shelf_moveall_confirm: "Siirretäänkö {n} pulloa: {from} → {to}?",
+  shelf_moveall_rest: "{n} ei mahdu sinne ja jää paikalleen.",
+  shelf_moveall_done: "{n} pulloa siirretty ✓",
   loc_slot: "Paikka",
   rack_cap_low: "Tällä tasolla yhdellä paikalla on jopa {n} pulloa.",
   sync_code_notfound: "Koodia ei löytynyt – tarkista se",
@@ -5058,6 +5190,24 @@ ru: {
   qr_print: "Печать",
   qr_close: "Закрыть",
   qr_cuts: "Линии реза",
+  shelf_scan: "▦  Сканировать ярус",
+  shelf_unknown: "QR-код не распознан – он не относится ни к одной полке этого погреба",
+  shelf_rack_only: "{rack}: отсканируйте этикетку яруса",
+  shelf_need_level: "Отсканируйте этикетку яруса (не этикетку полки)",
+  shelf_on_level: "На этом ярусе",
+  shelf_empty: "На этом ярусе пока ничего нет",
+  shelf_store: "Разместить здесь",
+  shelf_store_none: "Нет вин для размещения",
+  shelf_slots: "Занято мест: {n} из {m}",
+  shelf_full: "На этом ярусе нет свободных мест",
+  shelf_take: "Достать",
+  shelf_same: "Это тот же ярус",
+  shelf_next: "Сканировать следующий ярус",
+  shelf_how_many: "Сколько бутылок «{name}» разместить?",
+  shelf_moveall: "Переместить весь ярус",
+  shelf_moveall_confirm: "Переместить бутылки ({n}): {from} → {to}?",
+  shelf_moveall_rest: "{n} не помещаются туда и остаются на месте.",
+  shelf_moveall_done: "Перемещено бутылок: {n} ✓",
   loc_slot: "Место",
   rack_cap_low: "На этом ярусе в одном месте лежит до {n} бутылок.",
   sync_code_notfound: "Код не найден – проверьте его",
@@ -5384,6 +5534,24 @@ it: {
   qr_print: "Stampa",
   qr_close: "Chiudi",
   qr_cuts: "Linee di taglio",
+  shelf_scan: "▦  Scansiona ripiano",
+  shelf_unknown: "Codice QR non riconosciuto – non appartiene a nessuno scaffale di questa cantina",
+  shelf_rack_only: "{rack}: scansiona l'etichetta di un ripiano",
+  shelf_need_level: "Scansiona l'etichetta di un ripiano (non quella dello scaffale)",
+  shelf_on_level: "Su questo ripiano",
+  shelf_empty: "Su questo ripiano non c'è ancora nulla",
+  shelf_store: "Riponi qui",
+  shelf_store_none: "Nessun vino da riporre",
+  shelf_slots: "{n} di {m} posti occupati",
+  shelf_full: "Nessun posto libero su questo ripiano",
+  shelf_take: "Preleva",
+  shelf_same: "È lo stesso ripiano",
+  shelf_next: "Scansiona il ripiano successivo",
+  shelf_how_many: "Quante bottiglie di “{name}” riporre?",
+  shelf_moveall: "Sposta l'intero ripiano",
+  shelf_moveall_confirm: "Spostare {n} bottiglia/e da {from} a {to}?",
+  shelf_moveall_rest: "{n} non trovano posto lì e restano dove sono.",
+  shelf_moveall_done: "Bottiglie spostate: {n} ✓",
   loc_slot: "Posto",
   rack_cap_low: "Su questo ripiano ci sono fino a {n} bottiglie in un posto.",
   sync_code_notfound: "Codice non trovato – controllalo",
@@ -5710,6 +5878,24 @@ fr: {
   qr_print: "Imprimer",
   qr_close: "Fermer",
   qr_cuts: "Traits de coupe",
+  shelf_scan: "▦  Scanner un niveau",
+  shelf_unknown: "QR code non reconnu – il n'appartient à aucun casier de cette cave",
+  shelf_rack_only: "{rack} : veuillez scanner l'étiquette d'un niveau",
+  shelf_need_level: "Veuillez scanner l'étiquette d'un niveau (pas celle du casier)",
+  shelf_on_level: "Sur ce niveau",
+  shelf_empty: "Rien sur ce niveau pour l'instant",
+  shelf_store: "Ranger ici",
+  shelf_store_none: "Aucun vin à ranger",
+  shelf_slots: "{n} place(s) occupée(s) sur {m}",
+  shelf_full: "Aucune place libre sur ce niveau",
+  shelf_take: "Retirer",
+  shelf_same: "C'est le même niveau",
+  shelf_next: "Scanner le niveau suivant",
+  shelf_how_many: "Combien de bouteilles de « {name} » ranger ?",
+  shelf_moveall: "Déplacer tout le niveau",
+  shelf_moveall_confirm: "Déplacer {n} bouteille(s) de {from} vers {to} ?",
+  shelf_moveall_rest: "{n} n'ont pas de place là-bas et restent où elles sont.",
+  shelf_moveall_done: "{n} bouteille(s) déplacée(s) ✓",
   loc_slot: "Place",
   rack_cap_low: "Sur ce niveau, jusqu'à {n} bouteilles sont rangées dans un emplacement.",
   sync_code_notfound: "Code introuvable – vérifiez-le",
@@ -6036,6 +6222,24 @@ pl: {
   qr_print: "Drukuj",
   qr_close: "Zamknij",
   qr_cuts: "Linie cięcia",
+  shelf_scan: "▦  Skanuj poziom",
+  shelf_unknown: "Nie rozpoznano kodu QR – nie należy do żadnego regału w tej piwnicy",
+  shelf_rack_only: "{rack}: zeskanuj etykietę poziomu",
+  shelf_need_level: "Zeskanuj etykietę poziomu (nie etykietę regału)",
+  shelf_on_level: "Na tym poziomie",
+  shelf_empty: "Na tym poziomie nic jeszcze nie leży",
+  shelf_store: "Odłóż tutaj",
+  shelf_store_none: "Brak win do odłożenia",
+  shelf_slots: "Zajęte miejsca: {n} z {m}",
+  shelf_full: "Brak wolnego miejsca na tym poziomie",
+  shelf_take: "Wyjmij",
+  shelf_same: "To ten sam poziom",
+  shelf_next: "Skanuj następny poziom",
+  shelf_how_many: "Ile butelek „{name}” odłożyć?",
+  shelf_moveall: "Przenieś cały poziom",
+  shelf_moveall_confirm: "Przenieść butelki ({n}) z {from} na {to}?",
+  shelf_moveall_rest: "{n} nie mieści się tam i zostaje na miejscu.",
+  shelf_moveall_done: "Przeniesiono butelki: {n} ✓",
   loc_slot: "Miejsce",
   rack_cap_low: "Na tym poziomie w jednym miejscu leży do {n} butelek.",
   sync_code_notfound: "Nie znaleziono kodu – sprawdź go",
@@ -6362,6 +6566,24 @@ hu: {
   qr_print: "Nyomtatás",
   qr_close: "Bezárás",
   qr_cuts: "Vágóvonalak",
+  shelf_scan: "▦  Szint beolvasása",
+  shelf_unknown: "A QR-kód nem ismerhető fel – nem tartozik e pince egyik polcához sem",
+  shelf_rack_only: "{rack}: egy szint címkéjét kell beolvasni",
+  shelf_need_level: "Egy szint címkéjét kell beolvasni (nem a polcét)",
+  shelf_on_level: "Ezen a szinten",
+  shelf_empty: "Ezen a szinten még nincs semmi",
+  shelf_store: "Berakás ide",
+  shelf_store_none: "Nincs berakásra váró bor",
+  shelf_slots: "{n} / {m} hely foglalt",
+  shelf_full: "Nincs szabad hely ezen a szinten",
+  shelf_take: "Kivétel",
+  shelf_same: "Ez ugyanaz a szint",
+  shelf_next: "Következő szint beolvasása",
+  shelf_how_many: "Hány palack „{name}” kerüljön be?",
+  shelf_moveall: "Teljes szint áthelyezése",
+  shelf_moveall_confirm: "{n} palack áthelyezése: {from} → {to}?",
+  shelf_moveall_rest: "{n} nem fér el ott, ezért marad, ahol van.",
+  shelf_moveall_done: "{n} palack áthelyezve ✓",
   loc_slot: "Hely",
   rack_cap_low: "Ezen a szinten egy helyen legfeljebb {n} üveg van.",
   sync_code_notfound: "A kód nem található – ellenőrizd",
@@ -6688,6 +6910,24 @@ cs: {
   qr_print: "Tisk",
   qr_close: "Zavřít",
   qr_cuts: "Ořezové čáry",
+  shelf_scan: "▦  Skenovat úroveň",
+  shelf_unknown: "QR kód nebyl rozpoznán – nepatří k žádnému regálu tohoto sklepa",
+  shelf_rack_only: "{rack}: naskenujte štítek úrovně",
+  shelf_need_level: "Naskenujte štítek úrovně (ne štítek regálu)",
+  shelf_on_level: "Na této úrovni",
+  shelf_empty: "Na této úrovni zatím nic není",
+  shelf_store: "Uložit sem",
+  shelf_store_none: "Žádná vína k uložení",
+  shelf_slots: "Obsazeno {n} z {m} míst",
+  shelf_full: "Na této úrovni není volné místo",
+  shelf_take: "Vyjmout",
+  shelf_same: "To je stejná úroveň",
+  shelf_next: "Skenovat další úroveň",
+  shelf_how_many: "Kolik lahví „{name}“ uložit?",
+  shelf_moveall: "Přesunout celou úroveň",
+  shelf_moveall_confirm: "Přesunout lahve ({n}) z {from} na {to}?",
+  shelf_moveall_rest: "{n} se tam nevejde a zůstane na místě.",
+  shelf_moveall_done: "Přesunuto lahví: {n} ✓",
   loc_slot: "Místo",
   rack_cap_low: "Na této úrovni je na jednom místě až {n} lahví.",
   sync_code_notfound: "Kód nebyl nalezen – zkontrolujte jej",
@@ -7014,6 +7254,24 @@ sk: {
   qr_print: "Tlač",
   qr_close: "Zavrieť",
   qr_cuts: "Rezné čiary",
+  shelf_scan: "▦  Skenovať úroveň",
+  shelf_unknown: "QR kód nebol rozpoznaný – nepatrí k žiadnemu regálu tejto pivnice",
+  shelf_rack_only: "{rack}: naskenujte štítok úrovne",
+  shelf_need_level: "Naskenujte štítok úrovne (nie štítok regálu)",
+  shelf_on_level: "Na tejto úrovni",
+  shelf_empty: "Na tejto úrovni zatiaľ nič nie je",
+  shelf_store: "Uložiť sem",
+  shelf_store_none: "Žiadne vína na uloženie",
+  shelf_slots: "Obsadených miest: {n} z {m}",
+  shelf_full: "Na tejto úrovni nie je voľné miesto",
+  shelf_take: "Vybrať",
+  shelf_same: "To je rovnaká úroveň",
+  shelf_next: "Skenovať ďalšiu úroveň",
+  shelf_how_many: "Koľko fliaš „{name}“ uložiť?",
+  shelf_moveall: "Presunúť celú úroveň",
+  shelf_moveall_confirm: "Presunúť fľaše ({n}) z {from} na {to}?",
+  shelf_moveall_rest: "{n} sa tam nezmestí a zostane na mieste.",
+  shelf_moveall_done: "Presunuté fľaše: {n} ✓",
   loc_slot: "Miesto",
   rack_cap_low: "Na tejto úrovni je na jednom mieste až {n} fliaš.",
   sync_code_notfound: "Kód sa nenašiel – skontrolujte ho",
@@ -7340,6 +7598,24 @@ ro: {
   qr_print: "Tipărește",
   qr_close: "Închide",
   qr_cuts: "Linii de tăiere",
+  shelf_scan: "▦  Scanează nivelul",
+  shelf_unknown: "Cod QR nerecunoscut – nu aparține niciunui raft din această pivniță",
+  shelf_rack_only: "{rack}: scanează eticheta unui nivel",
+  shelf_need_level: "Scanează eticheta unui nivel (nu eticheta raftului)",
+  shelf_on_level: "Pe acest nivel",
+  shelf_empty: "Încă nu se află nimic pe acest nivel",
+  shelf_store: "Depozitează aici",
+  shelf_store_none: "Niciun vin de depozitat",
+  shelf_slots: "{n} din {m} locuri ocupate",
+  shelf_full: "Niciun loc liber pe acest nivel",
+  shelf_take: "Scoate",
+  shelf_same: "Este același nivel",
+  shelf_next: "Scanează nivelul următor",
+  shelf_how_many: "Câte sticle de „{name}” să fie depozitate?",
+  shelf_moveall: "Mută tot nivelul",
+  shelf_moveall_confirm: "Muți {n} sticlă/sticle de la {from} la {to}?",
+  shelf_moveall_rest: "{n} nu încap acolo și rămân pe loc.",
+  shelf_moveall_done: "Sticle mutate: {n} ✓",
   loc_slot: "Loc",
   rack_cap_low: "Pe acest nivel, într-un loc sunt până la {n} sticle.",
   sync_code_notfound: "Codul nu a fost găsit – verifică-l",
@@ -7666,6 +7942,24 @@ hr: {
   qr_print: "Ispis",
   qr_close: "Zatvori",
   qr_cuts: "Linije rezanja",
+  shelf_scan: "▦  Skeniraj razinu",
+  shelf_unknown: "QR kôd nije prepoznat – ne pripada nijednoj polici ovog podruma",
+  shelf_rack_only: "{rack}: skenirajte naljepnicu razine",
+  shelf_need_level: "Skenirajte naljepnicu razine (ne naljepnicu police)",
+  shelf_on_level: "Na ovoj razini",
+  shelf_empty: "Na ovoj razini još nema ničega",
+  shelf_store: "Pohrani ovdje",
+  shelf_store_none: "Nema vina za pohranu",
+  shelf_slots: "Zauzeto {n} od {m} mjesta",
+  shelf_full: "Nema slobodnog mjesta na ovoj razini",
+  shelf_take: "Izvadi",
+  shelf_same: "To je ista razina",
+  shelf_next: "Skeniraj sljedeću razinu",
+  shelf_how_many: "Koliko boca „{name}“ pohraniti?",
+  shelf_moveall: "Premjesti cijelu razinu",
+  shelf_moveall_confirm: "Premjestiti boce ({n}) s {from} na {to}?",
+  shelf_moveall_rest: "{n} ne stane tamo i ostaje na mjestu.",
+  shelf_moveall_done: "Premješteno boca: {n} ✓",
   loc_slot: "Mjesto",
   rack_cap_low: "Na ovoj razini u jednom je mjestu do {n} boca.",
   sync_code_notfound: "Kod nije pronađen – provjerite ga",
@@ -7992,6 +8286,24 @@ pt: {
   qr_print: "Imprimir",
   qr_close: "Fechar",
   qr_cuts: "Linhas de corte",
+  shelf_scan: "▦  Digitalizar nível",
+  shelf_unknown: "Código QR não reconhecido – não pertence a nenhuma prateleira desta adega",
+  shelf_rack_only: "{rack}: digitalize a etiqueta de um nível",
+  shelf_need_level: "Digitalize a etiqueta de um nível (não a etiqueta da prateleira)",
+  shelf_on_level: "Neste nível",
+  shelf_empty: "Ainda não há nada neste nível",
+  shelf_store: "Guardar aqui",
+  shelf_store_none: "Nenhum vinho para guardar",
+  shelf_slots: "{n} de {m} lugares ocupados",
+  shelf_full: "Não há nenhum lugar livre neste nível",
+  shelf_take: "Retirar",
+  shelf_same: "É o mesmo nível",
+  shelf_next: "Digitalizar o nível seguinte",
+  shelf_how_many: "Quantas garrafas de “{name}” guardar?",
+  shelf_moveall: "Mover o nível todo",
+  shelf_moveall_confirm: "Mover {n} garrafa(s) de {from} para {to}?",
+  shelf_moveall_rest: "{n} não cabem lá e ficam onde estão.",
+  shelf_moveall_done: "{n} garrafa(s) movida(s) ✓",
   loc_slot: "Lugar",
   rack_cap_low: "Neste nível há até {n} garrafas num lugar.",
   sync_code_notfound: "Código não encontrado – verifique-o",
@@ -8318,6 +8630,24 @@ no: {
   qr_print: "Skriv ut",
   qr_close: "Lukk",
   qr_cuts: "Skjærelinjer",
+  shelf_scan: "▦  Skann nivå",
+  shelf_unknown: "QR-koden ble ikke gjenkjent – den hører ikke til noen hylle i denne kjelleren",
+  shelf_rack_only: "{rack}: skann etiketten til et nivå",
+  shelf_need_level: "Skann etiketten til et nivå (ikke hylleetiketten)",
+  shelf_on_level: "På dette nivået",
+  shelf_empty: "Det ligger ingenting på dette nivået ennå",
+  shelf_store: "Legg inn her",
+  shelf_store_none: "Ingen viner å legge inn",
+  shelf_slots: "{n} av {m} plasser i bruk",
+  shelf_full: "Ingen ledig plass på dette nivået",
+  shelf_take: "Ta ut",
+  shelf_same: "Det er samme nivå",
+  shelf_next: "Skann neste nivå",
+  shelf_how_many: "Hvor mange flasker av «{name}» skal legges inn?",
+  shelf_moveall: "Flytt hele nivået",
+  shelf_moveall_confirm: "Flytte {n} flaske(r) fra {from} til {to}?",
+  shelf_moveall_rest: "{n} får ikke plass der og blir liggende.",
+  shelf_moveall_done: "{n} flaske(r) flyttet ✓",
   loc_slot: "Plass",
   rack_cap_low: "På denne hyllen ligger opptil {n} flasker på én plass.",
   sync_code_notfound: "Koden ble ikke funnet – sjekk den",
@@ -8644,6 +8974,24 @@ nl: {
   qr_print: "Printen",
   qr_close: "Sluiten",
   qr_cuts: "Snijlijnen",
+  shelf_scan: "▦  Niveau scannen",
+  shelf_unknown: "QR-code niet herkend – hoort bij geen enkel rek in deze kelder",
+  shelf_rack_only: "{rack}: scan het label van een niveau",
+  shelf_need_level: "Scan het label van een niveau (niet het rek-label)",
+  shelf_on_level: "Op dit niveau",
+  shelf_empty: "Op dit niveau ligt nog niets",
+  shelf_store: "Hier opslaan",
+  shelf_store_none: "Geen wijnen om op te slaan",
+  shelf_slots: "{n} van {m} plaatsen bezet",
+  shelf_full: "Geen vrije plaats op dit niveau",
+  shelf_take: "Uitnemen",
+  shelf_same: "Dat is hetzelfde niveau",
+  shelf_next: "Volgend niveau scannen",
+  shelf_how_many: "Hoeveel flessen van “{name}” opslaan?",
+  shelf_moveall: "Heel niveau verplaatsen",
+  shelf_moveall_confirm: "{n} fles(sen) van {from} naar {to} verplaatsen?",
+  shelf_moveall_rest: "{n} passen daar niet en blijven liggen.",
+  shelf_moveall_done: "{n} fles(sen) verplaatst ✓",
   loc_slot: "Plaats",
   rack_cap_low: "Op dit niveau liggen tot {n} flessen op één plek.",
   sync_code_notfound: "Code niet gevonden – controleer hem",
@@ -8970,6 +9318,24 @@ el: {
   qr_print: "Εκτύπωση",
   qr_close: "Κλείσιμο",
   qr_cuts: "Γραμμές κοπής",
+  shelf_scan: "▦  Σάρωση επιπέδου",
+  shelf_unknown: "Ο κωδικός QR δεν αναγνωρίστηκε – δεν ανήκει σε κανένα ράφι αυτού του κελαριού",
+  shelf_rack_only: "{rack}: σαρώστε την ετικέτα ενός επιπέδου",
+  shelf_need_level: "Σαρώστε την ετικέτα ενός επιπέδου (όχι του ραφιού)",
+  shelf_on_level: "Σε αυτό το επίπεδο",
+  shelf_empty: "Δεν υπάρχει ακόμη τίποτα σε αυτό το επίπεδο",
+  shelf_store: "Αποθήκευση εδώ",
+  shelf_store_none: "Δεν υπάρχουν κρασιά προς αποθήκευση",
+  shelf_slots: "{n} από {m} θέσεις κατειλημμένες",
+  shelf_full: "Δεν υπάρχει ελεύθερη θέση σε αυτό το επίπεδο",
+  shelf_take: "Αφαίρεση",
+  shelf_same: "Είναι το ίδιο επίπεδο",
+  shelf_next: "Σάρωση επόμενου επιπέδου",
+  shelf_how_many: "Πόσα μπουκάλια «{name}» να αποθηκευτούν;",
+  shelf_moveall: "Μετακίνηση όλου του επιπέδου",
+  shelf_moveall_confirm: "Μετακίνηση μπουκαλιών ({n}) από {from} σε {to};",
+  shelf_moveall_rest: "{n} δεν χωρούν εκεί και μένουν όπου είναι.",
+  shelf_moveall_done: "Μετακινήθηκαν μπουκάλια: {n} ✓",
   loc_slot: "Θέση",
   rack_cap_low: "Σε αυτό το επίπεδο αποθηκεύονται έως {n} φιάλες σε μία θέση.",
   sync_code_notfound: "Ο κωδικός δεν βρέθηκε – ελέγξτε τον",
@@ -9296,6 +9662,24 @@ uk: {
   qr_print: "Друк",
   qr_close: "Закрити",
   qr_cuts: "Лінії розрізу",
+  shelf_scan: "▦  Сканувати рівень",
+  shelf_unknown: "QR-код не розпізнано – він не належить жодному стелажу цього льоху",
+  shelf_rack_only: "{rack}: відскануйте етикетку рівня",
+  shelf_need_level: "Відскануйте етикетку рівня (не етикетку стелажа)",
+  shelf_on_level: "На цьому рівні",
+  shelf_empty: "На цьому рівні поки нічого немає",
+  shelf_store: "Розмістити тут",
+  shelf_store_none: "Немає вин для розміщення",
+  shelf_slots: "Зайнято місць: {n} з {m}",
+  shelf_full: "На цьому рівні немає вільного місця",
+  shelf_take: "Дістати",
+  shelf_same: "Це той самий рівень",
+  shelf_next: "Сканувати наступний рівень",
+  shelf_how_many: "Скільки пляшок «{name}» розмістити?",
+  shelf_moveall: "Перемістити весь рівень",
+  shelf_moveall_confirm: "Перемістити пляшки ({n}) з {from} на {to}?",
+  shelf_moveall_rest: "{n} не вміщуються туди й залишаються на місці.",
+  shelf_moveall_done: "Переміщено пляшок: {n} ✓",
   loc_slot: "Місце",
   rack_cap_low: "На цьому рівні в одному місці зберігається до {n} пляшок.",
   sync_code_notfound: "Код не знайдено – перевірте його",
@@ -9622,6 +10006,24 @@ ja: {
   qr_print: "印刷",
   qr_close: "閉じる",
   qr_cuts: "カットライン",
+  shelf_scan: "▦  段をスキャン",
+  shelf_unknown: "QRコードを認識できません – このセラーのどのラックにも属していません",
+  shelf_rack_only: "{rack}：段のラベルをスキャンしてください",
+  shelf_need_level: "段のラベルをスキャンしてください（ラックのラベルではありません）",
+  shelf_on_level: "この段にあるもの",
+  shelf_empty: "この段にはまだ何もありません",
+  shelf_store: "ここに保管",
+  shelf_store_none: "保管待ちのワインはありません",
+  shelf_slots: "{m}か所中{n}か所使用中",
+  shelf_full: "この段に空きがありません",
+  shelf_take: "取り出す",
+  shelf_same: "同じ段です",
+  shelf_next: "次の段をスキャン",
+  shelf_how_many: "「{name}」を何本保管しますか？",
+  shelf_moveall: "段ごと移動",
+  shelf_moveall_confirm: "{n}本のボトルを{from}から{to}へ移動しますか？",
+  shelf_moveall_rest: "{n}本は入りきらないため、そのまま残ります。",
+  shelf_moveall_done: "{n}本のボトルを移動しました ✓",
   loc_slot: "場所",
   rack_cap_low: "この段では、1か所に最大{n}本まで保管されます。",
   sync_code_notfound: "コードが見つかりません – ご確認ください",
@@ -9948,6 +10350,24 @@ ko: {
   qr_print: "인쇄",
   qr_close: "닫기",
   qr_cuts: "절단선",
+  shelf_scan: "▦  단 스캔",
+  shelf_unknown: "QR 코드를 인식할 수 없습니다 – 이 셀러의 어떤 랙에도 속하지 않습니다",
+  shelf_rack_only: "{rack}: 단의 라벨을 스캔하세요",
+  shelf_need_level: "단의 라벨을 스캔하세요 (랙 라벨이 아닙니다)",
+  shelf_on_level: "이 단에 있는 것",
+  shelf_empty: "이 단에는 아직 아무것도 없습니다",
+  shelf_store: "여기에 보관",
+  shelf_store_none: "보관할 와인이 없습니다",
+  shelf_slots: "{m}칸 중 {n}칸 사용 중",
+  shelf_full: "이 단에 빈 칸이 없습니다",
+  shelf_take: "꺼내기",
+  shelf_same: "같은 단입니다",
+  shelf_next: "다음 단 스캔",
+  shelf_how_many: "“{name}” 몇 병을 보관할까요?",
+  shelf_moveall: "단 전체 이동",
+  shelf_moveall_confirm: "{n}병을 {from}에서 {to}(으)로 이동할까요?",
+  shelf_moveall_rest: "{n}병은 자리가 없어 그대로 남습니다.",
+  shelf_moveall_done: "{n}병 이동 완료 ✓",
   loc_slot: "칸",
   rack_cap_low: "이 단에서는 한 칸에 최대 {n}병이 보관돼요.",
   sync_code_notfound: "코드를 찾을 수 없어요 – 확인해 주세요",
@@ -10274,6 +10694,24 @@ zh: {
   qr_print: "打印",
   qr_close: "关闭",
   qr_cuts: "裁切线",
+  shelf_scan: "▦  扫描层",
+  shelf_unknown: "无法识别二维码 – 它不属于此酒窖的任何酒架",
+  shelf_rack_only: "{rack}：请扫描某一层的标签",
+  shelf_need_level: "请扫描某一层的标签（不是酒架标签）",
+  shelf_on_level: "本层",
+  shelf_empty: "本层还没有放任何东西",
+  shelf_store: "存放到这里",
+  shelf_store_none: "没有待存放的葡萄酒",
+  shelf_slots: "已占用 {n}/{m} 个位",
+  shelf_full: "本层没有空位",
+  shelf_take: "取出",
+  shelf_same: "这是同一层",
+  shelf_next: "扫描下一层",
+  shelf_how_many: "要存放多少瓶“{name}”？",
+  shelf_moveall: "整层移动",
+  shelf_moveall_confirm: "将 {n} 瓶酒从 {from} 移到 {to}？",
+  shelf_moveall_rest: "有 {n} 瓶放不下，留在原处。",
+  shelf_moveall_done: "已移动 {n} 瓶 ✓",
   loc_slot: "位",
   rack_cap_low: "此层每个位最多存放 {n} 瓶。",
   sync_code_notfound: "未找到同步码 – 请检查",
@@ -10600,6 +11038,24 @@ hi: {
   qr_print: "प्रिंट करें",
   qr_close: "बंद करें",
   qr_cuts: "कटिंग लाइन",
+  shelf_scan: "▦  स्तर स्कैन करें",
+  shelf_unknown: "QR कोड पहचाना नहीं गया – यह इस तहखाने के किसी रैक का नहीं है",
+  shelf_rack_only: "{rack}: कृपया किसी स्तर का लेबल स्कैन करें",
+  shelf_need_level: "कृपया किसी स्तर का लेबल स्कैन करें (रैक का लेबल नहीं)",
+  shelf_on_level: "इस स्तर पर",
+  shelf_empty: "इस स्तर पर अभी कुछ नहीं है",
+  shelf_store: "यहाँ रखें",
+  shelf_store_none: "रखने के लिए कोई वाइन नहीं है",
+  shelf_slots: "{m} में से {n} स्थान भरे हैं",
+  shelf_full: "इस स्तर पर कोई स्थान खाली नहीं है",
+  shelf_take: "बाहर निकालें",
+  shelf_same: "यह वही स्तर है",
+  shelf_next: "अगला स्तर स्कैन करें",
+  shelf_how_many: "“{name}” की कितनी बोतलें रखनी हैं?",
+  shelf_moveall: "पूरा स्तर स्थानांतरित करें",
+  shelf_moveall_confirm: "{n} बोतल(ें) {from} से {to} में स्थानांतरित करें?",
+  shelf_moveall_rest: "{n} वहाँ नहीं आ पातीं और वहीं रहेंगी।",
+  shelf_moveall_done: "{n} बोतल(ें) स्थानांतरित ✓",
   loc_slot: "स्थान",
   rack_cap_low: "इस स्तर पर एक स्थान में अधिकतम {n} बोतलें रखी जाती हैं।",
   sync_code_notfound: "कोड नहीं मिला – कृपया जाँच लें",
@@ -11108,6 +11564,7 @@ function confirmDrink() {
   recordDrunk(w, companions, occasions, where);
   save(); saveDrunk();
   closeModal('drink-modal');
+  if (lvlSheetOpen()) renderLevelSheet();
   const active = document.querySelector('.tab.active');
   if (active && active.id === 'tab-trinkreife') renderTrinkreife();
   else if (active && active.id === 'tab-racks') { rackFilledSlot = null; renderRacks(); }
@@ -11774,6 +12231,7 @@ function removeFromRack(id) {
   rackFilledSlot = null;
   renderRacks();
   showToast(t('toast_rack_removed', { name: w.name }));
+  if (lvlSheetOpen()) renderLevelSheet();
 }
 // Umlagern: erst die Flasche im Fach wählen („Umlagern"), dann ein freies Fach (auch in einem anderen Regal) antippen
 function startMove(id) {
@@ -11934,7 +12392,7 @@ function renderRacks() {
       if (ri.key === 'optimal') blinkN.Optimal++;
     });
   });
-  let html = `<div class="rack-toolbar"><span class="rack-toolbar-lbl">${t('rack_blink_lbl')}</span>`
+  let html = `<div class="rack-scanbar"><button class="scan-btn" onclick="scanShelf()">${t('shelf_scan')}</button></div><div class="rack-toolbar"><span class="rack-toolbar-lbl">${t('rack_blink_lbl')}</span>`
     + BLINKS.map(([key, label, st]) => `<button class="rack-toggle${blinkOn[key] ? ' active' : ''}" onclick="toggleRackBlink('${key}')" aria-pressed="${blinkOn[key]}"><span class="rt-dot"></span>${st ? `<i class="rack-ripe-dot ripeness-${RIPE_CLASS[st]}"></i>` : ''}${esc(label)}${blinkN[key] ? ' · ' + blinkN[key] : ''}</button>`).join('')
     + `</div>`
     + (blinkOn.Urgent ? `<div class="rack-blink-hint">${t('rack_blink_hint')}</div>` : '')
@@ -12301,6 +12759,162 @@ function qrLabelsPrint() {
   window.addEventListener('afterprint', done);
   document.body.classList.add('qr-printing');
   setTimeout(() => window.print(), 50);
+}
+
+// ═══════════════════════════════════════
+// EBENEN-ETIKETT SCANNEN: einlagern, auslagern, umlagern, ganze Ebene verschieben
+// Ein Scan öffnet (je nach Lage) das Ebenen-Fenster, lagert den gewählten Wein ein oder legt die gewählte Flasche um.
+// ═══════════════════════════════════════
+let lvlSheet = { rack: null, e: 0 };
+const lvlSheetOpen = () => document.getElementById('lvl-modal').classList.contains('show');
+// "weinkeller:1:<Regal-ID>[:<Ebene>]" → { rack, e } (e = 0 beim Regal-Etikett) oder null
+function parseShelfCode(text) {
+  const m = /^weinkeller:1:([A-Za-z0-9_-]{1,40})(?::(\d{1,3}))?$/.exec(String(text || '').trim());
+  if (!m) return null;
+  const r = rackById(m[1]), e = m[2] ? parseInt(m[2]) : 0;
+  if (!r || e > r.rows || (m[2] && e < 1)) return null;
+  return { rack: r, e };
+}
+async function scanShelfCode() {
+  const res = await scanCode('qr');
+  if (!res) return null;
+  const p = parseShelfCode(res.text);
+  if (!p) showToast(t('shelf_unknown'));
+  return p;
+}
+// Freie Plätze einer Ebene (von links) mit freier Kapazität
+function levelFree(r, e) {
+  const map = slotMapFor(r.id), cap = rackCap(r, e), out = [];
+  for (let p = 1; p <= rackCols(r, e); p++) { const used = (map.get(e + '|' + p) || []).length; if (used < cap) out.push({ p, free: cap - used }); }
+  return out;
+}
+// Flaschen auf einer Ebene, nach Platz sortiert
+function levelBottles(r, e) {
+  const out = [];
+  wines.forEach(w => (w.placements || []).forEach(x => { if (x.rack === r.id && x.e === e) out.push({ w, p: x.p }); }));
+  return out.sort((a, b) => a.p - b.p);
+}
+function relocateBottle(w, from, r, e, p) {
+  const list = validPlacements(w);
+  const i = list.findIndex(x => x.rack === from.rack && x.e === from.e && x.p === from.p);
+  if (i < 0) return false;
+  list[i] = { rack: r.id, e, p };
+  setPlacements(w, list);
+  return true;
+}
+function showRacksTab() { showTab('racks', document.querySelector('.nav-btn[onclick*="showTab(\'racks\'"]')); }
+async function scanShelf() {
+  const p = await scanShelfCode();
+  if (!p) return;
+  const r = p.rack, e = p.e, idx = settings.racks.indexOf(r);
+  if (!e) { rackActive = idx; rackFilledSlot = null; showRacksTab(); showToast(t('shelf_rack_only', { rack: r.name })); return; }
+  if (rackMove) {   // gewählte Flasche in das erste freie Fach der gescannten Ebene legen
+    const m = rackMove, w = wines.find(x => x.id === m.id), fr = levelFree(r, e);
+    if (!fr.length) { showToast(t('shelf_full')); return; }
+    rackMove = null;
+    if (w && relocateBottle(w, m, r, e, fr[0].p)) { save(); placedToast(r, e, fr[0].p); }
+    rackActive = idx; renderRacks();
+    return;
+  }
+  if (rackSelectedWineId) { placeSelectedOnLevel(r, e); return; }
+  openLevelSheet(r, e);
+}
+// Gewählten (noch nicht eingelagerten) Wein in die ersten freien Plätze der Ebene legen
+function placeSelectedOnLevel(r, e) {
+  const w = wines.find(x => x.id === rackSelectedWineId);
+  if (!w || unplacedCount(w) < 1) { rackSelectedWineId = null; renderRacks(); return; }
+  const fr = levelFree(r, e), room = fr.reduce((s, x) => s + x.free, 0);
+  if (!room) { showToast(t('shelf_full')); return; }
+  let n = Math.min(unplacedCount(w), room);
+  if (n > 1) { const a = parseInt(prompt(t('shelf_how_many', { name: w.name }), String(n))); if (!(a >= 1)) return; n = Math.min(a, n); }
+  const list = validPlacements(w); let left = n;
+  for (const s of fr) { const k = Math.min(s.free, left); for (let j = 0; j < k; j++) list.push({ rack: r.id, e, p: s.p }); left -= k; if (!left) break; }
+  setPlacements(w, list); save();
+  if (unplacedCount(w) < 1) rackSelectedWineId = null;
+  rackActive = settings.racks.indexOf(r); renderRacks(); placedToast(r, e, fr[0].p);
+}
+function openLevelSheet(r, e) { lvlSheet = { rack: r.id, e }; renderLevelSheet(); document.getElementById('lvl-modal').classList.add('show'); }
+function closeLevelSheet() { closeModal('lvl-modal'); renderRacks(); }
+function renderLevelSheet() {
+  const r = rackById(lvlSheet.rack);
+  if (!r) { closeLevelSheet(); return; }
+  const e = lvlSheet.e, bottles = levelBottles(r, e), fr = levelFree(r, e), total = rackCols(r, e) * rackCap(r, e);
+  document.getElementById('lvl-title').textContent = r.name + ' · ' + levelLabel(r, e);
+  document.getElementById('lvl-sub').textContent = t('shelf_slots', { n: bottles.length, m: total });
+  const groups = [];   // gleicher Wein im gleichen Platz (Kiste) = eine Zeile mit Anzahl
+  bottles.forEach(b => { const g = groups.find(x => x.w === b.w && x.p === b.p); if (g) g.n++; else groups.push({ w: b.w, p: b.p, n: 1 }); });
+  let h = `<div class="lvl-h">${t('shelf_on_level')}</div>`;
+  if (!groups.length) h += `<div class="lvl-empty">${t('shelf_empty')}</div>`;
+  groups.forEach(g => {
+    h += `<div class="lvl-row"><div class="lvl-top"><span class="lvl-slot">P${g.p}</span><span class="lvl-name">${esc(g.w.name)}${g.w.year ? ' · ' + g.w.year : ''}${g.n > 1 ? ' ×' + g.n : ''}</span></div>
+      <div class="lvl-btns"><button class="wine-btn primary" onclick="lvlDrink('${g.w.id}',${g.p})">${t('btn_drink')}</button><button class="wine-btn" onclick="lvlMove('${g.w.id}',${g.p})">${t('rack_move')}</button><button class="wine-btn danger" onclick="lvlTake('${g.w.id}',${g.p})">${t('shelf_take')}</button></div></div>`;
+  });
+  h += `<div class="lvl-h">${t('shelf_store')}</div>`;
+  const waiting = wines.filter(w => unplacedCount(w) > 0);
+  if (!fr.length) h += `<div class="lvl-empty">${t('shelf_full')}</div>`;
+  else if (!waiting.length) h += `<div class="lvl-empty">${t('shelf_store_none')}</div>`;
+  else h += '<div class="lvl-chips">' + waiting.map(w => { const n = unplacedCount(w); return `<button class="wine-btn" onclick="lvlStore('${w.id}')">${esc(w.name)}${w.year ? ' · ' + w.year : ''}${n > 1 ? ' ×' + n : ''}</button>`; }).join('') + '</div>';
+  document.getElementById('lvl-body').innerHTML = h;
+}
+function lvlDrink(id, p) { rackFilledSlot = { rack: lvlSheet.rack, e: lvlSheet.e, p }; drinkFromSlot(id); }
+function lvlTake(id, p) { rackFilledSlot = { rack: lvlSheet.rack, e: lvlSheet.e, p }; removeFromRack(id); }
+function lvlStore(id) {
+  const r = rackById(lvlSheet.rack), e = lvlSheet.e, w = wines.find(x => x.id === id), fr = levelFree(r, e);
+  if (!w || unplacedCount(w) < 1) { renderLevelSheet(); return; }
+  if (!fr.length) { showToast(t('shelf_full')); return; }
+  placeBottleAtSlot(w, r, e, fr[0].p); save(); renderLevelSheet(); placedToast(r, e, fr[0].p);
+}
+function placeBottleAtSlot(w, r, e, p) { setPlacements(w, validPlacements(w).concat({ rack: r.id, e, p })); }
+// Eine Flasche dieser Ebene in die erste freie Stelle der als Nächstes gescannten Ebene legen
+async function lvlMove(id, p) {
+  const src = rackById(lvlSheet.rack), se = lvlSheet.e, w = wines.find(x => x.id === id);
+  const d = await scanShelfCode();
+  if (!d || !w) return;
+  if (!d.e) { showToast(t('shelf_need_level')); return; }
+  if (d.rack.id === src.id && d.e === se) { showToast(t('shelf_same')); return; }
+  const fr = levelFree(d.rack, d.e);
+  if (!fr.length) { showToast(t('shelf_full')); return; }
+  if (relocateBottle(w, { rack: src.id, e: se, p }, d.rack, d.e, fr[0].p)) { save(); renderLevelSheet(); placedToast(d.rack, d.e, fr[0].p); }
+}
+async function lvlNext() {
+  const p = await scanShelfCode();
+  if (!p) return;
+  if (!p.e) { showToast(t('shelf_need_level')); return; }
+  lvlSheet = { rack: p.rack.id, e: p.e }; renderLevelSheet();
+}
+// Ganze Ebene auf eine andere Ebene umziehen (z. B. beim Erweitern des Kellers): gleicher Platz, sonst erstes freies Fach
+async function lvlMoveAll() {
+  const src = rackById(lvlSheet.rack), se = lvlSheet.e, bottles = levelBottles(src, se);
+  const d = await scanShelfCode();
+  if (!d) return;
+  if (!d.e) { showToast(t('shelf_need_level')); return; }
+  if (d.rack.id === src.id && d.e === se) { showToast(t('shelf_same')); return; }
+  if (!bottles.length) { showToast(t('shelf_empty')); return; }
+  const cap = rackCap(d.rack, d.e), cols = rackCols(d.rack, d.e), map = slotMapFor(d.rack.id), used = {};
+  for (let q = 1; q <= cols; q++) used[q] = (map.get(d.e + '|' + q) || []).length;
+  const plan = [], rest = [];
+  bottles.forEach(b => {
+    let q = (b.p <= cols && used[b.p] < cap) ? b.p : null;
+    if (q === null) for (let k = 1; k <= cols; k++) if (used[k] < cap) { q = k; break; }
+    if (q === null) rest.push(b); else { used[q]++; plan.push({ b, q }); }
+  });
+  if (!plan.length) { showToast(t('shelf_full')); return; }
+  let msg = t('shelf_moveall_confirm', { n: plan.length, from: src.name + ' · ' + levelLabel(src, se), to: d.rack.name + ' · ' + levelLabel(d.rack, d.e) });
+  if (rest.length) msg += '\n' + t('shelf_moveall_rest', { n: rest.length });
+  if (!confirm(msg)) return;
+  plan.forEach(({ b, q }) => relocateBottle(b.w, { rack: src.id, e: se, p: b.p }, d.rack, d.e, q));
+  save(); renderLevelSheet(); showToast(t('shelf_moveall_done', { n: plan.length }));
+}
+// Im Formular "Wein hinzufügen": Regal/Ebene per QR-Etikett eintragen, Platz = erstes freies Fach der Ebene
+async function scanShelfForForm() {
+  const p = await scanShelfCode();
+  if (!p) return;
+  document.getElementById('f-loc-regal').value = p.rack.name;
+  if (!p.e) { document.getElementById('f-loc-ebene').value = ''; document.getElementById('f-loc-platz').value = ''; showToast(t('shelf_rack_only', { rack: p.rack.name })); return; }
+  document.getElementById('f-loc-ebene').value = String(p.e);
+  const fr = levelFree(p.rack, p.e);
+  document.getElementById('f-loc-platz').value = fr.length ? String(fr[0].p) : '';
+  showToast(fr.length ? p.rack.name + ' · ' + levelLabel(p.rack, p.e) + ' · ' + t('loc_slot') + ' ' + fr[0].p : t('shelf_full'));
 }
 
 let rackEditIdx = -1;   // Regal, dessen Ebenen gerade bearbeitet werden
