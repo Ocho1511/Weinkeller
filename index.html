@@ -569,6 +569,7 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .loc-chip { border: 1px solid var(--border); background: var(--bg, transparent); color: var(--gold-light); border-radius: 999px; padding: 4px 10px; font-family: inherit; font-size: 11px; font-weight: 600; cursor: pointer; }
 .loc-chip:active { background: var(--card); }
 .loc-open, .loc-text { font-size: 11px; color: var(--text-muted); }
+.loc-chip.loc-store { border-color: var(--gold); color: var(--gold); }
 .card-slots .ripeness-loc { margin: 0 0 10px; }
 @keyframes slotFlash { 0%, 100% { box-shadow: 0 0 0 0 rgba(196,162,74,0); } 50% { box-shadow: 0 0 0 4px rgba(196,162,74,.95), 0 0 14px 3px rgba(196,162,74,.6); } }
 .rack-slot.slot-flash { border-radius: 6px; animation: slotFlash .8s ease-in-out 3; }
@@ -3361,6 +3362,7 @@ de: {
   rack_move: "Umlagern",
   rack_move_hint: "Tippe ein freies Fach, um die Flasche dorthin zu legen.",
   loc_open: "{n} nicht eingelagert",
+  store_now: "Einlagern",
   rack_ph_cap: "Flaschen/Platz",
   rack_levels_title: "Ebenen: Name und Flaschen pro Platz",
   rack_level_name: "Name",
@@ -3737,6 +3739,7 @@ en: {
   rack_move: "Move",
   rack_move_hint: "Tap a free slot to move the bottle there.",
   loc_open: "{n} not stored",
+  store_now: "Store",
   rack_ph_cap: "Bottles/slot",
   rack_levels_title: "Levels: name and bottles per slot",
   rack_level_name: "Name",
@@ -4113,6 +4116,7 @@ es: {
   rack_move: "Mover",
   rack_move_hint: "Toca un hueco libre para mover la botella.",
   loc_open: "{n} sin colocar",
+  store_now: "Colocar",
   rack_ph_cap: "Botellas/hueco",
   rack_levels_title: "Niveles: nombre y botellas por hueco",
   rack_level_name: "Nombre",
@@ -4489,6 +4493,7 @@ sv: {
   rack_move: "Flytta",
   rack_move_hint: "Tryck på ett ledigt fack för att flytta flaskan dit.",
   loc_open: "{n} ej placerade",
+  store_now: "Placera",
   rack_ph_cap: "Flaskor/plats",
   rack_levels_title: "Hyllor: namn och flaskor per plats",
   rack_level_name: "Namn",
@@ -4865,6 +4870,7 @@ da: {
   rack_move: "Flyt",
   rack_move_hint: "Tryk på et ledigt felt for at flytte flasken dertil.",
   loc_open: "{n} ikke placeret",
+  store_now: "Placér",
   rack_ph_cap: "Flasker/plads",
   rack_levels_title: "Hylder: navn og flasker pr. plads",
   rack_level_name: "Navn",
@@ -5241,6 +5247,7 @@ fi: {
   rack_move: "Siirrä",
   rack_move_hint: "Napauta vapaata paikkaa siirtääksesi pullon sinne.",
   loc_open: "{n} sijoittamatta",
+  store_now: "Sijoita",
   rack_ph_cap: "Pulloa/paikka",
   rack_levels_title: "Tasot: nimi ja pulloja per paikka",
   rack_level_name: "Nimi",
@@ -5617,6 +5624,7 @@ ru: {
   rack_move: "Переместить",
   rack_move_hint: "Нажмите на свободное место, чтобы переложить бутылку.",
   loc_open: "{n} не размещено",
+  store_now: "Разместить",
   rack_ph_cap: "Бутылок/место",
   rack_levels_title: "Ярусы: название и бутылок на место",
   rack_level_name: "Название",
@@ -5993,6 +6001,7 @@ it: {
   rack_move: "Sposta",
   rack_move_hint: "Tocca un posto libero per spostare la bottiglia.",
   loc_open: "{n} non riposte",
+  store_now: "Riponi",
   rack_ph_cap: "Bottiglie/posto",
   rack_levels_title: "Ripiani: nome e bottiglie per posto",
   rack_level_name: "Nome",
@@ -6369,6 +6378,7 @@ fr: {
   rack_move: "Déplacer",
   rack_move_hint: "Touchez un emplacement libre pour y déplacer la bouteille.",
   loc_open: "{n} non rangées",
+  store_now: "Ranger",
   rack_ph_cap: "Bouteilles/empl.",
   rack_levels_title: "Niveaux : nom et bouteilles par emplacement",
   rack_level_name: "Nom",
@@ -6745,6 +6755,7 @@ pl: {
   rack_move: "Przenieś",
   rack_move_hint: "Dotknij wolnego miejsca, aby przenieść butelkę.",
   loc_open: "{n} nieułożone",
+  store_now: "Ułóż",
   rack_ph_cap: "Butelek/miejsce",
   rack_levels_title: "Poziomy: nazwa i butelek na miejsce",
   rack_level_name: "Nazwa",
@@ -7121,6 +7132,7 @@ hu: {
   rack_move: "Áthelyez",
   rack_move_hint: "Érintsen meg egy szabad helyet, hogy oda tegye az üveget.",
   loc_open: "{n} nincs elhelyezve",
+  store_now: "Elhelyez",
   rack_ph_cap: "Üveg/hely",
   rack_levels_title: "Szintek: név és üveg helyenként",
   rack_level_name: "Név",
@@ -7497,6 +7509,7 @@ cs: {
   rack_move: "Přesunout",
   rack_move_hint: "Klepněte na volné místo a láhev se tam přesune.",
   loc_open: "{n} neuloženo",
+  store_now: "Uložit",
   rack_ph_cap: "Lahví/místo",
   rack_levels_title: "Úrovně: název a lahví na místo",
   rack_level_name: "Název",
@@ -7873,6 +7886,7 @@ sk: {
   rack_move: "Presunúť",
   rack_move_hint: "Ťuknite na voľné miesto a fľaša sa tam presunie.",
   loc_open: "{n} neuložených",
+  store_now: "Uložiť",
   rack_ph_cap: "Fliaš/miesto",
   rack_levels_title: "Úrovne: názov a fliaš na miesto",
   rack_level_name: "Názov",
@@ -8249,6 +8263,7 @@ ro: {
   rack_move: "Mută",
   rack_move_hint: "Atinge un loc liber pentru a muta sticla acolo.",
   loc_open: "{n} neașezate",
+  store_now: "Așază",
   rack_ph_cap: "Sticle/loc",
   rack_levels_title: "Niveluri: nume și sticle pe loc",
   rack_level_name: "Nume",
@@ -8625,6 +8640,7 @@ hr: {
   rack_move: "Premjesti",
   rack_move_hint: "Dodirni slobodno mjesto da premjestiš bocu.",
   loc_open: "{n} nije pohranjeno",
+  store_now: "Pohrani",
   rack_ph_cap: "Boca/mjesto",
   rack_levels_title: "Razine: naziv i boca po mjestu",
   rack_level_name: "Naziv",
@@ -9001,6 +9017,7 @@ pt: {
   rack_move: "Mover",
   rack_move_hint: "Toque num lugar livre para mover a garrafa.",
   loc_open: "{n} por arrumar",
+  store_now: "Arrumar",
   rack_ph_cap: "Garrafas/lugar",
   rack_levels_title: "Níveis: nome e garrafas por lugar",
   rack_level_name: "Nome",
@@ -9377,6 +9394,7 @@ no: {
   rack_move: "Flytt",
   rack_move_hint: "Trykk på en ledig plass for å flytte flasken dit.",
   loc_open: "{n} ikke plassert",
+  store_now: "Plasser",
   rack_ph_cap: "Flasker/plass",
   rack_levels_title: "Hyller: navn og flasker per plass",
   rack_level_name: "Navn",
@@ -9753,6 +9771,7 @@ nl: {
   rack_move: "Verplaats",
   rack_move_hint: "Tik op een vrije plek om de fles daarheen te verplaatsen.",
   loc_open: "{n} niet opgeborgen",
+  store_now: "Opbergen",
   rack_ph_cap: "Flessen/plek",
   rack_levels_title: "Niveaus: naam en flessen per plek",
   rack_level_name: "Naam",
@@ -10129,6 +10148,7 @@ el: {
   rack_move: "Μετακίνηση",
   rack_move_hint: "Πατήστε μια ελεύθερη θέση για να μετακινήσετε εκεί τη φιάλη.",
   loc_open: "{n} χωρίς θέση",
+  store_now: "Τοποθέτηση",
   rack_ph_cap: "Φιάλες/θέση",
   rack_levels_title: "Επίπεδα: όνομα και φιάλες ανά θέση",
   rack_level_name: "Όνομα",
@@ -10505,6 +10525,7 @@ uk: {
   rack_move: "Перемістити",
   rack_move_hint: "Торкніться вільного місця, щоб перемістити туди пляшку.",
   loc_open: "Не розміщено: {n}",
+  store_now: "Розмістити",
   rack_ph_cap: "Пляшок/місце",
   rack_levels_title: "Рівні: назва та кількість пляшок у місці",
   rack_level_name: "Назва",
@@ -10881,6 +10902,7 @@ ja: {
   rack_move: "移動",
   rack_move_hint: "空いている場所をタップすると、ボトルをそこへ移動します。",
   loc_open: "未配置 {n}本",
+  store_now: "配置する",
   rack_ph_cap: "ボトル数/場所",
   rack_levels_title: "段: 名前と1か所あたりのボトル数",
   rack_level_name: "名前",
@@ -11257,6 +11279,7 @@ ko: {
   rack_move: "이동",
   rack_move_hint: "빈 칸을 탭하면 병을 그곳으로 옮겨요.",
   loc_open: "{n}개 미보관",
+  store_now: "보관하기",
   rack_ph_cap: "칸당 병 수",
   rack_levels_title: "단: 이름과 칸당 병 수",
   rack_level_name: "이름",
@@ -11633,6 +11656,7 @@ zh: {
   rack_move: "移动",
   rack_move_hint: "点按空位即可将酒瓶移到那里。",
   loc_open: "{n} 款未存放",
+  store_now: "存放",
   rack_ph_cap: "瓶/位",
   rack_levels_title: "层：名称及每位瓶数",
   rack_level_name: "名称",
@@ -12009,6 +12033,7 @@ hi: {
   rack_move: "स्थानांतरित करें",
   rack_move_hint: "बोतल को वहाँ ले जाने के लिए खाली स्थान पर टैप करें।",
   loc_open: "{n} रखी नहीं गईं",
+  store_now: "रखें",
   rack_ph_cap: "बोतलें/स्थान",
   rack_levels_title: "स्तर: नाम और प्रति स्थान बोतलें",
   rack_level_name: "नाम",
@@ -13623,13 +13648,26 @@ function wineSlotChips(w) {
     const r = rackById(g.x.rack);
     h += `<button class="loc-chip" onclick="event.stopPropagation();goToSlot('${r.id}',${g.x.e},${g.x.p})">📍 ${esc(r.name)} · ${esc(levelLabel(r, g.x.e))}/P${g.x.p}${g.n > 1 ? ' ×' + g.n : ''}</button>`;
   });
+  // Nicht eingelagerte Flaschen: mit Regalen gleich zum Einlagern (Regal-Tab, Wein vorgewählt), sonst nur Hinweis
+  const openChip = (n) => settings.racks.length
+    ? `<button class="loc-chip loc-store" onclick="event.stopPropagation();storeWine('${w.id}')">📥 ${esc(t('loc_open', { n }))} · ${esc(t('store_now'))}</button>`
+    : `<span class="loc-open">${esc(t('loc_open', { n }))}</span>`;
   const open = unplacedCount(w);
-  if (vp.length && open > 0) h += `<span class="loc-open">${esc(t('loc_open', { n: open }))}</span>`;
+  if (vp.length && open > 0) h += openChip(open);
   if (!vp.length) {
     const txt = formatLocation(w);
-    h = txt ? `<span class="loc-text">📍 ${esc(txt)}</span>` : `<span class="loc-open">${esc(t('loc_open', { n: w.count || 1 }))}</span>`;
+    h = txt ? `<span class="loc-text">📍 ${esc(txt)}</span>` : openChip(w.count || 1);
   }
   return `<div class="ripeness-loc">${h}</div>`;
+}
+// Wein direkt einlagern: Regal-Tab mit vorgewähltem Wein öffnen, dann freies Fach antippen
+function storeWine(id) {
+  const w = wines.find(x => x.id === id);
+  if (!w || !settings.racks.length) return;
+  rackSelectedWineId = id; rackFilledSlot = null; rackMove = null;
+  showTab('racks', document.querySelector('.nav-btn[onclick*="showTab(\'racks\'"]'));
+  renderRacks();
+  showToast(t('rack_assign_sel', { name: w.name }));
 }
 // Zum Platz im Regal springen: Regal wählen, Fach markieren, hinscrollen und kurz aufleuchten lassen
 function goToSlot(rackId, e, p) {
