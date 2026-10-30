@@ -570,7 +570,7 @@ body {
 .rack-preview.solo { margin: 0 0 10px; }
 .rack-action-name { font-size: 13px; font-weight: 700; color: var(--text); min-width: 0; }
 .rack-action-name span { display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); margin-top: 2px; }
-.rack-action-btns { display: flex; gap: 8px; }
+.rack-action-btns { display: flex; flex-wrap: wrap; gap: 8px; }
 .rack-slot.droppable { outline: 2px dashed var(--gold); outline-offset: 2px; border-radius: 6px; cursor: pointer; }
 .rack-slot.droppable .rack-empty { background: rgba(196,162,74,0.15); }
 .rack-add-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
@@ -3005,6 +3005,7 @@ de: {
   rack_level_name: "Name",
   rack_blink: "Zuerst trinken: blinken",
   rack_blink_hint: "Überschritten oder spätestens nächstes Jahr am Ende der Trinkreife",
+  rack_delete: "Wein löschen",
   rack_cap_low: "Auf dieser Ebene liegen bis zu {n} Flaschen in einem Platz.",
   sync_code_notfound: "Code nicht gefunden – bitte prüfen",
   toast_storage_full: "Speicher voll – Änderung konnte nicht gesichert werden",
@@ -3300,6 +3301,7 @@ en: {
   rack_level_name: "Name",
   rack_blink: "Drink first: blink",
   rack_blink_hint: "Past their drinking window, or ending by next year",
+  rack_delete: "Delete wine",
   rack_cap_low: "Up to {n} bottles are stored in one slot on this level.",
   sync_code_notfound: "Code not found – please check it",
   toast_storage_full: "Storage full – change could not be saved",
@@ -3595,6 +3597,7 @@ es: {
   rack_level_name: "Nombre",
   rack_blink: "Beber primero: parpadear",
   rack_blink_hint: "Pasados de su ventana de consumo o que terminan como tarde el año que viene",
+  rack_delete: "Eliminar vino",
   rack_cap_low: "En este nivel hay hasta {n} botellas en un hueco.",
   sync_code_notfound: "Código no encontrado: compruébalo",
   toast_storage_full: "Almacenamiento lleno: no se pudo guardar el cambio",
@@ -3890,6 +3893,7 @@ sv: {
   rack_level_name: "Namn",
   rack_blink: "Drick först: blinka",
   rack_blink_hint: "Förbi dryckesfönstret eller slutar senast nästa år",
+  rack_delete: "Ta bort vin",
   rack_cap_low: "På den här hyllan finns upp till {n} flaskor på en plats.",
   sync_code_notfound: "Koden hittades inte – kontrollera den",
   toast_storage_full: "Lagringsutrymmet är fullt – ändringen kunde inte sparas",
@@ -4185,6 +4189,7 @@ da: {
   rack_level_name: "Navn",
   rack_blink: "Drik først: blink",
   rack_blink_hint: "Over drikkevinduet eller slutter senest næste år",
+  rack_delete: "Slet vin",
   rack_cap_low: "På denne hylde ligger op til {n} flasker på én plads.",
   sync_code_notfound: "Koden blev ikke fundet – tjek den",
   toast_storage_full: "Lageret er fuldt – ændringen kunne ikke gemmes",
@@ -4480,6 +4485,7 @@ fi: {
   rack_level_name: "Nimi",
   rack_blink: "Juo ensin: vilku",
   rack_blink_hint: "Juomakypsyys ohi tai päättyy viimeistään ensi vuonna",
+  rack_delete: "Poista viini",
   rack_cap_low: "Tällä tasolla yhdellä paikalla on jopa {n} pulloa.",
   sync_code_notfound: "Koodia ei löytynyt – tarkista se",
   toast_storage_full: "Tallennustila täynnä – muutosta ei voitu tallentaa",
@@ -4775,6 +4781,7 @@ ru: {
   rack_level_name: "Название",
   rack_blink: "Пить первыми: мигание",
   rack_blink_hint: "Срок истёк или заканчивается не позже следующего года",
+  rack_delete: "Удалить вино",
   rack_cap_low: "На этом ярусе в одном месте лежит до {n} бутылок.",
   sync_code_notfound: "Код не найден – проверьте его",
   toast_storage_full: "Память заполнена – изменение не сохранено",
@@ -5070,6 +5077,7 @@ it: {
   rack_level_name: "Nome",
   rack_blink: "Da bere prima: lampeggia",
   rack_blink_hint: "Oltre la finestra di consumo o in scadenza entro il prossimo anno",
+  rack_delete: "Elimina vino",
   rack_cap_low: "Su questo ripiano ci sono fino a {n} bottiglie in un posto.",
   sync_code_notfound: "Codice non trovato – controllalo",
   toast_storage_full: "Memoria piena: impossibile salvare la modifica",
@@ -5365,6 +5373,7 @@ fr: {
   rack_level_name: "Nom",
   rack_blink: "À boire d'abord : clignote",
   rack_blink_hint: "Fenêtre de dégustation dépassée ou se terminant au plus tard l'an prochain",
+  rack_delete: "Supprimer le vin",
   rack_cap_low: "Sur ce niveau, jusqu'à {n} bouteilles sont rangées dans un emplacement.",
   sync_code_notfound: "Code introuvable – vérifiez-le",
   toast_storage_full: "Stockage plein : la modification n'a pas pu être enregistrée",
@@ -5660,6 +5669,7 @@ pl: {
   rack_level_name: "Nazwa",
   rack_blink: "Do wypicia najpierw: miganie",
   rack_blink_hint: "Po okresie picia lub kończy się najpóźniej w przyszłym roku",
+  rack_delete: "Usuń wino",
   rack_cap_low: "Na tym poziomie w jednym miejscu leży do {n} butelek.",
   sync_code_notfound: "Nie znaleziono kodu – sprawdź go",
   toast_storage_full: "Pamięć pełna – nie udało się zapisać zmiany",
@@ -5955,6 +5965,7 @@ hu: {
   rack_level_name: "Név",
   rack_blink: "Először innivaló: villog",
   rack_blink_hint: "Lejárt az ivási időszak, vagy legkésőbb jövőre véget ér",
+  rack_delete: "Bor törlése",
   rack_cap_low: "Ezen a szinten egy helyen legfeljebb {n} üveg van.",
   sync_code_notfound: "A kód nem található – ellenőrizd",
   toast_storage_full: "A tárhely megtelt – a módosítást nem sikerült menteni",
@@ -6250,6 +6261,7 @@ cs: {
   rack_level_name: "Název",
   rack_blink: "Pít nejdřív: blikat",
   rack_blink_hint: "Po době pití nebo končí nejpozději příští rok",
+  rack_delete: "Smazat víno",
   rack_cap_low: "Na této úrovni je na jednom místě až {n} lahví.",
   sync_code_notfound: "Kód nebyl nalezen – zkontrolujte jej",
   toast_storage_full: "Úložiště je plné – změnu se nepodařilo uložit",
@@ -6545,6 +6557,7 @@ sk: {
   rack_level_name: "Názov",
   rack_blink: "Piť najskôr: blikať",
   rack_blink_hint: "Po dobe pitia alebo končí najneskôr budúci rok",
+  rack_delete: "Zmazať víno",
   rack_cap_low: "Na tejto úrovni je na jednom mieste až {n} fliaš.",
   sync_code_notfound: "Kód sa nenašiel – skontrolujte ho",
   toast_storage_full: "Úložisko je plné – zmenu sa nepodarilo uložiť",
@@ -6840,6 +6853,7 @@ ro: {
   rack_level_name: "Nume",
   rack_blink: "De băut întâi: clipește",
   rack_blink_hint: "Fereastra de consum depășită sau se încheie cel târziu anul viitor",
+  rack_delete: "Șterge vinul",
   rack_cap_low: "Pe acest nivel, într-un loc sunt până la {n} sticle.",
   sync_code_notfound: "Codul nu a fost găsit – verifică-l",
   toast_storage_full: "Spațiu plin – modificarea nu a putut fi salvată",
@@ -7135,6 +7149,7 @@ hr: {
   rack_level_name: "Naziv",
   rack_blink: "Piti prvo: treperi",
   rack_blink_hint: "Prošlo razdoblje pijenja ili završava najkasnije iduće godine",
+  rack_delete: "Izbriši vino",
   rack_cap_low: "Na ovoj razini u jednom je mjestu do {n} boca.",
   sync_code_notfound: "Kod nije pronađen – provjerite ga",
   toast_storage_full: "Pohrana je puna – promjena nije spremljena",
@@ -7430,6 +7445,7 @@ pt: {
   rack_level_name: "Nome",
   rack_blink: "Beber primeiro: piscar",
   rack_blink_hint: "Fora da janela de consumo ou a terminar no máximo no próximo ano",
+  rack_delete: "Eliminar vinho",
   rack_cap_low: "Neste nível há até {n} garrafas num lugar.",
   sync_code_notfound: "Código não encontrado – verifique-o",
   toast_storage_full: "Armazenamento cheio – não foi possível guardar a alteração",
@@ -7725,6 +7741,7 @@ no: {
   rack_level_name: "Navn",
   rack_blink: "Drikk først: blink",
   rack_blink_hint: "Forbi drikkevinduet eller slutter senest neste år",
+  rack_delete: "Slett vin",
   rack_cap_low: "På denne hyllen ligger opptil {n} flasker på én plass.",
   sync_code_notfound: "Koden ble ikke funnet – sjekk den",
   toast_storage_full: "Lagringen er full – endringen kunne ikke lagres",
@@ -8020,6 +8037,7 @@ nl: {
   rack_level_name: "Naam",
   rack_blink: "Eerst drinken: knipperen",
   rack_blink_hint: "Drinkvenster voorbij of eindigt uiterlijk volgend jaar",
+  rack_delete: "Wijn verwijderen",
   rack_cap_low: "Op dit niveau liggen tot {n} flessen op één plek.",
   sync_code_notfound: "Code niet gevonden – controleer hem",
   toast_storage_full: "Opslag vol – wijziging kon niet worden opgeslagen",
@@ -8447,10 +8465,11 @@ function getRipenessInfo(w) {
 }
 
 let drinkId = null;
+let drinkSlotRef = null;   // Platz der Flasche, die aus der Regalansicht getrunken wird
 function drinkOne(id) {
   const w = wines.find(x => x.id === id);
   if (!w) return;
-  drinkId = id;
+  drinkId = id; drinkSlotRef = null;
   document.getElementById('drink-with').value = '';
   document.querySelectorAll('#drink-occasions .occ-chip').forEach(c => c.classList.remove('active'));
   document.getElementById('drink-modal-wine').textContent = w.name + (w.year ? ' · ' + w.year : '');
@@ -8465,21 +8484,34 @@ function confirmDrink() {
   if (!w) { closeModal('drink-modal'); return; }
   const companions = document.getElementById('drink-with').value.trim();
   const occasions = [...document.querySelectorAll('#drink-occasions .occ-chip.active')].map(c => c.getAttribute('data-occ'));
+  const ref = drinkSlotRef; drinkSlotRef = null;
+  const rr = ref && rackById(ref.rack);
+  const where = rr ? 'Regal ' + rr.name + ' · Ebene ' + ref.e + ' · Platz ' + ref.p : null;   // aus dem Regal getrunken: genau dieser Platz kommt in die Historie
   if ((w.count||1) <= 1) wines = wines.filter(x => x.id !== drinkId);
-  else { w.count = (w.count||1) - 1; if ((w.placements||[]).length > w.count) setPlacements(w, validPlacements(w)); }
-  recordDrunk(w, companions, occasions);
+  else {
+    w.count = (w.count||1) - 1;
+    if (ref) {   // der Platz der getrunkenen Flasche wird frei
+      const list = validPlacements(w);
+      const i = list.findIndex(x => x.rack === ref.rack && x.e === ref.e && x.p === ref.p);
+      if (i >= 0) { list.splice(i, 1); setPlacements(w, list); }
+    }
+    if ((w.placements||[]).length > w.count) setPlacements(w, validPlacements(w));
+  }
+  recordDrunk(w, companions, occasions, where);
   save(); saveDrunk();
   closeModal('drink-modal');
   const active = document.querySelector('.tab.active');
-  if (active && active.id === 'tab-trinkreife') renderTrinkreife(); else renderKeller();
+  if (active && active.id === 'tab-trinkreife') renderTrinkreife();
+  else if (active && active.id === 'tab-racks') { rackFilledSlot = null; renderRacks(); }
+  else renderKeller();
   showToast(t('toast_prost'));
 }
 
-function recordDrunk(w, companions, occasions) {
+function recordDrunk(w, companions, occasions, locText) {
   drunkWines.push({
     id: Date.now().toString() + Math.random().toString(36).slice(2,7),
     name: w.name, year: w.year||null, type: w.type||'other',
-    region: w.region||'', country: w.country||'', grape: w.grape||'', location: formatLocation(w),
+    region: w.region||'', country: w.country||'', grape: w.grape||'', location: locText != null ? locText : formatLocation(w),
     price: w.price||0, rating: w.rating||0,
     companions: companions||'', occasions: occasions||[],
     date: new Date().toISOString()
@@ -9243,8 +9275,10 @@ function renderRacks() {
       <div class="rack-action-name">${cut ? '' : esc(pw.name) + (pw.year ? ' · ' + pw.year : '') + (g.n > 1 ? ' ×' + g.n : '')}<span${cut ? ' style="margin-top:0;font-size:12px"' : ''}>${esc(formatLocation(pw))}</span></div>
       <div class="rack-action-btns">
         <button class="wine-btn" onclick="goToWine('${pw.id}')">${t('rack_open_wine')}</button>
+        <button class="wine-btn primary" onclick="drinkFromSlot('${pw.id}')">${t('btn_drink')}</button>
         <button class="wine-btn" onclick="startMove('${pw.id}')">${t('rack_move')}</button>
         <button class="wine-btn danger" onclick="removeFromRack('${pw.id}')">${t('rack_remove')}</button>
+        <button class="wine-btn danger" onclick="deleteWineFromRack('${pw.id}')">🗑 ${t('rack_delete')}</button>
       </div>
     </div>`;
   });
@@ -9296,6 +9330,20 @@ function goToSlot(rackId, e, p) {
     el.classList.add('slot-flash');
     setTimeout(() => el.classList.remove('slot-flash'), 2600);
   }, 60);
+}
+// Aus der Regalansicht: die Flasche im markierten Fach trinken (Platz wird frei) bzw. den ganzen Wein löschen
+function drinkFromSlot(id) {
+  const s = rackFilledSlot;
+  if (!s) return;
+  drinkOne(id);
+  drinkSlotRef = { rack: s.rack, e: s.e, p: s.p };
+}
+function deleteWineFromRack(id) {
+  const w = wines.find(x => x.id === id);
+  if (!w) return;
+  if (!confirm(w.name + (w.year ? ' ' + w.year : '') + ((w.count || 1) > 1 ? ' (×' + w.count + ')' : '') + ' – ' + t('confirm_del'))) return;
+  wines = wines.filter(x => x.id !== id);
+  save(); rackFilledSlot = null; renderRacks(); showToast(t('toast_removed'));
 }
 function toggleRackBlink() { settings.blinkUrgent = !settings.blinkUrgent; saveSettings(); renderRacks(); }
 // Trinkreife eines Weins fürs Regal: Zustand (wie in der Trinkreife-Ansicht) und "dringend" = überschritten
