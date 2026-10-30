@@ -2391,8 +2391,10 @@ function mmInfo(w) {
   const stock = wineStock(w);
   return [{ stock, min: mm.min, max: mm.max, low: mm.min != null && stock < mm.min, over: mm.max != null && stock > mm.max }];
 }
+// Bestand immer anzeigen; Min/Max und Warnung nur, wenn eingetragen
 function mmBadgeHtml(w) {
-  return mmInfo(w).map(r => `<div class="mm-badge ${r.low ? 'low' : r.over ? 'over' : 'ok'}">${t('mm_stock')} ${r.stock}${r.min != null ? ' · ' + t('mm_min') + ' ' + r.min : ''}${r.max != null ? ' · ' + t('mm_max') + ' ' + r.max : ''}${r.low ? ' ⚠' : ''}</div>`).join('');
+  const r = mmInfo(w)[0] || { stock: wineStock(w) };
+  return `<div class="mm-badge ${r.low ? 'low' : r.over ? 'over' : 'ok'}">${t('mm_stock')} ${r.stock}${r.min != null ? ' · ' + t('mm_min') + ' ' + r.min : ''}${r.max != null ? ' · ' + t('mm_max') + ' ' + r.max : ''}${r.low ? ' ⚠' : ''}</div>`;
 }
 function renderMinMaxFields(w) {
   const mm = mmOf(w && w.minMax);
