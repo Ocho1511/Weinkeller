@@ -569,6 +569,7 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .loc-chip { border: 1px solid var(--border); background: var(--bg, transparent); color: var(--gold-light); border-radius: 999px; padding: 4px 10px; font-family: inherit; font-size: 11px; font-weight: 600; cursor: pointer; }
 .loc-chip:active { background: var(--card); }
 .loc-open, .loc-text { font-size: 11px; color: var(--text-muted); }
+.rack-clear-btn { border-color: var(--danger, #c0392b); color: var(--danger, #e57373); }
 .loc-chip.loc-store { border-color: var(--gold); color: var(--gold); }
 .rack-store-banner { display: flex; align-items: center; gap: 10px; justify-content: space-between; margin: 0 0 12px; padding: 10px 12px; border: 1px solid var(--gold); border-radius: 12px; background: var(--card); font-size: 13px; font-weight: 600; color: var(--gold-light, var(--gold)); }
 .rack-store-banner .wine-btn { flex: none; width: auto; padding: 6px 12px; }
@@ -3376,6 +3377,10 @@ de: {
   store_filter: "Einlagern: {name} · {n} Fl. – freies Fach antippen",
   store_filter_off: "Alle anzeigen",
   store_back: "← Zum Keller",
+  rack_clear_btn: "Regal leeren",
+  rack_clear_confirm: "⚠ Regal „{name}“ leeren?\n\nAlle {n} Flaschen ({w} Weine) werden aus dem Regal genommen und gelten danach als „nicht eingelagert“. Die Weine selbst bleiben im Keller erhalten.\n\nDas lässt sich nicht automatisch rückgängig machen.",
+  rack_clear_done: "„{name}“ geleert – {n} Flaschen sind jetzt nicht eingelagert.",
+  rack_clear_empty: "„{name}“ ist bereits leer.",
   store_done: "✓ {name}: alle Flaschen eingelagert",
   rack_ph_cap: "Flaschen/Platz",
   rack_levels_title: "Ebenen: Name und Flaschen pro Platz",
@@ -3757,6 +3762,10 @@ en: {
   store_filter: "Store: {name} · {n} btl. – tap a free slot",
   store_filter_off: "Show all",
   store_back: "← To cellar",
+  rack_clear_btn: "Empty rack",
+  rack_clear_confirm: "⚠ Empty rack “{name}”?\n\nAll {n} bottles ({w} wines) will be removed from the rack and will then count as “not stored”. The wines themselves remain in the cellar.\n\nThis cannot be undone automatically.",
+  rack_clear_done: "“{name}” emptied – {n} bottles are now not stored.",
+  rack_clear_empty: "“{name}” is already empty.",
   store_done: "✓ {name}: all bottles stored",
   rack_ph_cap: "Bottles/slot",
   rack_levels_title: "Levels: name and bottles per slot",
@@ -4138,6 +4147,10 @@ es: {
   store_filter: "Colocar: {name} · {n} bot. – toca un hueco libre",
   store_filter_off: "Mostrar todo",
   store_back: "← A la bodega",
+  rack_clear_btn: "Vaciar estante",
+  rack_clear_confirm: "⚠ ¿Vaciar el estante «{name}»?\n\nSe retirarán las {n} botellas ({w} vinos) del estante y pasarán a figurar como «sin almacenar». Los vinos en sí permanecen en la bodega.\n\nEsto no se puede deshacer automáticamente.",
+  rack_clear_done: "Estante «{name}» vaciado – {n} botellas están ahora sin almacenar.",
+  rack_clear_empty: "El estante «{name}» ya está vacío.",
   store_done: "✓ {name}: todas las botellas colocadas",
   rack_ph_cap: "Botellas/hueco",
   rack_levels_title: "Niveles: nombre y botellas por hueco",
@@ -4519,6 +4532,10 @@ sv: {
   store_filter: "Placera: {name} · {n} fl. – tryck på en ledig plats",
   store_filter_off: "Visa alla",
   store_back: "← Till källaren",
+  rack_clear_btn: "Töm hyllan",
+  rack_clear_confirm: "⚠ Töm hyllan ”{name}”?\n\nAlla {n} flaskor ({w} viner) tas bort från hyllan och räknas därefter som ”ej inlagrade”. Vinerna själva finns kvar i vinkällaren.\n\nDet går inte att ångra automatiskt.",
+  rack_clear_done: "”{name}” har tömts – {n} flaskor är nu inte inlagrade.",
+  rack_clear_empty: "”{name}” är redan tom.",
   store_done: "✓ {name}: alla flaskor placerade",
   rack_ph_cap: "Flaskor/plats",
   rack_levels_title: "Hyllor: namn och flaskor per plats",
@@ -4900,6 +4917,10 @@ da: {
   store_filter: "Placér: {name} · {n} fl. – tryk på en ledig plads",
   store_filter_off: "Vis alle",
   store_back: "← Til kælderen",
+  rack_clear_btn: "Tøm reol",
+  rack_clear_confirm: "⚠ Tøm reolen »{name}«?\n\nAlle {n} flasker ({w} vine) tages ud af reolen og regnes derefter som »ikke lagret«. Selve vinene bliver i kælderen.\n\nDet kan ikke fortrydes automatisk.",
+  rack_clear_done: "»{name}« er tømt – {n} flasker er nu ikke lagret.",
+  rack_clear_empty: "»{name}« er allerede tom.",
   store_done: "✓ {name}: alle flasker placeret",
   rack_ph_cap: "Flasker/plads",
   rack_levels_title: "Hylder: navn og flasker pr. plads",
@@ -5281,6 +5302,10 @@ fi: {
   store_filter: "Sijoita: {name} · {n} pul. – napauta vapaata paikkaa",
   store_filter_off: "Näytä kaikki",
   store_back: "← Kellariin",
+  rack_clear_btn: "Tyhjennä hylly",
+  rack_clear_confirm: "⚠ Tyhjennetäänkö hylly ”{name}”?\n\nKaikki {n} pulloa ({w} viiniä) poistetaan hyllystä, ja ne lasketaan sen jälkeen ”ei varastoiduiksi”. Viinit itse säilyvät kellarissa.\n\nTätä ei voi perua automaattisesti.",
+  rack_clear_done: "”{name}” tyhjennetty – {n} pulloa ei ole nyt varastoitu.",
+  rack_clear_empty: "”{name}” on jo tyhjä.",
   store_done: "✓ {name}: kaikki pullot sijoitettu",
   rack_ph_cap: "Pulloa/paikka",
   rack_levels_title: "Tasot: nimi ja pulloja per paikka",
@@ -5662,6 +5687,10 @@ ru: {
   store_filter: "Разместить: {name} · {n} бут. – коснитесь свободной ячейки",
   store_filter_off: "Показать все",
   store_back: "← В погреб",
+  rack_clear_btn: "Очистить стеллаж",
+  rack_clear_confirm: "⚠ Очистить стеллаж «{name}»?\n\nВсе бутылки ({n} шт., {w} вин) будут сняты со стеллажа и после этого будут считаться «не размещёнными». Сами вина останутся в погребе.\n\nАвтоматически отменить это нельзя.",
+  rack_clear_done: "Стеллаж «{name}» очищен – {n} бутылок теперь не размещены.",
+  rack_clear_empty: "Стеллаж «{name}» уже пуст.",
   store_done: "✓ {name}: все бутылки размещены",
   rack_ph_cap: "Бутылок/место",
   rack_levels_title: "Ярусы: название и бутылок на место",
@@ -6043,6 +6072,10 @@ it: {
   store_filter: "Riponi: {name} · {n} bott. – tocca uno scomparto libero",
   store_filter_off: "Mostra tutto",
   store_back: "← Alla cantina",
+  rack_clear_btn: "Svuota scaffale",
+  rack_clear_confirm: "⚠ Svuotare lo scaffale «{name}»?\n\nTutte le {n} bottiglie ({w} vini) verranno tolte dallo scaffale e risulteranno poi «non riposte». I vini restano comunque in cantina.\n\nNon è possibile annullare l’operazione automaticamente.",
+  rack_clear_done: "«{name}» svuotato – {n} bottiglie ora non sono riposte.",
+  rack_clear_empty: "«{name}» è già vuoto.",
   store_done: "✓ {name}: tutte le bottiglie riposte",
   rack_ph_cap: "Bottiglie/posto",
   rack_levels_title: "Ripiani: nome e bottiglie per posto",
@@ -6424,6 +6457,10 @@ fr: {
   store_filter: "Ranger : {name} · {n} bout. – touchez un emplacement libre",
   store_filter_off: "Tout afficher",
   store_back: "← Vers la cave",
+  rack_clear_btn: "Vider l’étagère",
+  rack_clear_confirm: "⚠ Vider l’étagère « {name} » ?\n\nToutes les {n} bouteilles ({w} vins) seront retirées de l’étagère et seront ensuite considérées comme « non stockées ». Les vins eux-mêmes restent dans la cave.\n\nCette action ne peut pas être annulée automatiquement.",
+  rack_clear_done: "Étagère « {name} » vidée – {n} bouteilles ne sont plus stockées.",
+  rack_clear_empty: "L’étagère « {name} » est déjà vide.",
   store_done: "✓ {name} : toutes les bouteilles rangées",
   rack_ph_cap: "Bouteilles/empl.",
   rack_levels_title: "Niveaux : nom et bouteilles par emplacement",
@@ -6805,6 +6842,10 @@ pl: {
   store_filter: "Ułóż: {name} · {n} but. – dotknij wolne miejsce",
   store_filter_off: "Pokaż wszystko",
   store_back: "← Do piwnicy",
+  rack_clear_btn: "Opróżnij regał",
+  rack_clear_confirm: "⚠ Opróżnić regał „{name}”?\n\nWszystkie butelki ({n} szt., {w} win) zostaną zdjęte z regału i będą następnie traktowane jako „nieprzechowywane”. Same wina pozostają w piwnicy.\n\nNie można tego automatycznie cofnąć.",
+  rack_clear_done: "Regał „{name}” opróżniony – {n} butelek ma teraz status „nieprzechowywane”.",
+  rack_clear_empty: "Regał „{name}” jest już pusty.",
   store_done: "✓ {name}: wszystkie butelki ułożone",
   rack_ph_cap: "Butelek/miejsce",
   rack_levels_title: "Poziomy: nazwa i butelek na miejsce",
@@ -7186,6 +7227,10 @@ hu: {
   store_filter: "Elhelyezés: {name} · {n} üveg – koppints egy szabad helyre",
   store_filter_off: "Összes mutatása",
   store_back: "← A pincéhez",
+  rack_clear_btn: "Állvány kiürítése",
+  rack_clear_confirm: "⚠ Kiüríti a(z) „{name}” állványt?\n\nMind a(z) {n} palack ({w} bor) kikerül az állványból, és ezután „nincs tárolva” állapotúnak számít. Maguk a borok megmaradnak a pincében.\n\nEz automatikusan nem vonható vissza.",
+  rack_clear_done: "A(z) „{name}” állvány kiürítve – {n} palack most nincs tárolva.",
+  rack_clear_empty: "A(z) „{name}” állvány már üres.",
   store_done: "✓ {name}: minden üveg elhelyezve",
   rack_ph_cap: "Üveg/hely",
   rack_levels_title: "Szintek: név és üveg helyenként",
@@ -7567,6 +7612,10 @@ cs: {
   store_filter: "Uložit: {name} · {n} lahví – klepni na volné místo",
   store_filter_off: "Zobrazit vše",
   store_back: "← Do sklepa",
+  rack_clear_btn: "Vyprázdnit regál",
+  rack_clear_confirm: "⚠ Vyprázdnit regál „{name}“?\n\nVšech {n} lahví ({w} vín) bude z regálu odebráno a poté budou vedeny jako „neuskladněné“. Samotná vína zůstanou ve sklípku.\n\nToto nelze automaticky vrátit zpět.",
+  rack_clear_done: "Regál „{name}“ vyprázdněn – {n} lahví je nyní neuskladněných.",
+  rack_clear_empty: "Regál „{name}“ je již prázdný.",
   store_done: "✓ {name}: všechny lahve uloženy",
   rack_ph_cap: "Lahví/místo",
   rack_levels_title: "Úrovně: název a lahví na místo",
@@ -7948,6 +7997,10 @@ sk: {
   store_filter: "Uložiť: {name} · {n} fliaš – ťukni na voľné miesto",
   store_filter_off: "Zobraziť všetko",
   store_back: "← Do pivnice",
+  rack_clear_btn: "Vyprázdniť regál",
+  rack_clear_confirm: "⚠ Vyprázdniť regál „{name}“?\n\nVšetkých {n} fliaš ({w} vín) sa z regálu vyberie a potom sa budú evidovať ako „neuskladnené“. Samotné vína zostanú v pivnici.\n\nToto sa nedá automaticky vrátiť späť.",
+  rack_clear_done: "Regál „{name}“ je vyprázdnený – {n} fliaš je teraz neuskladnených.",
+  rack_clear_empty: "Regál „{name}“ je už prázdny.",
   store_done: "✓ {name}: všetky fľaše uložené",
   rack_ph_cap: "Fliaš/miesto",
   rack_levels_title: "Úrovne: názov a fliaš na miesto",
@@ -8329,6 +8382,10 @@ ro: {
   store_filter: "Așază: {name} · {n} stic. – atinge un loc liber",
   store_filter_off: "Arată tot",
   store_back: "← La pivniță",
+  rack_clear_btn: "Golește raftul",
+  rack_clear_confirm: "⚠ Golești raftul „{name}”?\n\nToate cele {n} sticle ({w} vinuri) vor fi scoase de pe raft și vor fi considerate apoi „nedepozitate”. Vinurile în sine rămân în pivniță.\n\nAcest lucru nu poate fi anulat automat.",
+  rack_clear_done: "Raftul „{name}” a fost golit – {n} sticle sunt acum nedepozitate.",
+  rack_clear_empty: "Raftul „{name}” este deja gol.",
   store_done: "✓ {name}: toate sticlele așezate",
   rack_ph_cap: "Sticle/loc",
   rack_levels_title: "Niveluri: nume și sticle pe loc",
@@ -8710,6 +8767,10 @@ hr: {
   store_filter: "Pohrani: {name} · {n} boc. – dodirni slobodno mjesto",
   store_filter_off: "Prikaži sve",
   store_back: "← U podrum",
+  rack_clear_btn: "Isprazni regal",
+  rack_clear_confirm: "⚠ Isprazniti regal „{name}”?\n\nSvih {n} boca ({w} vina) bit će uklonjeno iz regala i nakon toga će se voditi kao „nepohranjeno”. Sama vina ostaju u podrumu.\n\nOvo se ne može automatski poništiti.",
+  rack_clear_done: "Regal „{name}” je ispražnjen – {n} boca sada nije pohranjeno.",
+  rack_clear_empty: "Regal „{name}” je već prazan.",
   store_done: "✓ {name}: sve boce pohranjene",
   rack_ph_cap: "Boca/mjesto",
   rack_levels_title: "Razine: naziv i boca po mjestu",
@@ -9091,6 +9152,10 @@ pt: {
   store_filter: "Arrumar: {name} · {n} gar. – toca num lugar livre",
   store_filter_off: "Mostrar tudo",
   store_back: "← Para a adega",
+  rack_clear_btn: "Esvaziar estante",
+  rack_clear_confirm: "⚠ Esvaziar a estante “{name}”?\n\nTodas as {n} garrafas ({w} vinhos) serão retiradas da estante e passarão a contar como “não armazenadas”. Os vinhos em si permanecem na adega.\n\nIsto não pode ser desfeito automaticamente.",
+  rack_clear_done: "A estante “{name}” foi esvaziada – {n} garrafas estão agora não armazenadas.",
+  rack_clear_empty: "A estante “{name}” já está vazia.",
   store_done: "✓ {name}: todas as garrafas arrumadas",
   rack_ph_cap: "Garrafas/lugar",
   rack_levels_title: "Níveis: nome e garrafas por lugar",
@@ -9472,6 +9537,10 @@ no: {
   store_filter: "Plasser: {name} · {n} fl. – trykk på en ledig plass",
   store_filter_off: "Vis alle",
   store_back: "← Til kjelleren",
+  rack_clear_btn: "Tøm hylle",
+  rack_clear_confirm: "⚠ Tømme hyllen «{name}»?\n\nAlle {n} flaskene ({w} viner) tas ut av hyllen og regnes deretter som «ikke lagret». Selve vinene blir værende i kjelleren.\n\nDette kan ikke angres automatisk.",
+  rack_clear_done: "«{name}» er tømt – {n} flasker er nå ikke lagret.",
+  rack_clear_empty: "«{name}» er allerede tom.",
   store_done: "✓ {name}: alle flasker plassert",
   rack_ph_cap: "Flasker/plass",
   rack_levels_title: "Hyller: navn og flasker per plass",
@@ -9853,6 +9922,10 @@ nl: {
   store_filter: "Opbergen: {name} · {n} fl. – tik op een vrij vak",
   store_filter_off: "Toon alles",
   store_back: "← Naar de kelder",
+  rack_clear_btn: "Rek legen",
+  rack_clear_confirm: "⚠ Rek “{name}” legen?\n\nAlle {n} flessen ({w} wijnen) worden uit het rek gehaald en gelden daarna als “niet opgeslagen”. De wijnen zelf blijven in de kelder bewaard.\n\nDit kan niet automatisch ongedaan worden gemaakt.",
+  rack_clear_done: "“{name}” is geleegd – {n} flessen zijn nu niet opgeslagen.",
+  rack_clear_empty: "“{name}” is al leeg.",
   store_done: "✓ {name}: alle flessen opgeborgen",
   rack_ph_cap: "Flessen/plek",
   rack_levels_title: "Niveaus: naam en flessen per plek",
@@ -10234,6 +10307,10 @@ el: {
   store_filter: "Τοποθέτηση: {name} · {n} φιάλ. – πατήστε μια ελεύθερη θέση",
   store_filter_off: "Εμφάνιση όλων",
   store_back: "← Στο κελάρι",
+  rack_clear_btn: "Άδειασμα ραφιού",
+  rack_clear_confirm: "⚠ Να αδειάσει το ράφι «{name}»;\n\nΌλα τα {n} μπουκάλια ({w} κρασιά) θα αφαιρεθούν από το ράφι και στη συνέχεια θα θεωρούνται «μη αποθηκευμένα». Τα ίδια τα κρασιά παραμένουν στο κελάρι.\n\nΑυτό δεν μπορεί να αναιρεθεί αυτόματα.",
+  rack_clear_done: "Το ράφι «{name}» αδειάστηκε – {n} μπουκάλια είναι πλέον μη αποθηκευμένα.",
+  rack_clear_empty: "Το ράφι «{name}» είναι ήδη άδειο.",
   store_done: "✓ {name}: όλες οι φιάλες τοποθετήθηκαν",
   rack_ph_cap: "Φιάλες/θέση",
   rack_levels_title: "Επίπεδα: όνομα και φιάλες ανά θέση",
@@ -10615,6 +10692,10 @@ uk: {
   store_filter: "Розмістити: {name} · {n} пл. – торкніться вільного місця",
   store_filter_off: "Показати все",
   store_back: "← До погреба",
+  rack_clear_btn: "Очистити стелаж",
+  rack_clear_confirm: "⚠ Очистити стелаж «{name}»?\n\nУсі пляшки ({n} шт., {w} вин) буде зняно зі стелажа, і надалі вони вважатимуться «не розміщеними». Самі вина залишаться в погребі.\n\nЦе не можна скасувати автоматично.",
+  rack_clear_done: "Стелаж «{name}» очищено – {n} пляшок тепер не розміщено.",
+  rack_clear_empty: "Стелаж «{name}» уже порожній.",
   store_done: "✓ {name}: усі пляшки розміщено",
   rack_ph_cap: "Пляшок/місце",
   rack_levels_title: "Рівні: назва та кількість пляшок у місці",
@@ -10996,6 +11077,10 @@ ja: {
   store_filter: "配置: {name} · {n}本 – 空いている場所をタップ",
   store_filter_off: "すべて表示",
   store_back: "← セラーへ戻る",
+  rack_clear_btn: "ラックを空にする",
+  rack_clear_confirm: "⚠ ラック「{name}」を空にしますか？\n\nすべてのボトル（{n}本、{w}種類のワイン）がラックから取り出され、その後は「未保管」として扱われます。ワイン自体はセラーに残ります。\n\nこの操作を自動で元に戻すことはできません。",
+  rack_clear_done: "ラック「{name}」を空にしました。{n}本のボトルが未保管になりました。",
+  rack_clear_empty: "ラック「{name}」はすでに空です。",
   store_done: "✓ {name}: すべて配置しました",
   rack_ph_cap: "ボトル数/場所",
   rack_levels_title: "段: 名前と1か所あたりのボトル数",
@@ -11377,6 +11462,10 @@ ko: {
   store_filter: "보관: {name} · {n}병 – 빈 칸을 탭하세요",
   store_filter_off: "모두 보기",
   store_back: "← 셀러로",
+  rack_clear_btn: "랙 비우기",
+  rack_clear_confirm: "⚠ 랙 “{name}”을(를) 비우시겠습니까?\n\n병 {n}개(와인 {w}종)가 모두 랙에서 빠지며, 이후 “미보관”으로 처리됩니다. 와인 자체는 셀러에 그대로 남습니다.\n\n이 작업은 자동으로 되돌릴 수 없습니다.",
+  rack_clear_done: "랙 “{name}” 비우기 완료 – 병 {n}개가 이제 미보관 상태입니다.",
+  rack_clear_empty: "랙 “{name}”은(는) 이미 비어 있습니다.",
   store_done: "✓ {name}: 모든 병 보관 완료",
   rack_ph_cap: "칸당 병 수",
   rack_levels_title: "단: 이름과 칸당 병 수",
@@ -11758,6 +11847,10 @@ zh: {
   store_filter: "存放：{name} · {n} 瓶 – 请点按空位",
   store_filter_off: "显示全部",
   store_back: "← 返回酒窖",
+  rack_clear_btn: "清空酒架",
+  rack_clear_confirm: "⚠ 清空酒架“{name}”？\n\n全部 {n} 瓶酒（{w} 种葡萄酒）将从酒架上取出，之后视为“未存放”。葡萄酒本身仍保留在酒窖中。\n\n此操作无法自动撤销。",
+  rack_clear_done: "酒架“{name}”已清空——{n} 瓶酒现为未存放状态。",
+  rack_clear_empty: "酒架“{name}”已经是空的。",
   store_done: "✓ {name}：全部已存放",
   rack_ph_cap: "瓶/位",
   rack_levels_title: "层：名称及每位瓶数",
@@ -12139,6 +12232,10 @@ hi: {
   store_filter: "रखें: {name} · {n} बोतल – खाली स्थान पर टैप करें",
   store_filter_off: "सब दिखाएँ",
   store_back: "← सेलर पर",
+  rack_clear_btn: "रैक खाली करें",
+  rack_clear_confirm: "⚠ रैक “{name}” खाली करें?\n\nसभी {n} बोतलें ({w} वाइन) रैक से हटा दी जाएँगी और उसके बाद “संग्रहित नहीं” मानी जाएँगी। वाइन स्वयं तहखाने में बनी रहेंगी।\n\nइसे अपने-आप वापस नहीं किया जा सकता।",
+  rack_clear_done: "“{name}” खाली हो गया – {n} बोतलें अब संग्रहित नहीं हैं।",
+  rack_clear_empty: "“{name}” पहले से खाली है।",
   store_done: "✓ {name}: सभी बोतलें रखी गईं",
   rack_ph_cap: "बोतलें/स्थान",
   rack_levels_title: "स्तर: नाम और प्रति स्थान बोतलें",
@@ -13658,7 +13755,7 @@ function renderRacks() {
   const swOpen = sw ? unplacedCount(sw) : 0, swName = sw ? sw.name + (sw.year ? ' ' + sw.year : '') : '';
   if (sw && swOpen < 1 && rackSelectedWineId === sw.id) rackSelectedWineId = null;
   else if (sw && swOpen > 0 && !rackSelectedWineId) rackSelectedWineId = sw.id;
-  let html = (sw ? `<div class="rack-store-banner"><span>${swOpen ? '📥 ' + esc(t('store_filter', { name: swName, n: swOpen })) : esc(t('store_done', { name: swName }))}</span><span class="rsb-btns">${swOpen ? `<button class="wine-btn" onclick="clearStoreFilter()">${t('store_filter_off')}</button>` : ''}<button class="wine-btn primary" onclick="backFromStore()">${t('store_back')}</button></span></div>` : '') + `<div class="rack-scanbar"><button class="scan-btn" onclick="scanShelf()">${t('shelf_scan')}</button></div><div class="rack-toolbar"><span class="rack-toolbar-lbl">${t('rack_blink_lbl')}</span>`
+  let html = (sw ? `<div class="rack-store-banner"><span>${swOpen ? '📥 ' + esc(t('store_filter', { name: swName, n: swOpen })) : esc(t('store_done', { name: swName }))}</span><span class="rsb-btns">${swOpen ? `<button class="wine-btn" onclick="clearStoreFilter()">${t('store_filter_off')}</button>` : ''}<button class="wine-btn primary" onclick="backFromStore()">${t('store_back')}</button></span></div>` : '') + `<div class="rack-scanbar"><button class="scan-btn" onclick="scanShelf()">${t('shelf_scan')}</button><button class="scan-btn rack-clear-btn" onclick="clearRack(rackActive)">🧹 ${t('rack_clear_btn')}</button></div><div class="rack-toolbar"><span class="rack-toolbar-lbl">${t('rack_blink_lbl')}</span>`
     + BLINKS.map(([key, label, st]) => `<button class="rack-toggle${blinkOn[key] ? ' active' : ''}" onclick="toggleRackBlink('${key}')" aria-pressed="${blinkOn[key]}"><span class="rt-dot"></span>${st ? `<i class="rack-ripe-dot ripeness-${RIPE_CLASS[st]}"></i>` : ''}${esc(label)}${blinkN[key] ? ' · ' + blinkN[key] : ''}</button>`).join('')
     + `</div>`
     + (blinkOn.Urgent ? `<div class="rack-blink-hint">${t('rack_blink_hint')}</div>` : '')
@@ -14212,7 +14309,7 @@ function renderRackSetup() {
   const list = document.getElementById('rack-setup-list');
   if (!list) return;
   list.innerHTML = settings.racks.map((r,i) => {
-    let h = `<div class="rack-setup-item"><span class="n">${esc(r.name)}</span><span class="d">${r.rows} × ${r.cols}${r.cap > 1 ? ' · ×' + r.cap : ''}${Object.keys(r.lv || {}).length ? ' *' : ''}</span><button class="rack-setup-edit" onclick="openQrLabels(${i})" title="${esc(t('qr_btn'))}">▦</button><button class="rack-setup-edit" onclick="editRackLevels(${i})">✏️</button><button class="rack-setup-del" onclick="removeRack(${i})">🗑</button></div>`;
+    let h = `<div class="rack-setup-item"><span class="n">${esc(r.name)}</span><span class="d">${r.rows} × ${r.cols}${r.cap > 1 ? ' · ×' + r.cap : ''}${Object.keys(r.lv || {}).length ? ' *' : ''}</span><button class="rack-setup-edit" onclick="openQrLabels(${i})" title="${esc(t('qr_btn'))}">▦</button><button class="rack-setup-edit" onclick="editRackLevels(${i})">✏️</button><button class="rack-setup-edit" onclick="clearRack(${i})" title="${esc(t('rack_clear_btn'))}">🧹</button><button class="rack-setup-del" onclick="removeRack(${i})">🗑</button></div>`;
     if (i === rackEditIdx) {
       h += `<div class="rack-level-editor"><div class="rle-title">${t('rack_levels_title')}</div>`;
       h += `<div class="rle-row rle-head"><span></span><span>${t('rack_level_name')}</span><span>${t('rack_ph_cap')}</span></div>`;
@@ -14259,6 +14356,23 @@ function addRack() {
   document.getElementById('rack-new-cap').value = '';
   renderRackSetup();
   showToast(t('rack_added'));
+}
+// Regal leeren: alle Flaschen aus diesem Regal nehmen. Die Weine bleiben im Keller und gelten danach als "nicht eingelagert" (nichts wird gelöscht).
+function clearRack(i) {
+  const r = settings.racks[i];
+  if (!r) return;
+  const hit = wines.filter(w => (w.placements || []).some(x => x.rack === r.id));
+  const bottles = hit.reduce((n, w) => n + w.placements.filter(x => x.rack === r.id).length, 0);
+  if (!bottles) { showToast(t('rack_clear_empty', { name: r.name })); return; }
+  if (!confirm(t('rack_clear_confirm', { name: r.name, n: bottles, w: hit.length }))) return;
+  hit.forEach(w => setPlacements(w, w.placements.filter(x => x.rack !== r.id)));
+  rackFilledSlot = null;
+  if (rackMove && rackMove.rack === r.id) rackMove = null;
+  save();
+  renderRackSetup();
+  const active = document.querySelector('.tab.active');
+  if (active && active.id === 'tab-racks') renderRacks(); else if (active && active.id === 'tab-keller') renderKeller();
+  showToast(t('rack_clear_done', { name: r.name, n: bottles }));
 }
 function removeRack(i) {
   if (!confirm(t('rack_del_confirm', {name: settings.racks[i].name}))) return;
