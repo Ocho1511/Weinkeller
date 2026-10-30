@@ -302,7 +302,7 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .wine-meta { display: flex; gap: 12px; margin-top: 10px; align-items: center; flex-wrap: wrap; }
 .wine-stars { color: var(--gold); font-size: 13px; letter-spacing: 1px; }
 .wine-region { font-size: 11px; font-weight: 600; color: var(--text-muted); }
-.wine-map-link { text-decoration: none; font-size: 12px; margin-left: 2px; }
+.wine-region-link { color: inherit; text-decoration: underline dotted; text-underline-offset: 3px; text-decoration-color: var(--text-dim, currentColor); cursor: pointer; }
 .wine-row {
   background: var(--card);
   border: 1px solid var(--border);
@@ -8378,9 +8378,10 @@ function mapUrl(w) {
   const q = [w.region, w.country].filter(Boolean).join(', ');
   return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
 }
-function wineMapLink(w) {
-  if (!w.region && !w.country) return '';
-  return ` <a class="wine-map-link" href="${mapUrl(w)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(t('map_open'))}">🗺️</a>`;
+// Region und Land als Text; antippen öffnet die Karte (ohne eigenes Symbol)
+function wineRegionLink(w, text) {
+  if (!w.region && !w.country) return esc(text);
+  return `<a class="wine-region-link" href="${mapUrl(w)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(t('map_open'))}">${esc(text)}</a>`;
 }
 // Wikipedia-Link zur Rebsorte (bzw. zum Wein) – in der eingestellten Sprache
 function wikiUrl(w) {
@@ -8486,7 +8487,7 @@ function renderKeller() {
       </div>
       <div class="wine-meta">
         <div class="wine-stars">${stars}</div>
-        ${regionCountry?`<div class="wine-region">${esc(regionCountry)}${wineMapLink(w)}</div>`:''}
+        ${regionCountry?`<div class="wine-region">${wineRegionLink(w, regionCountry)}</div>`:''}
         ${loc?`<div class="wine-region">📍 ${esc(loc)}</div>`:''}
         <div class="wine-count-badge">${w.count||1} ${t('fl')}</div>
       </div>
