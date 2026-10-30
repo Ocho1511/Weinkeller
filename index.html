@@ -569,6 +569,7 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .loc-chip { border: 1px solid var(--border); background: var(--bg, transparent); color: var(--gold-light); border-radius: 999px; padding: 4px 10px; font-family: inherit; font-size: 11px; font-weight: 600; cursor: pointer; }
 .loc-chip:active { background: var(--card); }
 .loc-open, .loc-text { font-size: 11px; color: var(--text-muted); }
+.card-slots .ripeness-loc { margin: 0 0 10px; }
 @keyframes slotFlash { 0%, 100% { box-shadow: 0 0 0 0 rgba(196,162,74,0); } 50% { box-shadow: 0 0 0 4px rgba(196,162,74,.95), 0 0 14px 3px rgba(196,162,74,.6); } }
 .rack-slot.slot-flash { border-radius: 6px; animation: slotFlash .8s ease-in-out 3; }
 @media (prefers-reduced-motion: reduce) { .rack-slot.slot-flash { animation: none; } }
@@ -12570,9 +12571,9 @@ function renderKeller() {
       <div class="wine-meta">
         <div class="wine-stars">${stars}</div>
         ${regionCountry?`<div class="wine-region">${wineRegionLink(w, regionCountry)}</div>`:''}
-        ${loc?`<div class="wine-region">📍 ${esc(loc)}</div>`:''}
         <div class="wine-count-badge">${w.count||1} ${t('fl')}</div>
       </div>
+      ${loc || settings.racks.length ? `<div class="card-slots">${wineSlotChips(w)}</div>` : ''}
       ${mmBadgeHtml(w)}
       ${ripe ? `
       <div class="wine-ripeness">
