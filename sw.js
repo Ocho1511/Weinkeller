@@ -36,7 +36,7 @@ self.addEventListener('fetch', (e) => {
   // HTML/Navigation: network-first, damit neue App-Versionen sofort geladen werden; offline aus dem Cache
   if (req.mode === 'navigate' || url.pathname.endsWith('/') || url.pathname.endsWith('index.html')) {
     e.respondWith(
-      fetch(req).then((res) => remember(req, res))
+      fetch(req, { cache: 'no-cache' }).then((res) => remember(req, res))   // no-cache: bei jedem Öffnen beim Server nachfragen (GitHub Pages liefert sonst bis zu 10 Min. eine alte index.html aus dem HTTP-Cache)
         .catch(() => caches.match(req, { cacheName: CACHE }).then((r) => r || caches.match('./index.html', { cacheName: CACHE })))
     );
     return;
