@@ -5,6 +5,7 @@ const SCOPE = new URL(self.registration.scope).pathname;
 const CACHE = 'weinkeller-v8:' + SCOPE;
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png',
   './fonts/Inter-latin.woff2', './fonts/PlayfairDisplay-latin.woff2', './fonts/PlayfairDisplay-Italic-latin.woff2', './fonts/UnifrakturMaguntia-latin.woff2',
+  './fonts/Roboto-latin.woff2', './fonts/OpenSans-latin.woff2', './fonts/Lato-latin-400.woff2', './fonts/Lato-latin-700.woff2', './fonts/Montserrat-latin.woff2', './fonts/Poppins-latin-400.woff2', './fonts/Poppins-latin-600.woff2',
   './lib/xlsx.full.min.js', './lib/jspdf.umd.min.js', './lib/jspdf.plugin.autotable.min.js', './lib/html5-qrcode.min.js'];
 
 self.addEventListener('install', (e) => {
