@@ -625,13 +625,6 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .rack-action-name { font-size: 13px; font-weight: 700; color: var(--text); min-width: 0; }
 .rack-action-name span { display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); margin-top: 2px; }
 .rack-action-btns { display: flex; flex-wrap: wrap; gap: 8px; }
-/* 3D-Ansicht: eine einzige schräge Fläche (kein verschachteltes 3D), dazu Holzseiten, Bretter unter jeder Ebene und Schatten */
-.rack-box.tilt { transform: perspective(820px) rotateX(9deg); transform-origin: 50% 100%; transition: transform .35s ease; background: linear-gradient(#150f0d, #261b14); border: 6px solid #6b4f2c; border-top-width: 3px; border-bottom-width: 9px; border-radius: 10px;
-  box-shadow: inset 14px 0 16px -10px rgba(0,0,0,.7), inset -14px 0 16px -10px rgba(0,0,0,.7), 0 22px 22px -14px rgba(0,0,0,.75); }
-.rack-box.tilt .rack-grid { row-gap: 13px !important; }
-.rack-box.tilt .rack-slot { box-shadow: 0 5px 0 -1px #7a5a32, 0 9px 7px -3px rgba(0,0,0,.6); }
-.rack-box.tilt .rack-slot.picked, .rack-box.tilt .rack-slot.droppable { box-shadow: none; }
-@media (prefers-reduced-motion: reduce) { .rack-box.tilt { transform: none; transition: none; } }
 .rack-slot.droppable { outline: 2px dashed var(--gold); outline-offset: 2px; border-radius: 6px; cursor: pointer; }
 .rack-slot.droppable .rack-empty { background: rgba(196,162,74,0.15); }
 .rack-add-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
@@ -13627,8 +13620,6 @@ function selectFilledSlot(e, p) {
   rackFilledSlot = same ? null : { rack: r.id, e, p };
   rackSelectedWineId = null; rackMove = null;
   renderRacks();
-  // 3D-Ansicht: die flache Wein-Karte (Name, Jahrgang, Aktionen) gleich ins Bild holen
-  if (settings.rack3d && rackFilledSlot) { const bar = document.querySelector('#racks-content .rack-action-bar'); if (bar) bar.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
 }
 // Eine Flasche des Weins aus dem markierten Fach nehmen (landet zurück bei „Nicht zugeordnet")
 function removeFromRack(id) {
@@ -13803,7 +13794,6 @@ function renderRacks() {
       if (ri.key === 'optimal') blinkN.Optimal++;
     });
   });
-  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches, tilt = !!settings.rack3d && !reduceMotion;   // 3D-Ansicht: Regal leicht nach hinten gekippt (nur Optik, alle Fächer bleiben normal bedienbar)
   const sw = rackStoreFilter ? wines.find(x => x.id === rackStoreFilter) : null;
   if (rackStoreFilter && !sw) rackStoreFilter = null;
   const swOpen = sw ? unplacedCount(sw) : 0, swName = sw ? sw.name + (sw.year ? ' ' + sw.year : '') : '';
@@ -13811,10 +13801,9 @@ function renderRacks() {
   else if (sw && swOpen > 0 && !rackSelectedWineId) rackSelectedWineId = sw.id;
   let html = (sw ? `<div class="rack-store-banner"><span>${swOpen ? '📥 ' + esc(t('store_filter', { name: swName, n: swOpen })) : esc(t('store_done', { name: swName }))}</span><span class="rsb-btns">${swOpen ? `<button class="wine-btn" onclick="clearStoreFilter()">${t('store_filter_off')}</button>` : ''}<button class="wine-btn primary" onclick="backFromStore()">${t('store_back')}</button></span></div>` : '') + `<div class="rack-scanbar"><button class="scan-btn" onclick="scanShelf()">${t('shelf_scan')}</button><button class="scan-btn rack-clear-btn" onclick="clearRack(rackActive)">🧹 ${t('rack_clear_btn')}</button></div><div class="rack-toolbar"><span class="rack-toolbar-lbl">${t('rack_blink_lbl')}</span>`
     + BLINKS.map(([key, label, st]) => `<button class="rack-toggle${blinkOn[key] ? ' active' : ''}" onclick="toggleRackBlink('${key}')" aria-pressed="${blinkOn[key]}"><span class="rt-dot"></span>${st ? `<i class="rack-ripe-dot ripeness-${RIPE_CLASS[st]}"></i>` : ''}${esc(label)}${blinkN[key] ? ' · ' + blinkN[key] : ''}</button>`).join('')
-    + (reduceMotion ? '' : `<button class="rack-toggle${tilt ? ' active' : ''}" onclick="toggleRack3d()" aria-pressed="${tilt}"><span class="rt-dot"></span>3D</button>`)
     + `</div>`
     + (blinkOn.Urgent ? `<div class="rack-blink-hint">${t('rack_blink_hint')}</div>` : '')
-    + `<div class="rack-box${blink ? ' blink-on' : ''}${tilt ? ' tilt' : ''}"><div class="rack-box-title">${esc(r.name)}</div><div class="rack-box-sub">${filled} / ${total} ${t('racks_filled')}</div>`;
+    + `<div class="rack-box${blink ? ' blink-on' : ''}"><div class="rack-box-title">${esc(r.name)}</div><div class="rack-box-sub">${filled} / ${total} ${t('racks_filled')}</div>`;
   // Flaschengröße an die Spaltenzahl anpassen (60–96 px); ab 76 px steht der Jahrgang auf dem Etikett
   // Verfügbare Breite = Innenbreite des Containers - Box-Rahmen/-Padding (2 + 28) - Ebenen-Spalte (28)
   const elCs = getComputedStyle(el);
@@ -13971,7 +13960,6 @@ function deleteWineFromRack(id) {
   wines = wines.filter(x => x.id !== id);
   save(); rackFilledSlot = null; renderRacks(); showToast(t('toast_removed'));
 }
-function toggleRack3d() { settings.rack3d = !settings.rack3d; saveSettings(); renderRacks(); }
 function toggleRackBlink(key) { key = 'blink' + (key || 'Urgent'); settings[key] = !settings[key]; saveSettings(); renderRacks(); }
 // Trinkreife eines Weins fürs Regal: Zustand (wie in der Trinkreife-Ansicht) und "dringend" = überschritten
 // oder spätestens nächstes Jahr am Ende des Trinkfensters; null ohne Angabe
