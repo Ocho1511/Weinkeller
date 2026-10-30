@@ -1261,6 +1261,14 @@ input[type="file"] { display: none; }
       </select>
     </div>
     <div class="form-group" style="margin-top:14px">
+      <label data-i18n="celeb_label">Konfetti & Sound beim Trinken</label>
+      <select id="setup-celeb" onchange="setCelebrate(this.value)">
+        <option value="both" data-i18n="celeb_both">Konfetti und Sound</option>
+        <option value="confetti" data-i18n="celeb_confetti">Nur Konfetti</option>
+        <option value="off" data-i18n="celeb_off">Aus</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-top:14px">
       <label data-i18n="setup_font">Schriftart</label>
       <select id="setup-font" onchange="setFont(this.value)">
         <option value="inter" style="font-family:'Inter',sans-serif">Standard</option>
@@ -1403,10 +1411,11 @@ input[type="file"] { display: none; }
     <div class="modal-handle"></div>
     <h2 data-i18n="mm_list_title">Einkaufsliste</h2>
     <div id="shop-body"></div>
-    <div class="btn-row">
+    <div class="btn-row" style="flex-wrap:wrap;gap:8px">
       <button class="btn-secondary" onclick="closeModal('shop-modal')" data-i18n="qr_close">Schließen</button>
       <button class="btn-secondary" onclick="copyShoppingList()" data-i18n="mm_copy">Kopieren</button>
-      <button class="btn-primary" onclick="shareShoppingList()" data-i18n="mm_share">Liste teilen</button>
+      <button class="btn-secondary" onclick="shareShoppingList()" data-i18n="mm_share">Liste teilen</button>
+      <button class="btn-primary" onclick="shoppingToWishlist()" data-i18n="mm_to_wish" style="flex-basis:100%">Auf die Wunschliste setzen</button>
     </div>
   </div>
 </div>
@@ -1831,7 +1840,7 @@ function cleanWishes(arr) {
     id: cleanId(w.id, used), name: cleanStr(w.name, 200).trim(),
     year: cleanInt(w.year, 1000, 2200), type: VALID_TYPES.includes(w.type) ? w.type : 'other',
     region: cleanText(w.region, 120), country: cleanText(w.country, 120), grape: cleanText(w.grape, 120),
-    note: cleanText(w.note, 5000), done: !!w.done, minMax: cleanMinMax(w.minMax), restock: !!w.restock
+    note: cleanText(w.note, 5000), done: !!w.done, minMax: cleanMinMax(w.minMax), restock: !!w.restock, qty: cleanInt(w.qty, 1, 9999)
   }));
 }
 function cleanDrunk(arr) {
@@ -1905,7 +1914,7 @@ let drunkWines = cleanDrunk(safeParse(DRUNK_KEY, []));
 const DEFAULT_OWNER = "Ocho";
 const STAMP_KEY = 'weinkeller_v2_stamp';
 const SYNCBASE_KEY = 'weinkeller_v2_syncbase';
-let settings = Object.assign({currency:'€', lang:'de', racks:[], cellars:[], blinkUrgent:false, blinkOver:false, blinkPeak:false, blinkOptimal:false, owner:'', storage:'local', syncCode:'', email:'', font:'inter'}, safeParse(SETTINGS_KEY, {}));
+let settings = Object.assign({currency:'€', lang:'de', racks:[], cellars:[], blinkUrgent:false, blinkOver:false, blinkPeak:false, blinkOptimal:false, celeb:'both', owner:'', storage:'local', syncCode:'', email:'', font:'inter'}, safeParse(SETTINGS_KEY, {}));
 settings.cellars = cleanCellars(settings.cellars);
 settings.racks = cleanRacks(settings.racks);
 fixRackCellars();
@@ -2353,58 +2362,48 @@ async function restorePhotos(map, list) {
 photoLoadAll();
 
 // ═══════════════════════════════════════
-// MIN-/MAX-BESTÄNDE (pro Wein und Keller) und Einkaufsliste
-// Bestand eines Kellers = eingelagerte Flaschen in dessen Regalen; nicht eingelagerte zählen zum ersten (Standard-)Keller.
+// MIN-/MAX-BESTÄNDE (pro Wein) und Einkaufsliste
+// Bestand = alle Flaschen des Weins, egal in welchem Keller/Regal sie liegen oder ob sie noch nicht eingelagert sind.
+// Gespeichert als minMax[<Standard-Keller-ID>]; ältere Einträge je Keller werden beim Lesen zusammengezählt.
 // ═══════════════════════════════════════
 function defaultCellarId() { return (settings.cellars[0] || {}).id || DEFAULT_CELLAR_ID; }
-function cellarStock(w, cid) {
-  let n = 0;
-  validPlacements(w).forEach(x => { const r = rackById(x.rack); if (r && r.cellarId === cid) n++; });
-  if (cid === defaultCellarId()) n += unplacedCount(w);
-  return n;
+function wineStock(w) { return Math.max(w.count || 1, validPlacements(w).length); }
+function mmOf(o) {
+  let mn = null, mx = null;
+  Object.keys(o || {}).forEach(k => { const v = o[k] || {}; if (v.min != null) mn = (mn || 0) + v.min; if (v.max != null) mx = (mx || 0) + v.max; });
+  if (mn != null && mx != null && mx < mn) mx = mn;
+  return { min: mn, max: mx };
 }
 function mmInfo(w) {
-  const rows = [];
-  Object.keys(w.minMax || {}).forEach(cid => {
-    const c = settings.cellars.find(x => x.id === cid);
-    if (!c) return;
-    const mm = w.minMax[cid], stock = cellarStock(w, cid);
-    rows.push({ cid, name: c.name, stock, min: mm.min, max: mm.max, low: mm.min != null && stock < mm.min, over: mm.max != null && stock > mm.max });
-  });
-  return rows;
+  const mm = mmOf(w.minMax);
+  if (mm.min == null && mm.max == null) return [];
+  const stock = wineStock(w);
+  return [{ stock, min: mm.min, max: mm.max, low: mm.min != null && stock < mm.min, over: mm.max != null && stock > mm.max }];
 }
 function mmBadgeHtml(w) {
-  const rows = mmInfo(w), multi = settings.cellars.length > 1;
-  return rows.map(r => `<div class="mm-badge ${r.low ? 'low' : r.over ? 'over' : 'ok'}">${multi ? esc(r.name) + ': ' : ''}${t('mm_stock')} ${r.stock}${r.min != null ? ' · ' + t('mm_min') + ' ' + r.min : ''}${r.max != null ? ' · ' + t('mm_max') + ' ' + r.max : ''}${r.low ? ' ⚠' : ''}</div>`).join('');
+  return mmInfo(w).map(r => `<div class="mm-badge ${r.low ? 'low' : r.over ? 'over' : 'ok'}">${t('mm_stock')} ${r.stock}${r.min != null ? ' · ' + t('mm_min') + ' ' + r.min : ''}${r.max != null ? ' · ' + t('mm_max') + ' ' + r.max : ''}${r.low ? ' ⚠' : ''}</div>`).join('');
 }
 function renderMinMaxFields(w) {
-  const box = document.getElementById('f-minmax'), multi = settings.cellars.length > 1;
-  box.innerHTML = settings.cellars.map(c => {
-    const mm = (w && w.minMax && w.minMax[c.id]) || {};
-    return `<div class="mm-row">${multi ? '<span class="mm-cellar">' + esc(c.name) + '</span>' : ''}<label>${t('mm_min')}<input type="number" min="0" max="9999" data-mm="${c.id}" data-k="min" value="${mm.min != null ? mm.min : ''}"></label><label>${t('mm_max')}<input type="number" min="0" max="9999" data-mm="${c.id}" data-k="max" value="${mm.max != null ? mm.max : ''}"></label></div>`;
-  }).join('');
+  const mm = mmOf(w && w.minMax);
+  document.getElementById('f-minmax').innerHTML = `<div class="mm-row"><label>${t('mm_min')}<input type="number" min="0" max="9999" data-k="min" value="${mm.min != null ? mm.min : ''}"></label><label>${t('mm_max')}<input type="number" min="0" max="9999" data-k="max" value="${mm.max != null ? mm.max : ''}"></label></div>`;
 }
 function readMinMaxFields() {
-  const out = {};
-  document.querySelectorAll('#f-minmax input').forEach(i => { const v = i.value.trim(); if (v === '') return; (out[i.dataset.mm] = out[i.dataset.mm] || {})[i.dataset.k] = parseInt(v); });
-  return out;
+  const o = {};
+  document.querySelectorAll('#f-minmax input').forEach(i => { const v = i.value.trim(); if (v !== '') o[i.dataset.k] = parseInt(v); });
+  return Object.keys(o).length ? { [defaultCellarId()]: o } : {};
 }
 // Zu kaufende Weine: unter Minimum (Ziel = Maximum, sonst Minimum) sowie "nachkaufen"-Einträge der Wunschliste (letzte Flasche getrunken)
 function shoppingItems() {
-  const multi = settings.cellars.length > 1, items = [];
-  wines.forEach(w => mmInfo(w).forEach(r => { if (r.low) items.push({ name: w.name, year: w.year, cellar: multi ? r.name : '', need: (r.max != null ? r.max : r.min) - r.stock, stock: r.stock, min: r.min }); }));
+  const items = [];
+  wines.forEach(w => mmInfo(w).forEach(r => { if (r.low) items.push({ name: w.name, year: w.year, need: (r.max != null ? r.max : r.min) - r.stock, stock: r.stock, min: r.min }); }));
   wishes.forEach(w => {
     if (!w.restock || wines.some(x => x.name === w.name && (x.year || null) === (w.year || null))) return;   // Wein ist wieder im Keller: steht ggf. schon oben
-    Object.keys(w.minMax || {}).forEach(cid => {
-      const c = settings.cellars.find(x => x.id === cid), mm = w.minMax[cid];
-      if (!c) return;
-      const target = mm.max != null ? mm.max : (mm.min || 0);
-      if (target > 0) items.push({ name: w.name, year: w.year, cellar: multi ? c.name : '', need: target, stock: 0, min: mm.min });
-    });
+    const mm = mmOf(w.minMax), target = w.qty || (mm.max != null ? mm.max : (mm.min || 0));
+    if (target > 0) items.push({ name: w.name, year: w.year, need: target, stock: 0, min: mm.min });
   });
   return items.sort((a, b) => a.name.localeCompare(b.name));
 }
-const shopLabel = (i) => i.name + (i.year && !i.name.includes(String(i.year)) ? ' ' + i.year : '') + (i.cellar ? ' (' + i.cellar + ')' : '');
+const shopLabel = (i) => i.name + (i.year && !i.name.includes(String(i.year)) ? ' ' + i.year : '');
 function shoppingChipHtml() {
   if (!wines.some(w => Object.keys(w.minMax || {}).length) && !wishes.some(w => w.restock)) return '';
   const n = shoppingItems().length;
@@ -2427,23 +2426,38 @@ function copyShoppingList() {
 // Bestand unter dem Minimum (nur wenn ein Minimum ab 1 eingetragen ist; leer oder 0 = keine Aktion).
 // Liefert die betroffenen Keller; gone = die letzte Flasche wurde getrunken (Bestand 0)
 function mmLowRows(w, gone) {
-  return Object.keys(w.minMax || {}).map(cid => {
-    const c = settings.cellars.find(x => x.id === cid), mm = w.minMax[cid];
-    if (!c || !(mm.min >= 1)) return null;
-    const stock = gone ? 0 : cellarStock(w, cid);
-    return stock < mm.min ? { cid, name: c.name, stock, min: mm.min, max: mm.max } : null;
-  }).filter(Boolean);
+  const mm = mmOf(w.minMax);
+  if (!(mm.min >= 1)) return [];
+  const stock = gone ? 0 : wineStock(w);
+  return stock < mm.min ? [{ stock, min: mm.min, max: mm.max }] : [];
 }
-// Vorschlag nach dem Trinken: Wein zum Nachkaufen auf die Wunschliste setzen (Min/Max wandert mit, der Wein zählt dann auf der Einkaufsliste)
+function makeRestockWish(w, need) {
+  return { id: 'rs' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), name: w.name, year: w.year || null, type: w.type, region: w.region || null, country: w.country || null, grape: w.grape || null, note: t('mm_restock_note', { n: need }), done: false, minMax: cleanMinMax(w.minMax), restock: true, qty: need };
+}
+// Anzahl der zu beschaffenden Flaschen: Maximum (sonst Minimum) minus Bestand, mindestens 1
+const restockNeed = (row) => Math.max(1, (row.max != null ? row.max : row.min) - row.stock);
+const hasRestockWish = (w) => wishes.some(x => x.restock && x.name === w.name && (x.year || null) === (w.year || null));
+// Vorschlag nach dem Trinken: Wein mit der fehlenden Menge auf die Wunschliste setzen (Min/Max wandert mit)
 function offerRestock(w, row) {
-  if (wishes.some(x => x.restock && x.name === w.name && (x.year || null) === (w.year || null))) return;
-  const label = w.name + (w.year && !w.name.includes(String(w.year)) ? ' ' + w.year : '');
-  if (!confirm(t('mm_offer', { name: label, n: row.stock, min: row.min }))) return;
-  const target = row.max != null ? row.max : row.min;
-  wishes.push({ id: 'rs' + Date.now().toString(36), name: w.name, year: w.year || null, type: w.type, region: w.region || null, country: w.country || null, grape: w.grape || null, note: t('mm_restock_note', { n: target }), done: false, minMax: cleanMinMax(w.minMax), restock: true });
+  if (hasRestockWish(w)) return;
+  const need = restockNeed(row), label = w.name + (w.year && !w.name.includes(String(w.year)) ? ' ' + w.year : '');
+  if (!confirm(t('mm_offer', { name: label, n: row.stock, min: row.min, need }))) return;
+  wishes.push(makeRestockWish(w, need));
   saveWishes();
   showToast(t('mm_offer_done'));
   try { rerenderActive(); } catch (e) {}
+}
+// Einkaufsliste → Wunschliste: jeder Wein unter dem Minimum mit der Anzahl der zu beschaffenden Flaschen (später: Anbindung an einen Webshop)
+function shoppingToWishlist() {
+  let n = 0;
+  wines.forEach(w => {
+    const row = mmLowRows(w, false)[0];
+    if (!row || hasRestockWish(w)) return;
+    wishes.push(makeRestockWish(w, restockNeed(row))); n++;
+  });
+  if (n) { saveWishes(); showToast(t('mm_wish_added', { n })); }
+  closeModal('shop-modal');
+  showTab('wishlist', document.querySelector('.nav-btn[onclick*="showTab(\'wishlist\'"]'));
 }
 function cleanMinMax(o) {
   const out = {};
@@ -3397,9 +3411,15 @@ de: {
   mm_list_empty: "Nichts nachzukaufen – alle Bestände sind im grünen Bereich.",
   mm_share: "Liste teilen",
   mm_copy: "Kopieren",
-  mm_restock_note: "Nachkaufen: Ziel {n} Flaschen",
-  mm_offer: "Bestand unter Minimum: {name} ({n} von {min}). Auf die Wunschliste setzen?",
+  mm_restock_note: "Nachkaufen: {n} Flasche(n)",
+  mm_offer: "Bestand unter Minimum: {name} ({n} von {min}). {need} Flasche(n) nachkaufen und auf die Wunschliste setzen?",
   mm_offer_done: "Auf die Wunschliste gesetzt ✓",
+  mm_to_wish: "Auf die Wunschliste setzen",
+  mm_wish_added: "{n} Wein(e) auf die Wunschliste gesetzt ✓",
+  celeb_label: "Konfetti & Sound beim Trinken",
+  celeb_both: "Konfetti und Sound",
+  celeb_confetti: "Nur Konfetti",
+  celeb_off: "Aus",
   loc_slot: "Platz",
   rack_cap_low: "Auf dieser Ebene liegen bis zu {n} Flaschen in einem Platz.",
   sync_code_notfound: "Code nicht gefunden – bitte prüfen",
@@ -3759,9 +3779,15 @@ en: {
   mm_list_empty: "Nothing to buy – all stocks are within range.",
   mm_share: "Share list",
   mm_copy: "Copy",
-  mm_restock_note: "Buy again: target {n} bottles",
-  mm_offer: "Stock below minimum: {name} ({n} of {min}). Put it on the wish list?",
+  mm_restock_note: "Buy again: {n} bottle(s)",
+  mm_offer: "Stock below minimum: {name} ({n} of {min}). Buy {need} bottle(s) and put it on the wish list?",
   mm_offer_done: "Put on the wish list ✓",
+  mm_to_wish: "Put on wishlist",
+  mm_wish_added: "{n} wine(s) put on the wishlist ✓",
+  celeb_label: "Confetti & sound when drinking",
+  celeb_both: "Confetti and sound",
+  celeb_confetti: "Confetti only",
+  celeb_off: "Off",
   loc_slot: "Slot",
   rack_cap_low: "Up to {n} bottles are stored in one slot on this level.",
   sync_code_notfound: "Code not found – please check it",
@@ -4121,9 +4147,15 @@ es: {
   mm_list_empty: "Nada que comprar – todas las existencias están dentro del rango.",
   mm_share: "Compartir lista",
   mm_copy: "Copiar",
-  mm_restock_note: "Volver a comprar: objetivo {n} botellas",
-  mm_offer: "Stock por debajo del mínimo: {name} ({n} de {min}). ¿Añadirlo a la lista de deseos?",
+  mm_restock_note: "Volver a comprar: {n} botella(s)",
+  mm_offer: "Stock por debajo del mínimo: {name} ({n} de {min}). ¿Comprar {need} botella(s) y añadirlo a la lista de deseos?",
   mm_offer_done: "Añadido a la lista de deseos ✓",
+  mm_to_wish: "Añadir a la lista de deseos",
+  mm_wish_added: "{n} vino(s) añadido(s) a la lista de deseos ✓",
+  celeb_label: "Confeti y sonido al beber",
+  celeb_both: "Confeti y sonido",
+  celeb_confetti: "Solo confeti",
+  celeb_off: "Desactivado",
   loc_slot: "Sitio",
   rack_cap_low: "En este nivel hay hasta {n} botellas en un hueco.",
   sync_code_notfound: "Código no encontrado: compruébalo",
@@ -4483,9 +4515,15 @@ sv: {
   mm_list_empty: "Inget att köpa – alla lagernivåer är inom intervallet.",
   mm_share: "Dela lista",
   mm_copy: "Kopiera",
-  mm_restock_note: "Köp igen: mål {n} flaskor",
-  mm_offer: "Lagret under minimum: {name} ({n} av {min}). Lägga till på önskelistan?",
+  mm_restock_note: "Köp igen: {n} flaska/flaskor",
+  mm_offer: "Lagret under minimum: {name} ({n} av {min}). Köpa {need} flaska/flaskor och lägga till på önskelistan?",
   mm_offer_done: "Lagt till på önskelistan ✓",
+  mm_to_wish: "Lägg på önskelistan",
+  mm_wish_added: "{n} vin lades till på önskelistan ✓",
+  celeb_label: "Konfetti & ljud när du dricker",
+  celeb_both: "Konfetti och ljud",
+  celeb_confetti: "Bara konfetti",
+  celeb_off: "Av",
   loc_slot: "Plats",
   rack_cap_low: "På den här hyllan finns upp till {n} flaskor på en plats.",
   sync_code_notfound: "Koden hittades inte – kontrollera den",
@@ -4845,9 +4883,15 @@ da: {
   mm_list_empty: "Intet at købe – alle beholdninger er inden for intervallet.",
   mm_share: "Del liste",
   mm_copy: "Kopiér",
-  mm_restock_note: "Køb igen: mål {n} flasker",
-  mm_offer: "Beholdning under minimum: {name} ({n} af {min}). Sætte på ønskelisten?",
+  mm_restock_note: "Køb igen: {n} flaske/flasker",
+  mm_offer: "Beholdning under minimum: {name} ({n} af {min}). Købe {need} flaske/flasker og sætte på ønskelisten?",
   mm_offer_done: "Sat på ønskelisten ✓",
+  mm_to_wish: "Sæt på ønskelisten",
+  mm_wish_added: "{n} vin sat på ønskelisten ✓",
+  celeb_label: "Konfetti & lyd, når du drikker",
+  celeb_both: "Konfetti og lyd",
+  celeb_confetti: "Kun konfetti",
+  celeb_off: "Fra",
   loc_slot: "Plads",
   rack_cap_low: "På denne hylde ligger op til {n} flasker på én plads.",
   sync_code_notfound: "Koden blev ikke fundet – tjek den",
@@ -5207,9 +5251,15 @@ fi: {
   mm_list_empty: "Ei ostettavaa – kaikki varastot ovat rajoissa.",
   mm_share: "Jaa lista",
   mm_copy: "Kopioi",
-  mm_restock_note: "Osta lisää: tavoite {n} pulloa",
-  mm_offer: "Varasto alle minimin: {name} ({n} / {min}). Lisätäänkö toivelistalle?",
+  mm_restock_note: "Osta lisää: {n} pullo(a)",
+  mm_offer: "Varasto alle minimin: {name} ({n} / {min}). Ostetaanko {need} pullo(a) lisää ja lisätäänkö se toivelistalle?",
   mm_offer_done: "Lisätty toivelistalle ✓",
+  mm_to_wish: "Lisää toivelistalle",
+  mm_wish_added: "{n} viiniä lisätty toivelistalle ✓",
+  celeb_label: "Konfetti & ääni juodessa",
+  celeb_both: "Konfetti ja ääni",
+  celeb_confetti: "Vain konfetti",
+  celeb_off: "Pois",
   loc_slot: "Paikka",
   rack_cap_low: "Tällä tasolla yhdellä paikalla on jopa {n} pulloa.",
   sync_code_notfound: "Koodia ei löytynyt – tarkista se",
@@ -5569,9 +5619,15 @@ ru: {
   mm_list_empty: "Покупать нечего – все запасы в норме.",
   mm_share: "Поделиться списком",
   mm_copy: "Копировать",
-  mm_restock_note: "Докупить: цель {n} бутылок",
-  mm_offer: "Запас ниже минимума: {name} ({n} из {min}). Добавить в список желаний?",
+  mm_restock_note: "Докупить: {n} бут.",
+  mm_offer: "Запас ниже минимума: {name} ({n} из {min}). Докупить {need} бут. и добавить в список желаний?",
   mm_offer_done: "Добавлено в список желаний ✓",
+  mm_to_wish: "Добавить в список желаний",
+  mm_wish_added: "Вин добавлено в список желаний: {n} ✓",
+  celeb_label: "Конфетти и звук, когда пьёте",
+  celeb_both: "Конфетти и звук",
+  celeb_confetti: "Только конфетти",
+  celeb_off: "Выкл.",
   loc_slot: "Место",
   rack_cap_low: "На этом ярусе в одном месте лежит до {n} бутылок.",
   sync_code_notfound: "Код не найден – проверьте его",
@@ -5931,9 +5987,15 @@ it: {
   mm_list_empty: "Niente da acquistare – tutte le scorte sono nei limiti.",
   mm_share: "Condividi lista",
   mm_copy: "Copia",
-  mm_restock_note: "Riacquista: obiettivo {n} bottiglie",
-  mm_offer: "Scorta sotto il minimo: {name} ({n} su {min}). Aggiungerlo alla lista desideri?",
+  mm_restock_note: "Riacquista: {n} bottiglia/e",
+  mm_offer: "Scorta sotto il minimo: {name} ({n} su {min}). Riacquistare {need} bottiglia/e e aggiungerlo alla lista desideri?",
   mm_offer_done: "Aggiunto alla lista desideri ✓",
+  mm_to_wish: "Aggiungi alla lista desideri",
+  mm_wish_added: "{n} vini aggiunti alla lista desideri ✓",
+  celeb_label: "Coriandoli e suono quando bevi",
+  celeb_both: "Coriandoli e suono",
+  celeb_confetti: "Solo coriandoli",
+  celeb_off: "Disattivato",
   loc_slot: "Posto",
   rack_cap_low: "Su questo ripiano ci sono fino a {n} bottiglie in un posto.",
   sync_code_notfound: "Codice non trovato – controllalo",
@@ -6293,9 +6355,15 @@ fr: {
   mm_list_empty: "Rien à acheter – tous les stocks sont dans la plage.",
   mm_share: "Partager la liste",
   mm_copy: "Copier",
-  mm_restock_note: "À racheter : objectif {n} bouteilles",
-  mm_offer: "Stock sous le minimum : {name} ({n} sur {min}). L'ajouter à la liste de souhaits ?",
+  mm_restock_note: "À racheter : {n} bouteille(s)",
+  mm_offer: "Stock sous le minimum : {name} ({n} sur {min}). Racheter {need} bouteille(s) et l'ajouter à la liste de souhaits ?",
   mm_offer_done: "Ajouté à la liste de souhaits ✓",
+  mm_to_wish: "Ajouter à la liste de souhaits",
+  mm_wish_added: "{n} vin(s) ajouté(s) à la liste de souhaits ✓",
+  celeb_label: "Confettis & son en buvant",
+  celeb_both: "Confettis et son",
+  celeb_confetti: "Confettis seulement",
+  celeb_off: "Désactivé",
   loc_slot: "Place",
   rack_cap_low: "Sur ce niveau, jusqu'à {n} bouteilles sont rangées dans un emplacement.",
   sync_code_notfound: "Code introuvable – vérifiez-le",
@@ -6655,9 +6723,15 @@ pl: {
   mm_list_empty: "Nic do kupienia – wszystkie zapasy są w normie.",
   mm_share: "Udostępnij listę",
   mm_copy: "Kopiuj",
-  mm_restock_note: "Dokup: cel {n} butelek",
-  mm_offer: "Zapas poniżej minimum: {name} ({n} z {min}). Dodać do listy życzeń?",
+  mm_restock_note: "Dokup: butelek {n}",
+  mm_offer: "Zapas poniżej minimum: {name} ({n} z {min}). Dokupić butelek: {need} i dodać do listy życzeń?",
   mm_offer_done: "Dodano do listy życzeń ✓",
+  mm_to_wish: "Dodaj do listy życzeń",
+  mm_wish_added: "Dodano do listy życzeń win: {n} ✓",
+  celeb_label: "Konfetti i dźwięk przy piciu",
+  celeb_both: "Konfetti i dźwięk",
+  celeb_confetti: "Tylko konfetti",
+  celeb_off: "Wyłączone",
   loc_slot: "Miejsce",
   rack_cap_low: "Na tym poziomie w jednym miejscu leży do {n} butelek.",
   sync_code_notfound: "Nie znaleziono kodu – sprawdź go",
@@ -7017,9 +7091,15 @@ hu: {
   mm_list_empty: "Nincs mit venni – minden készlet a megfelelő tartományban van.",
   mm_share: "Lista megosztása",
   mm_copy: "Másolás",
-  mm_restock_note: "Utánvásárlás: cél {n} palack",
-  mm_offer: "A készlet a minimum alatt: {name} ({n} / {min}). Felkerüljön a kívánságlistára?",
+  mm_restock_note: "Utánvásárlás: {n} palack",
+  mm_offer: "A készlet a minimum alatt: {name} ({n} / {min}). Vásárol még {need} palackot, és felkerüljön a kívánságlistára?",
   mm_offer_done: "Felkerült a kívánságlistára ✓",
+  mm_to_wish: "Kívánságlistára",
+  mm_wish_added: "{n} bor került a kívánságlistára ✓",
+  celeb_label: "Konfetti és hang ivásnál",
+  celeb_both: "Konfetti és hang",
+  celeb_confetti: "Csak konfetti",
+  celeb_off: "Ki",
   loc_slot: "Hely",
   rack_cap_low: "Ezen a szinten egy helyen legfeljebb {n} üveg van.",
   sync_code_notfound: "A kód nem található – ellenőrizd",
@@ -7379,9 +7459,15 @@ cs: {
   mm_list_empty: "Není co nakoupit – všechny zásoby jsou v pořádku.",
   mm_share: "Sdílet seznam",
   mm_copy: "Kopírovat",
-  mm_restock_note: "Dokoupit: cíl {n} lahví",
-  mm_offer: "Zásoba pod minimem: {name} ({n} z {min}). Přidat na seznam přání?",
+  mm_restock_note: "Dokoupit lahví: {n}",
+  mm_offer: "Zásoba pod minimem: {name} ({n} z {min}). Dokoupit lahví: {need} a přidat na seznam přání?",
   mm_offer_done: "Přidáno na seznam přání ✓",
+  mm_to_wish: "Přidat na seznam přání",
+  mm_wish_added: "Na seznam přání přidáno vín: {n} ✓",
+  celeb_label: "Konfety a zvuk při pití",
+  celeb_both: "Konfety a zvuk",
+  celeb_confetti: "Pouze konfety",
+  celeb_off: "Vypnuto",
   loc_slot: "Místo",
   rack_cap_low: "Na této úrovni je na jednom místě až {n} lahví.",
   sync_code_notfound: "Kód nebyl nalezen – zkontrolujte jej",
@@ -7741,9 +7827,15 @@ sk: {
   mm_list_empty: "Nie je čo nakúpiť – všetky zásoby sú v poriadku.",
   mm_share: "Zdieľať zoznam",
   mm_copy: "Kopírovať",
-  mm_restock_note: "Dokúpiť: cieľ {n} fliaš",
-  mm_offer: "Zásoba pod minimom: {name} ({n} z {min}). Pridať do zoznamu želaní?",
+  mm_restock_note: "Dokúpiť fliaš: {n}",
+  mm_offer: "Zásoba pod minimom: {name} ({n} z {min}). Dokúpiť fliaš: {need} a pridať do zoznamu želaní?",
   mm_offer_done: "Pridané do zoznamu želaní ✓",
+  mm_to_wish: "Pridať do zoznamu želaní",
+  mm_wish_added: "Do zoznamu želaní pridaných vín: {n} ✓",
+  celeb_label: "Konfety a zvuk pri pití",
+  celeb_both: "Konfety a zvuk",
+  celeb_confetti: "Iba konfety",
+  celeb_off: "Vypnuté",
   loc_slot: "Miesto",
   rack_cap_low: "Na tejto úrovni je na jednom mieste až {n} fliaš.",
   sync_code_notfound: "Kód sa nenašiel – skontrolujte ho",
@@ -8103,9 +8195,15 @@ ro: {
   mm_list_empty: "Nimic de cumpărat – toate stocurile sunt în limite.",
   mm_share: "Partajează lista",
   mm_copy: "Copiază",
-  mm_restock_note: "Cumpără din nou: țintă {n} sticle",
-  mm_offer: "Stoc sub minim: {name} ({n} din {min}). Îl adaugi în lista de dorințe?",
+  mm_restock_note: "Cumpără din nou: {n} sticlă/sticle",
+  mm_offer: "Stoc sub minim: {name} ({n} din {min}). Cumperi {need} sticlă/sticle și îl adaugi în lista de dorințe?",
   mm_offer_done: "Adăugat în lista de dorințe ✓",
+  mm_to_wish: "Adaugă în lista de dorințe",
+  mm_wish_added: "Vinuri adăugate în lista de dorințe: {n} ✓",
+  celeb_label: "Confetti și sunet la băut",
+  celeb_both: "Confetti și sunet",
+  celeb_confetti: "Doar confetti",
+  celeb_off: "Oprit",
   loc_slot: "Loc",
   rack_cap_low: "Pe acest nivel, într-un loc sunt până la {n} sticle.",
   sync_code_notfound: "Codul nu a fost găsit – verifică-l",
@@ -8465,9 +8563,15 @@ hr: {
   mm_list_empty: "Nema što kupiti – sve su zalihe u rasponu.",
   mm_share: "Podijeli popis",
   mm_copy: "Kopiraj",
-  mm_restock_note: "Dokupi: cilj {n} boca",
-  mm_offer: "Zaliha ispod minimuma: {name} ({n} od {min}). Dodati na listu želja?",
+  mm_restock_note: "Dokupi boca: {n}",
+  mm_offer: "Zaliha ispod minimuma: {name} ({n} od {min}). Dokupiti boca: {need} i dodati na listu želja?",
   mm_offer_done: "Dodano na listu želja ✓",
+  mm_to_wish: "Stavi na listu želja",
+  mm_wish_added: "Na listu želja stavljeno vina: {n} ✓",
+  celeb_label: "Konfeti i zvuk pri pijenju",
+  celeb_both: "Konfeti i zvuk",
+  celeb_confetti: "Samo konfeti",
+  celeb_off: "Isključeno",
   loc_slot: "Mjesto",
   rack_cap_low: "Na ovoj razini u jednom je mjestu do {n} boca.",
   sync_code_notfound: "Kod nije pronađen – provjerite ga",
@@ -8827,9 +8931,15 @@ pt: {
   mm_list_empty: "Nada para comprar – todos os stocks estão dentro do intervalo.",
   mm_share: "Partilhar lista",
   mm_copy: "Copiar",
-  mm_restock_note: "Comprar de novo: objetivo {n} garrafas",
-  mm_offer: "Stock abaixo do mínimo: {name} ({n} de {min}). Adicionar à lista de desejos?",
+  mm_restock_note: "Comprar de novo: {n} garrafa(s)",
+  mm_offer: "Stock abaixo do mínimo: {name} ({n} de {min}). Comprar {need} garrafa(s) e adicionar à lista de desejos?",
   mm_offer_done: "Adicionado à lista de desejos ✓",
+  mm_to_wish: "Adicionar à lista de desejos",
+  mm_wish_added: "{n} vinho(s) adicionado(s) à lista de desejos ✓",
+  celeb_label: "Confetes e som ao beber",
+  celeb_both: "Confetes e som",
+  celeb_confetti: "Só confetes",
+  celeb_off: "Desligado",
   loc_slot: "Lugar",
   rack_cap_low: "Neste nível há até {n} garrafas num lugar.",
   sync_code_notfound: "Código não encontrado – verifique-o",
@@ -9189,9 +9299,15 @@ no: {
   mm_list_empty: "Ingenting å kjøpe – alle beholdninger er innenfor grensene.",
   mm_share: "Del liste",
   mm_copy: "Kopier",
-  mm_restock_note: "Kjøp igjen: mål {n} flasker",
-  mm_offer: "Beholdning under minimum: {name} ({n} av {min}). Sette på ønskelisten?",
+  mm_restock_note: "Kjøp igjen: {n} flaske(r)",
+  mm_offer: "Beholdning under minimum: {name} ({n} av {min}). Kjøpe {need} flaske(r) og sette på ønskelisten?",
   mm_offer_done: "Satt på ønskelisten ✓",
+  mm_to_wish: "Sett på ønskelisten",
+  mm_wish_added: "{n} vin satt på ønskelisten ✓",
+  celeb_label: "Konfetti og lyd når du drikker",
+  celeb_both: "Konfetti og lyd",
+  celeb_confetti: "Bare konfetti",
+  celeb_off: "Av",
   loc_slot: "Plass",
   rack_cap_low: "På denne hyllen ligger opptil {n} flasker på én plass.",
   sync_code_notfound: "Koden ble ikke funnet – sjekk den",
@@ -9551,9 +9667,15 @@ nl: {
   mm_list_empty: "Niets te kopen – alle voorraden zijn op peil.",
   mm_share: "Lijst delen",
   mm_copy: "Kopiëren",
-  mm_restock_note: "Bijkopen: doel {n} flessen",
-  mm_offer: "Voorraad onder het minimum: {name} ({n} van {min}). Op de verlanglijst zetten?",
+  mm_restock_note: "Bijkopen: {n} fles(sen)",
+  mm_offer: "Voorraad onder het minimum: {name} ({n} van {min}). {need} fles(sen) bijkopen en op de verlanglijst zetten?",
   mm_offer_done: "Op de verlanglijst gezet ✓",
+  mm_to_wish: "Op de verlanglijst zetten",
+  mm_wish_added: "{n} wijn(en) op de verlanglijst gezet ✓",
+  celeb_label: "Confetti & geluid bij het drinken",
+  celeb_both: "Confetti en geluid",
+  celeb_confetti: "Alleen confetti",
+  celeb_off: "Uit",
   loc_slot: "Plaats",
   rack_cap_low: "Op dit niveau liggen tot {n} flessen op één plek.",
   sync_code_notfound: "Code niet gevonden – controleer hem",
@@ -9913,9 +10035,15 @@ el: {
   mm_list_empty: "Τίποτα για αγορά – όλα τα αποθέματα είναι εντός ορίων.",
   mm_share: "Κοινοποίηση λίστας",
   mm_copy: "Αντιγραφή",
-  mm_restock_note: "Αγορά ξανά: στόχος {n} φιάλες",
-  mm_offer: "Το απόθεμα είναι κάτω από το ελάχιστο: {name} ({n} από {min}). Προσθήκη στη λίστα επιθυμιών;",
+  mm_restock_note: "Αγορά ξανά: {n} φιάλες",
+  mm_offer: "Το απόθεμα είναι κάτω από το ελάχιστο: {name} ({n} από {min}). Να αγοραστούν {need} φιάλες και να προστεθεί στη λίστα επιθυμιών;",
   mm_offer_done: "Προστέθηκε στη λίστα επιθυμιών ✓",
+  mm_to_wish: "Προσθήκη στη λίστα επιθυμιών",
+  mm_wish_added: "{n} κρασί(ά) προστέθηκαν στη λίστα επιθυμιών ✓",
+  celeb_label: "Κομφετί & ήχος όταν πίνεις",
+  celeb_both: "Κομφετί και ήχος",
+  celeb_confetti: "Μόνο κομφετί",
+  celeb_off: "Απενεργοποιημένο",
   loc_slot: "Θέση",
   rack_cap_low: "Σε αυτό το επίπεδο αποθηκεύονται έως {n} φιάλες σε μία θέση.",
   sync_code_notfound: "Ο κωδικός δεν βρέθηκε – ελέγξτε τον",
@@ -10275,9 +10403,15 @@ uk: {
   mm_list_empty: "Купувати нічого – усі запаси в нормі.",
   mm_share: "Поділитися списком",
   mm_copy: "Копіювати",
-  mm_restock_note: "Докупити: ціль {n} пляшок",
-  mm_offer: "Запас нижче мінімуму: {name} ({n} з {min}). Додати до списку бажань?",
+  mm_restock_note: "Докупити пляшок: {n}",
+  mm_offer: "Запас нижче мінімуму: {name} ({n} з {min}). Докупити пляшок: {need} і додати до списку бажань?",
   mm_offer_done: "Додано до списку бажань ✓",
+  mm_to_wish: "Додати до списку бажань",
+  mm_wish_added: "Вин додано до списку бажань: {n} ✓",
+  celeb_label: "Конфеті та звук під час пиття",
+  celeb_both: "Конфеті та звук",
+  celeb_confetti: "Лише конфеті",
+  celeb_off: "Вимк.",
   loc_slot: "Місце",
   rack_cap_low: "На цьому рівні в одному місці зберігається до {n} пляшок.",
   sync_code_notfound: "Код не знайдено – перевірте його",
@@ -10637,9 +10771,15 @@ ja: {
   mm_list_empty: "買うものはありません。すべての在庫が適正範囲内です。",
   mm_share: "リストを共有",
   mm_copy: "コピー",
-  mm_restock_note: "買い足し: 目標 {n} 本",
-  mm_offer: "在庫が最小数を下回りました：{name}（{n}/{min}）。ウィッシュリストに追加しますか？",
+  mm_restock_note: "買い足し: {n} 本",
+  mm_offer: "在庫が最小数を下回りました：{name}（{n}/{min}）。{need}本を買い足して、ウィッシュリストに追加しますか？",
   mm_offer_done: "ウィッシュリストに追加しました ✓",
+  mm_to_wish: "ウィッシュリストに追加",
+  mm_wish_added: "{n}件のワインをウィッシュリストに追加しました ✓",
+  celeb_label: "飲むときの紙吹雪＆サウンド",
+  celeb_both: "紙吹雪とサウンド",
+  celeb_confetti: "紙吹雪のみ",
+  celeb_off: "オフ",
   loc_slot: "場所",
   rack_cap_low: "この段では、1か所に最大{n}本まで保管されます。",
   sync_code_notfound: "コードが見つかりません – ご確認ください",
@@ -10999,9 +11139,15 @@ ko: {
   mm_list_empty: "살 것이 없어요 – 모든 재고가 적정 범위예요.",
   mm_share: "목록 공유",
   mm_copy: "복사",
-  mm_restock_note: "다시 구매: 목표 {n}병",
-  mm_offer: "재고가 최소 수량 미만입니다: {name} ({n}/{min}). 위시리스트에 추가할까요?",
+  mm_restock_note: "다시 구매: {n}병",
+  mm_offer: "재고가 최소 수량 미만입니다: {name} ({n}/{min}). {need}병을 다시 구매하고 위시리스트에 추가할까요?",
   mm_offer_done: "위시리스트에 추가했습니다 ✓",
+  mm_to_wish: "위시리스트에 추가",
+  mm_wish_added: "와인 {n}개를 위시리스트에 추가했습니다 ✓",
+  celeb_label: "마실 때 색종이 & 소리",
+  celeb_both: "색종이와 소리",
+  celeb_confetti: "색종이만",
+  celeb_off: "끔",
   loc_slot: "칸",
   rack_cap_low: "이 단에서는 한 칸에 최대 {n}병이 보관돼요.",
   sync_code_notfound: "코드를 찾을 수 없어요 – 확인해 주세요",
@@ -11361,9 +11507,15 @@ zh: {
   mm_list_empty: "无需购买 – 所有库存都在正常范围内。",
   mm_share: "分享清单",
   mm_copy: "复制",
-  mm_restock_note: "补货：目标 {n} 瓶",
-  mm_offer: "库存低于最低值：{name}（{n}/{min}）。要加入心愿单吗？",
+  mm_restock_note: "补货：{n} 瓶",
+  mm_offer: "库存低于最低值：{name}（{n}/{min}）。要补货 {need} 瓶并加入心愿单吗？",
   mm_offer_done: "已加入心愿单 ✓",
+  mm_to_wish: "加入心愿单",
+  mm_wish_added: "已将 {n} 款葡萄酒加入心愿单 ✓",
+  celeb_label: "饮用时的彩带与音效",
+  celeb_both: "彩带和音效",
+  celeb_confetti: "仅彩带",
+  celeb_off: "关闭",
   loc_slot: "位",
   rack_cap_low: "此层每个位最多存放 {n} 瓶。",
   sync_code_notfound: "未找到同步码 – 请检查",
@@ -11723,9 +11875,15 @@ hi: {
   mm_list_empty: "कुछ ख़रीदना नहीं है – सभी स्टॉक सही सीमा में हैं।",
   mm_share: "सूची साझा करें",
   mm_copy: "कॉपी करें",
-  mm_restock_note: "दोबारा ख़रीदें: लक्ष्य {n} बोतलें",
-  mm_offer: "स्टॉक न्यूनतम से कम: {name} ({n}/{min})। विशलिस्ट में जोड़ें?",
+  mm_restock_note: "दोबारा ख़रीदें: {n} बोतल(ें)",
+  mm_offer: "स्टॉक न्यूनतम से कम: {name} ({n}/{min})। {need} बोतल(ें) दोबारा ख़रीदकर विशलिस्ट में जोड़ें?",
   mm_offer_done: "विशलिस्ट में जोड़ा गया ✓",
+  mm_to_wish: "विशलिस्ट में जोड़ें",
+  mm_wish_added: "{n} वाइन विशलिस्ट में जोड़ी गईं ✓",
+  celeb_label: "पीते समय कंफ़ेटी और ध्वनि",
+  celeb_both: "कंफ़ेटी और ध्वनि",
+  celeb_confetti: "सिर्फ़ कंफ़ेटी",
+  celeb_off: "बंद",
   loc_slot: "स्थान",
   rack_cap_low: "इस स्तर पर एक स्थान में अधिकतम {n} बोतलें रखी जाती हैं।",
   sync_code_notfound: "कोड नहीं मिला – कृपया जाँच लें",
@@ -11917,6 +12075,85 @@ function applyFont() {
 }
 function setFont(f) { settings.font = f; saveSettings(); applyFont(); }
 
+// ═══════════════════════════════════════
+// FEIER BEIM TRINKEN: Konfetti von oben + kurzer Jubel-Sound.
+// Alles selbst erzeugt (Canvas und Web Audio): keine Sound-Dateien, keine Bibliotheken, keine Rechte Dritter.
+// ═══════════════════════════════════════
+function setCelebrate(v) { settings.celeb = v; saveSettings(); }
+let audioCtx = null;
+function audioContext() {
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return null;
+  if (!audioCtx) { try { audioCtx = new AC(); } catch (e) { return null; } }
+  if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+  return audioCtx;
+}
+// Korkenknall, dann eine aufsteigende, perlende Tonfolge mit Funkeln. ctx/at/vol sind austauschbar (Test mit OfflineAudioContext).
+function celebrationSound(ctx, at, vol) {
+  at = at || ctx.currentTime; vol = vol == null ? 0.22 : vol;
+  const out = ctx.createGain(); out.gain.value = vol; out.connect(ctx.destination);
+  // Knall: kurzer Rauschstoß durch einen fallenden Tiefpass + abfallender Sinus
+  const len = Math.floor(ctx.sampleRate * 0.14), buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+  const noise = ctx.createBufferSource(); noise.buffer = buf;
+  const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.setValueAtTime(5000, at); lp.frequency.exponentialRampToValueAtTime(500, at + 0.12);
+  const ng = ctx.createGain(); ng.gain.setValueAtTime(1.2, at); ng.gain.exponentialRampToValueAtTime(0.001, at + 0.14);
+  noise.connect(lp); lp.connect(ng); ng.connect(out); noise.start(at);
+  const thump = ctx.createOscillator(); thump.type = 'sine'; thump.frequency.setValueAtTime(260, at); thump.frequency.exponentialRampToValueAtTime(70, at + 0.1);
+  const tg = ctx.createGain(); tg.gain.setValueAtTime(0.9, at); tg.gain.exponentialRampToValueAtTime(0.001, at + 0.12);
+  thump.connect(tg); tg.connect(out); thump.start(at); thump.stop(at + 0.14);
+  // Perlende Tonfolge (C-Dur, aufsteigend) und hohes Funkeln
+  [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => {
+    const t0 = at + 0.16 + i * 0.075, o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = 'triangle'; o.frequency.value = f;
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(0.5, t0 + 0.012); g.gain.exponentialRampToValueAtTime(0.001, t0 + 0.38);
+    o.connect(g); g.connect(out); o.start(t0); o.stop(t0 + 0.4);
+  });
+  [2093, 2637, 3136, 2349].forEach((f, i) => {
+    const t0 = at + 0.5 + i * 0.07, o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = 'sine'; o.frequency.value = f;
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(0.18, t0 + 0.008); g.gain.exponentialRampToValueAtTime(0.001, t0 + 0.22);
+    o.connect(g); g.connect(out); o.start(t0); o.stop(t0 + 0.25);
+  });
+  return at + 1.0;
+}
+let confettiBusy = false;
+function confettiBurst() {
+  if (confettiBusy) return;
+  confettiBusy = true;
+  const cv = document.createElement('canvas'), dpr = window.devicePixelRatio || 1;
+  cv.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:500';
+  cv.width = Math.round(innerWidth * dpr); cv.height = Math.round(innerHeight * dpr);
+  document.body.appendChild(cv);
+  const ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
+  const colors = ['#c4a24a', '#e8d27a', '#8e1c3a', '#d9486b', '#40e0d0', '#8fb6cf', '#f0e6c8', '#9fbf6a'];
+  const n = innerWidth < 500 ? 130 : 220, P = [];
+  for (let i = 0; i < n; i++) P.push({ x: Math.random() * innerWidth, y: -20 - Math.random() * innerHeight * 0.5, vx: (Math.random() - 0.5) * 3, vy: 2 + Math.random() * 4, w: 6 + Math.random() * 8, h: 4 + Math.random() * 6, r: Math.random() * 6.28, vr: (Math.random() - 0.5) * 0.3, c: colors[i % colors.length], sw: Math.random() * 6.28 });
+  const t0 = performance.now(), DUR = 3600;
+  // Sicherung: auch wenn der Browser die Animation anhält (App im Hintergrund), verschwindet das Konfetti-Feld sicher
+  setTimeout(() => { cv.remove(); confettiBusy = false; }, DUR + 1000);
+  (function frame(now) {
+    if (!cv.isConnected) return;
+    const el = now - t0;
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    P.forEach(p => {
+      p.vy += 0.045; p.x += p.vx + Math.sin(p.sw += 0.06) * 0.8; p.y += p.vy * 0.9; p.r += p.vr;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r);
+      ctx.globalAlpha = Math.max(0, Math.min(1, (DUR - el) / 900));
+      ctx.fillStyle = p.c; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); ctx.restore();
+    });
+    if (el < DUR) requestAnimationFrame(frame); else { cv.remove(); confettiBusy = false; }
+  })(t0);
+}
+function celebrate() {
+  const mode = settings.celeb || 'both';
+  if (mode === 'off') return;
+  try {
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) confettiBurst();
+    if (mode === 'both') { const c = audioContext(); if (c) celebrationSound(c); }
+  } catch (e) { /* die Feier ist nur eine Zugabe und darf das Trinken nie stören */ }
+}
+
 function setCurrency(c) { settings.currency = c; saveSettings(); applyI18n(); }
 function setLanguage(l) { settings.lang = l; saveSettings(); applyI18n(); }
 function setOwner(v) { settings.owner = (v||'').trim(); saveSettings(); touchData(); applyI18n(); }
@@ -11943,6 +12180,7 @@ function showTab(name, btn) {
     document.getElementById('setup-currency').value = settings.currency;
     document.getElementById('setup-lang').value = settings.lang;
     document.getElementById('setup-font').value = settings.font || 'inter';
+    document.getElementById('setup-celeb').value = settings.celeb || 'both';
     updateCreditsUI(); refreshCredits();
     renderRackSetup();
     renderSetupSync();
@@ -12243,6 +12481,7 @@ function confirmDrink() {
   else if (active && active.id === 'tab-racks') { rackFilledSlot = null; renderRacks(); }
   else renderKeller();
   showToast(t('toast_prost'));
+  celebrate();
   const lowRows = mmLowRows(w, !wines.includes(w));
   if (lowRows.length) setTimeout(() => offerRestock(w, lowRows[0]), 700);
 }
@@ -13819,7 +14058,7 @@ function renderWishlist() {
     <div class="wish-card" style="${w.done?'opacity:.5':''}">
       <button class="wish-check ${w.done?'done':''}" onclick="toggleWish('${w.id}')">${w.done?'✓':''}</button>
       <div class="wish-info">
-        <div class="wish-name">${esc(w.name)}</div>
+        <div class="wish-name">${w.qty ? '<b>' + w.qty + '× </b>' : ''}${esc(w.name)}</div>
         <div class="wish-sub">${w.year||''} ${w.type?'· '+esc(TYPE_LABELS[w.type]||w.type):''}${w.grape?' · '+esc(w.grape):''}${(w.region||w.country)?' · '+esc([w.region,w.country].filter(Boolean).join(', ')):''} ${w.note?'· '+esc(w.note):''}</div>
       </div>
       <div class="wish-actions">
@@ -13845,8 +14084,8 @@ function wishToKeller(id) {
   if (!w) return;
   const norm = s => String(s||'').toLowerCase().replace(/\s+/g,' ').trim();
   const ex = wines.find(x => norm(x.name) === norm(w.name) && (x.year||null) === (w.year||null));
-  if (ex) { ex.count = (ex.count||1) + 1; if (!ex.note && w.note) ex.note = w.note; }
-  else wines.push(cleanWine({ id: Date.now().toString(), name: w.name, year: w.year, count: 1, type: w.type, region: w.region, country: w.country, grape: w.grape, note: w.note, minMax: w.minMax, added: new Date().toISOString() }));
+  if (ex) { ex.count = (ex.count||1) + (w.qty || 1); if (!ex.note && w.note) ex.note = w.note; }
+  else wines.push(cleanWine({ id: Date.now().toString(), name: w.name, year: w.year, count: w.qty || 1, type: w.type, region: w.region, country: w.country, grape: w.grape, note: w.note, minMax: w.minMax, added: new Date().toISOString() }));
   save();
   wishes = wishes.filter(x=>x.id!==id);
   saveWishes();
