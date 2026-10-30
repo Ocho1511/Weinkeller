@@ -800,6 +800,16 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .wish-info { flex: 1; }
 .wish-name { font-size: 14px; color: var(--text); }
 .wish-sub { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-top: 2px; }
+.wish-prices { margin-top: 8px; font-size: 12px; }
+.wp-head { font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
+.wp-row { display: flex; align-items: baseline; gap: 6px; padding: 3px 0; border-bottom: 1px dashed var(--border, rgba(128,128,128,.25)); }
+.wp-row .wp-shop { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.wp-row small { color: var(--text-muted); font-weight: 400; }
+.wp-row.best b { color: var(--accent, #2e7d32); }
+.wp-badge { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 8px; background: var(--accent, #2e7d32); color: #fff; white-space: nowrap; }
+.wp-sum { margin-top: 4px; font-weight: 700; }
+.wp-hint { margin: 6px 0; font-size: 10.5px; color: var(--text-muted); }
+.wish-price-btn { width: auto; padding: 4px 10px; }
 .wish-actions { display: flex; gap: 6px; }
 .wish-action-btn {
   background: none;
@@ -1840,7 +1850,7 @@ function cleanWishes(arr) {
     id: cleanId(w.id, used), name: cleanStr(w.name, 200).trim(),
     year: cleanInt(w.year, 1000, 2200), type: VALID_TYPES.includes(w.type) ? w.type : 'other',
     region: cleanText(w.region, 120), country: cleanText(w.country, 120), grape: cleanText(w.grape, 120),
-    note: cleanText(w.note, 5000), done: !!w.done, minMax: cleanMinMax(w.minMax), restock: !!w.restock, qty: cleanInt(w.qty, 1, 9999)
+    note: cleanText(w.note, 5000), done: !!w.done, minMax: cleanMinMax(w.minMax), restock: !!w.restock, qty: cleanInt(w.qty, 1, 9999), prices: cleanPrices(w.prices)
   }));
 }
 function cleanDrunk(arr) {
@@ -3414,6 +3424,14 @@ de: {
   mm_restock_note: "Nachkaufen: {n} Flasche(n)",
   mm_offer: "Bestand unter Minimum: {name} ({n} von {min}). {need} Flasche(n) nachkaufen und auf die Wunschliste setzen?",
   mm_offer_done: "Auf die Wunschliste gesetzt ✓",
+  wp_btn: "💶 Preise suchen",
+  wp_busy: "Suche Preise …",
+  wp_none: "Keine Preise gefunden.",
+  wp_head: "Preise laut Websuche, Stand {date}",
+  wp_best: "günstigster",
+  wp_hint: "Richtwerte aus der Websuche, ohne Gewähr. Versandkosten und Verfügbarkeit bitte beim Shop prüfen.",
+  wp_again: "Erneut suchen",
+  wp_sum: "{qty} Flaschen ≈ {sum}",
   mm_to_wish: "Auf die Wunschliste setzen",
   mm_wish_added: "{n} Wein(e) auf die Wunschliste gesetzt ✓",
   celeb_label: "Konfetti & Sound beim Trinken",
@@ -3782,6 +3800,14 @@ en: {
   mm_restock_note: "Buy again: {n} bottle(s)",
   mm_offer: "Stock below minimum: {name} ({n} of {min}). Buy {need} bottle(s) and put it on the wish list?",
   mm_offer_done: "Put on the wish list ✓",
+  wp_btn: "💶 Find prices",
+  wp_busy: "Searching prices …",
+  wp_none: "No prices found.",
+  wp_head: "Prices from web search, as of {date}",
+  wp_best: "cheapest",
+  wp_hint: "Guide values from web search, without guarantee. Please check shipping costs and availability with the shop.",
+  wp_again: "Search again",
+  wp_sum: "{qty} bottle(s) ≈ {sum}",
   mm_to_wish: "Put on wishlist",
   mm_wish_added: "{n} wine(s) put on the wishlist ✓",
   celeb_label: "Confetti & sound when drinking",
@@ -4150,6 +4176,14 @@ es: {
   mm_restock_note: "Volver a comprar: {n} botella(s)",
   mm_offer: "Stock por debajo del mínimo: {name} ({n} de {min}). ¿Comprar {need} botella(s) y añadirlo a la lista de deseos?",
   mm_offer_done: "Añadido a la lista de deseos ✓",
+  wp_btn: "💶 Buscar precios",
+  wp_busy: "Buscando precios …",
+  wp_none: "No se encontraron precios.",
+  wp_head: "Precios según la búsqueda web, a {date}",
+  wp_best: "más barato",
+  wp_hint: "Valores orientativos de la búsqueda web, sin garantía. Comprueba los gastos de envío y la disponibilidad en la tienda.",
+  wp_again: "Buscar de nuevo",
+  wp_sum: "{qty} botella(s) ≈ {sum}",
   mm_to_wish: "Añadir a la lista de deseos",
   mm_wish_added: "{n} vino(s) añadido(s) a la lista de deseos ✓",
   celeb_label: "Confeti y sonido al beber",
@@ -4518,6 +4552,14 @@ sv: {
   mm_restock_note: "Köp igen: {n} flaska/flaskor",
   mm_offer: "Lagret under minimum: {name} ({n} av {min}). Köpa {need} flaska/flaskor och lägga till på önskelistan?",
   mm_offer_done: "Lagt till på önskelistan ✓",
+  wp_btn: "💶 Sök priser",
+  wp_busy: "Söker priser …",
+  wp_none: "Inga priser hittades.",
+  wp_head: "Priser enligt webbsökning, per {date}",
+  wp_best: "billigast",
+  wp_hint: "Riktvärden från webbsökningen, utan garanti. Kontrollera fraktkostnad och tillgänglighet hos butiken.",
+  wp_again: "Sök igen",
+  wp_sum: "{qty} flaska/flaskor ≈ {sum}",
   mm_to_wish: "Lägg på önskelistan",
   mm_wish_added: "{n} vin lades till på önskelistan ✓",
   celeb_label: "Konfetti & ljud när du dricker",
@@ -4886,6 +4928,14 @@ da: {
   mm_restock_note: "Køb igen: {n} flaske/flasker",
   mm_offer: "Beholdning under minimum: {name} ({n} af {min}). Købe {need} flaske/flasker og sætte på ønskelisten?",
   mm_offer_done: "Sat på ønskelisten ✓",
+  wp_btn: "💶 Søg priser",
+  wp_busy: "Søger priser …",
+  wp_none: "Ingen priser fundet.",
+  wp_head: "Priser ifølge websøgning, pr. {date}",
+  wp_best: "billigst",
+  wp_hint: "Vejledende værdier fra websøgningen, uden garanti. Tjek venligst forsendelsesomkostninger og tilgængelighed hos shoppen.",
+  wp_again: "Søg igen",
+  wp_sum: "{qty} flaske(r) ≈ {sum}",
   mm_to_wish: "Sæt på ønskelisten",
   mm_wish_added: "{n} vin sat på ønskelisten ✓",
   celeb_label: "Konfetti & lyd, når du drikker",
@@ -5254,6 +5304,14 @@ fi: {
   mm_restock_note: "Osta lisää: {n} pullo(a)",
   mm_offer: "Varasto alle minimin: {name} ({n} / {min}). Ostetaanko {need} pullo(a) lisää ja lisätäänkö se toivelistalle?",
   mm_offer_done: "Lisätty toivelistalle ✓",
+  wp_btn: "💶 Hae hintoja",
+  wp_busy: "Haetaan hintoja …",
+  wp_none: "Hintoja ei löytynyt.",
+  wp_head: "Hinnat verkkohaun mukaan, tilanne {date}",
+  wp_best: "halvin",
+  wp_hint: "Suuntaa-antavia arvoja verkkohausta, ilman takuuta. Tarkista toimituskulut ja saatavuus kaupasta.",
+  wp_again: "Hae uudelleen",
+  wp_sum: "Pulloja: {qty} ≈ {sum}",
   mm_to_wish: "Lisää toivelistalle",
   mm_wish_added: "{n} viiniä lisätty toivelistalle ✓",
   celeb_label: "Konfetti & ääni juodessa",
@@ -5622,6 +5680,14 @@ ru: {
   mm_restock_note: "Докупить: {n} бут.",
   mm_offer: "Запас ниже минимума: {name} ({n} из {min}). Докупить {need} бут. и добавить в список желаний?",
   mm_offer_done: "Добавлено в список желаний ✓",
+  wp_btn: "💶 Найти цены",
+  wp_busy: "Ищу цены …",
+  wp_none: "Цены не найдены.",
+  wp_head: "Цены по результатам поиска в интернете, на {date}",
+  wp_best: "дешевле всего",
+  wp_hint: "Ориентировочные значения из поиска в интернете, без гарантии. Стоимость доставки и наличие уточняйте в магазине.",
+  wp_again: "Искать снова",
+  wp_sum: "Бутылок: {qty} ≈ {sum}",
   mm_to_wish: "Добавить в список желаний",
   mm_wish_added: "Вин добавлено в список желаний: {n} ✓",
   celeb_label: "Конфетти и звук, когда пьёте",
@@ -5990,6 +6056,14 @@ it: {
   mm_restock_note: "Riacquista: {n} bottiglia/e",
   mm_offer: "Scorta sotto il minimo: {name} ({n} su {min}). Riacquistare {need} bottiglia/e e aggiungerlo alla lista desideri?",
   mm_offer_done: "Aggiunto alla lista desideri ✓",
+  wp_btn: "💶 Cerca prezzi",
+  wp_busy: "Ricerca prezzi …",
+  wp_none: "Nessun prezzo trovato.",
+  wp_head: "Prezzi secondo la ricerca web, aggiornati al {date}",
+  wp_best: "più economico",
+  wp_hint: "Valori indicativi dalla ricerca web, senza garanzia. Verifica spese di spedizione e disponibilità presso il negozio.",
+  wp_again: "Cerca di nuovo",
+  wp_sum: "Bottiglie: {qty} ≈ {sum}",
   mm_to_wish: "Aggiungi alla lista desideri",
   mm_wish_added: "{n} vini aggiunti alla lista desideri ✓",
   celeb_label: "Coriandoli e suono quando bevi",
@@ -6358,6 +6432,14 @@ fr: {
   mm_restock_note: "À racheter : {n} bouteille(s)",
   mm_offer: "Stock sous le minimum : {name} ({n} sur {min}). Racheter {need} bouteille(s) et l'ajouter à la liste de souhaits ?",
   mm_offer_done: "Ajouté à la liste de souhaits ✓",
+  wp_btn: "💶 Chercher les prix",
+  wp_busy: "Recherche des prix …",
+  wp_none: "Aucun prix trouvé.",
+  wp_head: "Prix selon la recherche web, au {date}",
+  wp_best: "le moins cher",
+  wp_hint: "Valeurs indicatives issues de la recherche web, sans garantie. Veuillez vérifier les frais de port et la disponibilité auprès de la boutique.",
+  wp_again: "Rechercher à nouveau",
+  wp_sum: "{qty} bouteille(s) ≈ {sum}",
   mm_to_wish: "Ajouter à la liste de souhaits",
   mm_wish_added: "{n} vin(s) ajouté(s) à la liste de souhaits ✓",
   celeb_label: "Confettis & son en buvant",
@@ -6726,6 +6808,14 @@ pl: {
   mm_restock_note: "Dokup: butelek {n}",
   mm_offer: "Zapas poniżej minimum: {name} ({n} z {min}). Dokupić butelek: {need} i dodać do listy życzeń?",
   mm_offer_done: "Dodano do listy życzeń ✓",
+  wp_btn: "💶 Szukaj cen",
+  wp_busy: "Szukam cen …",
+  wp_none: "Nie znaleziono cen.",
+  wp_head: "Ceny według wyszukiwania w sieci, stan na {date}",
+  wp_best: "najtańsze",
+  wp_hint: "Wartości orientacyjne z wyszukiwania w sieci, bez gwarancji. Koszty wysyłki i dostępność proszę sprawdzić w sklepie.",
+  wp_again: "Szukaj ponownie",
+  wp_sum: "Butelek: {qty} ≈ {sum}",
   mm_to_wish: "Dodaj do listy życzeń",
   mm_wish_added: "Dodano do listy życzeń win: {n} ✓",
   celeb_label: "Konfetti i dźwięk przy piciu",
@@ -7094,6 +7184,14 @@ hu: {
   mm_restock_note: "Utánvásárlás: {n} palack",
   mm_offer: "A készlet a minimum alatt: {name} ({n} / {min}). Vásárol még {need} palackot, és felkerüljön a kívánságlistára?",
   mm_offer_done: "Felkerült a kívánságlistára ✓",
+  wp_btn: "💶 Árak keresése",
+  wp_busy: "Árak keresése …",
+  wp_none: "Nem található ár.",
+  wp_head: "Árak a webes keresés szerint, {date} állapot szerint",
+  wp_best: "legolcsóbb",
+  wp_hint: "Tájékoztató értékek a webes keresésből, garancia nélkül. A szállítási költséget és a készletet kérjük, ellenőrizze a webshopban.",
+  wp_again: "Keresés újra",
+  wp_sum: "{qty} palack ≈ {sum}",
   mm_to_wish: "Kívánságlistára",
   mm_wish_added: "{n} bor került a kívánságlistára ✓",
   celeb_label: "Konfetti és hang ivásnál",
@@ -7462,6 +7560,14 @@ cs: {
   mm_restock_note: "Dokoupit lahví: {n}",
   mm_offer: "Zásoba pod minimem: {name} ({n} z {min}). Dokoupit lahví: {need} a přidat na seznam přání?",
   mm_offer_done: "Přidáno na seznam přání ✓",
+  wp_btn: "💶 Hledat ceny",
+  wp_busy: "Hledám ceny …",
+  wp_none: "Žádné ceny nenalezeny.",
+  wp_head: "Ceny podle vyhledávání na webu, stav k {date}",
+  wp_best: "nejlevnější",
+  wp_hint: "Orientační hodnoty z vyhledávání na webu, bez záruky. Poštovné a dostupnost si prosím ověřte v obchodě.",
+  wp_again: "Hledat znovu",
+  wp_sum: "Lahví: {qty} ≈ {sum}",
   mm_to_wish: "Přidat na seznam přání",
   mm_wish_added: "Na seznam přání přidáno vín: {n} ✓",
   celeb_label: "Konfety a zvuk při pití",
@@ -7830,6 +7936,14 @@ sk: {
   mm_restock_note: "Dokúpiť fliaš: {n}",
   mm_offer: "Zásoba pod minimom: {name} ({n} z {min}). Dokúpiť fliaš: {need} a pridať do zoznamu želaní?",
   mm_offer_done: "Pridané do zoznamu želaní ✓",
+  wp_btn: "💶 Hľadať ceny",
+  wp_busy: "Hľadám ceny …",
+  wp_none: "Nenašli sa žiadne ceny.",
+  wp_head: "Ceny podľa vyhľadávania na webe, stav k {date}",
+  wp_best: "najlacnejšie",
+  wp_hint: "Orientačné hodnoty z vyhľadávania na webe, bez záruky. Poštovné a dostupnosť si prosím overte v obchode.",
+  wp_again: "Hľadať znova",
+  wp_sum: "Fliaš: {qty} ≈ {sum}",
   mm_to_wish: "Pridať do zoznamu želaní",
   mm_wish_added: "Do zoznamu želaní pridaných vín: {n} ✓",
   celeb_label: "Konfety a zvuk pri pití",
@@ -8198,6 +8312,14 @@ ro: {
   mm_restock_note: "Cumpără din nou: {n} sticlă/sticle",
   mm_offer: "Stoc sub minim: {name} ({n} din {min}). Cumperi {need} sticlă/sticle și îl adaugi în lista de dorințe?",
   mm_offer_done: "Adăugat în lista de dorințe ✓",
+  wp_btn: "💶 Caută prețuri",
+  wp_busy: "Se caută prețuri …",
+  wp_none: "Nu s-au găsit prețuri.",
+  wp_head: "Prețuri conform căutării web, la data de {date}",
+  wp_best: "cel mai ieftin",
+  wp_hint: "Valori orientative din căutarea web, fără garanție. Verificați costurile de transport și disponibilitatea la magazin.",
+  wp_again: "Caută din nou",
+  wp_sum: "Sticle: {qty} ≈ {sum}",
   mm_to_wish: "Adaugă în lista de dorințe",
   mm_wish_added: "Vinuri adăugate în lista de dorințe: {n} ✓",
   celeb_label: "Confetti și sunet la băut",
@@ -8566,6 +8688,14 @@ hr: {
   mm_restock_note: "Dokupi boca: {n}",
   mm_offer: "Zaliha ispod minimuma: {name} ({n} od {min}). Dokupiti boca: {need} i dodati na listu želja?",
   mm_offer_done: "Dodano na listu želja ✓",
+  wp_btn: "💶 Traži cijene",
+  wp_busy: "Tražim cijene …",
+  wp_none: "Cijene nisu pronađene.",
+  wp_head: "Cijene prema web pretrazi, stanje {date}",
+  wp_best: "najjeftinije",
+  wp_hint: "Okvirne vrijednosti iz web pretrage, bez jamstva. Troškove dostave i dostupnost provjerite u trgovini.",
+  wp_again: "Traži ponovno",
+  wp_sum: "Boca: {qty} ≈ {sum}",
   mm_to_wish: "Stavi na listu želja",
   mm_wish_added: "Na listu želja stavljeno vina: {n} ✓",
   celeb_label: "Konfeti i zvuk pri pijenju",
@@ -8934,6 +9064,14 @@ pt: {
   mm_restock_note: "Comprar de novo: {n} garrafa(s)",
   mm_offer: "Stock abaixo do mínimo: {name} ({n} de {min}). Comprar {need} garrafa(s) e adicionar à lista de desejos?",
   mm_offer_done: "Adicionado à lista de desejos ✓",
+  wp_btn: "💶 Procurar preços",
+  wp_busy: "A procurar preços …",
+  wp_none: "Nenhum preço encontrado.",
+  wp_head: "Preços segundo a pesquisa na web, em {date}",
+  wp_best: "mais barato",
+  wp_hint: "Valores indicativos da pesquisa na web, sem garantia. Verifique os custos de envio e a disponibilidade na loja.",
+  wp_again: "Procurar novamente",
+  wp_sum: "{qty} garrafa(s) ≈ {sum}",
   mm_to_wish: "Adicionar à lista de desejos",
   mm_wish_added: "{n} vinho(s) adicionado(s) à lista de desejos ✓",
   celeb_label: "Confetes e som ao beber",
@@ -9302,6 +9440,14 @@ no: {
   mm_restock_note: "Kjøp igjen: {n} flaske(r)",
   mm_offer: "Beholdning under minimum: {name} ({n} av {min}). Kjøpe {need} flaske(r) og sette på ønskelisten?",
   mm_offer_done: "Satt på ønskelisten ✓",
+  wp_btn: "💶 Søk priser",
+  wp_busy: "Søker etter priser …",
+  wp_none: "Fant ingen priser.",
+  wp_head: "Priser fra nettsøk, per {date}",
+  wp_best: "billigst",
+  wp_hint: "Veiledende verdier fra nettsøket, uten garanti. Sjekk fraktkostnader og tilgjengelighet hos butikken.",
+  wp_again: "Søk igjen",
+  wp_sum: "{qty} flaske(r) ≈ {sum}",
   mm_to_wish: "Sett på ønskelisten",
   mm_wish_added: "{n} vin satt på ønskelisten ✓",
   celeb_label: "Konfetti og lyd når du drikker",
@@ -9670,6 +9816,14 @@ nl: {
   mm_restock_note: "Bijkopen: {n} fles(sen)",
   mm_offer: "Voorraad onder het minimum: {name} ({n} van {min}). {need} fles(sen) bijkopen en op de verlanglijst zetten?",
   mm_offer_done: "Op de verlanglijst gezet ✓",
+  wp_btn: "💶 Prijzen zoeken",
+  wp_busy: "Prijzen zoeken …",
+  wp_none: "Geen prijzen gevonden.",
+  wp_head: "Prijzen volgens webzoekopdracht, stand {date}",
+  wp_best: "goedkoopst",
+  wp_hint: "Richtwaarden uit de webzoekopdracht, zonder garantie. Controleer verzendkosten en beschikbaarheid bij de winkel.",
+  wp_again: "Opnieuw zoeken",
+  wp_sum: "{qty} fles(sen) ≈ {sum}",
   mm_to_wish: "Op de verlanglijst zetten",
   mm_wish_added: "{n} wijn(en) op de verlanglijst gezet ✓",
   celeb_label: "Confetti & geluid bij het drinken",
@@ -10038,6 +10192,14 @@ el: {
   mm_restock_note: "Αγορά ξανά: {n} φιάλες",
   mm_offer: "Το απόθεμα είναι κάτω από το ελάχιστο: {name} ({n} από {min}). Να αγοραστούν {need} φιάλες και να προστεθεί στη λίστα επιθυμιών;",
   mm_offer_done: "Προστέθηκε στη λίστα επιθυμιών ✓",
+  wp_btn: "💶 Αναζήτηση τιμών",
+  wp_busy: "Αναζήτηση τιμών …",
+  wp_none: "Δεν βρέθηκαν τιμές.",
+  wp_head: "Τιμές βάσει αναζήτησης στο διαδίκτυο, στις {date}",
+  wp_best: "φθηνότερο",
+  wp_hint: "Ενδεικτικές τιμές από την αναζήτηση στο διαδίκτυο, χωρίς εγγύηση. Ελέγξτε τα έξοδα αποστολής και τη διαθεσιμότητα στο κατάστημα.",
+  wp_again: "Νέα αναζήτηση",
+  wp_sum: "Φιάλες: {qty} ≈ {sum}",
   mm_to_wish: "Προσθήκη στη λίστα επιθυμιών",
   mm_wish_added: "{n} κρασί(ά) προστέθηκαν στη λίστα επιθυμιών ✓",
   celeb_label: "Κομφετί & ήχος όταν πίνεις",
@@ -10406,6 +10568,14 @@ uk: {
   mm_restock_note: "Докупити пляшок: {n}",
   mm_offer: "Запас нижче мінімуму: {name} ({n} з {min}). Докупити пляшок: {need} і додати до списку бажань?",
   mm_offer_done: "Додано до списку бажань ✓",
+  wp_btn: "💶 Шукати ціни",
+  wp_busy: "Шукаю ціни …",
+  wp_none: "Цін не знайдено.",
+  wp_head: "Ціни за результатами пошуку в інтернеті, станом на {date}",
+  wp_best: "найдешевше",
+  wp_hint: "Орієнтовні значення з пошуку в інтернеті, без гарантії. Вартість доставки та наявність уточнюйте в магазині.",
+  wp_again: "Шукати знову",
+  wp_sum: "Пляшок: {qty} ≈ {sum}",
   mm_to_wish: "Додати до списку бажань",
   mm_wish_added: "Вин додано до списку бажань: {n} ✓",
   celeb_label: "Конфеті та звук під час пиття",
@@ -10774,6 +10944,14 @@ ja: {
   mm_restock_note: "買い足し: {n} 本",
   mm_offer: "在庫が最小数を下回りました：{name}（{n}/{min}）。{need}本を買い足して、ウィッシュリストに追加しますか？",
   mm_offer_done: "ウィッシュリストに追加しました ✓",
+  wp_btn: "💶 価格を検索",
+  wp_busy: "価格を検索中 …",
+  wp_none: "価格が見つかりませんでした。",
+  wp_head: "ウェブ検索による価格（{date}時点）",
+  wp_best: "最安",
+  wp_hint: "ウェブ検索に基づく目安であり、保証はありません。送料と在庫状況は販売店でご確認ください。",
+  wp_again: "再検索",
+  wp_sum: "{qty}本 ≈ {sum}",
   mm_to_wish: "ウィッシュリストに追加",
   mm_wish_added: "{n}件のワインをウィッシュリストに追加しました ✓",
   celeb_label: "飲むときの紙吹雪＆サウンド",
@@ -11142,6 +11320,14 @@ ko: {
   mm_restock_note: "다시 구매: {n}병",
   mm_offer: "재고가 최소 수량 미만입니다: {name} ({n}/{min}). {need}병을 다시 구매하고 위시리스트에 추가할까요?",
   mm_offer_done: "위시리스트에 추가했습니다 ✓",
+  wp_btn: "💶 가격 검색",
+  wp_busy: "가격 검색 중 …",
+  wp_none: "가격을 찾을 수 없습니다.",
+  wp_head: "웹 검색 기준 가격, {date} 기준",
+  wp_best: "최저가",
+  wp_hint: "웹 검색에서 가져온 참고 값이며 보증되지 않습니다. 배송비와 재고는 상점에서 확인해 주세요.",
+  wp_again: "다시 검색",
+  wp_sum: "{qty}병 ≈ {sum}",
   mm_to_wish: "위시리스트에 추가",
   mm_wish_added: "와인 {n}개를 위시리스트에 추가했습니다 ✓",
   celeb_label: "마실 때 색종이 & 소리",
@@ -11510,6 +11696,14 @@ zh: {
   mm_restock_note: "补货：{n} 瓶",
   mm_offer: "库存低于最低值：{name}（{n}/{min}）。要补货 {need} 瓶并加入心愿单吗？",
   mm_offer_done: "已加入心愿单 ✓",
+  wp_btn: "💶 搜索价格",
+  wp_busy: "正在搜索价格 …",
+  wp_none: "未找到价格。",
+  wp_head: "网络搜索价格，截至 {date}",
+  wp_best: "最低价",
+  wp_hint: "来自网络搜索的参考价格，不作保证。请向商店确认运费和库存情况。",
+  wp_again: "重新搜索",
+  wp_sum: "{qty} 瓶 ≈ {sum}",
   mm_to_wish: "加入心愿单",
   mm_wish_added: "已将 {n} 款葡萄酒加入心愿单 ✓",
   celeb_label: "饮用时的彩带与音效",
@@ -11878,6 +12072,14 @@ hi: {
   mm_restock_note: "दोबारा ख़रीदें: {n} बोतल(ें)",
   mm_offer: "स्टॉक न्यूनतम से कम: {name} ({n}/{min})। {need} बोतल(ें) दोबारा ख़रीदकर विशलिस्ट में जोड़ें?",
   mm_offer_done: "विशलिस्ट में जोड़ा गया ✓",
+  wp_btn: "💶 कीमतें खोजें",
+  wp_busy: "कीमतें खोज रहे हैं …",
+  wp_none: "कोई कीमत नहीं मिली।",
+  wp_head: "वेब खोज के अनुसार कीमतें, {date} तक",
+  wp_best: "सबसे सस्ता",
+  wp_hint: "वेब खोज से प्राप्त अनुमानित मान, बिना गारंटी। शिपिंग शुल्क और उपलब्धता कृपया दुकान पर जाँचें।",
+  wp_again: "फिर से खोजें",
+  wp_sum: "{qty} बोतलें ≈ {sum}",
   mm_to_wish: "विशलिस्ट में जोड़ें",
   mm_wish_added: "{n} वाइन विशलिस्ट में जोड़ी गईं ✓",
   celeb_label: "पीते समय कंफ़ेटी और ध्वनि",
@@ -14048,6 +14250,65 @@ function saveWish() {
   showToast(t('toast_added'));
 }
 
+// ═══════════════════════════════════════
+// PREISSUCHE FÜR DIE WUNSCHLISTE (KI + Websuche, 1 Guthaben je Suche; Preise ohne Links, nur Richtwerte)
+// ═══════════════════════════════════════
+const wishPriceBusy = new Set();
+function cleanPrices(p) {
+  if (!p || typeof p !== 'object' || !Array.isArray(p.items)) return null;
+  const items = p.items.filter(i => i && typeof i === 'object').map(i => ({ shop: cleanStr(i.shop, 80).trim(), price: Number(i.price), note: cleanStr(i.note, 120).trim() }))
+    .filter(i => i.shop && Number.isFinite(i.price) && i.price > 0 && i.price < 1000000)
+    .map(i => ({ shop: i.shop, price: Math.round(i.price * 100) / 100, note: i.note })).sort((a, b) => a.price - b.price).slice(0, 8);
+  if (!items.length) return null;
+  return { at: Number.isFinite(Date.parse(p.at)) ? new Date(Date.parse(p.at)).toISOString() : new Date().toISOString(), cur: cleanStr(p.cur, 6).trim() || '€', items };   // CURRENCIES steht erst weiter unten: hier nicht zugreifen (wird beim Laden aufgerufen)
+}
+async function lookupWinePrices(w) {
+  const cur = currencyName();
+  const resp = await aiFetch(SCAN_PROXY_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1500,
+      tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 3 }],
+      system: `Du bist ein Preisvergleich für Wein. Suche mit der Websuche aktuelle Verkaufspreise (Endverbraucher, 0,75-l-Flasche) für genau den genannten Wein bei Online-Weinhändlern. Antworte am Ende mit GENAU EINEM JSON-Objekt ohne Markdown: {"offers":[{"shop":"Name des Händlers","price":Zahl,"note":"kurzer Hinweis oder leer"}]}. Regeln: Nur Preise nennen, die du in den Suchergebnissen tatsächlich gesehen hast, nichts schätzen oder erfinden. Preis pro Flasche in ${cur} als Zahl ohne Währungssymbol (bei anderer Währung des Händlers umrechnen). Höchstens 5 Angebote von verschiedenen Händlern, keine URLs. Stimmt der Jahrgang nicht oder ist der Preis nur für Kartons/Magnums, das kurz in "note" schreiben (z. B. "Jahrgang 2019", "zzgl. Versand"). Findest du nichts Belastbares: {"offers":[]}.`,
+      messages: [{ role: 'user', content: `Wein: ${w.name}${w.year && !w.name.includes(String(w.year)) ? ' ' + w.year : ''}${w.region ? ', ' + w.region : ''}${w.country ? ', ' + w.country : ''}. Wo gibt es ihn aktuell am günstigsten, und was kostet eine Flasche?` }]
+    })
+  });
+  const data = await resp.json();
+  if (data.type === 'error' || !data.content) return null;
+  const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n');
+  const m = text.match(/\{[\s\S]*\}/);
+  if (!m) return null;
+  try { const o = JSON.parse(m[0]); return Array.isArray(o.offers) ? o.offers : null; } catch { return null; }
+}
+async function searchWishPrices(id) {
+  const w = wishes.find(x => x.id === id);
+  if (!w || wishPriceBusy.has(id)) return;
+  wishPriceBusy.add(id); renderWishlist();
+  try {
+    const offers = await lookupWinePrices(w);
+    if (!wishes.includes(w)) return;
+    if (offers === null) { showToast(t('toast_scanfail')); return; }
+    const p = cleanPrices({ at: new Date().toISOString(), cur: settings.currency, items: offers });
+    if (!p) { showToast(t('wp_none')); return; }
+    w.prices = p; saveWishes();
+  } catch (e) {
+    if (!e || (!e.noCredits && !e.noConsent)) showToast(t('toast_scanfail'));
+  } finally {
+    wishPriceBusy.delete(id); renderWishlist();
+  }
+}
+function wishPricesHtml(w) {
+  const p = w.prices, busy = wishPriceBusy.has(w.id);
+  const btn = `<button class="wish-action-btn wish-price-btn" onclick="searchWishPrices('${w.id}')" ${busy ? 'disabled' : ''}>${busy ? t('wp_busy') : (p ? t('wp_again') : t('wp_btn'))}</button>`;
+  if (!p) return `<div class="wish-prices">${btn}</div>`;
+  const c = CURRENCIES[p.cur] || CURRENCIES[settings.currency], money = (n) => { const v = Number.isInteger(n) ? n : n.toFixed(2); return c ? c.fmt(v) : p.cur + ' ' + v; };
+  const date = new Date(p.at).toLocaleDateString();
+  const rows = p.items.map((i, k) => `<div class="wp-row${k === 0 ? ' best' : ''}"><span class="wp-shop">${esc(i.shop)}${i.note ? '<small> · ' + esc(i.note) + '</small>' : ''}</span>${k === 0 ? '<span class="wp-badge">' + t('wp_best') + '</span>' : ''}<b>${money(i.price)}</b></div>`).join('');
+  const sum = w.qty > 1 ? `<div class="wp-sum">${t('wp_sum', { qty: w.qty, sum: money(p.items[0].price * w.qty) })}</div>` : '';
+  return `<div class="wish-prices"><div class="wp-head">${t('wp_head', { date })}</div>${rows}${sum}<div class="wp-hint">${t('wp_hint')}</div>${btn}</div>`;
+}
 function renderWishlist() {
   const el = document.getElementById('wish-list');
   if (!wishes.length) {
@@ -14060,6 +14321,7 @@ function renderWishlist() {
       <div class="wish-info">
         <div class="wish-name">${w.qty ? '<b>' + w.qty + '× </b>' : ''}${esc(w.name)}</div>
         <div class="wish-sub">${w.year||''} ${w.type?'· '+esc(TYPE_LABELS[w.type]||w.type):''}${w.grape?' · '+esc(w.grape):''}${(w.region||w.country)?' · '+esc([w.region,w.country].filter(Boolean).join(', ')):''} ${w.note?'· '+esc(w.note):''}</div>
+        ${wishPricesHtml(w)}
       </div>
       <div class="wish-actions">
         <button class="wish-action-btn" onclick="wishToKeller('${w.id}')">${t('to_cellar')}</button>
