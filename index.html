@@ -12595,7 +12595,10 @@ function setOwner(v) { settings.owner = (v||'').trim(); saveSettings(); touchDat
 // NAV
 // ═══════════════════════════════════════
 function showTab(name, btn) {
-  if (name !== 'racks') rackStoreFilter = null;   // Einlagern-Filter gilt nur für den Besuch der Regalkarte, der ihn ausgelöst hat
+  if (name !== 'racks' && rackStoreFilter) {   // Einlagern-Vorgang gilt nur für den Besuch der Regalkarte, der ihn ausgelöst hat: Filter und vorgewählten Wein verwerfen
+    if (rackSelectedWineId === rackStoreFilter) rackSelectedWineId = null;
+    rackStoreFilter = null;
+  }
   if (adminPw) { adminPw = ''; const ac = document.getElementById('admin-content'); if (ac) ac.innerHTML = ''; }   // Admin-Daten und Passwort beim Verlassen verwerfen
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
