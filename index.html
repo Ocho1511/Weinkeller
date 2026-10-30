@@ -517,6 +517,28 @@ body {
 .rack-collabel { font-size: 10px; color: var(--text-dim); text-align: center; }
 .rack-slot { width: 60px; height: 22px; position: relative; display: flex; align-items: center; }
 .rack-slot .rack-empty { flex: 1; }
+.rack-ripe { position: absolute; left: 1px; top: 1px; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.9); box-shadow: 0 0 0 1px rgba(0,0,0,.45); pointer-events: none; z-index: 2; }
+.rack-slot.tiny .rack-ripe { width: 7px; height: 7px; border-width: 1px; }
+.rack-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: -6px 0 14px; font-size: 11px; color: var(--text-muted); }
+.rack-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.rack-ripe-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; border: 1px solid rgba(255,255,255,.7); }
+.rack-toolbar { margin-bottom: 10px; }
+.rack-toggle { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--border); background: var(--card); color: var(--text-muted); font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.rack-toggle .rt-dot { width: 22px; height: 12px; border-radius: 6px; background: var(--border); position: relative; transition: background .2s; }
+.rack-toggle .rt-dot::after { content: ''; position: absolute; top: 2px; left: 2px; width: 8px; height: 8px; border-radius: 50%; background: #fff; transition: transform .2s; }
+.rack-toggle.active { color: var(--text); border-color: var(--red-alert); }
+.rack-toggle.active .rt-dot { background: var(--red-alert); }
+.rack-toggle.active .rt-dot::after { transform: translateX(10px); }
+.rack-blink-hint { font-size: 11px; color: var(--text-muted); margin: -4px 0 10px; }
+@keyframes rackBlink { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,90,90,0); } 50% { box-shadow: 0 0 0 3px rgba(255,90,90,.9), 0 0 10px 2px rgba(255,90,90,.6); } }
+@keyframes rackDot { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.6); } }
+.rack-box.blink-on .rack-slot.filled:not(.urgent) > :not(.rack-ripe):not(.rack-slot-count) { opacity: .4; }
+.rack-slot.urgent.blinking { border-radius: 6px; animation: rackBlink 1.1s ease-in-out infinite; }
+.rack-slot.urgent.blinking .rack-ripe { animation: rackDot 1.1s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .rack-slot.urgent.blinking { animation: none; box-shadow: 0 0 0 2px rgba(255,90,90,.9); }
+  .rack-slot.urgent.blinking .rack-ripe { animation: none; }
+}
 .rack-box { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
 .rack-box::-webkit-scrollbar { height: 6px; }
 .rack-box::-webkit-scrollbar-track { background: transparent; }
@@ -1748,7 +1770,7 @@ let drunkWines = cleanDrunk(safeParse(DRUNK_KEY, []));
 const DEFAULT_OWNER = "Ocho";
 const STAMP_KEY = 'weinkeller_v2_stamp';
 const SYNCBASE_KEY = 'weinkeller_v2_syncbase';
-let settings = Object.assign({currency:'€', lang:'de', racks:[], cellars:[], owner:'', storage:'local', syncCode:'', email:'', font:'inter'}, safeParse(SETTINGS_KEY, {}));
+let settings = Object.assign({currency:'€', lang:'de', racks:[], cellars:[], blinkUrgent:false, owner:'', storage:'local', syncCode:'', email:'', font:'inter'}, safeParse(SETTINGS_KEY, {}));
 settings.cellars = cleanCellars(settings.cellars);
 settings.racks = cleanRacks(settings.racks);
 fixRackCellars();
@@ -2974,6 +2996,8 @@ de: {
   rack_ph_cap: "Flaschen/Platz",
   rack_levels_title: "Ebenen: Name und Flaschen pro Platz",
   rack_level_name: "Name",
+  rack_blink: "Zuerst trinken: blinken",
+  rack_blink_hint: "Überschritten oder spätestens nächstes Jahr am Ende der Trinkreife",
   rack_cap_low: "Auf dieser Ebene liegen bis zu {n} Flaschen in einem Platz.",
   sync_code_notfound: "Code nicht gefunden – bitte prüfen",
   toast_storage_full: "Speicher voll – Änderung konnte nicht gesichert werden",
@@ -3267,6 +3291,8 @@ en: {
   rack_ph_cap: "Bottles/slot",
   rack_levels_title: "Levels: name and bottles per slot",
   rack_level_name: "Name",
+  rack_blink: "Drink first: blink",
+  rack_blink_hint: "Past their drinking window, or ending by next year",
   rack_cap_low: "Up to {n} bottles are stored in one slot on this level.",
   sync_code_notfound: "Code not found – please check it",
   toast_storage_full: "Storage full – change could not be saved",
@@ -3560,6 +3586,8 @@ es: {
   rack_ph_cap: "Botellas/hueco",
   rack_levels_title: "Niveles: nombre y botellas por hueco",
   rack_level_name: "Nombre",
+  rack_blink: "Beber primero: parpadear",
+  rack_blink_hint: "Pasados de su ventana de consumo o que terminan como tarde el año que viene",
   rack_cap_low: "En este nivel hay hasta {n} botellas en un hueco.",
   sync_code_notfound: "Código no encontrado: compruébalo",
   toast_storage_full: "Almacenamiento lleno: no se pudo guardar el cambio",
@@ -3853,6 +3881,8 @@ sv: {
   rack_ph_cap: "Flaskor/plats",
   rack_levels_title: "Hyllor: namn och flaskor per plats",
   rack_level_name: "Namn",
+  rack_blink: "Drick först: blinka",
+  rack_blink_hint: "Förbi dryckesfönstret eller slutar senast nästa år",
   rack_cap_low: "På den här hyllan finns upp till {n} flaskor på en plats.",
   sync_code_notfound: "Koden hittades inte – kontrollera den",
   toast_storage_full: "Lagringsutrymmet är fullt – ändringen kunde inte sparas",
@@ -4146,6 +4176,8 @@ da: {
   rack_ph_cap: "Flasker/plads",
   rack_levels_title: "Hylder: navn og flasker pr. plads",
   rack_level_name: "Navn",
+  rack_blink: "Drik først: blink",
+  rack_blink_hint: "Over drikkevinduet eller slutter senest næste år",
   rack_cap_low: "På denne hylde ligger op til {n} flasker på én plads.",
   sync_code_notfound: "Koden blev ikke fundet – tjek den",
   toast_storage_full: "Lageret er fuldt – ændringen kunne ikke gemmes",
@@ -4439,6 +4471,8 @@ fi: {
   rack_ph_cap: "Pulloa/paikka",
   rack_levels_title: "Tasot: nimi ja pulloja per paikka",
   rack_level_name: "Nimi",
+  rack_blink: "Juo ensin: vilku",
+  rack_blink_hint: "Juomakypsyys ohi tai päättyy viimeistään ensi vuonna",
   rack_cap_low: "Tällä tasolla yhdellä paikalla on jopa {n} pulloa.",
   sync_code_notfound: "Koodia ei löytynyt – tarkista se",
   toast_storage_full: "Tallennustila täynnä – muutosta ei voitu tallentaa",
@@ -4732,6 +4766,8 @@ ru: {
   rack_ph_cap: "Бутылок/место",
   rack_levels_title: "Ярусы: название и бутылок на место",
   rack_level_name: "Название",
+  rack_blink: "Пить первыми: мигание",
+  rack_blink_hint: "Срок истёк или заканчивается не позже следующего года",
   rack_cap_low: "На этом ярусе в одном месте лежит до {n} бутылок.",
   sync_code_notfound: "Код не найден – проверьте его",
   toast_storage_full: "Память заполнена – изменение не сохранено",
@@ -5025,6 +5061,8 @@ it: {
   rack_ph_cap: "Bottiglie/posto",
   rack_levels_title: "Ripiani: nome e bottiglie per posto",
   rack_level_name: "Nome",
+  rack_blink: "Da bere prima: lampeggia",
+  rack_blink_hint: "Oltre la finestra di consumo o in scadenza entro il prossimo anno",
   rack_cap_low: "Su questo ripiano ci sono fino a {n} bottiglie in un posto.",
   sync_code_notfound: "Codice non trovato – controllalo",
   toast_storage_full: "Memoria piena: impossibile salvare la modifica",
@@ -5318,6 +5356,8 @@ fr: {
   rack_ph_cap: "Bouteilles/empl.",
   rack_levels_title: "Niveaux : nom et bouteilles par emplacement",
   rack_level_name: "Nom",
+  rack_blink: "À boire d'abord : clignote",
+  rack_blink_hint: "Fenêtre de dégustation dépassée ou se terminant au plus tard l'an prochain",
   rack_cap_low: "Sur ce niveau, jusqu'à {n} bouteilles sont rangées dans un emplacement.",
   sync_code_notfound: "Code introuvable – vérifiez-le",
   toast_storage_full: "Stockage plein : la modification n'a pas pu être enregistrée",
@@ -5611,6 +5651,8 @@ pl: {
   rack_ph_cap: "Butelek/miejsce",
   rack_levels_title: "Poziomy: nazwa i butelek na miejsce",
   rack_level_name: "Nazwa",
+  rack_blink: "Do wypicia najpierw: miganie",
+  rack_blink_hint: "Po okresie picia lub kończy się najpóźniej w przyszłym roku",
   rack_cap_low: "Na tym poziomie w jednym miejscu leży do {n} butelek.",
   sync_code_notfound: "Nie znaleziono kodu – sprawdź go",
   toast_storage_full: "Pamięć pełna – nie udało się zapisać zmiany",
@@ -5904,6 +5946,8 @@ hu: {
   rack_ph_cap: "Üveg/hely",
   rack_levels_title: "Szintek: név és üveg helyenként",
   rack_level_name: "Név",
+  rack_blink: "Először innivaló: villog",
+  rack_blink_hint: "Lejárt az ivási időszak, vagy legkésőbb jövőre véget ér",
   rack_cap_low: "Ezen a szinten egy helyen legfeljebb {n} üveg van.",
   sync_code_notfound: "A kód nem található – ellenőrizd",
   toast_storage_full: "A tárhely megtelt – a módosítást nem sikerült menteni",
@@ -6197,6 +6241,8 @@ cs: {
   rack_ph_cap: "Lahví/místo",
   rack_levels_title: "Úrovně: název a lahví na místo",
   rack_level_name: "Název",
+  rack_blink: "Pít nejdřív: blikat",
+  rack_blink_hint: "Po době pití nebo končí nejpozději příští rok",
   rack_cap_low: "Na této úrovni je na jednom místě až {n} lahví.",
   sync_code_notfound: "Kód nebyl nalezen – zkontrolujte jej",
   toast_storage_full: "Úložiště je plné – změnu se nepodařilo uložit",
@@ -6490,6 +6536,8 @@ sk: {
   rack_ph_cap: "Fliaš/miesto",
   rack_levels_title: "Úrovne: názov a fliaš na miesto",
   rack_level_name: "Názov",
+  rack_blink: "Piť najskôr: blikať",
+  rack_blink_hint: "Po dobe pitia alebo končí najneskôr budúci rok",
   rack_cap_low: "Na tejto úrovni je na jednom mieste až {n} fliaš.",
   sync_code_notfound: "Kód sa nenašiel – skontrolujte ho",
   toast_storage_full: "Úložisko je plné – zmenu sa nepodarilo uložiť",
@@ -6783,6 +6831,8 @@ ro: {
   rack_ph_cap: "Sticle/loc",
   rack_levels_title: "Niveluri: nume și sticle pe loc",
   rack_level_name: "Nume",
+  rack_blink: "De băut întâi: clipește",
+  rack_blink_hint: "Fereastra de consum depășită sau se încheie cel târziu anul viitor",
   rack_cap_low: "Pe acest nivel, într-un loc sunt până la {n} sticle.",
   sync_code_notfound: "Codul nu a fost găsit – verifică-l",
   toast_storage_full: "Spațiu plin – modificarea nu a putut fi salvată",
@@ -7076,6 +7126,8 @@ hr: {
   rack_ph_cap: "Boca/mjesto",
   rack_levels_title: "Razine: naziv i boca po mjestu",
   rack_level_name: "Naziv",
+  rack_blink: "Piti prvo: treperi",
+  rack_blink_hint: "Prošlo razdoblje pijenja ili završava najkasnije iduće godine",
   rack_cap_low: "Na ovoj razini u jednom je mjestu do {n} boca.",
   sync_code_notfound: "Kod nije pronađen – provjerite ga",
   toast_storage_full: "Pohrana je puna – promjena nije spremljena",
@@ -7369,6 +7421,8 @@ pt: {
   rack_ph_cap: "Garrafas/lugar",
   rack_levels_title: "Níveis: nome e garrafas por lugar",
   rack_level_name: "Nome",
+  rack_blink: "Beber primeiro: piscar",
+  rack_blink_hint: "Fora da janela de consumo ou a terminar no máximo no próximo ano",
   rack_cap_low: "Neste nível há até {n} garrafas num lugar.",
   sync_code_notfound: "Código não encontrado – verifique-o",
   toast_storage_full: "Armazenamento cheio – não foi possível guardar a alteração",
@@ -7662,6 +7716,8 @@ no: {
   rack_ph_cap: "Flasker/plass",
   rack_levels_title: "Hyller: navn og flasker per plass",
   rack_level_name: "Navn",
+  rack_blink: "Drikk først: blink",
+  rack_blink_hint: "Forbi drikkevinduet eller slutter senest neste år",
   rack_cap_low: "På denne hyllen ligger opptil {n} flasker på én plass.",
   sync_code_notfound: "Koden ble ikke funnet – sjekk den",
   toast_storage_full: "Lagringen er full – endringen kunne ikke lagres",
@@ -7955,6 +8011,8 @@ nl: {
   rack_ph_cap: "Flessen/plek",
   rack_levels_title: "Niveaus: naam en flessen per plek",
   rack_level_name: "Naam",
+  rack_blink: "Eerst drinken: knipperen",
+  rack_blink_hint: "Drinkvenster voorbij of eindigt uiterlijk volgend jaar",
   rack_cap_low: "Op dit niveau liggen tot {n} flessen op één plek.",
   sync_code_notfound: "Code niet gevonden – controleer hem",
   toast_storage_full: "Opslag vol – wijziging kon niet worden opgeslagen",
@@ -9108,7 +9166,13 @@ function renderRacks() {
   for (let e = 1; e <= r.rows; e++) total += rackCols(r, e) * rackCap(r, e);
   map.forEach((v, k) => { const [e, p] = k.split('|'); if (+e <= r.rows && +p <= rackCols(r, +e)) filled += v.length; });
 
-  let html = `<div class="rack-box"><div class="rack-box-title">${esc(r.name)}</div><div class="rack-box-sub">${filled} / ${total} ${t('racks_filled')}</div>`;
+  // Trinkreife-Punkt an jeder Flasche; auf Wunsch blinken die Weine, die zuerst getrunken werden sollten
+  const blink = !!settings.blinkUrgent;
+  let urgentN = 0;
+  map.forEach((v, k) => { const [e, p] = k.split('|'); if (+e <= r.rows && +p <= rackCols(r, +e)) v.forEach(x => { const ri = ripeInfo(x.w); if (ri && ri.urgent) urgentN++; }); });
+  let html = `<div class="rack-toolbar"><button class="rack-toggle${blink ? ' active' : ''}" onclick="toggleRackBlink()" aria-pressed="${blink}"><span class="rt-dot"></span>${t('rack_blink')}${urgentN ? ' · ' + urgentN : ''}</button></div>`
+    + (blink ? `<div class="rack-blink-hint">${t('rack_blink_hint')}</div>` : '')
+    + `<div class="rack-box${blink ? ' blink-on' : ''}"><div class="rack-box-title">${esc(r.name)}</div><div class="rack-box-sub">${filled} / ${total} ${t('racks_filled')}</div>`;
   // Flaschengröße an die Spaltenzahl anpassen (60–96 px); ab 76 px steht der Jahrgang auf dem Etikett
   // Verfügbare Breite = Innenbreite des Containers - Box-Rahmen/-Padding (2 + 28) - Ebenen-Spalte (28)
   const elCs = getComputedStyle(el);
@@ -9139,11 +9203,15 @@ function renderRacks() {
         const w = entries[0].w;
         const picked = rackFilledSlot && rackFilledSlot.rack === r.id && rackFilledSlot.e === e && rackFilledSlot.p === p;
         const badge = cap > 1 ? `<span class="rack-slot-count">${entries.length}/${cap}</span>` : '';
-        html += `<div class="rack-slot filled${picked?' picked':''}${dropping && entries.length < cap ? ' droppable' : ''}" style="width:${slotW}px;height:${slotH}px" onclick="slotClick(${e},${p})" title="${esc(w.name)}${w.year?' · '+w.year:''}">${bottleVisual(w, slotW, slotMode)}${badge}</div>`;
+        let topKey = null, urgent = false;   // im Fach (Kiste) zählt der dringendste Wein
+        entries.forEach(x => { const ri = ripeInfo(x.w); if (!ri) return; if (ri.urgent) urgent = true; if (!topKey || RIPE_PRIO[ri.key] > RIPE_PRIO[topKey]) topKey = ri.key; });
+        const dot = topKey ? `<span class="rack-ripe ripeness-${RIPE_CLASS[topKey]}"></span>` : '';
+        html += `<div class="rack-slot filled${picked?' picked':''}${dropping && entries.length < cap ? ' droppable' : ''}${urgent ? ' urgent' : ''}${urgent && blink ? ' blinking' : ''}${slotW < 30 ? ' tiny' : ''}" style="width:${slotW}px;height:${slotH}px" onclick="slotClick(${e},${p})" title="${esc(w.name)}${w.year?' · '+w.year:''}">${bottleVisual(w, slotW, slotMode)}${badge}${dot}</div>`;
       } else html += `<div class="rack-slot${dropping?' droppable':''}" style="width:${slotW}px;height:${slotH}px" onclick="slotClick(${e},${p})"><div class="rack-empty" style="height:${Math.max(15, slotH-7)}px"></div></div>`;
     }
   }
   html += `</div></div>`;
+  html += `<div class="rack-legend">` + ['young', 'optimal', 'peak', 'over'].map(k => `<span><i class="rack-ripe-dot ripeness-${RIPE_CLASS[k]}"></i>${t('seg_' + k)}</span>`).join('') + `</div>`;
 
   // Umlagern: Hinweis mit Abbrechen
   if (rackMove) {
@@ -9190,6 +9258,16 @@ function renderRacks() {
     html += `<div style="font-size:13px;color:var(--text-muted)">${t('racks_all_placed')}</div>`;
   }
   el.innerHTML = html;
+}
+function toggleRackBlink() { settings.blinkUrgent = !settings.blinkUrgent; saveSettings(); renderRacks(); }
+// Trinkreife eines Weins fürs Regal: Zustand (wie in der Trinkreife-Ansicht) und "dringend" = überschritten
+// oder spätestens nächstes Jahr am Ende des Trinkfensters; null ohne Angabe
+const RIPE_PRIO = { young: 0, optimal: 1, peak: 2, over: 3 };
+const RIPE_CLASS = { young: 'jung', optimal: 'optimal', peak: 'peak', over: 'over' };
+function ripeInfo(w) {
+  if (!(w.drinkFrom || w.drinkTo)) return null;
+  const now = new Date().getFullYear(), to = w.drinkTo || (w.drinkFrom || now) + 5;
+  return { key: ripeStatusKey(w), urgent: to - now <= 1 };
 }
 function setRackActive(i) { rackActive = i; rackFilledSlot = null; renderRacks(); }
 
