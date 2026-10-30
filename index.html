@@ -572,6 +572,7 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .loc-chip.loc-store { border-color: var(--gold); color: var(--gold); }
 .rack-store-banner { display: flex; align-items: center; gap: 10px; justify-content: space-between; margin: 0 0 12px; padding: 10px 12px; border: 1px solid var(--gold); border-radius: 12px; background: var(--card); font-size: 13px; font-weight: 600; color: var(--gold-light, var(--gold)); }
 .rack-store-banner .wine-btn { flex: none; width: auto; padding: 6px 12px; }
+.rack-store-banner .rsb-btns { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
 .card-slots .ripeness-loc { margin: 0 0 10px; }
 @keyframes slotFlash { 0%, 100% { box-shadow: 0 0 0 0 rgba(196,162,74,0); } 50% { box-shadow: 0 0 0 4px rgba(196,162,74,.95), 0 0 14px 3px rgba(196,162,74,.6); } }
 .rack-slot.slot-flash { border-radius: 6px; animation: slotFlash .8s ease-in-out 3; }
@@ -3374,6 +3375,8 @@ de: {
   store_now: "Einlagern",
   store_filter: "Einlagern: {name} · {n} Fl. – freies Fach antippen",
   store_filter_off: "Alle anzeigen",
+  store_back: "← Zum Keller",
+  store_done: "✓ {name}: alle Flaschen eingelagert",
   rack_ph_cap: "Flaschen/Platz",
   rack_levels_title: "Ebenen: Name und Flaschen pro Platz",
   rack_level_name: "Name",
@@ -3753,6 +3756,8 @@ en: {
   store_now: "Store",
   store_filter: "Store: {name} · {n} btl. – tap a free slot",
   store_filter_off: "Show all",
+  store_back: "← To cellar",
+  store_done: "✓ {name}: all bottles stored",
   rack_ph_cap: "Bottles/slot",
   rack_levels_title: "Levels: name and bottles per slot",
   rack_level_name: "Name",
@@ -4132,6 +4137,8 @@ es: {
   store_now: "Colocar",
   store_filter: "Colocar: {name} · {n} bot. – toca un hueco libre",
   store_filter_off: "Mostrar todo",
+  store_back: "← A la bodega",
+  store_done: "✓ {name}: todas las botellas colocadas",
   rack_ph_cap: "Botellas/hueco",
   rack_levels_title: "Niveles: nombre y botellas por hueco",
   rack_level_name: "Nombre",
@@ -4511,6 +4518,8 @@ sv: {
   store_now: "Placera",
   store_filter: "Placera: {name} · {n} fl. – tryck på en ledig plats",
   store_filter_off: "Visa alla",
+  store_back: "← Till källaren",
+  store_done: "✓ {name}: alla flaskor placerade",
   rack_ph_cap: "Flaskor/plats",
   rack_levels_title: "Hyllor: namn och flaskor per plats",
   rack_level_name: "Namn",
@@ -4890,6 +4899,8 @@ da: {
   store_now: "Placér",
   store_filter: "Placér: {name} · {n} fl. – tryk på en ledig plads",
   store_filter_off: "Vis alle",
+  store_back: "← Til kælderen",
+  store_done: "✓ {name}: alle flasker placeret",
   rack_ph_cap: "Flasker/plads",
   rack_levels_title: "Hylder: navn og flasker pr. plads",
   rack_level_name: "Navn",
@@ -5269,6 +5280,8 @@ fi: {
   store_now: "Sijoita",
   store_filter: "Sijoita: {name} · {n} pul. – napauta vapaata paikkaa",
   store_filter_off: "Näytä kaikki",
+  store_back: "← Kellariin",
+  store_done: "✓ {name}: kaikki pullot sijoitettu",
   rack_ph_cap: "Pulloa/paikka",
   rack_levels_title: "Tasot: nimi ja pulloja per paikka",
   rack_level_name: "Nimi",
@@ -5648,6 +5661,8 @@ ru: {
   store_now: "Разместить",
   store_filter: "Разместить: {name} · {n} бут. – коснитесь свободной ячейки",
   store_filter_off: "Показать все",
+  store_back: "← В погреб",
+  store_done: "✓ {name}: все бутылки размещены",
   rack_ph_cap: "Бутылок/место",
   rack_levels_title: "Ярусы: название и бутылок на место",
   rack_level_name: "Название",
@@ -6027,6 +6042,8 @@ it: {
   store_now: "Riponi",
   store_filter: "Riponi: {name} · {n} bott. – tocca uno scomparto libero",
   store_filter_off: "Mostra tutto",
+  store_back: "← Alla cantina",
+  store_done: "✓ {name}: tutte le bottiglie riposte",
   rack_ph_cap: "Bottiglie/posto",
   rack_levels_title: "Ripiani: nome e bottiglie per posto",
   rack_level_name: "Nome",
@@ -6406,6 +6423,8 @@ fr: {
   store_now: "Ranger",
   store_filter: "Ranger : {name} · {n} bout. – touchez un emplacement libre",
   store_filter_off: "Tout afficher",
+  store_back: "← Vers la cave",
+  store_done: "✓ {name} : toutes les bouteilles rangées",
   rack_ph_cap: "Bouteilles/empl.",
   rack_levels_title: "Niveaux : nom et bouteilles par emplacement",
   rack_level_name: "Nom",
@@ -6785,6 +6804,8 @@ pl: {
   store_now: "Ułóż",
   store_filter: "Ułóż: {name} · {n} but. – dotknij wolne miejsce",
   store_filter_off: "Pokaż wszystko",
+  store_back: "← Do piwnicy",
+  store_done: "✓ {name}: wszystkie butelki ułożone",
   rack_ph_cap: "Butelek/miejsce",
   rack_levels_title: "Poziomy: nazwa i butelek na miejsce",
   rack_level_name: "Nazwa",
@@ -7164,6 +7185,8 @@ hu: {
   store_now: "Elhelyez",
   store_filter: "Elhelyezés: {name} · {n} üveg – koppints egy szabad helyre",
   store_filter_off: "Összes mutatása",
+  store_back: "← A pincéhez",
+  store_done: "✓ {name}: minden üveg elhelyezve",
   rack_ph_cap: "Üveg/hely",
   rack_levels_title: "Szintek: név és üveg helyenként",
   rack_level_name: "Név",
@@ -7543,6 +7566,8 @@ cs: {
   store_now: "Uložit",
   store_filter: "Uložit: {name} · {n} lahví – klepni na volné místo",
   store_filter_off: "Zobrazit vše",
+  store_back: "← Do sklepa",
+  store_done: "✓ {name}: všechny lahve uloženy",
   rack_ph_cap: "Lahví/místo",
   rack_levels_title: "Úrovně: název a lahví na místo",
   rack_level_name: "Název",
@@ -7922,6 +7947,8 @@ sk: {
   store_now: "Uložiť",
   store_filter: "Uložiť: {name} · {n} fliaš – ťukni na voľné miesto",
   store_filter_off: "Zobraziť všetko",
+  store_back: "← Do pivnice",
+  store_done: "✓ {name}: všetky fľaše uložené",
   rack_ph_cap: "Fliaš/miesto",
   rack_levels_title: "Úrovne: názov a fliaš na miesto",
   rack_level_name: "Názov",
@@ -8301,6 +8328,8 @@ ro: {
   store_now: "Așază",
   store_filter: "Așază: {name} · {n} stic. – atinge un loc liber",
   store_filter_off: "Arată tot",
+  store_back: "← La pivniță",
+  store_done: "✓ {name}: toate sticlele așezate",
   rack_ph_cap: "Sticle/loc",
   rack_levels_title: "Niveluri: nume și sticle pe loc",
   rack_level_name: "Nume",
@@ -8680,6 +8709,8 @@ hr: {
   store_now: "Pohrani",
   store_filter: "Pohrani: {name} · {n} boc. – dodirni slobodno mjesto",
   store_filter_off: "Prikaži sve",
+  store_back: "← U podrum",
+  store_done: "✓ {name}: sve boce pohranjene",
   rack_ph_cap: "Boca/mjesto",
   rack_levels_title: "Razine: naziv i boca po mjestu",
   rack_level_name: "Naziv",
@@ -9059,6 +9090,8 @@ pt: {
   store_now: "Arrumar",
   store_filter: "Arrumar: {name} · {n} gar. – toca num lugar livre",
   store_filter_off: "Mostrar tudo",
+  store_back: "← Para a adega",
+  store_done: "✓ {name}: todas as garrafas arrumadas",
   rack_ph_cap: "Garrafas/lugar",
   rack_levels_title: "Níveis: nome e garrafas por lugar",
   rack_level_name: "Nome",
@@ -9438,6 +9471,8 @@ no: {
   store_now: "Plasser",
   store_filter: "Plasser: {name} · {n} fl. – trykk på en ledig plass",
   store_filter_off: "Vis alle",
+  store_back: "← Til kjelleren",
+  store_done: "✓ {name}: alle flasker plassert",
   rack_ph_cap: "Flasker/plass",
   rack_levels_title: "Hyller: navn og flasker per plass",
   rack_level_name: "Navn",
@@ -9817,6 +9852,8 @@ nl: {
   store_now: "Opbergen",
   store_filter: "Opbergen: {name} · {n} fl. – tik op een vrij vak",
   store_filter_off: "Toon alles",
+  store_back: "← Naar de kelder",
+  store_done: "✓ {name}: alle flessen opgeborgen",
   rack_ph_cap: "Flessen/plek",
   rack_levels_title: "Niveaus: naam en flessen per plek",
   rack_level_name: "Naam",
@@ -10196,6 +10233,8 @@ el: {
   store_now: "Τοποθέτηση",
   store_filter: "Τοποθέτηση: {name} · {n} φιάλ. – πατήστε μια ελεύθερη θέση",
   store_filter_off: "Εμφάνιση όλων",
+  store_back: "← Στο κελάρι",
+  store_done: "✓ {name}: όλες οι φιάλες τοποθετήθηκαν",
   rack_ph_cap: "Φιάλες/θέση",
   rack_levels_title: "Επίπεδα: όνομα και φιάλες ανά θέση",
   rack_level_name: "Όνομα",
@@ -10575,6 +10614,8 @@ uk: {
   store_now: "Розмістити",
   store_filter: "Розмістити: {name} · {n} пл. – торкніться вільного місця",
   store_filter_off: "Показати все",
+  store_back: "← До погреба",
+  store_done: "✓ {name}: усі пляшки розміщено",
   rack_ph_cap: "Пляшок/місце",
   rack_levels_title: "Рівні: назва та кількість пляшок у місці",
   rack_level_name: "Назва",
@@ -10954,6 +10995,8 @@ ja: {
   store_now: "配置する",
   store_filter: "配置: {name} · {n}本 – 空いている場所をタップ",
   store_filter_off: "すべて表示",
+  store_back: "← セラーへ戻る",
+  store_done: "✓ {name}: すべて配置しました",
   rack_ph_cap: "ボトル数/場所",
   rack_levels_title: "段: 名前と1か所あたりのボトル数",
   rack_level_name: "名前",
@@ -11333,6 +11376,8 @@ ko: {
   store_now: "보관하기",
   store_filter: "보관: {name} · {n}병 – 빈 칸을 탭하세요",
   store_filter_off: "모두 보기",
+  store_back: "← 셀러로",
+  store_done: "✓ {name}: 모든 병 보관 완료",
   rack_ph_cap: "칸당 병 수",
   rack_levels_title: "단: 이름과 칸당 병 수",
   rack_level_name: "이름",
@@ -11712,6 +11757,8 @@ zh: {
   store_now: "存放",
   store_filter: "存放：{name} · {n} 瓶 – 请点按空位",
   store_filter_off: "显示全部",
+  store_back: "← 返回酒窖",
+  store_done: "✓ {name}：全部已存放",
   rack_ph_cap: "瓶/位",
   rack_levels_title: "层：名称及每位瓶数",
   rack_level_name: "名称",
@@ -12091,6 +12138,8 @@ hi: {
   store_now: "रखें",
   store_filter: "रखें: {name} · {n} बोतल – खाली स्थान पर टैप करें",
   store_filter_off: "सब दिखाएँ",
+  store_back: "← सेलर पर",
+  store_done: "✓ {name}: सभी बोतलें रखी गईं",
   rack_ph_cap: "बोतलें/स्थान",
   rack_levels_title: "स्तर: नाम और प्रति स्थान बोतलें",
   rack_level_name: "नाम",
@@ -13381,6 +13430,7 @@ let rackActive = 0;
 let rackSelectedWineId = null;  // Wein aus „Nicht zugeordnet", der gerade eingeräumt wird
 let rackFilledSlot = null;      // markiertes belegtes Fach {rack, e, p}
 let rackMove = null;            // Flasche, die gerade umgelagert wird {id, rack, e, p}
+let rackStoreBackY = 0;         // Scrollstand der Keller-Liste, zu dem "Zum Keller" zurückkehrt
 let rackStoreFilter = null;     // Wein-ID: Regalkarte zeigt nur die noch nicht eingelagerten Flaschen dieses Weins (Einlagern-Knopf der Keller-Karte)
 function rackById(id) { return settings.racks.find(r => r.id === id) || null; }
 // Alle Ebenen haben gleich viele Plätze; Flaschen pro Platz: Standard des Regals, je Ebene überschreibbar (r.lv[Ebene].cap)
@@ -13604,9 +13654,11 @@ function renderRacks() {
     });
   });
   const sw = rackStoreFilter ? wines.find(x => x.id === rackStoreFilter) : null;
-  if (rackStoreFilter && (!sw || unplacedCount(sw) < 1)) { rackStoreFilter = null; if (sw) rackSelectedWineId = null; }
-  else if (sw && !rackSelectedWineId) rackSelectedWineId = sw.id;
-  let html = (rackStoreFilter && sw ? `<div class="rack-store-banner"><span>📥 ${esc(t('store_filter', { name: sw.name + (sw.year ? ' ' + sw.year : ''), n: unplacedCount(sw) }))}</span><button class="wine-btn" onclick="clearStoreFilter()">${t('store_filter_off')}</button></div>` : '') + `<div class="rack-scanbar"><button class="scan-btn" onclick="scanShelf()">${t('shelf_scan')}</button></div><div class="rack-toolbar"><span class="rack-toolbar-lbl">${t('rack_blink_lbl')}</span>`
+  if (rackStoreFilter && !sw) rackStoreFilter = null;
+  const swOpen = sw ? unplacedCount(sw) : 0, swName = sw ? sw.name + (sw.year ? ' ' + sw.year : '') : '';
+  if (sw && swOpen < 1 && rackSelectedWineId === sw.id) rackSelectedWineId = null;
+  else if (sw && swOpen > 0 && !rackSelectedWineId) rackSelectedWineId = sw.id;
+  let html = (sw ? `<div class="rack-store-banner"><span>${swOpen ? '📥 ' + esc(t('store_filter', { name: swName, n: swOpen })) : esc(t('store_done', { name: swName }))}</span><span class="rsb-btns">${swOpen ? `<button class="wine-btn" onclick="clearStoreFilter()">${t('store_filter_off')}</button>` : ''}<button class="wine-btn primary" onclick="backFromStore()">${t('store_back')}</button></span></div>` : '') + `<div class="rack-scanbar"><button class="scan-btn" onclick="scanShelf()">${t('shelf_scan')}</button></div><div class="rack-toolbar"><span class="rack-toolbar-lbl">${t('rack_blink_lbl')}</span>`
     + BLINKS.map(([key, label, st]) => `<button class="rack-toggle${blinkOn[key] ? ' active' : ''}" onclick="toggleRackBlink('${key}')" aria-pressed="${blinkOn[key]}"><span class="rt-dot"></span>${st ? `<i class="rack-ripe-dot ripeness-${RIPE_CLASS[st]}"></i>` : ''}${esc(label)}${blinkN[key] ? ' · ' + blinkN[key] : ''}</button>`).join('')
     + `</div>`
     + (blinkOn.Urgent ? `<div class="rack-blink-hint">${t('rack_blink_hint')}</div>` : '')
@@ -13683,7 +13735,7 @@ function renderRacks() {
   });
 
   // Nicht zugeordnet – Tippen zum Platzieren
-  const unplaced = wines.filter(w => unplacedCount(w) > 0 && (!rackStoreFilter || w.id === rackStoreFilter));
+  const unplaced = wines.filter(w => unplacedCount(w) > 0 && (!sw || swOpen < 1 || w.id === sw.id));
   if (rackSelectedWineId && !unplaced.some(w => w.id === rackSelectedWineId)) rackSelectedWineId = null;
   html += `<div class="stats-title" style="margin:8px 0 10px">${t('racks_unassigned')} (${unplaced.length})</div>`;
   if (unplaced.length) {
@@ -13724,6 +13776,7 @@ function wineSlotChips(w) {
 function storeWine(id) {
   const w = wines.find(x => x.id === id);
   if (!w || !settings.racks.length) return;
+  rackStoreBackY = window.scrollY || 0;
   rackSelectedWineId = id; rackFilledSlot = null; rackMove = null;
   showTab('racks', document.querySelector('.nav-btn[onclick*="showTab(\'racks\'"]'));
   rackStoreFilter = id;
@@ -13731,6 +13784,14 @@ function storeWine(id) {
   window.scrollTo({ top: 0 });
 }
 function clearStoreFilter() { rackStoreFilter = null; rackSelectedWineId = null; renderRacks(); }
+// Zurück zur Keller-Liste (an dieselbe Stelle), egal ob ein-, teil- oder nicht eingelagert wurde
+function backFromStore() {
+  const y = rackStoreBackY;
+  rackSelectedWineId = null;
+  showTab('keller', document.querySelector('.nav-btn[onclick*="showTab(\'keller\'"]'));
+  renderKeller();
+  window.scrollTo({ top: y });
+}
 // Zum Platz im Regal springen: Regal wählen, Fach markieren, hinscrollen und kurz aufleuchten lassen
 function goToSlot(rackId, e, p) {
   const i = settings.racks.findIndex(r => r.id === rackId);
