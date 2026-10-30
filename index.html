@@ -2411,7 +2411,7 @@ function shoppingItems() {
   const items = [];
   wines.forEach(w => mmInfo(w).forEach(r => { if (r.low) items.push({ name: w.name, year: w.year, need: (r.max != null ? r.max : r.min) - r.stock, stock: r.stock, min: r.min }); }));
   wishes.forEach(w => {
-    if (!w.restock || wines.some(x => x.name === w.name && (x.year || null) === (w.year || null))) return;   // Wein ist wieder im Keller: steht ggf. schon oben
+    if (!w.restock || wines.some(x => sameWine(x, w))) return;   // Wein ist wieder im Keller: steht ggf. schon oben
     const mm = mmOf(w.minMax), target = w.qty || (mm.max != null ? mm.max : (mm.min || 0));
     if (target > 0) items.push({ name: w.name, year: w.year, need: target, stock: 0, min: mm.min });
   });
@@ -2450,7 +2450,14 @@ function makeRestockWish(w, need) {
 }
 // Anzahl der zu beschaffenden Flaschen: Maximum (sonst Minimum) minus Bestand, mindestens 1
 const restockNeed = (row) => Math.max(1, (row.max != null ? row.max : row.min) - row.stock);
-const hasRestockWish = (w) => wishes.some(x => x.restock && x.name === w.name && (x.year || null) === (w.year || null));
+const hasRestockWish = (w) => wishes.some(x => x.restock && sameWine(x, w));
+const normName = s => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+// Gleicher Wein = Name + Jahrgang + Rebsorte (Groß-/Kleinschreibung und Leerzeichen egal); fehlt bei einem von beiden die Rebsorte, zählt sie nicht
+function sameWine(a, b) {
+  if (normName(a.name) !== normName(b.name) || (a.year || null) !== (b.year || null)) return false;
+  const ga = normName(a.grape), gb = normName(b.grape);
+  return !ga || !gb || ga === gb;
+}
 // Vorschlag nach dem Trinken: Wein mit der fehlenden Menge auf die Wunschliste setzen (Min/Max wandert mit)
 function offerRestock(w, row) {
   if (hasRestockWish(w)) return;
@@ -12891,7 +12898,6 @@ function saveWine() {
   // Ort der ersten Flasche kommt aus dem Formular; weitere Flaschen (placements) bleiben beim Bearbeiten erhalten.
   // Ein Platz fasst so viele Flaschen, wie das Regal erlaubt (Weinregal: 1, Boden/Kiste: mehr).
   const oldWine = editId ? wines.find(w => w.id === editId) : null;
-  const sameWineName = (a, b) => a.name.toLowerCase().trim() === b.name.toLowerCase().trim() && (a.year||null) === (b.year||null);
   const sameSlot = (a, b) => !!a && !!b && a.rack === b.rack && a.e === b.e && a.p === b.p;
   const nz = v => v || null;
   const locUnchanged = !!oldWine && nz(wine.locRegal) === nz(oldWine.locRegal) && nz(wine.locEbene) === nz(oldWine.locEbene) && nz(wine.locPlatz) === nz(oldWine.locPlatz);
@@ -12908,7 +12914,7 @@ function saveWine() {
       if (used >= rackCap(typedRack, typed.e)) {
         const clash = (entries.find(x => x.w.id !== wine.id) || entries[0] || {}).w;
         // Neuer Eintrag desselben Weins darf sich den Platz teilen (wird unten zusammengeführt)
-        if (!(clash && !editId && sameWineName(clash, wine))) { showToast(t('toast_slot_taken', { w: clash ? clash.name : '' })); return; }
+        if (!(clash && !editId && sameWine(clash, wine))) { showToast(t('toast_slot_taken', { w: clash ? clash.name : '' })); return; }
       }
     }
     list = typed ? [typed].concat(list.slice(1)) : list.slice(1);
@@ -12918,8 +12924,7 @@ function saveWine() {
     wines = wines.map(w => w.id === editId ? wine : w);
     showToast(t('toast_updated'));
   } else {
-    const norm = s => String(s||'').toLowerCase().replace(/\s+/g,' ').trim();
-    const existing = wines.find(w => norm(w.name) === norm(wine.name) && (w.year||null) === (wine.year||null));
+    const existing = wines.find(w => sameWine(w, wine));
     if (existing) {
       existing.count = (existing.count||1) + (wine.count||1);
       ['region','country','grape','locRegal','locEbene','locPlatz','drinkFrom','drinkTo','price','image','rating','note','ean','photo'].forEach(k => {
@@ -14385,9 +14390,8 @@ function deleteWish(id) {
 function wishToKeller(id) {
   const w = wishes.find(x=>x.id===id);
   if (!w) return;
-  const norm = s => String(s||'').toLowerCase().replace(/\s+/g,' ').trim();
-  const ex = wines.find(x => norm(x.name) === norm(w.name) && (x.year||null) === (w.year||null));
-  if (ex) { ex.count = (ex.count||1) + (w.qty || 1); if (!ex.note && w.note) ex.note = w.note; }
+  const ex = wines.find(x => sameWine(x, w));
+  if (ex) { ex.count = (ex.count||1) + (w.qty || 1); if (!ex.note && w.note) ex.note = w.note; if (!ex.grape && w.grape) ex.grape = w.grape; }
   else wines.push(cleanWine({ id: Date.now().toString(), name: w.name, year: w.year, count: w.qty || 1, type: w.type, region: w.region, country: w.country, grape: w.grape, note: w.note, minMax: w.minMax, added: new Date().toISOString() }));
   save();
   wishes = wishes.filter(x=>x.id!==id);
