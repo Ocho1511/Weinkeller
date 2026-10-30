@@ -519,6 +519,13 @@ body {
 .rack-slot .rack-empty { flex: 1; }
 .rack-ripe { position: absolute; left: 1px; top: 1px; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.9); box-shadow: 0 0 0 1px rgba(0,0,0,.45); pointer-events: none; z-index: 2; }
 .rack-slot.tiny .rack-ripe { width: 7px; height: 7px; border-width: 1px; }
+.ripeness-loc { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: -6px 0 10px; }
+.loc-chip { border: 1px solid var(--border); background: var(--bg, transparent); color: var(--gold-light); border-radius: 999px; padding: 4px 10px; font-family: inherit; font-size: 11px; font-weight: 600; cursor: pointer; }
+.loc-chip:active { background: var(--card); }
+.loc-open, .loc-text { font-size: 11px; color: var(--text-muted); }
+@keyframes slotFlash { 0%, 100% { box-shadow: 0 0 0 0 rgba(196,162,74,0); } 50% { box-shadow: 0 0 0 4px rgba(196,162,74,.95), 0 0 14px 3px rgba(196,162,74,.6); } }
+.rack-slot.slot-flash { border-radius: 6px; animation: slotFlash .8s ease-in-out 3; }
+@media (prefers-reduced-motion: reduce) { .rack-slot.slot-flash { animation: none; } }
 .rack-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: -6px 0 14px; font-size: 11px; color: var(--text-muted); }
 .rack-legend span { display: inline-flex; align-items: center; gap: 5px; }
 .rack-ripe-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; border: 1px solid rgba(255,255,255,.7); }
@@ -9206,7 +9213,7 @@ function renderRacks() {
         let topKey = null, urgent = false;   // im Fach (Kiste) zählt der dringendste Wein
         entries.forEach(x => { const ri = ripeInfo(x.w); if (!ri) return; if (ri.urgent) urgent = true; if (!topKey || RIPE_PRIO[ri.key] > RIPE_PRIO[topKey]) topKey = ri.key; });
         const dot = topKey ? `<span class="rack-ripe ripeness-${RIPE_CLASS[topKey]}"></span>` : '';
-        html += `<div class="rack-slot filled${picked?' picked':''}${dropping && entries.length < cap ? ' droppable' : ''}${urgent ? ' urgent' : ''}${urgent && blink ? ' blinking' : ''}${slotW < 30 ? ' tiny' : ''}" style="width:${slotW}px;height:${slotH}px" onclick="slotClick(${e},${p})" title="${esc(w.name)}${w.year?' · '+w.year:''}">${bottleVisual(w, slotW, slotMode)}${badge}${dot}</div>`;
+        html += `<div class="rack-slot filled${picked?' picked':''}${dropping && entries.length < cap ? ' droppable' : ''}${urgent ? ' urgent' : ''}${urgent && blink ? ' blinking' : ''}${slotW < 30 ? ' tiny' : ''}" data-slot="${e}|${p}" style="width:${slotW}px;height:${slotH}px" onclick="slotClick(${e},${p})" title="${esc(w.name)}${w.year?' · '+w.year:''}">${bottleVisual(w, slotW, slotMode)}${badge}${dot}</div>`;
       } else html += `<div class="rack-slot${dropping?' droppable':''}" style="width:${slotW}px;height:${slotH}px" onclick="slotClick(${e},${p})"><div class="rack-empty" style="height:${Math.max(15, slotH-7)}px"></div></div>`;
     }
   }
@@ -9258,6 +9265,37 @@ function renderRacks() {
     html += `<div style="font-size:13px;color:var(--text-muted)">${t('racks_all_placed')}</div>`;
   }
   el.innerHTML = html;
+}
+// Lagerplätze eines Weins als antippbare Chips (Trinkreife-Ansicht): Klick springt ins Regal auf genau diesen Platz
+function wineSlotChips(w) {
+  const vp = validPlacements(w), groups = new Map();
+  vp.forEach(x => { const k = x.rack + '|' + x.e + '|' + x.p, g = groups.get(k); if (g) g.n++; else groups.set(k, { x, n: 1 }); });
+  let h = '';
+  groups.forEach(g => {
+    const r = rackById(g.x.rack);
+    h += `<button class="loc-chip" onclick="event.stopPropagation();goToSlot('${r.id}',${g.x.e},${g.x.p})">📍 ${esc(r.name)} · ${esc(levelLabel(r, g.x.e))}/P${g.x.p}${g.n > 1 ? ' ×' + g.n : ''}</button>`;
+  });
+  const open = unplacedCount(w);
+  if (vp.length && open > 0) h += `<span class="loc-open">${esc(t('loc_open', { n: open }))}</span>`;
+  if (!vp.length) {
+    const txt = formatLocation(w);
+    h = txt ? `<span class="loc-text">📍 ${esc(txt)}</span>` : `<span class="loc-open">${esc(t('loc_open', { n: w.count || 1 }))}</span>`;
+  }
+  return `<div class="ripeness-loc">${h}</div>`;
+}
+// Zum Platz im Regal springen: Regal wählen, Fach markieren, hinscrollen und kurz aufleuchten lassen
+function goToSlot(rackId, e, p) {
+  const i = settings.racks.findIndex(r => r.id === rackId);
+  if (i < 0) return;
+  rackActive = i; rackFilledSlot = { rack: rackId, e, p }; rackSelectedWineId = null; rackMove = null;
+  showTab('racks', document.querySelector('.nav-btn[onclick*="showTab(\'racks\'"]'));
+  setTimeout(() => {
+    const el = document.querySelector('.rack-slot[data-slot="' + e + '|' + p + '"]');
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.classList.add('slot-flash');
+    setTimeout(() => el.classList.remove('slot-flash'), 2600);
+  }, 60);
 }
 function toggleRackBlink() { settings.blinkUrgent = !settings.blinkUrgent; saveSettings(); renderRacks(); }
 // Trinkreife eines Weins fürs Regal: Zustand (wie in der Trinkreife-Ansicht) und "dringend" = überschritten
@@ -9431,6 +9469,7 @@ function renderTrinkreife() {
     <div class="ripeness-card" onclick="goToWine('${w.id}')" style="cursor:pointer">
       <div class="ripeness-wine-name">${esc(w.name)}</div>
       <div class="ripeness-meta">${w.year||''} ${w.type?' · '+esc(TYPE_LABELS[w.type]||w.type):''}</div>
+      ${wineSlotChips(w)}
       <div style="display:flex;gap:0;border-radius:6px;overflow:hidden;height:18px;margin-bottom:6px">
         <div class="rt-seg rt-jung" style="flex:${from-(w.year||from-3)}">${t('seg_young')}</div>
         <div class="rt-seg rt-optimal" style="flex:${peak-from+1}">${t('seg_optimal')}</div>
