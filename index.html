@@ -2394,7 +2394,7 @@ function shoppingItems() {
   const multi = settings.cellars.length > 1, items = [];
   wines.forEach(w => mmInfo(w).forEach(r => { if (r.low) items.push({ name: w.name, year: w.year, cellar: multi ? r.name : '', need: (r.max != null ? r.max : r.min) - r.stock, stock: r.stock, min: r.min }); }));
   wishes.forEach(w => {
-    if (!w.restock) return;
+    if (!w.restock || wines.some(x => x.name === w.name && (x.year || null) === (w.year || null))) return;   // Wein ist wieder im Keller: steht ggf. schon oben
     Object.keys(w.minMax || {}).forEach(cid => {
       const c = settings.cellars.find(x => x.id === cid), mm = w.minMax[cid];
       if (!c) return;
@@ -2424,21 +2424,33 @@ async function shareShoppingList() {
 function copyShoppingList() {
   navigator.clipboard.writeText(shoppingText()).then(() => showToast(t('toast_copy'))).catch(() => showToast(t('toast_copyfail')));
 }
-// Letzte Flasche eines Weins mit Min/Max getrunken: der Wein verschwindet aus dem Keller, bleibt aber als "nachkaufen" in der Wunschliste
-function addRestockWish(w) {
-  const mm = cleanMinMax(w.minMax);
-  if (!Object.keys(mm).length) return;
+// Bestand unter dem Minimum (nur wenn ein Minimum ab 1 eingetragen ist; leer oder 0 = keine Aktion).
+// Liefert die betroffenen Keller; gone = die letzte Flasche wurde getrunken (Bestand 0)
+function mmLowRows(w, gone) {
+  return Object.keys(w.minMax || {}).map(cid => {
+    const c = settings.cellars.find(x => x.id === cid), mm = w.minMax[cid];
+    if (!c || !(mm.min >= 1)) return null;
+    const stock = gone ? 0 : cellarStock(w, cid);
+    return stock < mm.min ? { cid, name: c.name, stock, min: mm.min, max: mm.max } : null;
+  }).filter(Boolean);
+}
+// Vorschlag nach dem Trinken: Wein zum Nachkaufen auf die Wunschliste setzen (Min/Max wandert mit, der Wein zählt dann auf der Einkaufsliste)
+function offerRestock(w, row) {
   if (wishes.some(x => x.restock && x.name === w.name && (x.year || null) === (w.year || null))) return;
-  const target = Math.max(0, ...Object.values(mm).map(v => v.max != null ? v.max : (v.min || 0)));
-  wishes.push({ id: 'rs' + Date.now().toString(36), name: w.name, year: w.year || null, type: w.type, region: w.region || null, country: w.country || null, grape: w.grape || null, note: t('mm_restock_note', { n: target }), done: false, minMax: mm, restock: true });
+  const label = w.name + (w.year && !w.name.includes(String(w.year)) ? ' ' + w.year : '');
+  if (!confirm(t('mm_offer', { name: label, n: row.stock, min: row.min }))) return;
+  const target = row.max != null ? row.max : row.min;
+  wishes.push({ id: 'rs' + Date.now().toString(36), name: w.name, year: w.year || null, type: w.type, region: w.region || null, country: w.country || null, grape: w.grape || null, note: t('mm_restock_note', { n: target }), done: false, minMax: cleanMinMax(w.minMax), restock: true });
   saveWishes();
+  showToast(t('mm_offer_done'));
+  try { rerenderActive(); } catch (e) {}
 }
 function cleanMinMax(o) {
   const out = {};
   if (!o || typeof o !== 'object' || Array.isArray(o)) return out;
   Object.keys(o).slice(0, 12).forEach(k => {
     if (!ID_RE.test(k) || !o[k] || typeof o[k] !== 'object') return;
-    const mn = cleanInt(o[k].min, 0, 9999); let mx = cleanInt(o[k].max, 0, 9999);
+    const mn = cleanInt(o[k].min, 0, 9999) || null; let mx = cleanInt(o[k].max, 0, 9999) || null;   // 0 = kein Wert
     if (mn == null && mx == null) return;
     if (mn != null && mx != null && mx < mn) mx = mn;
     out[k] = { min: mn, max: mx };
@@ -3385,8 +3397,9 @@ de: {
   mm_list_empty: "Nichts nachzukaufen – alle Bestände sind im grünen Bereich.",
   mm_share: "Liste teilen",
   mm_copy: "Kopieren",
-  mm_toast_low: "Bestand unter Minimum: {name} ({n} von {min})",
   mm_restock_note: "Nachkaufen: Ziel {n} Flaschen",
+  mm_offer: "Bestand unter Minimum: {name} ({n} von {min}). Auf die Wunschliste setzen?",
+  mm_offer_done: "Auf die Wunschliste gesetzt ✓",
   loc_slot: "Platz",
   rack_cap_low: "Auf dieser Ebene liegen bis zu {n} Flaschen in einem Platz.",
   sync_code_notfound: "Code nicht gefunden – bitte prüfen",
@@ -3746,8 +3759,9 @@ en: {
   mm_list_empty: "Nothing to buy – all stocks are within range.",
   mm_share: "Share list",
   mm_copy: "Copy",
-  mm_toast_low: "Stock below minimum: {name} ({n} of {min})",
   mm_restock_note: "Buy again: target {n} bottles",
+  mm_offer: "Stock below minimum: {name} ({n} of {min}). Put it on the wish list?",
+  mm_offer_done: "Put on the wish list ✓",
   loc_slot: "Slot",
   rack_cap_low: "Up to {n} bottles are stored in one slot on this level.",
   sync_code_notfound: "Code not found – please check it",
@@ -4107,8 +4121,9 @@ es: {
   mm_list_empty: "Nada que comprar – todas las existencias están dentro del rango.",
   mm_share: "Compartir lista",
   mm_copy: "Copiar",
-  mm_toast_low: "Existencias por debajo del mínimo: {name} ({n} de {min})",
   mm_restock_note: "Volver a comprar: objetivo {n} botellas",
+  mm_offer: "Stock por debajo del mínimo: {name} ({n} de {min}). ¿Añadirlo a la lista de deseos?",
+  mm_offer_done: "Añadido a la lista de deseos ✓",
   loc_slot: "Sitio",
   rack_cap_low: "En este nivel hay hasta {n} botellas en un hueco.",
   sync_code_notfound: "Código no encontrado: compruébalo",
@@ -4468,8 +4483,9 @@ sv: {
   mm_list_empty: "Inget att köpa – alla lagernivåer är inom intervallet.",
   mm_share: "Dela lista",
   mm_copy: "Kopiera",
-  mm_toast_low: "Lager under minimum: {name} ({n} av {min})",
   mm_restock_note: "Köp igen: mål {n} flaskor",
+  mm_offer: "Lagret under minimum: {name} ({n} av {min}). Lägga till på önskelistan?",
+  mm_offer_done: "Lagt till på önskelistan ✓",
   loc_slot: "Plats",
   rack_cap_low: "På den här hyllan finns upp till {n} flaskor på en plats.",
   sync_code_notfound: "Koden hittades inte – kontrollera den",
@@ -4829,8 +4845,9 @@ da: {
   mm_list_empty: "Intet at købe – alle beholdninger er inden for intervallet.",
   mm_share: "Del liste",
   mm_copy: "Kopiér",
-  mm_toast_low: "Beholdning under minimum: {name} ({n} af {min})",
   mm_restock_note: "Køb igen: mål {n} flasker",
+  mm_offer: "Beholdning under minimum: {name} ({n} af {min}). Sætte på ønskelisten?",
+  mm_offer_done: "Sat på ønskelisten ✓",
   loc_slot: "Plads",
   rack_cap_low: "På denne hylde ligger op til {n} flasker på én plads.",
   sync_code_notfound: "Koden blev ikke fundet – tjek den",
@@ -5190,8 +5207,9 @@ fi: {
   mm_list_empty: "Ei ostettavaa – kaikki varastot ovat rajoissa.",
   mm_share: "Jaa lista",
   mm_copy: "Kopioi",
-  mm_toast_low: "Varasto alle minimin: {name} ({n}/{min})",
   mm_restock_note: "Osta lisää: tavoite {n} pulloa",
+  mm_offer: "Varasto alle minimin: {name} ({n} / {min}). Lisätäänkö toivelistalle?",
+  mm_offer_done: "Lisätty toivelistalle ✓",
   loc_slot: "Paikka",
   rack_cap_low: "Tällä tasolla yhdellä paikalla on jopa {n} pulloa.",
   sync_code_notfound: "Koodia ei löytynyt – tarkista se",
@@ -5551,8 +5569,9 @@ ru: {
   mm_list_empty: "Покупать нечего – все запасы в норме.",
   mm_share: "Поделиться списком",
   mm_copy: "Копировать",
-  mm_toast_low: "Запас ниже минимума: {name} ({n} из {min})",
   mm_restock_note: "Докупить: цель {n} бутылок",
+  mm_offer: "Запас ниже минимума: {name} ({n} из {min}). Добавить в список желаний?",
+  mm_offer_done: "Добавлено в список желаний ✓",
   loc_slot: "Место",
   rack_cap_low: "На этом ярусе в одном месте лежит до {n} бутылок.",
   sync_code_notfound: "Код не найден – проверьте его",
@@ -5912,8 +5931,9 @@ it: {
   mm_list_empty: "Niente da acquistare – tutte le scorte sono nei limiti.",
   mm_share: "Condividi lista",
   mm_copy: "Copia",
-  mm_toast_low: "Scorta sotto il minimo: {name} ({n} su {min})",
   mm_restock_note: "Riacquista: obiettivo {n} bottiglie",
+  mm_offer: "Scorta sotto il minimo: {name} ({n} su {min}). Aggiungerlo alla lista desideri?",
+  mm_offer_done: "Aggiunto alla lista desideri ✓",
   loc_slot: "Posto",
   rack_cap_low: "Su questo ripiano ci sono fino a {n} bottiglie in un posto.",
   sync_code_notfound: "Codice non trovato – controllalo",
@@ -6273,8 +6293,9 @@ fr: {
   mm_list_empty: "Rien à acheter – tous les stocks sont dans la plage.",
   mm_share: "Partager la liste",
   mm_copy: "Copier",
-  mm_toast_low: "Stock sous le minimum : {name} ({n} sur {min})",
   mm_restock_note: "À racheter : objectif {n} bouteilles",
+  mm_offer: "Stock sous le minimum : {name} ({n} sur {min}). L'ajouter à la liste de souhaits ?",
+  mm_offer_done: "Ajouté à la liste de souhaits ✓",
   loc_slot: "Place",
   rack_cap_low: "Sur ce niveau, jusqu'à {n} bouteilles sont rangées dans un emplacement.",
   sync_code_notfound: "Code introuvable – vérifiez-le",
@@ -6634,8 +6655,9 @@ pl: {
   mm_list_empty: "Nic do kupienia – wszystkie zapasy są w normie.",
   mm_share: "Udostępnij listę",
   mm_copy: "Kopiuj",
-  mm_toast_low: "Zapas poniżej minimum: {name} ({n} z {min})",
   mm_restock_note: "Dokup: cel {n} butelek",
+  mm_offer: "Zapas poniżej minimum: {name} ({n} z {min}). Dodać do listy życzeń?",
+  mm_offer_done: "Dodano do listy życzeń ✓",
   loc_slot: "Miejsce",
   rack_cap_low: "Na tym poziomie w jednym miejscu leży do {n} butelek.",
   sync_code_notfound: "Nie znaleziono kodu – sprawdź go",
@@ -6995,8 +7017,9 @@ hu: {
   mm_list_empty: "Nincs mit venni – minden készlet a megfelelő tartományban van.",
   mm_share: "Lista megosztása",
   mm_copy: "Másolás",
-  mm_toast_low: "Készlet a minimum alatt: {name} ({n}/{min})",
   mm_restock_note: "Utánvásárlás: cél {n} palack",
+  mm_offer: "A készlet a minimum alatt: {name} ({n} / {min}). Felkerüljön a kívánságlistára?",
+  mm_offer_done: "Felkerült a kívánságlistára ✓",
   loc_slot: "Hely",
   rack_cap_low: "Ezen a szinten egy helyen legfeljebb {n} üveg van.",
   sync_code_notfound: "A kód nem található – ellenőrizd",
@@ -7356,8 +7379,9 @@ cs: {
   mm_list_empty: "Není co nakoupit – všechny zásoby jsou v pořádku.",
   mm_share: "Sdílet seznam",
   mm_copy: "Kopírovat",
-  mm_toast_low: "Zásoba pod minimem: {name} ({n} z {min})",
   mm_restock_note: "Dokoupit: cíl {n} lahví",
+  mm_offer: "Zásoba pod minimem: {name} ({n} z {min}). Přidat na seznam přání?",
+  mm_offer_done: "Přidáno na seznam přání ✓",
   loc_slot: "Místo",
   rack_cap_low: "Na této úrovni je na jednom místě až {n} lahví.",
   sync_code_notfound: "Kód nebyl nalezen – zkontrolujte jej",
@@ -7717,8 +7741,9 @@ sk: {
   mm_list_empty: "Nie je čo nakúpiť – všetky zásoby sú v poriadku.",
   mm_share: "Zdieľať zoznam",
   mm_copy: "Kopírovať",
-  mm_toast_low: "Zásoba pod minimom: {name} ({n} z {min})",
   mm_restock_note: "Dokúpiť: cieľ {n} fliaš",
+  mm_offer: "Zásoba pod minimom: {name} ({n} z {min}). Pridať do zoznamu želaní?",
+  mm_offer_done: "Pridané do zoznamu želaní ✓",
   loc_slot: "Miesto",
   rack_cap_low: "Na tejto úrovni je na jednom mieste až {n} fliaš.",
   sync_code_notfound: "Kód sa nenašiel – skontrolujte ho",
@@ -8078,8 +8103,9 @@ ro: {
   mm_list_empty: "Nimic de cumpărat – toate stocurile sunt în limite.",
   mm_share: "Partajează lista",
   mm_copy: "Copiază",
-  mm_toast_low: "Stoc sub minim: {name} ({n} din {min})",
   mm_restock_note: "Cumpără din nou: țintă {n} sticle",
+  mm_offer: "Stoc sub minim: {name} ({n} din {min}). Îl adaugi în lista de dorințe?",
+  mm_offer_done: "Adăugat în lista de dorințe ✓",
   loc_slot: "Loc",
   rack_cap_low: "Pe acest nivel, într-un loc sunt până la {n} sticle.",
   sync_code_notfound: "Codul nu a fost găsit – verifică-l",
@@ -8439,8 +8465,9 @@ hr: {
   mm_list_empty: "Nema što kupiti – sve su zalihe u rasponu.",
   mm_share: "Podijeli popis",
   mm_copy: "Kopiraj",
-  mm_toast_low: "Zalihe ispod minimuma: {name} ({n} od {min})",
   mm_restock_note: "Dokupi: cilj {n} boca",
+  mm_offer: "Zaliha ispod minimuma: {name} ({n} od {min}). Dodati na listu želja?",
+  mm_offer_done: "Dodano na listu želja ✓",
   loc_slot: "Mjesto",
   rack_cap_low: "Na ovoj razini u jednom je mjestu do {n} boca.",
   sync_code_notfound: "Kod nije pronađen – provjerite ga",
@@ -8800,8 +8827,9 @@ pt: {
   mm_list_empty: "Nada para comprar – todos os stocks estão dentro do intervalo.",
   mm_share: "Partilhar lista",
   mm_copy: "Copiar",
-  mm_toast_low: "Stock abaixo do mínimo: {name} ({n} de {min})",
   mm_restock_note: "Comprar de novo: objetivo {n} garrafas",
+  mm_offer: "Stock abaixo do mínimo: {name} ({n} de {min}). Adicionar à lista de desejos?",
+  mm_offer_done: "Adicionado à lista de desejos ✓",
   loc_slot: "Lugar",
   rack_cap_low: "Neste nível há até {n} garrafas num lugar.",
   sync_code_notfound: "Código não encontrado – verifique-o",
@@ -9161,8 +9189,9 @@ no: {
   mm_list_empty: "Ingenting å kjøpe – alle beholdninger er innenfor grensene.",
   mm_share: "Del liste",
   mm_copy: "Kopier",
-  mm_toast_low: "Beholdning under minimum: {name} ({n} av {min})",
   mm_restock_note: "Kjøp igjen: mål {n} flasker",
+  mm_offer: "Beholdning under minimum: {name} ({n} av {min}). Sette på ønskelisten?",
+  mm_offer_done: "Satt på ønskelisten ✓",
   loc_slot: "Plass",
   rack_cap_low: "På denne hyllen ligger opptil {n} flasker på én plass.",
   sync_code_notfound: "Koden ble ikke funnet – sjekk den",
@@ -9522,8 +9551,9 @@ nl: {
   mm_list_empty: "Niets te kopen – alle voorraden zijn op peil.",
   mm_share: "Lijst delen",
   mm_copy: "Kopiëren",
-  mm_toast_low: "Voorraad onder minimum: {name} ({n} van {min})",
   mm_restock_note: "Bijkopen: doel {n} flessen",
+  mm_offer: "Voorraad onder het minimum: {name} ({n} van {min}). Op de verlanglijst zetten?",
+  mm_offer_done: "Op de verlanglijst gezet ✓",
   loc_slot: "Plaats",
   rack_cap_low: "Op dit niveau liggen tot {n} flessen op één plek.",
   sync_code_notfound: "Code niet gevonden – controleer hem",
@@ -9883,8 +9913,9 @@ el: {
   mm_list_empty: "Τίποτα για αγορά – όλα τα αποθέματα είναι εντός ορίων.",
   mm_share: "Κοινοποίηση λίστας",
   mm_copy: "Αντιγραφή",
-  mm_toast_low: "Απόθεμα κάτω από το ελάχιστο: {name} ({n} από {min})",
   mm_restock_note: "Αγορά ξανά: στόχος {n} φιάλες",
+  mm_offer: "Το απόθεμα είναι κάτω από το ελάχιστο: {name} ({n} από {min}). Προσθήκη στη λίστα επιθυμιών;",
+  mm_offer_done: "Προστέθηκε στη λίστα επιθυμιών ✓",
   loc_slot: "Θέση",
   rack_cap_low: "Σε αυτό το επίπεδο αποθηκεύονται έως {n} φιάλες σε μία θέση.",
   sync_code_notfound: "Ο κωδικός δεν βρέθηκε – ελέγξτε τον",
@@ -10244,8 +10275,9 @@ uk: {
   mm_list_empty: "Купувати нічого – усі запаси в нормі.",
   mm_share: "Поділитися списком",
   mm_copy: "Копіювати",
-  mm_toast_low: "Запас нижче мінімуму: {name} ({n} з {min})",
   mm_restock_note: "Докупити: ціль {n} пляшок",
+  mm_offer: "Запас нижче мінімуму: {name} ({n} з {min}). Додати до списку бажань?",
+  mm_offer_done: "Додано до списку бажань ✓",
   loc_slot: "Місце",
   rack_cap_low: "На цьому рівні в одному місці зберігається до {n} пляшок.",
   sync_code_notfound: "Код не знайдено – перевірте його",
@@ -10605,8 +10637,9 @@ ja: {
   mm_list_empty: "買うものはありません。すべての在庫が適正範囲内です。",
   mm_share: "リストを共有",
   mm_copy: "コピー",
-  mm_toast_low: "在庫が最小値未満: {name} ({n}/{min})",
   mm_restock_note: "買い足し: 目標 {n} 本",
+  mm_offer: "在庫が最小数を下回りました：{name}（{n}/{min}）。ウィッシュリストに追加しますか？",
+  mm_offer_done: "ウィッシュリストに追加しました ✓",
   loc_slot: "場所",
   rack_cap_low: "この段では、1か所に最大{n}本まで保管されます。",
   sync_code_notfound: "コードが見つかりません – ご確認ください",
@@ -10966,8 +10999,9 @@ ko: {
   mm_list_empty: "살 것이 없어요 – 모든 재고가 적정 범위예요.",
   mm_share: "목록 공유",
   mm_copy: "복사",
-  mm_toast_low: "재고가 최소 미만: {name} ({n}/{min})",
   mm_restock_note: "다시 구매: 목표 {n}병",
+  mm_offer: "재고가 최소 수량 미만입니다: {name} ({n}/{min}). 위시리스트에 추가할까요?",
+  mm_offer_done: "위시리스트에 추가했습니다 ✓",
   loc_slot: "칸",
   rack_cap_low: "이 단에서는 한 칸에 최대 {n}병이 보관돼요.",
   sync_code_notfound: "코드를 찾을 수 없어요 – 확인해 주세요",
@@ -11327,8 +11361,9 @@ zh: {
   mm_list_empty: "无需购买 – 所有库存都在正常范围内。",
   mm_share: "分享清单",
   mm_copy: "复制",
-  mm_toast_low: "库存低于最低值：{name} ({n}/{min})",
   mm_restock_note: "补货：目标 {n} 瓶",
+  mm_offer: "库存低于最低值：{name}（{n}/{min}）。要加入心愿单吗？",
+  mm_offer_done: "已加入心愿单 ✓",
   loc_slot: "位",
   rack_cap_low: "此层每个位最多存放 {n} 瓶。",
   sync_code_notfound: "未找到同步码 – 请检查",
@@ -11688,8 +11723,9 @@ hi: {
   mm_list_empty: "कुछ ख़रीदना नहीं है – सभी स्टॉक सही सीमा में हैं।",
   mm_share: "सूची साझा करें",
   mm_copy: "कॉपी करें",
-  mm_toast_low: "स्टॉक न्यूनतम से कम: {name} ({n}/{min})",
   mm_restock_note: "दोबारा ख़रीदें: लक्ष्य {n} बोतलें",
+  mm_offer: "स्टॉक न्यूनतम से कम: {name} ({n}/{min})। विशलिस्ट में जोड़ें?",
+  mm_offer_done: "विशलिस्ट में जोड़ा गया ✓",
   loc_slot: "स्थान",
   rack_cap_low: "इस स्तर पर एक स्थान में अधिकतम {n} बोतलें रखी जाती हैं।",
   sync_code_notfound: "कोड नहीं मिला – कृपया जाँच लें",
@@ -12188,7 +12224,7 @@ function confirmDrink() {
   const ref = drinkSlotRef; drinkSlotRef = null;
   const rr = ref && rackById(ref.rack);
   const where = rr ? t('ph_regal') + ' ' + rr.name + ' · ' + t('ph_ebene') + ' ' + ref.e + ' · ' + t('loc_slot') + ' ' + ref.p : null;   // aus dem Regal getrunken: genau dieser Platz kommt in die Historie
-  if ((w.count||1) <= 1) { wines = wines.filter(x => x.id !== drinkId); addRestockWish(w); }
+  if ((w.count||1) <= 1) wines = wines.filter(x => x.id !== drinkId);
   else {
     w.count = (w.count||1) - 1;
     if (ref) {   // der Platz der getrunkenen Flasche wird frei
@@ -12207,8 +12243,8 @@ function confirmDrink() {
   else if (active && active.id === 'tab-racks') { rackFilledSlot = null; renderRacks(); }
   else renderKeller();
   showToast(t('toast_prost'));
-  const lowRow = wines.includes(w) ? mmInfo(w).find(r => r.low) : null;
-  if (lowRow) setTimeout(() => showToast(t('mm_toast_low', { name: w.name, n: lowRow.stock, min: lowRow.min })), 1800);
+  const lowRows = mmLowRows(w, !wines.includes(w));
+  if (lowRows.length) setTimeout(() => offerRestock(w, lowRows[0]), 700);
 }
 
 function recordDrunk(w, companions, occasions, locText) {
