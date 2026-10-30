@@ -13773,10 +13773,10 @@ function wineSlotChips(w) {
   return `<div class="ripeness-loc">${h}</div>`;
 }
 // Wein direkt einlagern: Regal-Tab mit vorgewähltem Wein öffnen, dann freies Fach antippen
-function storeWine(id) {
+function storeWine(id, backY) {
   const w = wines.find(x => x.id === id);
   if (!w || !settings.racks.length) return;
-  rackStoreBackY = window.scrollY || 0;
+  rackStoreBackY = backY != null ? backY : (window.scrollY || 0);
   rackSelectedWineId = id; rackFilledSlot = null; rackMove = null;
   showTab('racks', document.querySelector('.nav-btn[onclick*="showTab(\'racks\'"]'));
   rackStoreFilter = id;
@@ -14509,13 +14509,27 @@ function wishToKeller(id) {
   const w = wishes.find(x=>x.id===id);
   if (!w) return;
   const ex = wines.find(x => sameWine(x, w));
-  if (ex) { ex.count = (ex.count||1) + (w.qty || 1); if (!ex.note && w.note) ex.note = w.note; if (!ex.grape && w.grape) ex.grape = w.grape; }
-  else wines.push(cleanWine({ id: Date.now().toString(), name: w.name, year: w.year, count: w.qty || 1, type: w.type, region: w.region, country: w.country, grape: w.grape, note: w.note, minMax: w.minMax, added: new Date().toISOString() }));
+  // Nachkauf-Wünsche tragen nur einen Automatik-Text als Notiz: nicht in den Wein übernehmen.
+  // Preis: günstigster Treffer der Preissuche, nur wenn er in der aktuellen Währung vorliegt.
+  const note = w.restock ? null : w.note;
+  const price = w.prices && w.prices.cur === settings.currency && w.prices.items.length ? w.prices.items[0].price : null;
+  let target = ex;
+  if (ex) {
+    ex.count = (ex.count||1) + (w.qty || 1);
+    if (!ex.note && note) ex.note = note;
+    if (!ex.grape && w.grape) ex.grape = w.grape;
+    if (!ex.price && price) ex.price = price;
+  } else {
+    target = cleanWine({ id: Date.now().toString(), name: w.name, year: w.year, count: w.qty || 1, type: w.type, region: w.region, country: w.country, grape: w.grape, note, price, minMax: w.minMax, added: new Date().toISOString() });
+    wines.push(target);
+  }
   save();
   wishes = wishes.filter(x=>x.id!==id);
   saveWishes();
   renderWishlist();
   showToast(t('toast_moved'));
+  // Gibt es Regale und ist etwas nicht eingelagert: gleich zum Einlagern (Zurück-Knopf führt in den Keller)
+  if (settings.racks.length && unplacedCount(target) > 0) storeWine(target.id, 0);
 }
 
 // ═══════════════════════════════════════
