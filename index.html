@@ -529,7 +529,9 @@ body {
 .rack-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: -6px 0 14px; font-size: 11px; color: var(--text-muted); }
 .rack-legend span { display: inline-flex; align-items: center; gap: 5px; }
 .rack-ripe-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; border: 1px solid rgba(255,255,255,.7); }
-.rack-toolbar { margin-bottom: 10px; }
+.rack-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-bottom: 10px; }
+.rack-toolbar-lbl { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+.rack-toggle .rack-ripe-dot { margin-right: -2px; }
 .rack-toggle { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--border); background: var(--card); color: var(--text-muted); font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
 .rack-toggle .rt-dot { width: 22px; height: 12px; border-radius: 6px; background: var(--border); position: relative; transition: background .2s; }
 .rack-toggle .rt-dot::after { content: ''; position: absolute; top: 2px; left: 2px; width: 8px; height: 8px; border-radius: 50%; background: #fff; transition: transform .2s; }
@@ -539,12 +541,12 @@ body {
 .rack-blink-hint { font-size: 11px; color: var(--text-muted); margin: -4px 0 10px; }
 @keyframes rackBlink { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,90,90,0); } 50% { box-shadow: 0 0 0 3px rgba(255,90,90,.9), 0 0 10px 2px rgba(255,90,90,.6); } }
 @keyframes rackDot { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.6); } }
-.rack-box.blink-on .rack-slot.filled:not(.urgent) > :not(.rack-ripe):not(.rack-slot-count) { opacity: .4; }
-.rack-slot.urgent.blinking { border-radius: 6px; animation: rackBlink 1.1s ease-in-out infinite; }
-.rack-slot.urgent.blinking .rack-ripe { animation: rackDot 1.1s ease-in-out infinite; }
+.rack-box.blink-on .rack-slot.filled:not(.blinking) > :not(.rack-ripe):not(.rack-slot-count) { opacity: .4; }
+.rack-slot.blinking { border-radius: 6px; animation: rackBlink 1.1s ease-in-out infinite; }
+.rack-slot.blinking .rack-ripe { animation: rackDot 1.1s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
-  .rack-slot.urgent.blinking { animation: none; box-shadow: 0 0 0 2px rgba(255,90,90,.9); }
-  .rack-slot.urgent.blinking .rack-ripe { animation: none; }
+  .rack-slot.blinking { animation: none; box-shadow: 0 0 0 2px rgba(255,90,90,.9); }
+  .rack-slot.blinking .rack-ripe { animation: none; }
 }
 .rack-box { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
 .rack-box::-webkit-scrollbar { height: 6px; }
@@ -1781,7 +1783,7 @@ let drunkWines = cleanDrunk(safeParse(DRUNK_KEY, []));
 const DEFAULT_OWNER = "Ocho";
 const STAMP_KEY = 'weinkeller_v2_stamp';
 const SYNCBASE_KEY = 'weinkeller_v2_syncbase';
-let settings = Object.assign({currency:'€', lang:'de', racks:[], cellars:[], blinkUrgent:false, owner:'', storage:'local', syncCode:'', email:'', font:'inter'}, safeParse(SETTINGS_KEY, {}));
+let settings = Object.assign({currency:'€', lang:'de', racks:[], cellars:[], blinkUrgent:false, blinkOver:false, blinkPeak:false, blinkOptimal:false, owner:'', storage:'local', syncCode:'', email:'', font:'inter'}, safeParse(SETTINGS_KEY, {}));
 settings.cellars = cleanCellars(settings.cellars);
 settings.racks = cleanRacks(settings.racks);
 fixRackCellars();
@@ -3007,8 +3009,9 @@ de: {
   rack_ph_cap: "Flaschen/Platz",
   rack_levels_title: "Ebenen: Name und Flaschen pro Platz",
   rack_level_name: "Name",
-  rack_blink: "Zuerst trinken: blinken",
   rack_blink_hint: "Überschritten oder spätestens nächstes Jahr am Ende der Trinkreife",
+  rack_blink_lbl: "Blinken:",
+  rack_blink_first: "Zuerst trinken",
   rack_delete: "Wein löschen",
   dm_slot: "Aus welchem Platz genommen?",
   dm_slot_none: "Nicht eingelagerte Flasche",
@@ -3305,8 +3308,9 @@ en: {
   rack_ph_cap: "Bottles/slot",
   rack_levels_title: "Levels: name and bottles per slot",
   rack_level_name: "Name",
-  rack_blink: "Drink first: blink",
   rack_blink_hint: "Past their drinking window, or ending by next year",
+  rack_blink_lbl: "Blink:",
+  rack_blink_first: "Drink first",
   rack_delete: "Delete wine",
   dm_slot: "Taken from which slot?",
   dm_slot_none: "Bottle not in a slot",
@@ -3603,8 +3607,9 @@ es: {
   rack_ph_cap: "Botellas/hueco",
   rack_levels_title: "Niveles: nombre y botellas por hueco",
   rack_level_name: "Nombre",
-  rack_blink: "Beber primero: parpadear",
   rack_blink_hint: "Pasados de su ventana de consumo o que terminan como tarde el año que viene",
+  rack_blink_lbl: "Parpadear:",
+  rack_blink_first: "Beber primero",
   rack_delete: "Eliminar vino",
   dm_slot: "¿De qué hueco se sacó?",
   dm_slot_none: "Botella sin colocar",
@@ -3901,8 +3906,9 @@ sv: {
   rack_ph_cap: "Flaskor/plats",
   rack_levels_title: "Hyllor: namn och flaskor per plats",
   rack_level_name: "Namn",
-  rack_blink: "Drick först: blinka",
   rack_blink_hint: "Förbi dryckesfönstret eller slutar senast nästa år",
+  rack_blink_lbl: "Blinka:",
+  rack_blink_first: "Drick först",
   rack_delete: "Ta bort vin",
   dm_slot: "Från vilken plats togs den?",
   dm_slot_none: "Flaska utan plats",
@@ -4199,8 +4205,9 @@ da: {
   rack_ph_cap: "Flasker/plads",
   rack_levels_title: "Hylder: navn og flasker pr. plads",
   rack_level_name: "Navn",
-  rack_blink: "Drik først: blink",
   rack_blink_hint: "Over drikkevinduet eller slutter senest næste år",
+  rack_blink_lbl: "Blink:",
+  rack_blink_first: "Drik først",
   rack_delete: "Slet vin",
   dm_slot: "Fra hvilken plads blev den taget?",
   dm_slot_none: "Flaske uden plads",
@@ -4497,8 +4504,9 @@ fi: {
   rack_ph_cap: "Pulloa/paikka",
   rack_levels_title: "Tasot: nimi ja pulloja per paikka",
   rack_level_name: "Nimi",
-  rack_blink: "Juo ensin: vilku",
   rack_blink_hint: "Juomakypsyys ohi tai päättyy viimeistään ensi vuonna",
+  rack_blink_lbl: "Vilku:",
+  rack_blink_first: "Juo ensin",
   rack_delete: "Poista viini",
   dm_slot: "Miltä paikalta otettu?",
   dm_slot_none: "Pullo ilman paikkaa",
@@ -4795,8 +4803,9 @@ ru: {
   rack_ph_cap: "Бутылок/место",
   rack_levels_title: "Ярусы: название и бутылок на место",
   rack_level_name: "Название",
-  rack_blink: "Пить первыми: мигание",
   rack_blink_hint: "Срок истёк или заканчивается не позже следующего года",
+  rack_blink_lbl: "Мигание:",
+  rack_blink_first: "Пить первыми",
   rack_delete: "Удалить вино",
   dm_slot: "Из какого места взята?",
   dm_slot_none: "Бутылка без места",
@@ -5093,8 +5102,9 @@ it: {
   rack_ph_cap: "Bottiglie/posto",
   rack_levels_title: "Ripiani: nome e bottiglie per posto",
   rack_level_name: "Nome",
-  rack_blink: "Da bere prima: lampeggia",
   rack_blink_hint: "Oltre la finestra di consumo o in scadenza entro il prossimo anno",
+  rack_blink_lbl: "Lampeggia:",
+  rack_blink_first: "Da bere prima",
   rack_delete: "Elimina vino",
   dm_slot: "Da quale posto è stata presa?",
   dm_slot_none: "Bottiglia non riposta",
@@ -5391,8 +5401,9 @@ fr: {
   rack_ph_cap: "Bouteilles/empl.",
   rack_levels_title: "Niveaux : nom et bouteilles par emplacement",
   rack_level_name: "Nom",
-  rack_blink: "À boire d'abord : clignote",
   rack_blink_hint: "Fenêtre de dégustation dépassée ou se terminant au plus tard l'an prochain",
+  rack_blink_lbl: "Clignoter :",
+  rack_blink_first: "À boire d'abord",
   rack_delete: "Supprimer le vin",
   dm_slot: "Prise de quel emplacement ?",
   dm_slot_none: "Bouteille non rangée",
@@ -5689,8 +5700,9 @@ pl: {
   rack_ph_cap: "Butelek/miejsce",
   rack_levels_title: "Poziomy: nazwa i butelek na miejsce",
   rack_level_name: "Nazwa",
-  rack_blink: "Do wypicia najpierw: miganie",
   rack_blink_hint: "Po okresie picia lub kończy się najpóźniej w przyszłym roku",
+  rack_blink_lbl: "Miganie:",
+  rack_blink_first: "Najpierw wypić",
   rack_delete: "Usuń wino",
   dm_slot: "Z którego miejsca zabrano?",
   dm_slot_none: "Butelka bez miejsca",
@@ -5987,8 +5999,9 @@ hu: {
   rack_ph_cap: "Üveg/hely",
   rack_levels_title: "Szintek: név és üveg helyenként",
   rack_level_name: "Név",
-  rack_blink: "Először innivaló: villog",
   rack_blink_hint: "Lejárt az ivási időszak, vagy legkésőbb jövőre véget ér",
+  rack_blink_lbl: "Villogás:",
+  rack_blink_first: "Először innivaló",
   rack_delete: "Bor törlése",
   dm_slot: "Melyik helyről vették ki?",
   dm_slot_none: "Elhelyezetlen üveg",
@@ -6285,8 +6298,9 @@ cs: {
   rack_ph_cap: "Lahví/místo",
   rack_levels_title: "Úrovně: název a lahví na místo",
   rack_level_name: "Název",
-  rack_blink: "Pít nejdřív: blikat",
   rack_blink_hint: "Po době pití nebo končí nejpozději příští rok",
+  rack_blink_lbl: "Blikání:",
+  rack_blink_first: "Pít nejdřív",
   rack_delete: "Smazat víno",
   dm_slot: "Z kterého místa byla vzata?",
   dm_slot_none: "Láhev bez místa",
@@ -6583,8 +6597,9 @@ sk: {
   rack_ph_cap: "Fliaš/miesto",
   rack_levels_title: "Úrovne: názov a fliaš na miesto",
   rack_level_name: "Názov",
-  rack_blink: "Piť najskôr: blikať",
   rack_blink_hint: "Po dobe pitia alebo končí najneskôr budúci rok",
+  rack_blink_lbl: "Blikanie:",
+  rack_blink_first: "Piť najskôr",
   rack_delete: "Zmazať víno",
   dm_slot: "Z ktorého miesta bola vzatá?",
   dm_slot_none: "Fľaša bez miesta",
@@ -6881,8 +6896,9 @@ ro: {
   rack_ph_cap: "Sticle/loc",
   rack_levels_title: "Niveluri: nume și sticle pe loc",
   rack_level_name: "Nume",
-  rack_blink: "De băut întâi: clipește",
   rack_blink_hint: "Fereastra de consum depășită sau se încheie cel târziu anul viitor",
+  rack_blink_lbl: "Clipire:",
+  rack_blink_first: "De băut întâi",
   rack_delete: "Șterge vinul",
   dm_slot: "Din ce loc a fost luată?",
   dm_slot_none: "Sticlă fără loc",
@@ -7179,8 +7195,9 @@ hr: {
   rack_ph_cap: "Boca/mjesto",
   rack_levels_title: "Razine: naziv i boca po mjestu",
   rack_level_name: "Naziv",
-  rack_blink: "Piti prvo: treperi",
   rack_blink_hint: "Prošlo razdoblje pijenja ili završava najkasnije iduće godine",
+  rack_blink_lbl: "Treperenje:",
+  rack_blink_first: "Piti prvo",
   rack_delete: "Izbriši vino",
   dm_slot: "Iz kojeg je mjesta uzeta?",
   dm_slot_none: "Boca bez mjesta",
@@ -7477,8 +7494,9 @@ pt: {
   rack_ph_cap: "Garrafas/lugar",
   rack_levels_title: "Níveis: nome e garrafas por lugar",
   rack_level_name: "Nome",
-  rack_blink: "Beber primeiro: piscar",
   rack_blink_hint: "Fora da janela de consumo ou a terminar no máximo no próximo ano",
+  rack_blink_lbl: "Piscar:",
+  rack_blink_first: "Beber primeiro",
   rack_delete: "Eliminar vinho",
   dm_slot: "De que lugar foi retirada?",
   dm_slot_none: "Garrafa sem lugar",
@@ -7775,8 +7793,9 @@ no: {
   rack_ph_cap: "Flasker/plass",
   rack_levels_title: "Hyller: navn og flasker per plass",
   rack_level_name: "Navn",
-  rack_blink: "Drikk først: blink",
   rack_blink_hint: "Forbi drikkevinduet eller slutter senest neste år",
+  rack_blink_lbl: "Blink:",
+  rack_blink_first: "Drikk først",
   rack_delete: "Slett vin",
   dm_slot: "Fra hvilken plass ble den tatt?",
   dm_slot_none: "Flaske uten plass",
@@ -8073,8 +8092,9 @@ nl: {
   rack_ph_cap: "Flessen/plek",
   rack_levels_title: "Niveaus: naam en flessen per plek",
   rack_level_name: "Naam",
-  rack_blink: "Eerst drinken: knipperen",
   rack_blink_hint: "Drinkvenster voorbij of eindigt uiterlijk volgend jaar",
+  rack_blink_lbl: "Knipperen:",
+  rack_blink_first: "Eerst drinken",
   rack_delete: "Wijn verwijderen",
   dm_slot: "Uit welke plek genomen?",
   dm_slot_none: "Fles zonder plek",
@@ -9276,12 +9296,28 @@ function renderRacks() {
   for (let e = 1; e <= r.rows; e++) total += rackCols(r, e) * rackCap(r, e);
   map.forEach((v, k) => { const [e, p] = k.split('|'); if (+e <= r.rows && +p <= rackCols(r, +e)) filled += v.length; });
 
-  // Trinkreife-Punkt an jeder Flasche; auf Wunsch blinken die Weine, die zuerst getrunken werden sollten
-  const blink = !!settings.blinkUrgent;
-  let urgentN = 0;
-  map.forEach((v, k) => { const [e, p] = k.split('|'); if (+e <= r.rows && +p <= rackCols(r, +e)) v.forEach(x => { const ri = ripeInfo(x.w); if (ri && ri.urgent) urgentN++; }); });
-  let html = `<div class="rack-toolbar"><button class="rack-toggle${blink ? ' active' : ''}" onclick="toggleRackBlink()" aria-pressed="${blink}"><span class="rt-dot"></span>${t('rack_blink')}${urgentN ? ' · ' + urgentN : ''}</button></div>`
-    + (blink ? `<div class="rack-blink-hint">${t('rack_blink_hint')}</div>` : '')
+  // Trinkreife-Punkt an jeder Flasche; auf Wunsch blinken Weine nach Trinkreife (jede Gruppe einzeln wählbar)
+  const BLINKS = [['Urgent', t('rack_blink_first'), null], ['Over', t('seg_over'), 'over'], ['Peak', t('seg_peak'), 'peak'], ['Optimal', t('seg_optimal'), 'optimal']];
+  const blinkOn = {};
+  BLINKS.forEach(b => { blinkOn[b[0]] = !!settings['blink' + b[0]]; });
+  const blink = BLINKS.some(b => blinkOn[b[0]]);
+  const matchBlink = ri => !!ri && ((blinkOn.Urgent && ri.urgent) || (blinkOn.Over && ri.key === 'over') || (blinkOn.Peak && ri.key === 'peak') || (blinkOn.Optimal && ri.key === 'optimal'));
+  const blinkN = { Urgent: 0, Over: 0, Peak: 0, Optimal: 0 };
+  map.forEach((v, k) => {
+    const [e, p] = k.split('|');
+    if (+e <= r.rows && +p <= rackCols(r, +e)) v.forEach(x => {
+      const ri = ripeInfo(x.w);
+      if (!ri) return;
+      if (ri.urgent) blinkN.Urgent++;
+      if (ri.key === 'over') blinkN.Over++;
+      if (ri.key === 'peak') blinkN.Peak++;
+      if (ri.key === 'optimal') blinkN.Optimal++;
+    });
+  });
+  let html = `<div class="rack-toolbar"><span class="rack-toolbar-lbl">${t('rack_blink_lbl')}</span>`
+    + BLINKS.map(([key, label, st]) => `<button class="rack-toggle${blinkOn[key] ? ' active' : ''}" onclick="toggleRackBlink('${key}')" aria-pressed="${blinkOn[key]}"><span class="rt-dot"></span>${st ? `<i class="rack-ripe-dot ripeness-${RIPE_CLASS[st]}"></i>` : ''}${esc(label)}${blinkN[key] ? ' · ' + blinkN[key] : ''}</button>`).join('')
+    + `</div>`
+    + (blinkOn.Urgent ? `<div class="rack-blink-hint">${t('rack_blink_hint')}</div>` : '')
     + `<div class="rack-box${blink ? ' blink-on' : ''}"><div class="rack-box-title">${esc(r.name)}</div><div class="rack-box-sub">${filled} / ${total} ${t('racks_filled')}</div>`;
   // Flaschengröße an die Spaltenzahl anpassen (60–96 px); ab 76 px steht der Jahrgang auf dem Etikett
   // Verfügbare Breite = Innenbreite des Containers - Box-Rahmen/-Padding (2 + 28) - Ebenen-Spalte (28)
@@ -9314,9 +9350,9 @@ function renderRacks() {
         const picked = rackFilledSlot && rackFilledSlot.rack === r.id && rackFilledSlot.e === e && rackFilledSlot.p === p;
         const badge = cap > 1 ? `<span class="rack-slot-count">${entries.length}/${cap}</span>` : '';
         let topKey = null, urgent = false;   // im Fach (Kiste) zählt der dringendste Wein
-        entries.forEach(x => { const ri = ripeInfo(x.w); if (!ri) return; if (ri.urgent) urgent = true; if (!topKey || RIPE_PRIO[ri.key] > RIPE_PRIO[topKey]) topKey = ri.key; });
+        entries.forEach(x => { const ri = ripeInfo(x.w); if (!ri) return; if (matchBlink(ri)) urgent = true; if (!topKey || RIPE_PRIO[ri.key] > RIPE_PRIO[topKey]) topKey = ri.key; });
         const dot = topKey ? `<span class="rack-ripe ripeness-${RIPE_CLASS[topKey]}"></span>` : '';
-        html += `<div class="rack-slot filled${picked?' picked':''}${dropping && entries.length < cap ? ' droppable' : ''}${urgent ? ' urgent' : ''}${urgent && blink ? ' blinking' : ''}${slotW < 30 ? ' tiny' : ''}" data-slot="${e}|${p}" style="width:${slotW}px;height:${slotH}px" onclick="slotClick(${e},${p})" title="${esc(w.name)}${w.year?' · '+w.year:''}">${bottleVisual(w, slotW, slotMode)}${badge}${dot}</div>`;
+        html += `<div class="rack-slot filled${picked?' picked':''}${dropping && entries.length < cap ? ' droppable' : ''}${urgent ? ' blinking' : ''}${slotW < 30 ? ' tiny' : ''}" data-slot="${e}|${p}" style="width:${slotW}px;height:${slotH}px" onclick="slotClick(${e},${p})" title="${esc(w.name)}${w.year?' · '+w.year:''}">${bottleVisual(w, slotW, slotMode)}${badge}${dot}</div>`;
       } else html += `<div class="rack-slot${dropping?' droppable':''}" style="width:${slotW}px;height:${slotH}px" onclick="slotClick(${e},${p})"><div class="rack-empty" style="height:${Math.max(15, slotH-7)}px"></div></div>`;
     }
   }
@@ -9415,7 +9451,7 @@ function deleteWineFromRack(id) {
   wines = wines.filter(x => x.id !== id);
   save(); rackFilledSlot = null; renderRacks(); showToast(t('toast_removed'));
 }
-function toggleRackBlink() { settings.blinkUrgent = !settings.blinkUrgent; saveSettings(); renderRacks(); }
+function toggleRackBlink(key) { key = 'blink' + (key || 'Urgent'); settings[key] = !settings[key]; saveSettings(); renderRacks(); }
 // Trinkreife eines Weins fürs Regal: Zustand (wie in der Trinkreife-Ansicht) und "dringend" = überschritten
 // oder spätestens nächstes Jahr am Ende des Trinkfensters; null ohne Angabe
 const RIPE_PRIO = { young: 0, optimal: 1, peak: 2, over: 3 };
