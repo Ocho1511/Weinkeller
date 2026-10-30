@@ -513,7 +513,7 @@ body {
 .rack-box-title { font-family: var(--heading-font, 'Playfair Display', serif); font-size: 15px; color: var(--gold-light); margin-bottom: 2px; }
 .rack-box-sub { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 12px; }
 .rack-grid { display: inline-grid; gap: 7px; }
-.rack-elabel { font-size: 10px; color: var(--text-dim); display: flex; align-items: center; justify-content: flex-end; padding-right: 4px; }
+.rack-elabel { white-space: nowrap; overflow: hidden; font-size: 10px; color: var(--text-dim); display: flex; align-items: center; justify-content: flex-end; padding-right: 4px; }
 .rack-collabel { font-size: 10px; color: var(--text-dim); text-align: center; }
 .rack-slot { width: 60px; height: 22px; position: relative; display: flex; align-items: center; }
 .rack-slot .rack-empty { flex: 1; }
@@ -556,6 +556,10 @@ body {
 .rack-level-editor { margin: 4px 0 10px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--card); }
 .rack-level-editor .rle-title { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
 .rack-level-editor .rle-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 4px 0; font-size: 13px; color: var(--text); }
+.rack-level-editor .rle-row > span:first-child { width: 28px; color: var(--text-muted); }
+.rack-level-editor .rle-head { font-size: 11px; color: var(--text-muted); }
+.rack-level-editor .rle-head > span:not(:first-child) { flex: 1; text-align: right; }
+.rack-level-editor .rle-row input.rle-name { flex: 1; width: auto; text-align: left; }
 .rack-level-editor .rle-row input { width: 80px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px; color: var(--text); font-size: 13px; text-align: right; }
 .rack-setup-del { flex-shrink: 0; width: 30px; height: 30px; border-radius: 8px; border: none; background: var(--red-alert); color: #fff; font-size: 13px; cursor: pointer; }
 .input-with-scan { display: flex; gap: 8px; }
@@ -1700,14 +1704,14 @@ function cleanRacks(arr) {
     names.add(name); ids.add(id);
     const cellarId = cleanStr(r.cellarId, 40).trim();
     const cap = cleanInt(r.cap, 1, 500) || 1;
-    // Einzelne Ebenen dürfen eine andere Kapazität haben (z. B. unten Kisten mit Platz für 6, darüber einzelne Flaschen)
+    // Einzelne Ebenen dürfen einen eigenen Namen und eine andere Kapazität haben (z. B. unten Kisten mit Platz für 6, darüber einzelne Flaschen)
     const lv = {};
     if (r.lv && typeof r.lv === 'object' && !Array.isArray(r.lv)) {
       Object.keys(r.lv).slice(0, 60).forEach(k => {
         const e = parseInt(k), o = r.lv[k];
         if (!(e >= 1 && e <= rows) || !o || typeof o !== 'object') return;
-        const cp = cleanInt(o.cap, 1, 500) || cap;
-        if (cp !== cap) lv[e] = { cap: cp };
+        const cp = cleanInt(o.cap, 1, 500) || cap, nm = cleanStr(o.name, 6).trim();
+        if (cp !== cap || nm) { lv[e] = { cap: cp }; if (nm) lv[e].name = nm; }
       });
     }
     return { id, name, rows, cols, cap, lv, cellarId: ID_RE.test(cellarId) ? cellarId : DEFAULT_CELLAR_ID };
@@ -2760,6 +2764,7 @@ de: {
   rack_assign_hint: "Tippe einen Wein, dann ein freies Fach zum Einsortieren.",
   rack_assign_sel: "„{name}\" gewählt – freies Fach antippen (erneut tippen = abwählen).",
   toast_rack_placed: "In {rack} · E{e} · Platz {p} einsortiert ✓",
+  toast_rack_placed_n: "In {rack} · {e} · Platz {p} einsortiert ✓",
   rack_open_wine: "Wein öffnen",
   rack_remove: "Aus Fach entfernen",
   toast_rack_removed: "„{name}\" aus dem Fach entfernt ✓",
@@ -2967,7 +2972,8 @@ de: {
   rack_move_hint: "Tippe ein freies Fach, um die Flasche dorthin zu legen.",
   loc_open: "{n} nicht eingelagert",
   rack_ph_cap: "Flaschen/Platz",
-  rack_caps_title: "Flaschen pro Platz je Ebene",
+  rack_levels_title: "Ebenen: Name und Flaschen pro Platz",
+  rack_level_name: "Name",
   rack_cap_low: "Auf dieser Ebene liegen bis zu {n} Flaschen in einem Platz.",
   sync_code_notfound: "Code nicht gefunden – bitte prüfen",
   toast_storage_full: "Speicher voll – Änderung konnte nicht gesichert werden",
@@ -3051,6 +3057,7 @@ en: {
   rack_assign_hint: "Tap a wine, then a free slot to place it.",
   rack_assign_sel: "\"{name}\" selected – tap a free slot (tap again to deselect).",
   toast_rack_placed: "Placed in {rack} · L{e} · slot {p} ✓",
+  toast_rack_placed_n: "Placed in {rack} · {e} · slot {p} ✓",
   rack_open_wine: "Open wine",
   rack_remove: "Remove from slot",
   toast_rack_removed: "\"{name}\" removed from slot ✓",
@@ -3258,7 +3265,8 @@ en: {
   rack_move_hint: "Tap a free slot to move the bottle there.",
   loc_open: "{n} not stored",
   rack_ph_cap: "Bottles/slot",
-  rack_caps_title: "Bottles per slot, by level",
+  rack_levels_title: "Levels: name and bottles per slot",
+  rack_level_name: "Name",
   rack_cap_low: "Up to {n} bottles are stored in one slot on this level.",
   sync_code_notfound: "Code not found – please check it",
   toast_storage_full: "Storage full – change could not be saved",
@@ -3342,6 +3350,7 @@ es: {
   rack_assign_hint: "Toca un vino y luego un hueco libre para colocarlo.",
   rack_assign_sel: "\"{name}\" seleccionado – toca un hueco libre (toca otra vez para deseleccionar).",
   toast_rack_placed: "Colocado en {rack} · N{e} · hueco {p} ✓",
+  toast_rack_placed_n: "Colocado en {rack} · {e} · hueco {p} ✓",
   rack_open_wine: "Abrir vino",
   rack_remove: "Quitar del hueco",
   toast_rack_removed: "\"{name}\" quitado del hueco ✓",
@@ -3549,7 +3558,8 @@ es: {
   rack_move_hint: "Toca un hueco libre para mover la botella.",
   loc_open: "{n} sin colocar",
   rack_ph_cap: "Botellas/hueco",
-  rack_caps_title: "Botellas por hueco, por nivel",
+  rack_levels_title: "Niveles: nombre y botellas por hueco",
+  rack_level_name: "Nombre",
   rack_cap_low: "En este nivel hay hasta {n} botellas en un hueco.",
   sync_code_notfound: "Código no encontrado: compruébalo",
   toast_storage_full: "Almacenamiento lleno: no se pudo guardar el cambio",
@@ -3633,6 +3643,7 @@ sv: {
   rack_assign_hint: "Tryck på ett vin och sedan på en ledig plats.",
   rack_assign_sel: "\"{name}\" valt – tryck på en ledig plats (tryck igen för att avmarkera).",
   toast_rack_placed: "Placerat i {rack} · N{e} · plats {p} ✓",
+  toast_rack_placed_n: "Placerat i {rack} · {e} · plats {p} ✓",
   rack_open_wine: "Öppna vin",
   rack_remove: "Ta bort från platsen",
   toast_rack_removed: "\"{name}\" borttaget från platsen ✓",
@@ -3840,7 +3851,8 @@ sv: {
   rack_move_hint: "Tryck på ett ledigt fack för att flytta flaskan dit.",
   loc_open: "{n} ej placerade",
   rack_ph_cap: "Flaskor/plats",
-  rack_caps_title: "Flaskor per plats, per hylla",
+  rack_levels_title: "Hyllor: namn och flaskor per plats",
+  rack_level_name: "Namn",
   rack_cap_low: "På den här hyllan finns upp till {n} flaskor på en plats.",
   sync_code_notfound: "Koden hittades inte – kontrollera den",
   toast_storage_full: "Lagringsutrymmet är fullt – ändringen kunde inte sparas",
@@ -3924,6 +3936,7 @@ da: {
   rack_assign_hint: "Tryk på en vin og derefter på en ledig plads.",
   rack_assign_sel: "\"{name}\" valgt – tryk på en ledig plads (tryk igen for at fravælge).",
   toast_rack_placed: "Placeret i {rack} · N{e} · plads {p} ✓",
+  toast_rack_placed_n: "Placeret i {rack} · {e} · plads {p} ✓",
   rack_open_wine: "Åbn vin",
   rack_remove: "Fjern fra pladsen",
   toast_rack_removed: "\"{name}\" fjernet fra pladsen ✓",
@@ -4131,7 +4144,8 @@ da: {
   rack_move_hint: "Tryk på et ledigt felt for at flytte flasken dertil.",
   loc_open: "{n} ikke placeret",
   rack_ph_cap: "Flasker/plads",
-  rack_caps_title: "Flasker pr. plads, pr. hylde",
+  rack_levels_title: "Hylder: navn og flasker pr. plads",
+  rack_level_name: "Navn",
   rack_cap_low: "På denne hylde ligger op til {n} flasker på én plads.",
   sync_code_notfound: "Koden blev ikke fundet – tjek den",
   toast_storage_full: "Lageret er fuldt – ændringen kunne ikke gemmes",
@@ -4215,6 +4229,7 @@ fi: {
   rack_assign_hint: "Napauta viiniä ja sitten vapaata paikkaa.",
   rack_assign_sel: "\"{name}\" valittu – napauta vapaata paikkaa (napauta uudestaan poistaaksesi valinnan).",
   toast_rack_placed: "Sijoitettu: {rack} · T{e} · paikka {p} ✓",
+  toast_rack_placed_n: "Sijoitettu: {rack} · {e} · paikka {p} ✓",
   rack_open_wine: "Avaa viini",
   rack_remove: "Poista paikalta",
   toast_rack_removed: "\"{name}\" poistettu paikalta ✓",
@@ -4422,7 +4437,8 @@ fi: {
   rack_move_hint: "Napauta vapaata paikkaa siirtääksesi pullon sinne.",
   loc_open: "{n} sijoittamatta",
   rack_ph_cap: "Pulloa/paikka",
-  rack_caps_title: "Pulloja per paikka, tasoittain",
+  rack_levels_title: "Tasot: nimi ja pulloja per paikka",
+  rack_level_name: "Nimi",
   rack_cap_low: "Tällä tasolla yhdellä paikalla on jopa {n} pulloa.",
   sync_code_notfound: "Koodia ei löytynyt – tarkista se",
   toast_storage_full: "Tallennustila täynnä – muutosta ei voitu tallentaa",
@@ -4506,6 +4522,7 @@ ru: {
   rack_assign_hint: "Коснитесь вина, затем свободной ячейки.",
   rack_assign_sel: "«{name}» выбрано – коснитесь свободной ячейки (повторное касание отменяет выбор).",
   toast_rack_placed: "Размещено: {rack} · Я{e} · место {p} ✓",
+  toast_rack_placed_n: "Размещено: {rack} · {e} · место {p} ✓",
   rack_open_wine: "Открыть вино",
   rack_remove: "Убрать из ячейки",
   toast_rack_removed: "«{name}» убрано из ячейки ✓",
@@ -4713,7 +4730,8 @@ ru: {
   rack_move_hint: "Нажмите на свободное место, чтобы переложить бутылку.",
   loc_open: "{n} не размещено",
   rack_ph_cap: "Бутылок/место",
-  rack_caps_title: "Бутылок на место, по ярусам",
+  rack_levels_title: "Ярусы: название и бутылок на место",
+  rack_level_name: "Название",
   rack_cap_low: "На этом ярусе в одном месте лежит до {n} бутылок.",
   sync_code_notfound: "Код не найден – проверьте его",
   toast_storage_full: "Память заполнена – изменение не сохранено",
@@ -4797,6 +4815,7 @@ it: {
   rack_assign_hint: "Tocca un vino, poi uno scomparto libero.",
   rack_assign_sel: "\"{name}\" selezionato – tocca uno scomparto libero (tocca di nuovo per deselezionare).",
   toast_rack_placed: "Posizionato in {rack} · L{e} · posto {p} ✓",
+  toast_rack_placed_n: "Posizionato in {rack} · {e} · posto {p} ✓",
   rack_open_wine: "Apri vino",
   rack_remove: "Rimuovi dallo scomparto",
   toast_rack_removed: "\"{name}\" rimosso dallo scomparto ✓",
@@ -5004,7 +5023,8 @@ it: {
   rack_move_hint: "Tocca un posto libero per spostare la bottiglia.",
   loc_open: "{n} non riposte",
   rack_ph_cap: "Bottiglie/posto",
-  rack_caps_title: "Bottiglie per posto, per ripiano",
+  rack_levels_title: "Ripiani: nome e bottiglie per posto",
+  rack_level_name: "Nome",
   rack_cap_low: "Su questo ripiano ci sono fino a {n} bottiglie in un posto.",
   sync_code_notfound: "Codice non trovato – controllalo",
   toast_storage_full: "Memoria piena: impossibile salvare la modifica",
@@ -5088,6 +5108,7 @@ fr: {
   rack_assign_hint: "Touchez un vin, puis un emplacement libre.",
   rack_assign_sel: "« {name} » sélectionné – touchez un emplacement libre (touchez à nouveau pour désélectionner).",
   toast_rack_placed: "Placé dans {rack} · N{e} · place {p} ✓",
+  toast_rack_placed_n: "Placé dans {rack} · {e} · place {p} ✓",
   rack_open_wine: "Ouvrir le vin",
   rack_remove: "Retirer de l'emplacement",
   toast_rack_removed: "« {name} » retiré de l'emplacement ✓",
@@ -5295,7 +5316,8 @@ fr: {
   rack_move_hint: "Touchez un emplacement libre pour y déplacer la bouteille.",
   loc_open: "{n} non rangées",
   rack_ph_cap: "Bouteilles/empl.",
-  rack_caps_title: "Bouteilles par emplacement, par niveau",
+  rack_levels_title: "Niveaux : nom et bouteilles par emplacement",
+  rack_level_name: "Nom",
   rack_cap_low: "Sur ce niveau, jusqu'à {n} bouteilles sont rangées dans un emplacement.",
   sync_code_notfound: "Code introuvable – vérifiez-le",
   toast_storage_full: "Stockage plein : la modification n'a pas pu être enregistrée",
@@ -5379,6 +5401,7 @@ pl: {
   rack_assign_hint: "Dotknij wino, a potem wolne miejsce.",
   rack_assign_sel: "\"{name}\" wybrane – dotknij wolne miejsce (dotknij ponownie, aby odznaczyć).",
   toast_rack_placed: "Umieszczono w {rack} · P{e} · miejsce {p} ✓",
+  toast_rack_placed_n: "Umieszczono w {rack} · {e} · miejsce {p} ✓",
   rack_open_wine: "Otwórz wino",
   rack_remove: "Usuń z miejsca",
   toast_rack_removed: "\"{name}\" usunięto z miejsca ✓",
@@ -5586,7 +5609,8 @@ pl: {
   rack_move_hint: "Dotknij wolnego miejsca, aby przenieść butelkę.",
   loc_open: "{n} nieułożone",
   rack_ph_cap: "Butelek/miejsce",
-  rack_caps_title: "Butelek na miejsce, wg poziomów",
+  rack_levels_title: "Poziomy: nazwa i butelek na miejsce",
+  rack_level_name: "Nazwa",
   rack_cap_low: "Na tym poziomie w jednym miejscu leży do {n} butelek.",
   sync_code_notfound: "Nie znaleziono kodu – sprawdź go",
   toast_storage_full: "Pamięć pełna – nie udało się zapisać zmiany",
@@ -5670,6 +5694,7 @@ hu: {
   rack_assign_hint: "Koppints egy borra, majd egy szabad helyre.",
   rack_assign_sel: "\"{name}\" kiválasztva – koppints egy szabad helyre (újra koppintva megszünteted).",
   toast_rack_placed: "Elhelyezve: {rack} · {e}. szint · {p}. hely ✓",
+  toast_rack_placed_n: "Elhelyezve: {rack} · {e} · {p}. hely ✓",
   rack_open_wine: "Bor megnyitása",
   rack_remove: "Eltávolítás a helyről",
   toast_rack_removed: "\"{name}\" eltávolítva a helyről ✓",
@@ -5877,7 +5902,8 @@ hu: {
   rack_move_hint: "Érintsen meg egy szabad helyet, hogy oda tegye az üveget.",
   loc_open: "{n} nincs elhelyezve",
   rack_ph_cap: "Üveg/hely",
-  rack_caps_title: "Üveg helyenként, szintenként",
+  rack_levels_title: "Szintek: név és üveg helyenként",
+  rack_level_name: "Név",
   rack_cap_low: "Ezen a szinten egy helyen legfeljebb {n} üveg van.",
   sync_code_notfound: "A kód nem található – ellenőrizd",
   toast_storage_full: "A tárhely megtelt – a módosítást nem sikerült menteni",
@@ -5961,6 +5987,7 @@ cs: {
   rack_assign_hint: "Klepni na víno a poté na volné místo.",
   rack_assign_sel: "\"{name}\" vybráno – klepni na volné místo (dalším klepnutím zrušíš výběr).",
   toast_rack_placed: "Umístěno v {rack} · Ú{e} · místo {p} ✓",
+  toast_rack_placed_n: "Umístěno v {rack} · {e} · místo {p} ✓",
   rack_open_wine: "Otevřít víno",
   rack_remove: "Odebrat z místa",
   toast_rack_removed: "\"{name}\" odebráno z místa ✓",
@@ -6168,7 +6195,8 @@ cs: {
   rack_move_hint: "Klepněte na volné místo a láhev se tam přesune.",
   loc_open: "{n} neuloženo",
   rack_ph_cap: "Lahví/místo",
-  rack_caps_title: "Lahví na místo, podle úrovní",
+  rack_levels_title: "Úrovně: název a lahví na místo",
+  rack_level_name: "Název",
   rack_cap_low: "Na této úrovni je na jednom místě až {n} lahví.",
   sync_code_notfound: "Kód nebyl nalezen – zkontrolujte jej",
   toast_storage_full: "Úložiště je plné – změnu se nepodařilo uložit",
@@ -6252,6 +6280,7 @@ sk: {
   rack_assign_hint: "Ťukni na víno a potom na voľné miesto.",
   rack_assign_sel: "\"{name}\" vybrané – ťukni na voľné miesto (opätovným ťuknutím zrušíš výber).",
   toast_rack_placed: "Umiestnené v {rack} · Ú{e} · miesto {p} ✓",
+  toast_rack_placed_n: "Umiestnené v {rack} · {e} · miesto {p} ✓",
   rack_open_wine: "Otvoriť víno",
   rack_remove: "Odobrať z miesta",
   toast_rack_removed: "\"{name}\" odobrané z miesta ✓",
@@ -6459,7 +6488,8 @@ sk: {
   rack_move_hint: "Ťuknite na voľné miesto a fľaša sa tam presunie.",
   loc_open: "{n} neuložených",
   rack_ph_cap: "Fliaš/miesto",
-  rack_caps_title: "Fliaš na miesto, podľa úrovní",
+  rack_levels_title: "Úrovne: názov a fliaš na miesto",
+  rack_level_name: "Názov",
   rack_cap_low: "Na tejto úrovni je na jednom mieste až {n} fliaš.",
   sync_code_notfound: "Kód sa nenašiel – skontrolujte ho",
   toast_storage_full: "Úložisko je plné – zmenu sa nepodarilo uložiť",
@@ -6543,6 +6573,7 @@ ro: {
   rack_assign_hint: "Atinge un vin, apoi un loc liber.",
   rack_assign_sel: "\"{name}\" selectat – atinge un loc liber (atinge din nou pentru a deselecta).",
   toast_rack_placed: "Plasat în {rack} · N{e} · loc {p} ✓",
+  toast_rack_placed_n: "Plasat în {rack} · {e} · loc {p} ✓",
   rack_open_wine: "Deschide vinul",
   rack_remove: "Elimină din loc",
   toast_rack_removed: "\"{name}\" eliminat din loc ✓",
@@ -6750,7 +6781,8 @@ ro: {
   rack_move_hint: "Atinge un loc liber pentru a muta sticla acolo.",
   loc_open: "{n} neașezate",
   rack_ph_cap: "Sticle/loc",
-  rack_caps_title: "Sticle pe loc, pe nivel",
+  rack_levels_title: "Niveluri: nume și sticle pe loc",
+  rack_level_name: "Nume",
   rack_cap_low: "Pe acest nivel, într-un loc sunt până la {n} sticle.",
   sync_code_notfound: "Codul nu a fost găsit – verifică-l",
   toast_storage_full: "Spațiu plin – modificarea nu a putut fi salvată",
@@ -6834,6 +6866,7 @@ hr: {
   rack_assign_hint: "Dodirni vino, zatim slobodno mjesto.",
   rack_assign_sel: "\"{name}\" odabrano – dodirni slobodno mjesto (ponovni dodir poništava odabir).",
   toast_rack_placed: "Smješteno u {rack} · R{e} · mjesto {p} ✓",
+  toast_rack_placed_n: "Smješteno u {rack} · {e} · mjesto {p} ✓",
   rack_open_wine: "Otvori vino",
   rack_remove: "Ukloni s mjesta",
   toast_rack_removed: "\"{name}\" uklonjeno s mjesta ✓",
@@ -7041,7 +7074,8 @@ hr: {
   rack_move_hint: "Dodirni slobodno mjesto da premjestiš bocu.",
   loc_open: "{n} nije pohranjeno",
   rack_ph_cap: "Boca/mjesto",
-  rack_caps_title: "Boca po mjestu, po razini",
+  rack_levels_title: "Razine: naziv i boca po mjestu",
+  rack_level_name: "Naziv",
   rack_cap_low: "Na ovoj razini u jednom je mjestu do {n} boca.",
   sync_code_notfound: "Kod nije pronađen – provjerite ga",
   toast_storage_full: "Pohrana je puna – promjena nije spremljena",
@@ -7125,6 +7159,7 @@ pt: {
   rack_assign_hint: "Toca num vinho e depois num lugar livre.",
   rack_assign_sel: "\"{name}\" selecionado – toca num lugar livre (toca novamente para desmarcar).",
   toast_rack_placed: "Colocado em {rack} · N{e} · lugar {p} ✓",
+  toast_rack_placed_n: "Colocado em {rack} · {e} · lugar {p} ✓",
   rack_open_wine: "Abrir vinho",
   rack_remove: "Remover do lugar",
   toast_rack_removed: "\"{name}\" removido do lugar ✓",
@@ -7332,7 +7367,8 @@ pt: {
   rack_move_hint: "Toque num lugar livre para mover a garrafa.",
   loc_open: "{n} por arrumar",
   rack_ph_cap: "Garrafas/lugar",
-  rack_caps_title: "Garrafas por lugar, por nível",
+  rack_levels_title: "Níveis: nome e garrafas por lugar",
+  rack_level_name: "Nome",
   rack_cap_low: "Neste nível há até {n} garrafas num lugar.",
   sync_code_notfound: "Código não encontrado – verifique-o",
   toast_storage_full: "Armazenamento cheio – não foi possível guardar a alteração",
@@ -7416,6 +7452,7 @@ no: {
   rack_assign_hint: "Trykk på en vin og deretter på en ledig plass.",
   rack_assign_sel: "\"{name}\" valgt – trykk på en ledig plass (trykk igjen for å velge bort).",
   toast_rack_placed: "Plassert i {rack} · N{e} · plass {p} ✓",
+  toast_rack_placed_n: "Plassert i {rack} · {e} · plass {p} ✓",
   rack_open_wine: "Åpne vin",
   rack_remove: "Fjern fra plassen",
   toast_rack_removed: "\"{name}\" fjernet fra plassen ✓",
@@ -7623,7 +7660,8 @@ no: {
   rack_move_hint: "Trykk på en ledig plass for å flytte flasken dit.",
   loc_open: "{n} ikke plassert",
   rack_ph_cap: "Flasker/plass",
-  rack_caps_title: "Flasker per plass, per hylle",
+  rack_levels_title: "Hyller: navn og flasker per plass",
+  rack_level_name: "Navn",
   rack_cap_low: "På denne hyllen ligger opptil {n} flasker på én plass.",
   sync_code_notfound: "Koden ble ikke funnet – sjekk den",
   toast_storage_full: "Lagringen er full – endringen kunne ikke lagres",
@@ -7707,6 +7745,7 @@ nl: {
   rack_assign_hint: "Tik op een wijn en daarna op een vrij vak.",
   rack_assign_sel: "\"{name}\" geselecteerd – tik op een vrij vak (tik nogmaals om te deselecteren).",
   toast_rack_placed: "Geplaatst in {rack} · N{e} · plek {p} ✓",
+  toast_rack_placed_n: "Geplaatst in {rack} · {e} · plek {p} ✓",
   rack_open_wine: "Wijn openen",
   rack_remove: "Uit vak verwijderen",
   toast_rack_removed: "\"{name}\" uit vak verwijderd ✓",
@@ -7914,7 +7953,8 @@ nl: {
   rack_move_hint: "Tik op een vrije plek om de fles daarheen te verplaatsen.",
   loc_open: "{n} niet opgeborgen",
   rack_ph_cap: "Flessen/plek",
-  rack_caps_title: "Flessen per plek, per niveau",
+  rack_levels_title: "Niveaus: naam en flessen per plek",
+  rack_level_name: "Naam",
   rack_cap_low: "Op dit niveau liggen tot {n} flessen op één plek.",
   sync_code_notfound: "Code niet gevonden – controleer hem",
   toast_storage_full: "Opslag vol – wijziging kon niet worden opgeslagen",
@@ -8152,7 +8192,7 @@ function formatLocation(w) {
   if (vp.length > 1) {
     const byRack = new Map();
     vp.forEach(x => {
-      const name = rackById(x.rack).name, m = byRack.get(name) || new Map(), k = 'E' + x.e + '/P' + x.p;
+      const name = rackById(x.rack).name, m = byRack.get(name) || new Map(), k = levelLabel(rackById(x.rack), x.e) + '/P' + x.p;
       m.set(k, (m.get(k) || 0) + 1); byRack.set(name, m);
     });
     return [...byRack].map(([name, m]) => 'Regal ' + name + ': ' + [...m].map(([k, n]) => k + (n > 1 ? ' ×' + n : '')).join(', ')).join(' · ') + suffix;
@@ -8871,6 +8911,12 @@ function rackById(id) { return settings.racks.find(r => r.id === id) || null; }
 function rackCols(r) { return r.cols; }
 function rackCap(r, e) { return (r && ((r.lv && r.lv[e] && r.lv[e].cap) || r.cap)) || 1; }
 function rackMaxCols(r) { return r.cols; }
+// Beschriftung einer Ebene: eigener Name (max. 6 Zeichen) oder "E<Nummer>"
+function levelLabel(r, e) { return (r && r.lv && r.lv[e] && r.lv[e].name) || 'E' + e; }
+function placedToast(r, e, p) {
+  const custom = r.lv && r.lv[e] && r.lv[e].name;
+  showToast(t(custom ? 'toast_rack_placed_n' : 'toast_rack_placed', { rack: r.name, e: custom || e, p: p }));
+}
 // Plätze eines Weins, die es wirklich gibt (Regal vorhanden, Fach liegt im Regal)
 function validPlacements(w) {
   return (w.placements || []).filter(x => { const r = rackById(x.rack); return r && x.e <= r.rows && x.p <= rackCols(r, x.e); });
@@ -8944,7 +8990,7 @@ function slotClick(e, p) {
     if (w) {
       const list = validPlacements(w);
       const i = list.findIndex(x => x.rack === m.rack && x.e === m.e && x.p === m.p);
-      if (i >= 0) { list[i] = { rack: r.id, e, p }; setPlacements(w, list); save(); showToast(t('toast_rack_placed', { rack: r.name, e: e, p: p })); }
+      if (i >= 0) { list[i] = { rack: r.id, e, p }; setPlacements(w, list); save(); placedToast(r, e, p); }
     }
     renderRacks();
     return;
@@ -8959,7 +9005,7 @@ function slotClick(e, p) {
     save();
     if (unplacedCount(w) < 1) rackSelectedWineId = null;
     renderRacks();
-    showToast(t('toast_rack_placed', { rack: r.name, e: e, p: p }));
+    placedToast(r, e, p);
     return;
   }
   if (entries.length) selectFilledSlot(e, p);
@@ -9067,20 +9113,24 @@ function renderRacks() {
   // Verfügbare Breite = Innenbreite des Containers - Box-Rahmen/-Padding (2 + 28) - Ebenen-Spalte (28)
   const elCs = getComputedStyle(el);
   const innerW = (el.clientWidth || 360) - (parseFloat(elCs.paddingLeft) || 0) - (parseFloat(elCs.paddingRight) || 0);
-  const availW = Math.max(240, innerW - 2 - 28 - 28);
+  const lblCtx = document.createElement('canvas').getContext('2d');
+  lblCtx.font = '10px Inter, sans-serif';
+  let lblW = 28;
+  for (let e = 1; e <= r.rows; e++) lblW = Math.max(lblW, Math.ceil(lblCtx.measureText(levelLabel(r, e)).width) + 10);
+  const availW = Math.max(240, innerW - 2 - 28 - lblW);
   // Plätze schrumpfen, bis die ganze Ebene in die Breite passt (erst bei sehr breiten Regalen erscheint ein seitlicher Balken)
   const gap = maxCols > 10 ? 3 : maxCols > 7 ? 4 : 7;
   const slotW = Math.max(18, Math.min(96, Math.floor((availW - gap * maxCols) / maxCols)));
   const slotH = Math.max(Math.round(slotW * 22 / 60), 26);   // Tippfläche mindestens 26 px hoch
   const slotMode = slotW >= 76 ? 'year' : 'none';
-  const colTmpl = `28px repeat(${maxCols}, ${slotW}px)`;
+  const colTmpl = `${lblW}px repeat(${maxCols}, ${slotW}px)`;
   const dropping = !!(rackSelectedWineId || rackMove);
   // Kopfzeile mit Platz-Nummern
   html += `<div class="rack-grid" style="grid-template-columns:${colTmpl};gap:${gap}px"><div></div>`;
   for (let p=1;p<=maxCols;p++) html += `<div class="rack-collabel">${p}</div>`;
   // Ebenen von oben (höchste) nach unten (Ebene 1); Ebenen mit weniger Plätzen lassen den Rest leer
   for (let e=r.rows; e>=1; e--) {
-    html += `<div class="rack-elabel">E${e}</div>`;
+    html += `<div class="rack-elabel">${esc(levelLabel(r, e))}</div>`;
     const cap = rackCap(r, e), cols = rackCols(r, e);
     for (let p=1;p<=maxCols;p++) {
       if (p > cols) { html += '<div></div>'; continue; }
@@ -9151,24 +9201,31 @@ function renderRackSetup() {
   list.innerHTML = settings.racks.map((r,i) => {
     let h = `<div class="rack-setup-item"><span class="n">${esc(r.name)}</span><span class="d">${r.rows} × ${r.cols}${r.cap > 1 ? ' · ×' + r.cap : ''}${Object.keys(r.lv || {}).length ? ' *' : ''}</span><button class="rack-setup-edit" onclick="editRackLevels(${i})">✏️</button><button class="rack-setup-del" onclick="removeRack(${i})">🗑</button></div>`;
     if (i === rackEditIdx) {
-      h += `<div class="rack-level-editor"><div class="rle-title">${t('rack_caps_title')}</div>`;
-      for (let e = r.rows; e >= 1; e--) h += `<label class="rle-row"><span>E${e}</span><input type="number" min="1" max="500" value="${rackCap(r, e)}" onchange="setLevelCap(${i},${e},this.value)"></label>`;
+      h += `<div class="rack-level-editor"><div class="rle-title">${t('rack_levels_title')}</div>`;
+      h += `<div class="rle-row rle-head"><span></span><span>${t('rack_level_name')}</span><span>${t('rack_ph_cap')}</span></div>`;
+      for (let e = r.rows; e >= 1; e--) h += `<div class="rle-row"><span>E${e}</span><input type="text" class="rle-name" maxlength="6" placeholder="E${e}" value="${esc((r.lv && r.lv[e] && r.lv[e].name) || '')}" onchange="setLevelProp(${i},${e},'name',this.value)"><input type="number" min="1" max="500" value="${rackCap(r, e)}" onchange="setLevelProp(${i},${e},'cap',this.value)"></div>`;
       h += '</div>';
     }
     return h;
   }).join('');
 }
 function editRackLevels(i) { rackEditIdx = rackEditIdx === i ? -1 : i; renderRackSetup(); }
-// Flaschen pro Platz für eine Ebene setzen (nicht unter die aktuell dort vorhandene Belegung)
-function setLevelCap(i, e, v) {
+// Name oder Flaschen pro Platz einer Ebene setzen (Kapazität nicht unter die aktuell dort vorhandene Belegung)
+function setLevelProp(i, e, prop, v) {
   const r = settings.racks[i];
   if (!r) return;
-  const cap = Math.max(1, Math.min(500, parseInt(v) || 1));
-  let most = 0;
-  slotMapFor(r.id).forEach((arr, k) => { if (+k.split('|')[0] === e) most = Math.max(most, arr.length); });
-  if (cap < most) { showToast(t('rack_cap_low', { n: most })); renderRackSetup(); return; }
   r.lv = r.lv || {};
-  if (cap === r.cap) delete r.lv[e]; else r.lv[e] = { cap };
+  const cur = r.lv[e] || {};
+  let name = cur.name || '', cap = cur.cap || r.cap;
+  if (prop === 'name') name = String(v || '').trim().slice(0, 6);
+  else {
+    cap = Math.max(1, Math.min(500, parseInt(v) || 1));
+    let most = 0;
+    slotMapFor(r.id).forEach((arr, k) => { if (+k.split('|')[0] === e) most = Math.max(most, arr.length); });
+    if (cap < most) { showToast(t('rack_cap_low', { n: most })); renderRackSetup(); return; }
+  }
+  if (!name && cap === r.cap) delete r.lv[e];
+  else { r.lv[e] = { cap }; if (name) r.lv[e].name = name; }
   saveSettings(); touchData();
   renderRackSetup();
 }
