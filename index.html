@@ -13053,6 +13053,47 @@ function openAddModal() {
 
 function closeModal(id) { if (id === 'add-modal') { formToken++; if (formPhotoPending) { photoDel(formPhotoPending); formPhotoPending = null; } } document.getElementById(id).classList.remove('show'); }
 
+// Fenster per Wischen nach unten schließen (wie iOS-Sheets). Gilt nur am Griff und am oberen Rand des Fensters (und nur ganz oben im Fenster),
+// damit das Scrollen im Fenster nie versehentlich schließt. Das Fenster folgt dem Finger, bei zu kurzem Zug schnappt es zurück.
+(function () {
+  const AREA = 64;   // px ab Oberkante des Fensters: Griff + Überschrift
+  let g = null;
+  document.addEventListener('touchstart', (ev) => {
+    g = null;
+    if (ev.touches.length !== 1) return;
+    const modal = ev.target.closest && ev.target.closest('.modal-overlay.show .modal');
+    if (!modal || modal.scrollTop > 0) return;
+    const y = ev.touches[0].clientY;
+    if (y - modal.getBoundingClientRect().top > AREA) return;
+    g = { modal, overlay: modal.parentElement, y0: y, t0: Date.now(), dy: 0 };
+    modal.style.transition = 'none';
+  }, { passive: true });
+  document.addEventListener('touchmove', (ev) => {
+    if (!g) return;
+    const dy = ev.touches[0].clientY - g.y0;
+    g.dy = Math.max(0, dy);
+    if (dy <= 0) { g.modal.style.transform = ''; return; }
+    ev.preventDefault();   // kein Mitscrollen/Gummiband der Seite dahinter
+    g.modal.style.transform = 'translateY(' + dy + 'px)';
+    g.overlay.style.background = 'rgba(0,0,0,' + Math.max(0.1, 0.7 * (1 - dy / 400)).toFixed(2) + ')';
+  }, { passive: false });
+  const end = () => {
+    if (!g) return;
+    const { modal, overlay, dy, t0 } = g; g = null;
+    const fast = dy > 40 && dy / Math.max(1, Date.now() - t0) > 0.6;   // schneller Wisch (px/ms)
+    modal.style.transition = 'transform .2s ease-out';
+    if (dy > 110 || fast) {
+      modal.style.transform = 'translateY(100%)';
+      setTimeout(() => { closeModal(overlay.id); modal.style.transition = ''; modal.style.transform = ''; overlay.style.background = ''; }, 200);
+    } else {
+      modal.style.transform = ''; overlay.style.background = '';
+      setTimeout(() => { modal.style.transition = ''; }, 220);
+    }
+  };
+  document.addEventListener('touchend', end);
+  document.addEventListener('touchcancel', end);
+})();
+
 function setStar(n) {
   currentStar = n;
   document.querySelectorAll('.star-btn').forEach((btn,i) => {
