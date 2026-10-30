@@ -684,6 +684,9 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 }
 .rt-seg {
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -11593,7 +11596,7 @@ function renderTrinkreife() {
       <div class="ripeness-meta">${w.year||''} ${w.type?' · '+esc(TYPE_LABELS[w.type]||w.type):''}</div>
       ${wineSlotChips(w)}
       <div style="display:flex;gap:0;border-radius:6px;overflow:hidden;height:18px;margin-bottom:6px">
-        <div class="rt-seg rt-jung" style="flex:${from-(w.year||from-3)}">${t('seg_young')}</div>
+        ${from-(w.year||from-3) > 0 ? `<div class="rt-seg rt-jung" style="flex:${from-(w.year||from-3)}">${t('seg_young')}</div>` : ''}
         <div class="rt-seg rt-optimal" style="flex:${peak-from+1}">${t('seg_optimal')}</div>
         <div class="rt-seg rt-peak" style="flex:${to-peak+1}">${t('seg_peak')}</div>
         <div class="rt-seg rt-over" style="flex:2">–</div>
