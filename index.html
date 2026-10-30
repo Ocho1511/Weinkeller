@@ -14114,7 +14114,7 @@ function openQrLabels(i) {
   document.getElementById('qr-title').textContent = t('qr_title', { name: i < 0 ? t('nav_racks') : racks[0].name });
   const grid = document.getElementById('qr-grid'); grid.innerHTML = '';
   qrLabelCanvases.forEach(cv => { const el = document.createElement('canvas'); el.width = cv.width; el.height = cv.height; el.getContext('2d').drawImage(cv, 0, 0); grid.appendChild(el); });
-  document.getElementById('qr-print-btn').style.display = isNativeApp() ? 'none' : '';
+  document.getElementById('qr-print-btn').style.display = isNativeApp() || noBrowserPrint() ? 'none' : '';
   document.getElementById('qr-modal').classList.add('show');
 }
 function qrPages(perPage) { const pages = []; for (let k = 0; k < qrLabelCanvases.length; k += perPage) pages.push(qrLabelCanvases.slice(k, k + perPage)); return pages; }
@@ -14138,17 +14138,21 @@ async function qrLabelsPdf() {
   } catch (err) { exportFailed(err); }
 }
 // Browser-Druck: nur der Bogen wird gedruckt (Stylesheet für @media print)
-function qrLabelsPrint() {
+// iPhone/iPad (auch als Home-Bildschirm-App): kein verlässlicher Browser-Druck; dort läuft Drucken über "PDF teilen / drucken" (Teilen-Menü → Drucken)
+const noBrowserPrint = () => /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+async function qrLabelsPrint() {
   const cuts = document.getElementById('qr-cuts').checked;
   const sheet = document.getElementById('qr-print-sheet');
   sheet.innerHTML = qrPages(SHEET.cols * SHEET.rows).map(page => '<div class="qr-page">' + page.map((cv, k) => {
     const x = SHEET.left + (k % SHEET.cols) * SHEET.px, y = SHEET.top + Math.floor(k / SHEET.cols) * SHEET.py;
     return '<img src="' + cv.toDataURL('image/png') + '" style="left:' + x + 'mm;top:' + y + 'mm;' + (cuts ? 'outline:0.1mm solid #bbb;' : '') + '">';
   }).join('') + '</div>').join('');
+  // Erst drucken, wenn alle Etiketten-Bilder dekodiert sind (sonst kommen leere Seiten), und im selben Klick-Vorgang bleiben
+  try { await Promise.all([...sheet.querySelectorAll('img')].map(im => im.decode())); } catch (e) {}
   const done = () => { document.body.classList.remove('qr-printing'); window.removeEventListener('afterprint', done); };
   window.addEventListener('afterprint', done);
   document.body.classList.add('qr-printing');
-  setTimeout(() => window.print(), 50);
+  try { window.print(); } catch (e) { done(); showToast(t('toast_exportfail')); }
 }
 
 // ═══════════════════════════════════════
