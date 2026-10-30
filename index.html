@@ -223,7 +223,8 @@ body {
 .dot-rosé { background: var(--rose); }
 .dot-sekt { background: var(--sparkling); }
 .dot-other { background: #8a7080; }
-.wine-type-grape { flex-shrink: 0; margin-top: 2px; display: block; line-height: 0; }
+.wine-type-grape { flex-shrink: 0; margin-top: 2px; display: block; line-height: 0; color: inherit; text-decoration: none; }
+a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .wine-row .wine-type-grape { margin-top: 0; }
 .wine-card-img { flex-shrink: 0; display: block; }
 .wine-card-img img {
@@ -8326,7 +8327,12 @@ function grapeSvg(fill) {
     </g>
   </svg>`;
 }
-function typeGrape(w) { return `<span class="wine-type-grape" title="${esc(TYPE_LABELS[w.type]||'')}">${grapeSvg(TYPE_FILL[w.type]||TYPE_FILL.other)}</span>`; }
+// Traubensymbol in der Farbe der Weinart; antippen öffnet die Wikipedia-Seite zur Rebsorte bzw. zum Wein
+function typeGrape(w) {
+  const svg = grapeSvg(TYPE_FILL[w.type]||TYPE_FILL.other);
+  if (!w.grape && !w.name) return `<span class="wine-type-grape" title="${esc(TYPE_LABELS[w.type]||'')}">${svg}</span>`;
+  return `<a class="wine-type-grape" href="${wikiUrl(w)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(t('wiki_open'))}" aria-label="${esc(t('wiki_open'))}">${svg}</a>`;
+}
 let TYPE_LABELS = buildTypeLabels();
 
 function formatLocation(w) {
@@ -8381,10 +8387,6 @@ function wikiUrl(w) {
   const q = w.grape || w.name || '';
   const lang = (settings.lang || 'de');
   return 'https://' + lang + '.wikipedia.org/wiki/Special:Search?search=' + encodeURIComponent(q) + '&go=Go';
-}
-function wineWikiLink(w) {
-  if (!w.grape && !w.name) return '';
-  return ` <a class="wine-map-link" href="${wikiUrl(w)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(t('wiki_open'))}">📖</a>`;
 }
 
 function renderKeller() {
@@ -8478,7 +8480,7 @@ function renderKeller() {
         ${wineImgHtml(w,'wine-card-img')}
         <div style="flex:1;min-width:0">
           <div class="wine-name">${esc(w.name)}</div>
-          <div class="wine-year">${w.year||''} ${w.grape?'· '+esc(w.grape):''}${wineWikiLink(w)}</div>
+          <div class="wine-year">${w.year||''} ${w.grape?'· '+esc(w.grape):''}</div>
         </div>
         ${typeGrape(w)}
       </div>
