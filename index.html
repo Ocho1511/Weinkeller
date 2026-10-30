@@ -526,6 +526,19 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 #scan-reader { width: 100%; max-width: 480px; }
 #scan-reader video { border-radius: 12px; }
 #scan-cancel { min-width: 160px; }
+#qr-grid { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+#qr-grid canvas { width: calc(50% - 4px); height: auto; border-radius: 6px; background: #fff; }
+.qr-hint { font-size: 12px; color: var(--text-muted); }
+.qr-cuts { display: flex; align-items: center; gap: 8px; font-size: 13px; margin-bottom: 12px; }
+.rack-qr-all { margin-top: 10px; }
+#qr-print-sheet { display: none; }
+@media print {
+  body.qr-printing > *:not(#qr-print-sheet) { display: none !important; }
+  body.qr-printing #qr-print-sheet { display: block; }
+  @page { size: A4; margin: 0; }
+  .qr-page { position: relative; width: 210mm; height: 297mm; page-break-after: always; overflow: hidden; }
+  .qr-page img { position: absolute; width: 63.5mm; height: 38.1mm; }
+}
 .rack-ripe { position: absolute; left: 1px; top: 1px; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.9); box-shadow: 0 0 0 1px rgba(0,0,0,.45); pointer-events: none; z-index: 2; }
 .rack-slot.tiny .rack-ripe { width: 7px; height: 7px; border-width: 1px; }
 .ripeness-loc { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: -6px 0 10px; }
@@ -1345,6 +1358,22 @@ input[type="file"] { display: none; }
 <!-- ════════════════════════════════════════
      ADD WINE MODAL
 ════════════════════════════════════════ -->
+<div class="modal-overlay" id="qr-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2 id="qr-title"></h2>
+    <div class="qr-hint" data-i18n="qr_hint">Ein Etikett für das Regal und je eines pro Ebene. Ausdrucken (Etikettenbogen 63,5 × 38,1 mm, 21 pro Seite) und aufkleben.</div>
+    <div id="qr-grid"></div>
+    <label class="qr-cuts"><input type="checkbox" id="qr-cuts"> <span data-i18n="qr_cuts">Schnittlinien</span></label>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="closeModal('qr-modal')" data-i18n="qr_close">Schließen</button>
+      <button class="btn-secondary" id="qr-print-btn" onclick="qrLabelsPrint()" data-i18n="qr_print">Drucken</button>
+      <button class="btn-primary" onclick="qrLabelsPdf()" data-i18n="qr_pdf">PDF teilen / drucken</button>
+    </div>
+  </div>
+</div>
+<div id="qr-print-sheet"></div>
+
 <div id="scan-overlay"><div id="scan-hint"></div><div id="scan-reader"></div><button id="scan-cancel" class="btn-secondary" data-i18n="btn_cancel">Abbrechen</button></div>
 
 <div class="modal-overlay" id="add-modal">
@@ -3065,6 +3094,14 @@ de: {
   barcode_known: "{name} ist schon im Keller. Noch eine Flasche hinzufügen?",
   barcode_added: "Flasche hinzugefügt – jetzt {n} Stück",
   barcode_error: "Abfrage fehlgeschlagen (keine Verbindung?)",
+  qr_btn: "QR-Etiketten",
+  qr_all: "QR-Etiketten für alle Regale",
+  qr_title: "QR-Etiketten: {name}",
+  qr_hint: "Ein Etikett für das Regal und je eines pro Ebene. Ausdrucken (Etikettenbogen 63,5 × 38,1 mm, 21 pro Seite) und aufkleben.",
+  qr_pdf: "PDF teilen / drucken",
+  qr_print: "Drucken",
+  qr_close: "Schließen",
+  qr_cuts: "Schnittlinien",
   loc_slot: "Platz",
   rack_cap_low: "Auf dieser Ebene liegen bis zu {n} Flaschen in einem Platz.",
   sync_code_notfound: "Code nicht gefunden – bitte prüfen",
@@ -3383,6 +3420,14 @@ en: {
   barcode_known: "{name} is already in your cellar. Add one more bottle?",
   barcode_added: "Bottle added – now {n} in stock",
   barcode_error: "Lookup failed (no connection?)",
+  qr_btn: "QR labels",
+  qr_all: "QR labels for all racks",
+  qr_title: "QR labels: {name}",
+  qr_hint: "One label for the rack and one for each level. Print them (label sheet 63.5 × 38.1 mm, 21 per page) and stick them on.",
+  qr_pdf: "Share / print PDF",
+  qr_print: "Print",
+  qr_close: "Close",
+  qr_cuts: "Cut lines",
   loc_slot: "Slot",
   rack_cap_low: "Up to {n} bottles are stored in one slot on this level.",
   sync_code_notfound: "Code not found – please check it",
@@ -3701,6 +3746,14 @@ es: {
   barcode_known: "{name} ya está en tu bodega. ¿Añadir una botella más?",
   barcode_added: "Botella añadida – ahora hay {n} en stock",
   barcode_error: "Error en la consulta (¿sin conexión?)",
+  qr_btn: "Etiquetas QR",
+  qr_all: "Etiquetas QR de todos los estantes",
+  qr_title: "Etiquetas QR: {name}",
+  qr_hint: "Una etiqueta para el estante y una por cada nivel. Imprímelas (hoja de etiquetas de 63,5 × 38,1 mm, 21 por página) y pégalas.",
+  qr_pdf: "Compartir / imprimir PDF",
+  qr_print: "Imprimir",
+  qr_close: "Cerrar",
+  qr_cuts: "Líneas de corte",
   loc_slot: "Sitio",
   rack_cap_low: "En este nivel hay hasta {n} botellas en un hueco.",
   sync_code_notfound: "Código no encontrado: compruébalo",
@@ -4019,6 +4072,14 @@ sv: {
   barcode_known: "{name} finns redan i din vinkällare. Lägga till en flaska till?",
   barcode_added: "Flaska tillagd – nu {n} i lager",
   barcode_error: "Sökningen misslyckades (ingen anslutning?)",
+  qr_btn: "QR-etiketter",
+  qr_all: "QR-etiketter för alla hyllor",
+  qr_title: "QR-etiketter: {name}",
+  qr_hint: "En etikett för hyllan och en för varje hyllplan. Skriv ut (etikettark 63,5 × 38,1 mm, 21 per sida) och sätt fast dem.",
+  qr_pdf: "Dela / skriv ut PDF",
+  qr_print: "Skriv ut",
+  qr_close: "Stäng",
+  qr_cuts: "Skärlinjer",
   loc_slot: "Plats",
   rack_cap_low: "På den här hyllan finns upp till {n} flaskor på en plats.",
   sync_code_notfound: "Koden hittades inte – kontrollera den",
@@ -4337,6 +4398,14 @@ da: {
   barcode_known: "{name} er allerede i din vinkælder. Tilføj endnu en flaske?",
   barcode_added: "Flaske tilføjet – nu {n} på lager",
   barcode_error: "Opslaget mislykkedes (ingen forbindelse?)",
+  qr_btn: "QR-etiketter",
+  qr_all: "QR-etiketter til alle reoler",
+  qr_title: "QR-etiketter: {name}",
+  qr_hint: "Én etiket til reolen og én for hver hylde. Udskriv dem (etiketark 63,5 × 38,1 mm, 21 pr. side) og sæt dem på.",
+  qr_pdf: "Del / udskriv PDF",
+  qr_print: "Udskriv",
+  qr_close: "Luk",
+  qr_cuts: "Skærelinjer",
   loc_slot: "Plads",
   rack_cap_low: "På denne hylde ligger op til {n} flasker på én plads.",
   sync_code_notfound: "Koden blev ikke fundet – tjek den",
@@ -4655,6 +4724,14 @@ fi: {
   barcode_known: "{name} on jo kellarissasi. Lisätäänkö vielä yksi pullo?",
   barcode_added: "Pullo lisätty – nyt {n} kpl",
   barcode_error: "Haku epäonnistui (ei yhteyttä?)",
+  qr_btn: "QR-tarrat",
+  qr_all: "QR-tarrat kaikille hyllyille",
+  qr_title: "QR-tarrat: {name}",
+  qr_hint: "Yksi tarra hyllylle ja yksi jokaiselle tasolle. Tulosta (tarra-arkki 63,5 × 38,1 mm, 21 per sivu) ja kiinnitä.",
+  qr_pdf: "Jaa / tulosta PDF",
+  qr_print: "Tulosta",
+  qr_close: "Sulje",
+  qr_cuts: "Leikkuuviivat",
   loc_slot: "Paikka",
   rack_cap_low: "Tällä tasolla yhdellä paikalla on jopa {n} pulloa.",
   sync_code_notfound: "Koodia ei löytynyt – tarkista se",
@@ -4973,6 +5050,14 @@ ru: {
   barcode_known: "{name} уже есть в вашем погребе. Добавить ещё одну бутылку?",
   barcode_added: "Бутылка добавлена – теперь в наличии {n}",
   barcode_error: "Не удалось выполнить поиск (нет соединения?)",
+  qr_btn: "QR-этикетки",
+  qr_all: "QR-этикетки для всех полок",
+  qr_title: "QR-этикетки: {name}",
+  qr_hint: "Одна этикетка для полки и по одной для каждого яруса. Распечатайте (лист этикеток 63,5 × 38,1 мм, 21 на странице) и наклейте.",
+  qr_pdf: "Поделиться / печать PDF",
+  qr_print: "Печать",
+  qr_close: "Закрыть",
+  qr_cuts: "Линии реза",
   loc_slot: "Место",
   rack_cap_low: "На этом ярусе в одном месте лежит до {n} бутылок.",
   sync_code_notfound: "Код не найден – проверьте его",
@@ -5291,6 +5376,14 @@ it: {
   barcode_known: "{name} è già in cantina. Aggiungere un'altra bottiglia?",
   barcode_added: "Bottiglia aggiunta – ora ne hai {n}",
   barcode_error: "Ricerca non riuscita (nessuna connessione?)",
+  qr_btn: "Etichette QR",
+  qr_all: "Etichette QR per tutti gli scaffali",
+  qr_title: "Etichette QR: {name}",
+  qr_hint: "Un'etichetta per lo scaffale e una per ogni ripiano. Stampa (foglio di etichette 63,5 × 38,1 mm, 21 per pagina) e applica.",
+  qr_pdf: "Condividi / stampa PDF",
+  qr_print: "Stampa",
+  qr_close: "Chiudi",
+  qr_cuts: "Linee di taglio",
   loc_slot: "Posto",
   rack_cap_low: "Su questo ripiano ci sono fino a {n} bottiglie in un posto.",
   sync_code_notfound: "Codice non trovato – controllalo",
@@ -5609,6 +5702,14 @@ fr: {
   barcode_known: "{name} est déjà dans votre cave. Ajouter une bouteille de plus ?",
   barcode_added: "Bouteille ajoutée – {n} en stock désormais",
   barcode_error: "Échec de la recherche (pas de connexion ?)",
+  qr_btn: "Étiquettes QR",
+  qr_all: "Étiquettes QR pour tous les casiers",
+  qr_title: "Étiquettes QR : {name}",
+  qr_hint: "Une étiquette pour le casier et une par niveau. Imprimez (planche d'étiquettes 63,5 × 38,1 mm, 21 par page) et collez.",
+  qr_pdf: "Partager / imprimer le PDF",
+  qr_print: "Imprimer",
+  qr_close: "Fermer",
+  qr_cuts: "Traits de coupe",
   loc_slot: "Place",
   rack_cap_low: "Sur ce niveau, jusqu'à {n} bouteilles sont rangées dans un emplacement.",
   sync_code_notfound: "Code introuvable – vérifiez-le",
@@ -5927,6 +6028,14 @@ pl: {
   barcode_known: "{name} jest już w Twojej piwniczce. Dodać jeszcze jedną butelkę?",
   barcode_added: "Dodano butelkę – teraz w zapasie: {n}",
   barcode_error: "Wyszukiwanie nie powiodło się (brak połączenia?)",
+  qr_btn: "Etykiety QR",
+  qr_all: "Etykiety QR dla wszystkich regałów",
+  qr_title: "Etykiety QR: {name}",
+  qr_hint: "Jedna etykieta na regał i po jednej na każdy poziom. Wydrukuj (arkusz etykiet 63,5 × 38,1 mm, 21 na stronie) i naklej.",
+  qr_pdf: "Udostępnij / drukuj PDF",
+  qr_print: "Drukuj",
+  qr_close: "Zamknij",
+  qr_cuts: "Linie cięcia",
   loc_slot: "Miejsce",
   rack_cap_low: "Na tym poziomie w jednym miejscu leży do {n} butelek.",
   sync_code_notfound: "Nie znaleziono kodu – sprawdź go",
@@ -6245,6 +6354,14 @@ hu: {
   barcode_known: "A(z) {name} már a pincédben van. Hozzáadsz még egy palackot?",
   barcode_added: "Palack hozzáadva – most {n} db van készleten",
   barcode_error: "A lekérdezés sikertelen (nincs kapcsolat?)",
+  qr_btn: "QR-címkék",
+  qr_all: "QR-címkék az összes polchoz",
+  qr_title: "QR-címkék: {name}",
+  qr_hint: "Egy címke a polchoz és egy-egy minden szinthez. Nyomtasd ki (címkelap 63,5 × 38,1 mm, 21 db oldalanként) és ragaszd fel.",
+  qr_pdf: "PDF megosztása / nyomtatása",
+  qr_print: "Nyomtatás",
+  qr_close: "Bezárás",
+  qr_cuts: "Vágóvonalak",
   loc_slot: "Hely",
   rack_cap_low: "Ezen a szinten egy helyen legfeljebb {n} üveg van.",
   sync_code_notfound: "A kód nem található – ellenőrizd",
@@ -6563,6 +6680,14 @@ cs: {
   barcode_known: "{name} už ve sklípku je. Přidat ještě jednu lahev?",
   barcode_added: "Lahev přidána – nyní {n} ks",
   barcode_error: "Dotaz se nezdařil (bez připojení?)",
+  qr_btn: "QR štítky",
+  qr_all: "QR štítky pro všechny regály",
+  qr_title: "QR štítky: {name}",
+  qr_hint: "Jeden štítek pro regál a jeden pro každou úroveň. Vytiskněte (arch štítků 63,5 × 38,1 mm, 21 na stránku) a nalepte.",
+  qr_pdf: "Sdílet / tisknout PDF",
+  qr_print: "Tisk",
+  qr_close: "Zavřít",
+  qr_cuts: "Ořezové čáry",
   loc_slot: "Místo",
   rack_cap_low: "Na této úrovni je na jednom místě až {n} lahví.",
   sync_code_notfound: "Kód nebyl nalezen – zkontrolujte jej",
@@ -6881,6 +7006,14 @@ sk: {
   barcode_known: "{name} je už vo vašej pivnici. Pridať ešte jednu fľašu?",
   barcode_added: "Fľaša pridaná – teraz {n} ks",
   barcode_error: "Dotaz zlyhal (bez pripojenia?)",
+  qr_btn: "QR štítky",
+  qr_all: "QR štítky pre všetky regály",
+  qr_title: "QR štítky: {name}",
+  qr_hint: "Jeden štítok pre regál a jeden pre každú úroveň. Vytlačte (hárok štítkov 63,5 × 38,1 mm, 21 na stranu) a nalepte.",
+  qr_pdf: "Zdieľať / tlačiť PDF",
+  qr_print: "Tlač",
+  qr_close: "Zavrieť",
+  qr_cuts: "Rezné čiary",
   loc_slot: "Miesto",
   rack_cap_low: "Na tejto úrovni je na jednom mieste až {n} fliaš.",
   sync_code_notfound: "Kód sa nenašiel – skontrolujte ho",
@@ -7199,6 +7332,14 @@ ro: {
   barcode_known: "{name} este deja în pivniță. Adaugi încă o sticlă?",
   barcode_added: "Sticlă adăugată – acum {n} în stoc",
   barcode_error: "Căutarea a eșuat (fără conexiune?)",
+  qr_btn: "Etichete QR",
+  qr_all: "Etichete QR pentru toate rafturile",
+  qr_title: "Etichete QR: {name}",
+  qr_hint: "O etichetă pentru raft și câte una pentru fiecare nivel. Imprimă-le (coală de etichete 63,5 × 38,1 mm, 21 pe pagină) și lipește-le.",
+  qr_pdf: "Distribuie / tipărește PDF",
+  qr_print: "Tipărește",
+  qr_close: "Închide",
+  qr_cuts: "Linii de tăiere",
   loc_slot: "Loc",
   rack_cap_low: "Pe acest nivel, într-un loc sunt până la {n} sticle.",
   sync_code_notfound: "Codul nu a fost găsit – verifică-l",
@@ -7517,6 +7658,14 @@ hr: {
   barcode_known: "{name} je već u tvom podrumu. Dodati još jednu bocu?",
   barcode_added: "Boca dodana – sada ih je {n} na zalihi",
   barcode_error: "Upit nije uspio (nema veze?)",
+  qr_btn: "QR naljepnice",
+  qr_all: "QR naljepnice za sve police",
+  qr_title: "QR naljepnice: {name}",
+  qr_hint: "Jedna naljepnica za policu i po jedna za svaku razinu. Ispišite (arak naljepnica 63,5 × 38,1 mm, 21 po stranici) i zalijepite.",
+  qr_pdf: "Podijeli / ispiši PDF",
+  qr_print: "Ispis",
+  qr_close: "Zatvori",
+  qr_cuts: "Linije rezanja",
   loc_slot: "Mjesto",
   rack_cap_low: "Na ovoj razini u jednom je mjestu do {n} boca.",
   sync_code_notfound: "Kod nije pronađen – provjerite ga",
@@ -7835,6 +7984,14 @@ pt: {
   barcode_known: "{name} já está na adega. Adicionar mais uma garrafa?",
   barcode_added: "Garrafa adicionada – agora {n} em stock",
   barcode_error: "Falha na consulta (sem ligação?)",
+  qr_btn: "Etiquetas QR",
+  qr_all: "Etiquetas QR para todas as prateleiras",
+  qr_title: "Etiquetas QR: {name}",
+  qr_hint: "Uma etiqueta para a prateleira e uma por cada nível. Imprima (folha de etiquetas de 63,5 × 38,1 mm, 21 por página) e cole.",
+  qr_pdf: "Partilhar / imprimir PDF",
+  qr_print: "Imprimir",
+  qr_close: "Fechar",
+  qr_cuts: "Linhas de corte",
   loc_slot: "Lugar",
   rack_cap_low: "Neste nível há até {n} garrafas num lugar.",
   sync_code_notfound: "Código não encontrado – verifique-o",
@@ -8153,6 +8310,14 @@ no: {
   barcode_known: "{name} er allerede i vinkjelleren din. Legge til en flaske til?",
   barcode_added: "Flaske lagt til – nå {n} på lager",
   barcode_error: "Oppslaget mislyktes (ingen tilkobling?)",
+  qr_btn: "QR-etiketter",
+  qr_all: "QR-etiketter for alle hyller",
+  qr_title: "QR-etiketter: {name}",
+  qr_hint: "Én etikett til hyllen og én for hvert nivå. Skriv ut (etikettark 63,5 × 38,1 mm, 21 per side) og fest dem på.",
+  qr_pdf: "Del / skriv ut PDF",
+  qr_print: "Skriv ut",
+  qr_close: "Lukk",
+  qr_cuts: "Skjærelinjer",
   loc_slot: "Plass",
   rack_cap_low: "På denne hyllen ligger opptil {n} flasker på én plass.",
   sync_code_notfound: "Koden ble ikke funnet – sjekk den",
@@ -8471,6 +8636,14 @@ nl: {
   barcode_known: "{name} staat al in je kelder. Nog een fles toevoegen?",
   barcode_added: "Fles toegevoegd – nu {n} op voorraad",
   barcode_error: "Opzoeken mislukt (geen verbinding?)",
+  qr_btn: "QR-labels",
+  qr_all: "QR-labels voor alle rekken",
+  qr_title: "QR-labels: {name}",
+  qr_hint: "Eén label voor het rek en één per niveau. Print ze uit (etikettenvel 63,5 × 38,1 mm, 21 per pagina) en plak ze erop.",
+  qr_pdf: "PDF delen / printen",
+  qr_print: "Printen",
+  qr_close: "Sluiten",
+  qr_cuts: "Snijlijnen",
   loc_slot: "Plaats",
   rack_cap_low: "Op dit niveau liggen tot {n} flessen op één plek.",
   sync_code_notfound: "Code niet gevonden – controleer hem",
@@ -8789,6 +8962,14 @@ el: {
   barcode_known: "Το {name} υπάρχει ήδη στο κελάρι σας. Να προστεθεί ένα ακόμη μπουκάλι;",
   barcode_added: "Το μπουκάλι προστέθηκε – τώρα {n} σε απόθεμα",
   barcode_error: "Η αναζήτηση απέτυχε (δεν υπάρχει σύνδεση;)",
+  qr_btn: "Ετικέτες QR",
+  qr_all: "Ετικέτες QR για όλα τα ράφια",
+  qr_title: "Ετικέτες QR: {name}",
+  qr_hint: "Μία ετικέτα για το ράφι και μία για κάθε επίπεδο. Εκτυπώστε (φύλλο ετικετών 63,5 × 38,1 mm, 21 ανά σελίδα) και κολλήστε τις.",
+  qr_pdf: "Κοινοποίηση / εκτύπωση PDF",
+  qr_print: "Εκτύπωση",
+  qr_close: "Κλείσιμο",
+  qr_cuts: "Γραμμές κοπής",
   loc_slot: "Θέση",
   rack_cap_low: "Σε αυτό το επίπεδο αποθηκεύονται έως {n} φιάλες σε μία θέση.",
   sync_code_notfound: "Ο κωδικός δεν βρέθηκε – ελέγξτε τον",
@@ -9107,6 +9288,14 @@ uk: {
   barcode_known: "{name} уже є у вашому погребі. Додати ще одну пляшку?",
   barcode_added: "Пляшку додано – тепер у наявності {n}",
   barcode_error: "Не вдалося виконати пошук (немає з'єднання?)",
+  qr_btn: "QR-етикетки",
+  qr_all: "QR-етикетки для всіх стелажів",
+  qr_title: "QR-етикетки: {name}",
+  qr_hint: "Одна етикетка для стелажа і по одній для кожного рівня. Роздрукуйте (аркуш етикеток 63,5 × 38,1 мм, 21 на сторінці) і наклейте.",
+  qr_pdf: "Поділитися / друкувати PDF",
+  qr_print: "Друк",
+  qr_close: "Закрити",
+  qr_cuts: "Лінії розрізу",
   loc_slot: "Місце",
   rack_cap_low: "На цьому рівні в одному місці зберігається до {n} пляшок.",
   sync_code_notfound: "Код не знайдено – перевірте його",
@@ -9425,6 +9614,14 @@ ja: {
   barcode_known: "{name} はすでにセラーにあります。もう1本追加しますか？",
   barcode_added: "ボトルを追加しました – 現在 {n} 本",
   barcode_error: "検索に失敗しました（接続を確認してください）",
+  qr_btn: "QRラベル",
+  qr_all: "すべてのラックのQRラベル",
+  qr_title: "QRラベル: {name}",
+  qr_hint: "ラックに1枚、各段に1枚ずつのラベルです。印刷して(ラベル用紙 63.5 × 38.1 mm、1ページ21面)貼り付けてください。",
+  qr_pdf: "PDFを共有 / 印刷",
+  qr_print: "印刷",
+  qr_close: "閉じる",
+  qr_cuts: "カットライン",
   loc_slot: "場所",
   rack_cap_low: "この段では、1か所に最大{n}本まで保管されます。",
   sync_code_notfound: "コードが見つかりません – ご確認ください",
@@ -9743,6 +9940,14 @@ ko: {
   barcode_known: "{name}이(가) 이미 셀러에 있습니다. 한 병 더 추가할까요?",
   barcode_added: "병이 추가되었습니다 – 현재 {n}병",
   barcode_error: "조회에 실패했습니다 (연결을 확인해 주세요)",
+  qr_btn: "QR 라벨",
+  qr_all: "모든 랙의 QR 라벨",
+  qr_title: "QR 라벨: {name}",
+  qr_hint: "랙용 라벨 1개와 각 단마다 라벨 1개씩입니다. 인쇄한 뒤(라벨 용지 63.5 × 38.1 mm, 페이지당 21개) 붙이세요.",
+  qr_pdf: "PDF 공유 / 인쇄",
+  qr_print: "인쇄",
+  qr_close: "닫기",
+  qr_cuts: "절단선",
   loc_slot: "칸",
   rack_cap_low: "이 단에서는 한 칸에 최대 {n}병이 보관돼요.",
   sync_code_notfound: "코드를 찾을 수 없어요 – 확인해 주세요",
@@ -10061,6 +10266,14 @@ zh: {
   barcode_known: "{name} 已在您的酒窖中。再添加一瓶吗？",
   barcode_added: "已添加酒瓶 – 现有 {n} 瓶",
   barcode_error: "查询失败（无网络连接？）",
+  qr_btn: "二维码标签",
+  qr_all: "所有酒架的二维码标签",
+  qr_title: "二维码标签: {name}",
+  qr_hint: "酒架一张标签,每一层各一张标签。打印后(标签纸 63.5 × 38.1 毫米,每页 21 张)贴上即可。",
+  qr_pdf: "分享 / 打印 PDF",
+  qr_print: "打印",
+  qr_close: "关闭",
+  qr_cuts: "裁切线",
   loc_slot: "位",
   rack_cap_low: "此层每个位最多存放 {n} 瓶。",
   sync_code_notfound: "未找到同步码 – 请检查",
@@ -10379,6 +10592,14 @@ hi: {
   barcode_known: "{name} पहले से आपके सेलर में है। एक और बोतल जोड़ें?",
   barcode_added: "बोतल जोड़ी गई – अब स्टॉक में {n} हैं",
   barcode_error: "खोज विफल रही (कनेक्शन नहीं है?)",
+  qr_btn: "QR लेबल",
+  qr_all: "सभी रैक के QR लेबल",
+  qr_title: "QR लेबल: {name}",
+  qr_hint: "रैक के लिए एक लेबल और हर स्तर के लिए एक-एक। प्रिंट करें (लेबल शीट 63.5 × 38.1 mm, प्रति पृष्ठ 21) और चिपकाएँ।",
+  qr_pdf: "PDF साझा करें / प्रिंट करें",
+  qr_print: "प्रिंट करें",
+  qr_close: "बंद करें",
+  qr_cuts: "कटिंग लाइन",
   loc_slot: "स्थान",
   rack_cap_low: "इस स्तर पर एक स्थान में अधिकतम {n} बोतलें रखी जाती हैं।",
   sync_code_notfound: "कोड नहीं मिला – कृपया जाँच लें",
@@ -11863,12 +12084,231 @@ function ripeInfo(w) {
 function setRackActive(i) { rackActive = i; rackFilledSlot = null; renderRacks(); }
 
 // Setup: Regale verwalten
+// ═══════════════════════════════════════
+// QR-ETIKETTEN FÜR REGALE UND EBENEN
+// Inhalt eines Codes: "weinkeller:1:<Regal-ID>" (Regal) bzw. "weinkeller:1:<Regal-ID>:<Ebene>" (Ebene).
+// Ausgabe: Etikettenbogen A4 mit 3 x 7 Etiketten zu je 63,5 x 38,1 mm (gängiges Format, z. B. Avery L7160), als PDF zum Teilen/Drucken
+// (iPhone: Teilen-Menü → Drucken) und im Browser direkt über "Drucken".
+// ═══════════════════════════════════════
+// Minimaler QR-Erzeuger: Byte-Modus, Fehlerkorrektur M, Version 1–6 (bis 106 Zeichen) – genug für unsere kurzen Codes
+const QR_VERS = [null,
+  { data: 16, ec: 10, blocks: [[1, 16]], align: [] },
+  { data: 28, ec: 16, blocks: [[1, 28]], align: [6, 18] },
+  { data: 44, ec: 26, blocks: [[1, 44]], align: [6, 22] },
+  { data: 64, ec: 18, blocks: [[2, 32]], align: [6, 26] },
+  { data: 86, ec: 24, blocks: [[2, 43]], align: [6, 30] },
+  { data: 108, ec: 16, blocks: [[4, 27]], align: [6, 34] }];
+const GF_EXP = new Array(512), GF_LOG = new Array(256);
+(function () { let x = 1; for (let i = 0; i < 255; i++) { GF_EXP[i] = x; GF_LOG[x] = i; x <<= 1; if (x & 256) x ^= 0x11D; } for (let i = 255; i < 512; i++) GF_EXP[i] = GF_EXP[i - 255]; })();
+const gfMul = (a, b) => (a && b) ? GF_EXP[GF_LOG[a] + GF_LOG[b]] : 0;
+function rsDivisor(deg) {
+  const r = new Array(deg).fill(0); r[deg - 1] = 1;
+  let root = 1;
+  for (let i = 0; i < deg; i++) {
+    for (let j = 0; j < r.length; j++) { r[j] = gfMul(r[j], root); if (j + 1 < r.length) r[j] ^= r[j + 1]; }
+    root = gfMul(root, 2);
+  }
+  return r;
+}
+function rsRemainder(data, divisor) {
+  const res = new Array(divisor.length).fill(0);
+  for (const b of data) {
+    const f = b ^ res.shift(); res.push(0);
+    divisor.forEach((c, i) => { res[i] ^= gfMul(c, f); });
+  }
+  return res;
+}
+// Liefert die Modul-Matrix (Array von Zeilen, true = dunkel) oder null, wenn der Text zu lang ist
+function qrMatrix(text) {
+  const bytes = Array.from(new TextEncoder().encode(String(text)));
+  let ver = 0;
+  for (let v = 1; v <= 6; v++) if (bytes.length <= QR_VERS[v].data - 2) { ver = v; break; }
+  if (!ver) return null;
+  const V = QR_VERS[ver];
+  // Datenbits: Modus 0100, Länge (8 Bit), Bytes, Abschluss, Füllbytes
+  const bits = [];
+  const put = (val, n) => { for (let i = n - 1; i >= 0; i--) bits.push((val >>> i) & 1); };
+  put(4, 4); put(bytes.length, 8); bytes.forEach(b => put(b, 8));
+  put(0, Math.min(4, V.data * 8 - bits.length));
+  while (bits.length % 8) bits.push(0);
+  const cw = []; for (let i = 0; i < bits.length; i += 8) cw.push(parseInt(bits.slice(i, i + 8).join(''), 2));
+  for (let pad = 0xEC; cw.length < V.data; pad ^= 0xEC ^ 0x11) cw.push(pad);
+  // Blöcke + Fehlerkorrektur, dann verschränken
+  const div = rsDivisor(V.ec), blocks = [];
+  let pos = 0;
+  V.blocks.forEach(([count, len]) => { for (let k = 0; k < count; k++) { const d = cw.slice(pos, pos + len); pos += len; blocks.push({ d, e: rsRemainder(d, div) }); } });
+  const all = [];
+  const maxD = Math.max(...blocks.map(b => b.d.length));
+  for (let i = 0; i < maxD; i++) blocks.forEach(b => { if (i < b.d.length) all.push(b.d[i]); });
+  for (let i = 0; i < V.ec; i++) blocks.forEach(b => all.push(b.e[i]));
+  // Matrix mit Funktionsmustern
+  const size = 17 + 4 * ver;
+  const mod = Array.from({ length: size }, () => new Array(size).fill(false));
+  const fn = Array.from({ length: size }, () => new Array(size).fill(false));
+  const setFn = (x, y, dark) => { if (x >= 0 && y >= 0 && x < size && y < size) { mod[y][x] = dark; fn[y][x] = true; } };
+  for (let i = 0; i < size; i++) { setFn(6, i, i % 2 === 0); setFn(i, 6, i % 2 === 0); }
+  const finder = (cx, cy) => { for (let dy = -4; dy <= 4; dy++) for (let dx = -4; dx <= 4; dx++) { const d = Math.max(Math.abs(dx), Math.abs(dy)); setFn(cx + dx, cy + dy, d !== 2 && d !== 4); } };
+  finder(3, 3); finder(size - 4, 3); finder(3, size - 4);
+  const al = V.align;
+  al.forEach((ax, i) => al.forEach((ay, j) => {
+    if ((i === 0 && j === 0) || (i === 0 && j === al.length - 1) || (i === al.length - 1 && j === 0)) return;
+    for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) setFn(ax + dx, ay + dy, Math.max(Math.abs(dx), Math.abs(dy)) !== 1);
+  }));
+  const formatBits = (mask) => {
+    const data = mask;   // Fehlerkorrektur M = 00
+    let rem = data;
+    for (let i = 0; i < 10; i++) rem = (rem << 1) ^ ((rem >>> 9) * 0x537);
+    const bitsF = ((data << 10) | rem) ^ 0x5412;
+    const bit = (i) => ((bitsF >>> i) & 1) !== 0;
+    for (let i = 0; i <= 5; i++) setFn(8, i, bit(i));
+    setFn(8, 7, bit(6)); setFn(8, 8, bit(7)); setFn(7, 8, bit(8));
+    for (let i = 9; i < 15; i++) setFn(14 - i, 8, bit(i));
+    for (let i = 0; i < 8; i++) setFn(size - 1 - i, 8, bit(i));
+    for (let i = 8; i < 15; i++) setFn(8, size - 15 + i, bit(i));
+    setFn(8, size - 8, true);
+  };
+  formatBits(0);
+  // Daten im Zickzack einsetzen
+  const dbits = []; all.forEach(c => { for (let i = 7; i >= 0; i--) dbits.push((c >>> i) & 1); });
+  let k = 0;
+  for (let right = size - 1; right >= 1; right -= 2) {
+    if (right === 6) right = 5;
+    for (let vert = 0; vert < size; vert++) for (let j = 0; j < 2; j++) {
+      const x = right - j, upward = ((right + 1) & 2) === 0, y = upward ? size - 1 - vert : vert;
+      if (!fn[y][x] && k < dbits.length) { mod[y][x] = dbits[k] === 1; k++; }
+    }
+  }
+  // Maske wählen (niedrigste Strafpunkte)
+  const maskFn = [(x, y) => (x + y) % 2 === 0, (x, y) => y % 2 === 0, (x, y) => x % 3 === 0, (x, y) => (x + y) % 3 === 0,
+    (x, y) => (Math.floor(x / 3) + Math.floor(y / 2)) % 2 === 0, (x, y) => (x * y) % 2 + (x * y) % 3 === 0,
+    (x, y) => ((x * y) % 2 + (x * y) % 3) % 2 === 0, (x, y) => ((x + y) % 2 + (x * y) % 3) % 2 === 0];
+  const applyMask = (m) => { for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) if (!fn[y][x] && maskFn[m](x, y)) mod[y][x] = !mod[y][x]; };
+  const penalty = () => {
+    let p = 0;
+    const lines = [];
+    for (let y = 0; y < size; y++) lines.push(mod[y].map(Number).join(''));
+    for (let x = 0; x < size; x++) lines.push(mod.map(r => Number(r[x])).join(''));
+    lines.forEach(s => {
+      (s.match(/0{5,}|1{5,}/g) || []).forEach(run => { p += 3 + (run.length - 5); });
+      p += 40 * ((s.match(/(?=10111010000)/g) || []).length + (s.match(/(?=00001011101)/g) || []).length);
+    });
+    for (let y = 0; y < size - 1; y++) for (let x = 0; x < size - 1; x++) { const c = mod[y][x]; if (c === mod[y][x + 1] && c === mod[y + 1][x] && c === mod[y + 1][x + 1]) p += 3; }
+    let dark = 0; mod.forEach(r => r.forEach(c => { if (c) dark++; }));
+    p += (Math.ceil(Math.abs(dark * 20 - size * size * 10) / (size * size)) - 1) * 10;
+    return p;
+  };
+  let best = 0, bestP = Infinity;
+  for (let m = 0; m < 8; m++) { applyMask(m); formatBits(m); const p = penalty(); if (p < bestP) { bestP = p; best = m; } applyMask(m); }
+  applyMask(best); formatBits(best);
+  return mod;
+}
+function qrCode(rack, level) { return 'weinkeller:1:' + rack.id + (level ? ':' + level : ''); }
+// Etiketten eines Regals: eines für das Regal, je eines pro Ebene (Ebene 1 unten)
+function rackLabels(r) {
+  const out = [{ rack: r, level: 0 }];
+  for (let e = r.rows; e >= 1; e--) out.push({ rack: r, level: e });
+  return out;
+}
+// Text so verkleinern/umbrechen, dass er in Breite und Zeilenzahl passt; gibt die Zeilen und die Schriftgröße zurück
+function fitLines(ctx, text, weight, maxW, maxLines, maxPx, minPx) {
+  const words = String(text).split(/\s+/).filter(Boolean);
+  for (let px = maxPx; px >= minPx; px -= 2) {
+    ctx.font = weight + ' ' + px + 'px Inter, system-ui, sans-serif';
+    const lines = []; let cur = '';
+    for (const w of words) {
+      const test = cur ? cur + ' ' + w : w;
+      if (ctx.measureText(test).width <= maxW || !cur) cur = test; else { lines.push(cur); cur = w; }
+    }
+    if (cur) lines.push(cur);
+    if (lines.length <= maxLines && lines.every(l => ctx.measureText(l).width <= maxW)) return { lines, px };
+  }
+  ctx.font = weight + ' ' + minPx + 'px Inter, system-ui, sans-serif';
+  let s = String(text);
+  while (s.length > 1 && ctx.measureText(s + '…').width > maxW) s = s.slice(0, -1);
+  return { lines: [s + '…'], px: minPx };
+}
+const LABEL_W_MM = 63.5, LABEL_H_MM = 38.1, LABEL_DPI = 300;
+function drawQrLabel(lab) {
+  const W = Math.round(LABEL_W_MM / 25.4 * LABEL_DPI), H = Math.round(LABEL_H_MM / 25.4 * LABEL_DPI);
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+  const m = qrMatrix(qrCode(lab.rack, lab.level)), n = m.length, quiet = 2;
+  const box = H - 44, cell = Math.floor(box / (n + quiet * 2)), qs = cell * n, qx = 24 + Math.floor((box - cell * (n + quiet * 2)) / 2) + cell * quiet, qy = Math.floor((H - qs) / 2);
+  ctx.fillStyle = '#000';
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (m[y][x]) ctx.fillRect(qx + x * cell, qy + y * cell, cell, cell);
+  const tx = 24 + box + 24, tw = W - tx - 24;
+  ctx.textBaseline = 'alphabetic'; ctx.textAlign = 'left';
+  if (lab.level) {
+    ctx.fillStyle = '#555';
+    const rf = fitLines(ctx, lab.rack.name, '600', tw, 1, 36, 22);
+    ctx.font = '600 ' + rf.px + 'px Inter, system-ui, sans-serif'; ctx.fillText(rf.lines[0], tx, 78);
+    ctx.fillStyle = '#000';
+    const lf = fitLines(ctx, levelLabel(lab.rack, lab.level), '800', tw, 1, 150, 44);
+    ctx.font = '800 ' + lf.px + 'px Inter, system-ui, sans-serif'; ctx.fillText(lf.lines[0], tx, 78 + 36 + lf.px * 0.9);
+    ctx.fillStyle = '#777'; ctx.font = '500 26px Inter, system-ui, sans-serif'; ctx.fillText(t('ph_ebene'), tx, H - 60);
+  } else {
+    ctx.fillStyle = '#777'; ctx.font = '500 28px Inter, system-ui, sans-serif'; ctx.fillText(t('ph_regal'), tx, 80);
+    ctx.fillStyle = '#000';
+    const nf = fitLines(ctx, lab.rack.name, '800', tw, 3, 84, 30);
+    ctx.font = '800 ' + nf.px + 'px Inter, system-ui, sans-serif';
+    nf.lines.forEach((ln, i) => ctx.fillText(ln, tx, 80 + 20 + nf.px * (i + 1) * 1.05));
+  }
+  ctx.fillStyle = '#aaa'; ctx.font = '500 20px Inter, system-ui, sans-serif'; ctx.textAlign = 'right'; ctx.fillText('Weinkeller', W - 24, H - 22);
+  return c;
+}
+let qrLabelCanvases = [];
+function openQrLabels(i) {
+  const racks = i < 0 ? settings.racks : [settings.racks[i]].filter(Boolean);
+  if (!racks.length) return;
+  qrLabelCanvases = [];
+  racks.forEach(r => rackLabels(r).forEach(lab => qrLabelCanvases.push(drawQrLabel(lab))));
+  document.getElementById('qr-title').textContent = t('qr_title', { name: i < 0 ? t('nav_racks') : racks[0].name });
+  const grid = document.getElementById('qr-grid'); grid.innerHTML = '';
+  qrLabelCanvases.forEach(cv => { const el = document.createElement('canvas'); el.width = cv.width; el.height = cv.height; el.getContext('2d').drawImage(cv, 0, 0); grid.appendChild(el); });
+  document.getElementById('qr-print-btn').style.display = isNativeApp() ? 'none' : '';
+  document.getElementById('qr-modal').classList.add('show');
+}
+function qrPages(perPage) { const pages = []; for (let k = 0; k < qrLabelCanvases.length; k += perPage) pages.push(qrLabelCanvases.slice(k, k + perPage)); return pages; }
+// Raster des Bogens: 3 Spalten x 7 Zeilen, Abstand der Etiketten 66,0 mm waagerecht, 38,1 mm senkrecht, Rand links 7,2 mm, oben 15,1 mm
+const SHEET = { cols: 3, rows: 7, left: 7.2, top: 15.1, px: 66.0, py: 38.1 };
+async function qrLabelsPdf() {
+  try { await loadLib('pdf'); } catch { showToast(t('toast_exportfail')); return; }
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    const cuts = document.getElementById('qr-cuts').checked;
+    qrPages(SHEET.cols * SHEET.rows).forEach((page, pi) => {
+      if (pi) doc.addPage();
+      page.forEach((cv, k) => {
+        const x = SHEET.left + (k % SHEET.cols) * SHEET.px, y = SHEET.top + Math.floor(k / SHEET.cols) * SHEET.py;
+        doc.addImage(cv.toDataURL('image/png'), 'PNG', x, y, LABEL_W_MM, LABEL_H_MM, undefined, 'FAST');   // komprimiert einbetten (sonst mehrere MB pro Seite)
+        if (cuts) { doc.setDrawColor(190); doc.setLineWidth(0.1); doc.rect(x, y, LABEL_W_MM, LABEL_H_MM); }
+      });
+    });
+    await saveFile('weinkeller-qr-etiketten.pdf', doc.output('blob'));
+  } catch (err) { exportFailed(err); }
+}
+// Browser-Druck: nur der Bogen wird gedruckt (Stylesheet für @media print)
+function qrLabelsPrint() {
+  const cuts = document.getElementById('qr-cuts').checked;
+  const sheet = document.getElementById('qr-print-sheet');
+  sheet.innerHTML = qrPages(SHEET.cols * SHEET.rows).map(page => '<div class="qr-page">' + page.map((cv, k) => {
+    const x = SHEET.left + (k % SHEET.cols) * SHEET.px, y = SHEET.top + Math.floor(k / SHEET.cols) * SHEET.py;
+    return '<img src="' + cv.toDataURL('image/png') + '" style="left:' + x + 'mm;top:' + y + 'mm;' + (cuts ? 'outline:0.1mm solid #bbb;' : '') + '">';
+  }).join('') + '</div>').join('');
+  const done = () => { document.body.classList.remove('qr-printing'); window.removeEventListener('afterprint', done); };
+  window.addEventListener('afterprint', done);
+  document.body.classList.add('qr-printing');
+  setTimeout(() => window.print(), 50);
+}
+
 let rackEditIdx = -1;   // Regal, dessen Ebenen gerade bearbeitet werden
 function renderRackSetup() {
   const list = document.getElementById('rack-setup-list');
   if (!list) return;
   list.innerHTML = settings.racks.map((r,i) => {
-    let h = `<div class="rack-setup-item"><span class="n">${esc(r.name)}</span><span class="d">${r.rows} × ${r.cols}${r.cap > 1 ? ' · ×' + r.cap : ''}${Object.keys(r.lv || {}).length ? ' *' : ''}</span><button class="rack-setup-edit" onclick="editRackLevels(${i})">✏️</button><button class="rack-setup-del" onclick="removeRack(${i})">🗑</button></div>`;
+    let h = `<div class="rack-setup-item"><span class="n">${esc(r.name)}</span><span class="d">${r.rows} × ${r.cols}${r.cap > 1 ? ' · ×' + r.cap : ''}${Object.keys(r.lv || {}).length ? ' *' : ''}</span><button class="rack-setup-edit" onclick="openQrLabels(${i})" title="${esc(t('qr_btn'))}">▦</button><button class="rack-setup-edit" onclick="editRackLevels(${i})">✏️</button><button class="rack-setup-del" onclick="removeRack(${i})">🗑</button></div>`;
     if (i === rackEditIdx) {
       h += `<div class="rack-level-editor"><div class="rle-title">${t('rack_levels_title')}</div>`;
       h += `<div class="rle-row rle-head"><span></span><span>${t('rack_level_name')}</span><span>${t('rack_ph_cap')}</span></div>`;
@@ -11876,7 +12316,7 @@ function renderRackSetup() {
       h += '</div>';
     }
     return h;
-  }).join('');
+  }).join('') + (settings.racks.length ? `<div class="rack-qr-all"><button class="wine-btn" onclick="openQrLabels(-1)">▦ ${t('qr_all')}</button></div>` : '');
 }
 function editRackLevels(i) { rackEditIdx = rackEditIdx === i ? -1 : i; renderRackSetup(); }
 // Name oder Flaschen pro Platz einer Ebene setzen (Kapazität nicht unter die aktuell dort vorhandene Belegung)
