@@ -532,6 +532,21 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .qr-cuts { display: flex; align-items: center; gap: 8px; font-size: 13px; margin-bottom: 12px; }
 .rack-qr-all { margin-top: 10px; }
 .rack-scanbar { margin-bottom: 10px; }
+#photo-overlay { display: none; position: fixed; inset: 0; z-index: 420; background: rgba(0,0,0,.92); align-items: center; justify-content: center; }
+#photo-overlay.show { display: flex; }
+#photo-overlay img { max-width: 96vw; max-height: 92vh; border-radius: 10px; }
+#f-photo-box img { max-width: 100%; max-height: 220px; border-radius: 10px; display: block; }
+.mm-row { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 8px; flex-wrap: wrap; }
+.mm-row label { display: flex; flex-direction: column; font-size: 12px; color: var(--text-muted); gap: 4px; flex: 1; min-width: 90px; }
+.mm-cellar { width: 100%; font-size: 12px; font-weight: 700; color: var(--gold-light); }
+.mm-badge { font-size: 11px; font-weight: 600; border-radius: 8px; padding: 3px 8px; margin: 6px 0 0; display: inline-block; }
+.mm-badge.ok { color: var(--green); background: rgba(60,160,90,.12); }
+.mm-badge.low { color: #fff; background: var(--red-alert); }
+.mm-badge.over { color: var(--gold); background: rgba(196,162,74,.14); }
+.filter-chip.warn { border-color: var(--red-alert); color: var(--red-alert); }
+.shop-row { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+.shop-row .n { font-weight: 700; color: var(--gold); white-space: nowrap; }
+.shop-row small { display: block; color: var(--text-muted); font-size: 11px; }
 #lvl-body .lvl-h { font-size: 12px; font-weight: 700; color: var(--gold-light); letter-spacing: .06em; text-transform: uppercase; margin: 16px 0 8px; }
 .lvl-row { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; }
 .lvl-top { display: flex; gap: 10px; align-items: baseline; margin-bottom: 8px; }
@@ -1383,6 +1398,20 @@ input[type="file"] { display: none; }
 </div>
 <div id="qr-print-sheet"></div>
 
+<div class="modal-overlay" id="shop-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2 data-i18n="mm_list_title">Einkaufsliste</h2>
+    <div id="shop-body"></div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="closeModal('shop-modal')" data-i18n="qr_close">Schließen</button>
+      <button class="btn-secondary" onclick="copyShoppingList()" data-i18n="mm_copy">Kopieren</button>
+      <button class="btn-primary" onclick="shareShoppingList()" data-i18n="mm_share">Liste teilen</button>
+    </div>
+  </div>
+</div>
+<div id="photo-overlay" onclick="this.classList.remove('show')"><img id="photo-view-img" alt=""></div>
+
 <div id="scan-overlay"><div id="scan-hint"></div><div id="scan-reader"></div><button id="scan-cancel" class="btn-secondary" data-i18n="btn_cancel">Abbrechen</button></div>
 
 <div class="modal-overlay" id="add-modal">
@@ -1415,6 +1444,10 @@ input[type="file"] { display: none; }
         <label data-i18n="l_count">Flaschen</label>
         <input id="f-count" placeholder="1" type="number" min="1" value="1">
       </div>
+    </div>
+    <div class="form-group">
+      <label data-i18n="l_stock">Bestand (Flaschen)</label>
+      <div id="f-minmax"></div>
     </div>
     <div class="form-group">
       <label data-i18n="l_type">Weintyp</label>
@@ -1470,6 +1503,15 @@ input[type="file"] { display: none; }
       <label data-i18n="l_image">Flaschenbild (URL aus dem Internet)</label>
       <input id="f-image" placeholder="https://… .jpg" type="url" oninput="updateImagePreview()">
       <div id="f-image-preview" class="image-preview" style="display:none"></div>
+    </div>
+    <div class="form-group">
+      <label data-i18n="photo_label">Eigenes Foto</label>
+      <div id="f-photo-box" class="image-preview" style="display:none"></div>
+      <input type="hidden" id="f-photo">
+      <input type="file" id="photo-input" accept="image/*" onchange="handlePhotoPick(event)">
+      <button type="button" class="scan-btn" onclick="document.getElementById('photo-input').click()" data-i18n="photo_btn">📷  Foto aufnehmen / auswählen</button>
+      <button type="button" class="btn-secondary" id="photo-remove" onclick="removeFormPhoto()" style="display:none;margin-top:8px" data-i18n="photo_remove">Foto entfernen</button>
+      <div class="qr-hint" data-i18n="photo_hint">Das Foto bleibt auf diesem Gerät und wird nicht synchronisiert.</div>
     </div>
     <div class="form-group">
       <label data-i18n="l_rating">Bewertung</label>
@@ -1767,6 +1809,8 @@ function cleanWine(w, used) {
     locRegal: cleanText(w.locRegal, 60), locEbene: cleanSlot(w.locEbene), locPlatz: cleanSlot(w.locPlatz),
     placements: cleanPlacements(w, count),
     ean: /^\d{8,14}$/.test(String(w.ean || '')) ? String(w.ean) : null,
+    photo: ID_RE.test(String(w.photo || '')) ? String(w.photo) : null,
+    minMax: cleanMinMax(w.minMax),
     location: cleanText(w.location, 200),
     drinkFrom: cleanInt(w.drinkFrom, 1000, 2300), drinkTo: cleanInt(w.drinkTo, 1000, 2300),
     price: parsePrice(w.price), image: cleanImage(w.image), imageUser: !!w.imageUser,
@@ -1787,7 +1831,7 @@ function cleanWishes(arr) {
     id: cleanId(w.id, used), name: cleanStr(w.name, 200).trim(),
     year: cleanInt(w.year, 1000, 2200), type: VALID_TYPES.includes(w.type) ? w.type : 'other',
     region: cleanText(w.region, 120), country: cleanText(w.country, 120), grape: cleanText(w.grape, 120),
-    note: cleanText(w.note, 5000), done: !!w.done
+    note: cleanText(w.note, 5000), done: !!w.done, minMax: cleanMinMax(w.minMax), restock: !!w.restock
   }));
 }
 function cleanDrunk(arr) {
@@ -1877,7 +1921,7 @@ let ripeFilterStatus = 'alle';
 let histFilterType = 'alle';
 let histFilterOcc = 'alle';
 
-function save() { safeSet(STORE_KEY, JSON.stringify(wines)); touchData(); }
+function save() { safeSet(STORE_KEY, JSON.stringify(wines)); touchData(); photoGC(); }
 function saveWishes() { safeSet(WISH_KEY, JSON.stringify(wishes)); touchData(); }
 function saveDrunk() { safeSet(DRUNK_KEY, JSON.stringify(drunkWines)); touchData(); }
 function saveSettings() { safeSet(SETTINGS_KEY, JSON.stringify(settings)); }
@@ -2221,6 +2265,187 @@ async function resolveWineImage(info, crit) {
   return null;
 }
 
+// ═══════════════════════════════════════
+// EIGENE FOTOS: bleiben auf dem Gerät (IndexedDB); im Wein steht nur die Foto-ID. Das Foto wird nicht synchronisiert.
+// ═══════════════════════════════════════
+const photoCache = new Map();         // Foto-ID -> Daten-URL (JPEG)
+var formPhotoPending = null;          // neu gewähltes, noch nicht gespeichertes Foto des offenen Formulars
+let photoDbP = null;
+function photoDb() {
+  if (!photoDbP) photoDbP = new Promise((resolve, reject) => {
+    try {
+      const rq = indexedDB.open('weinkeller_photos', 1);
+      rq.onupgradeneeded = () => rq.result.createObjectStore('p');
+      rq.onsuccess = () => resolve(rq.result);
+      rq.onerror = () => reject(rq.error);
+    } catch (e) { reject(e); }
+  }).catch((e) => { photoDbP = null; throw e; });
+  return photoDbP;
+}
+async function photoTx(mode, fn) {
+  const db = await photoDb();
+  return new Promise((res, rej) => {
+    const tx = db.transaction('p', mode);
+    fn(tx.objectStore('p'));
+    tx.oncomplete = () => res();
+    tx.onerror = tx.onabort = () => rej(tx.error || new Error('idb'));
+  });
+}
+async function photoPut(id, dataUrl) { await photoTx('readwrite', st => st.put(dataUrl, id)); photoCache.set(id, dataUrl); }
+async function photoDel(id) { photoCache.delete(id); try { await photoTx('readwrite', st => st.delete(id)); } catch (e) {} }
+async function photoLoadAll() {
+  try {
+    const db = await photoDb();
+    await new Promise((res) => {
+      const rq = db.transaction('p', 'readonly').objectStore('p').openCursor();
+      rq.onsuccess = () => { const c = rq.result; if (c) { photoCache.set(String(c.key), c.value); c.continue(); } else res(); };
+      rq.onerror = () => res();
+    });
+  } catch (e) { /* ohne IndexedDB (z. B. privater Modus): dann eben keine eigenen Fotos */ }
+  try { rerenderActive(); } catch (e) {}
+}
+// Nicht mehr verwendete Fotos löschen (Wein gelöscht, Foto ersetzt oder entfernt)
+function photoGC() {
+  const used = new Set(wines.map(w => w.photo).filter(Boolean));
+  if (formPhotoPending) used.add(formPhotoPending);
+  [...photoCache.keys()].forEach(id => { if (!used.has(id)) photoDel(id); });
+}
+async function handlePhotoPick(e) {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  try {
+    const dataUrl = 'data:image/jpeg;base64,' + await imageToBase64(file, 1000);
+    const id = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    await photoPut(id, dataUrl);
+    if (formPhotoPending) photoDel(formPhotoPending);   // ein früher gewähltes, nicht gespeichertes Foto verwerfen
+    formPhotoPending = id;
+    document.getElementById('f-photo').value = id;
+    updateFormPhoto();
+    showToast(t('photo_saved'));
+  } catch (err) { showToast(t('photo_fail')); }
+}
+function removeFormPhoto() {
+  if (formPhotoPending) { photoDel(formPhotoPending); formPhotoPending = null; }
+  document.getElementById('f-photo').value = '';
+  updateFormPhoto();
+}
+function updateFormPhoto() {
+  const id = document.getElementById('f-photo').value, u = id && photoCache.get(id);
+  const box = document.getElementById('f-photo-box'), rm = document.getElementById('photo-remove');
+  box.innerHTML = u ? '<img src="' + u + '" alt="">' : '';
+  box.style.display = u ? 'block' : 'none';
+  rm.style.display = u ? '' : 'none';
+}
+function showPhoto(id) {
+  const u = photoCache.get(id);
+  if (!u) return;
+  document.getElementById('photo-view-img').src = u;
+  document.getElementById('photo-overlay').classList.add('show');
+}
+async function restorePhotos(map, list) {
+  if (!map || typeof map !== 'object' || !list) return;
+  for (const w of list) {
+    const u = w.photo && map[w.photo];
+    if (typeof u === 'string' && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(u) && u.length < 4000000) { try { await photoPut(w.photo, u); } catch (e) {} }
+  }
+}
+photoLoadAll();
+
+// ═══════════════════════════════════════
+// MIN-/MAX-BESTÄNDE (pro Wein und Keller) und Einkaufsliste
+// Bestand eines Kellers = eingelagerte Flaschen in dessen Regalen; nicht eingelagerte zählen zum ersten (Standard-)Keller.
+// ═══════════════════════════════════════
+function defaultCellarId() { return (settings.cellars[0] || {}).id || DEFAULT_CELLAR_ID; }
+function cellarStock(w, cid) {
+  let n = 0;
+  validPlacements(w).forEach(x => { const r = rackById(x.rack); if (r && r.cellarId === cid) n++; });
+  if (cid === defaultCellarId()) n += unplacedCount(w);
+  return n;
+}
+function mmInfo(w) {
+  const rows = [];
+  Object.keys(w.minMax || {}).forEach(cid => {
+    const c = settings.cellars.find(x => x.id === cid);
+    if (!c) return;
+    const mm = w.minMax[cid], stock = cellarStock(w, cid);
+    rows.push({ cid, name: c.name, stock, min: mm.min, max: mm.max, low: mm.min != null && stock < mm.min, over: mm.max != null && stock > mm.max });
+  });
+  return rows;
+}
+function mmBadgeHtml(w) {
+  const rows = mmInfo(w), multi = settings.cellars.length > 1;
+  return rows.map(r => `<div class="mm-badge ${r.low ? 'low' : r.over ? 'over' : 'ok'}">${multi ? esc(r.name) + ': ' : ''}${t('mm_stock')} ${r.stock}${r.min != null ? ' · ' + t('mm_min') + ' ' + r.min : ''}${r.max != null ? ' · ' + t('mm_max') + ' ' + r.max : ''}${r.low ? ' ⚠' : ''}</div>`).join('');
+}
+function renderMinMaxFields(w) {
+  const box = document.getElementById('f-minmax'), multi = settings.cellars.length > 1;
+  box.innerHTML = settings.cellars.map(c => {
+    const mm = (w && w.minMax && w.minMax[c.id]) || {};
+    return `<div class="mm-row">${multi ? '<span class="mm-cellar">' + esc(c.name) + '</span>' : ''}<label>${t('mm_min')}<input type="number" min="0" max="9999" data-mm="${c.id}" data-k="min" value="${mm.min != null ? mm.min : ''}"></label><label>${t('mm_max')}<input type="number" min="0" max="9999" data-mm="${c.id}" data-k="max" value="${mm.max != null ? mm.max : ''}"></label></div>`;
+  }).join('');
+}
+function readMinMaxFields() {
+  const out = {};
+  document.querySelectorAll('#f-minmax input').forEach(i => { const v = i.value.trim(); if (v === '') return; (out[i.dataset.mm] = out[i.dataset.mm] || {})[i.dataset.k] = parseInt(v); });
+  return out;
+}
+// Zu kaufende Weine: unter Minimum (Ziel = Maximum, sonst Minimum) sowie "nachkaufen"-Einträge der Wunschliste (letzte Flasche getrunken)
+function shoppingItems() {
+  const multi = settings.cellars.length > 1, items = [];
+  wines.forEach(w => mmInfo(w).forEach(r => { if (r.low) items.push({ name: w.name, year: w.year, cellar: multi ? r.name : '', need: (r.max != null ? r.max : r.min) - r.stock, stock: r.stock, min: r.min }); }));
+  wishes.forEach(w => {
+    if (!w.restock) return;
+    Object.keys(w.minMax || {}).forEach(cid => {
+      const c = settings.cellars.find(x => x.id === cid), mm = w.minMax[cid];
+      if (!c) return;
+      const target = mm.max != null ? mm.max : (mm.min || 0);
+      if (target > 0) items.push({ name: w.name, year: w.year, cellar: multi ? c.name : '', need: target, stock: 0, min: mm.min });
+    });
+  });
+  return items.sort((a, b) => a.name.localeCompare(b.name));
+}
+const shopLabel = (i) => i.name + (i.year && !i.name.includes(String(i.year)) ? ' ' + i.year : '') + (i.cellar ? ' (' + i.cellar + ')' : '');
+function shoppingChipHtml() {
+  if (!wines.some(w => Object.keys(w.minMax || {}).length) && !wishes.some(w => w.restock)) return '';
+  const n = shoppingItems().length;
+  return `<button class="filter-chip${n ? ' warn' : ''}" onclick="openShoppingList()">${t('mm_filter')}${n ? ' · ' + n : ''}</button>`;
+}
+function openShoppingList() {
+  const items = shoppingItems();
+  document.getElementById('shop-body').innerHTML = items.length
+    ? items.map(i => `<div class="shop-row"><div>${esc(shopLabel(i))}<small>${t('mm_stock')} ${i.stock}${i.min != null ? ' · ' + t('mm_min') + ' ' + i.min : ''}</small></div><span class="n">${i.need}×</span></div>`).join('')
+    : `<div class="lvl-empty">${t('mm_list_empty')}</div>`;
+  document.getElementById('shop-modal').classList.add('show');
+}
+const shoppingText = () => shoppingItems().map(i => i.need + '× ' + shopLabel(i)).join('\n');
+async function shareShoppingList() {
+  try { await saveFile('einkaufsliste.txt', new Blob([shoppingText()], { type: 'text/plain;charset=utf-8' })); } catch (err) { exportFailed(err); }
+}
+function copyShoppingList() {
+  navigator.clipboard.writeText(shoppingText()).then(() => showToast(t('toast_copy'))).catch(() => showToast(t('toast_copyfail')));
+}
+// Letzte Flasche eines Weins mit Min/Max getrunken: der Wein verschwindet aus dem Keller, bleibt aber als "nachkaufen" in der Wunschliste
+function addRestockWish(w) {
+  const mm = cleanMinMax(w.minMax);
+  if (!Object.keys(mm).length) return;
+  if (wishes.some(x => x.restock && x.name === w.name && (x.year || null) === (w.year || null))) return;
+  const target = Math.max(0, ...Object.values(mm).map(v => v.max != null ? v.max : (v.min || 0)));
+  wishes.push({ id: 'rs' + Date.now().toString(36), name: w.name, year: w.year || null, type: w.type, region: w.region || null, country: w.country || null, grape: w.grape || null, note: t('mm_restock_note', { n: target }), done: false, minMax: mm, restock: true });
+  saveWishes();
+}
+function cleanMinMax(o) {
+  const out = {};
+  if (!o || typeof o !== 'object' || Array.isArray(o)) return out;
+  Object.keys(o).slice(0, 12).forEach(k => {
+    if (!ID_RE.test(k) || !o[k] || typeof o[k] !== 'object') return;
+    const mn = cleanInt(o[k].min, 0, 9999); let mx = cleanInt(o[k].max, 0, 9999);
+    if (mn == null && mx == null) return;
+    if (mn != null && mx != null && mx < mn) mx = mn;
+    out[k] = { min: mn, max: mx };
+  });
+  return out;
+}
+
 // Bildvorschau im Formular aktualisieren
 function updateImagePreview() {
   const url = (document.getElementById('f-image').value || '').trim();
@@ -2394,7 +2619,8 @@ const IAP_SHOW_PRICE = false;
 // Gezeigt werden dort nur Bilder, die der Nutzer selbst gesetzt hat (eigene Bild-Adresse oder Foto). Die Web-Apps bleiben unverändert.
 const NATIVE_FETCH_IMAGES = false;
 const autoImagesOff = () => isNativeApp() && !NATIVE_FETCH_IMAGES;
-function shownImage(w) {
+function shownImage(w) { if (w && w.photo && photoCache.has(w.photo)) return photoCache.get(w.photo); return urlImage(w); }
+function urlImage(w) {
   const u = w && w.image;
   if (!u) return '';
   if (autoImagesOff() && !w.imageUser && !/^data:/i.test(u)) return '';
@@ -3144,6 +3370,23 @@ de: {
   shelf_moveall_confirm: "{n} Flasche(n) von {from} nach {to} verschieben?",
   shelf_moveall_rest: "{n} finden dort keinen Platz und bleiben liegen.",
   shelf_moveall_done: "{n} Flasche(n) verschoben ✓",
+  photo_label: "Eigenes Foto",
+  photo_btn: "📷  Foto aufnehmen / auswählen",
+  photo_remove: "Foto entfernen",
+  photo_saved: "Foto gespeichert ✓",
+  photo_fail: "Foto konnte nicht gespeichert werden",
+  photo_hint: "Das Foto bleibt auf diesem Gerät und wird nicht synchronisiert.",
+  l_stock: "Bestand (Flaschen)",
+  mm_stock: "Bestand",
+  mm_min: "Min",
+  mm_max: "Max",
+  mm_filter: "🛒 Nachbestellen",
+  mm_list_title: "Einkaufsliste",
+  mm_list_empty: "Nichts nachzukaufen – alle Bestände sind im grünen Bereich.",
+  mm_share: "Liste teilen",
+  mm_copy: "Kopieren",
+  mm_toast_low: "Bestand unter Minimum: {name} ({n} von {min})",
+  mm_restock_note: "Nachkaufen: Ziel {n} Flaschen",
   loc_slot: "Platz",
   rack_cap_low: "Auf dieser Ebene liegen bis zu {n} Flaschen in einem Platz.",
   sync_code_notfound: "Code nicht gefunden – bitte prüfen",
@@ -3488,6 +3731,23 @@ en: {
   shelf_moveall_confirm: "Move {n} bottle(s) from {from} to {to}?",
   shelf_moveall_rest: "{n} do not fit there and stay where they are.",
   shelf_moveall_done: "{n} bottle(s) moved ✓",
+  photo_label: "Own photo",
+  photo_btn: "📷  Take / choose photo",
+  photo_remove: "Remove photo",
+  photo_saved: "Photo saved ✓",
+  photo_fail: "Photo could not be saved",
+  photo_hint: "The photo stays on this device and is not synchronised.",
+  l_stock: "Stock (bottles)",
+  mm_stock: "Stock",
+  mm_min: "Min",
+  mm_max: "Max",
+  mm_filter: "🛒 Reorder",
+  mm_list_title: "Shopping list",
+  mm_list_empty: "Nothing to buy – all stocks are within range.",
+  mm_share: "Share list",
+  mm_copy: "Copy",
+  mm_toast_low: "Stock below minimum: {name} ({n} of {min})",
+  mm_restock_note: "Buy again: target {n} bottles",
   loc_slot: "Slot",
   rack_cap_low: "Up to {n} bottles are stored in one slot on this level.",
   sync_code_notfound: "Code not found – please check it",
@@ -3832,6 +4092,23 @@ es: {
   shelf_moveall_confirm: "¿Mover {n} botella(s) de {from} a {to}?",
   shelf_moveall_rest: "{n} no caben allí y se quedan donde están.",
   shelf_moveall_done: "{n} botella(s) movida(s) ✓",
+  photo_label: "Foto propia",
+  photo_btn: "📷  Hacer / elegir foto",
+  photo_remove: "Quitar foto",
+  photo_saved: "Foto guardada ✓",
+  photo_fail: "No se pudo guardar la foto",
+  photo_hint: "La foto se queda en este dispositivo y no se sincroniza.",
+  l_stock: "Existencias (botellas)",
+  mm_stock: "Existencias",
+  mm_min: "Mín",
+  mm_max: "Máx",
+  mm_filter: "🛒 Reponer",
+  mm_list_title: "Lista de la compra",
+  mm_list_empty: "Nada que comprar – todas las existencias están dentro del rango.",
+  mm_share: "Compartir lista",
+  mm_copy: "Copiar",
+  mm_toast_low: "Existencias por debajo del mínimo: {name} ({n} de {min})",
+  mm_restock_note: "Volver a comprar: objetivo {n} botellas",
   loc_slot: "Sitio",
   rack_cap_low: "En este nivel hay hasta {n} botellas en un hueco.",
   sync_code_notfound: "Código no encontrado: compruébalo",
@@ -4176,6 +4453,23 @@ sv: {
   shelf_moveall_confirm: "Flytta {n} flaska/flaskor från {from} till {to}?",
   shelf_moveall_rest: "{n} får inte plats där och blir kvar.",
   shelf_moveall_done: "{n} flaska/flaskor flyttade ✓",
+  photo_label: "Eget foto",
+  photo_btn: "📷  Ta / välj foto",
+  photo_remove: "Ta bort foto",
+  photo_saved: "Foto sparat ✓",
+  photo_fail: "Fotot kunde inte sparas",
+  photo_hint: "Fotot finns kvar på den här enheten och synkroniseras inte.",
+  l_stock: "Lager (flaskor)",
+  mm_stock: "Lager",
+  mm_min: "Min",
+  mm_max: "Max",
+  mm_filter: "🛒 Köp igen",
+  mm_list_title: "Inköpslista",
+  mm_list_empty: "Inget att köpa – alla lagernivåer är inom intervallet.",
+  mm_share: "Dela lista",
+  mm_copy: "Kopiera",
+  mm_toast_low: "Lager under minimum: {name} ({n} av {min})",
+  mm_restock_note: "Köp igen: mål {n} flaskor",
   loc_slot: "Plats",
   rack_cap_low: "På den här hyllan finns upp till {n} flaskor på en plats.",
   sync_code_notfound: "Koden hittades inte – kontrollera den",
@@ -4520,6 +4814,23 @@ da: {
   shelf_moveall_confirm: "Flyt {n} flaske(r) fra {from} til {to}?",
   shelf_moveall_rest: "{n} kan ikke være der og bliver liggende.",
   shelf_moveall_done: "{n} flaske(r) flyttet ✓",
+  photo_label: "Eget foto",
+  photo_btn: "📷  Tag / vælg foto",
+  photo_remove: "Fjern foto",
+  photo_saved: "Foto gemt ✓",
+  photo_fail: "Fotoet kunne ikke gemmes",
+  photo_hint: "Fotoet bliver på denne enhed og synkroniseres ikke.",
+  l_stock: "Beholdning (flasker)",
+  mm_stock: "Beholdning",
+  mm_min: "Min",
+  mm_max: "Maks",
+  mm_filter: "🛒 Genbestil",
+  mm_list_title: "Indkøbsliste",
+  mm_list_empty: "Intet at købe – alle beholdninger er inden for intervallet.",
+  mm_share: "Del liste",
+  mm_copy: "Kopiér",
+  mm_toast_low: "Beholdning under minimum: {name} ({n} af {min})",
+  mm_restock_note: "Køb igen: mål {n} flasker",
   loc_slot: "Plads",
   rack_cap_low: "På denne hylde ligger op til {n} flasker på én plads.",
   sync_code_notfound: "Koden blev ikke fundet – tjek den",
@@ -4864,6 +5175,23 @@ fi: {
   shelf_moveall_confirm: "Siirretäänkö {n} pulloa: {from} → {to}?",
   shelf_moveall_rest: "{n} ei mahdu sinne ja jää paikalleen.",
   shelf_moveall_done: "{n} pulloa siirretty ✓",
+  photo_label: "Oma kuva",
+  photo_btn: "📷  Ota / valitse kuva",
+  photo_remove: "Poista kuva",
+  photo_saved: "Kuva tallennettu ✓",
+  photo_fail: "Kuvaa ei voitu tallentaa",
+  photo_hint: "Kuva pysyy tällä laitteella eikä synkronoidu.",
+  l_stock: "Varasto (pulloja)",
+  mm_stock: "Varasto",
+  mm_min: "Min",
+  mm_max: "Maks",
+  mm_filter: "🛒 Täydennä",
+  mm_list_title: "Ostoslista",
+  mm_list_empty: "Ei ostettavaa – kaikki varastot ovat rajoissa.",
+  mm_share: "Jaa lista",
+  mm_copy: "Kopioi",
+  mm_toast_low: "Varasto alle minimin: {name} ({n}/{min})",
+  mm_restock_note: "Osta lisää: tavoite {n} pulloa",
   loc_slot: "Paikka",
   rack_cap_low: "Tällä tasolla yhdellä paikalla on jopa {n} pulloa.",
   sync_code_notfound: "Koodia ei löytynyt – tarkista se",
@@ -5208,6 +5536,23 @@ ru: {
   shelf_moveall_confirm: "Переместить бутылки ({n}): {from} → {to}?",
   shelf_moveall_rest: "{n} не помещаются туда и остаются на месте.",
   shelf_moveall_done: "Перемещено бутылок: {n} ✓",
+  photo_label: "Своё фото",
+  photo_btn: "📷  Сделать / выбрать фото",
+  photo_remove: "Удалить фото",
+  photo_saved: "Фото сохранено ✓",
+  photo_fail: "Не удалось сохранить фото",
+  photo_hint: "Фото остаётся на этом устройстве и не синхронизируется.",
+  l_stock: "Запас (бутылок)",
+  mm_stock: "Запас",
+  mm_min: "Мин",
+  mm_max: "Макс",
+  mm_filter: "🛒 Докупить",
+  mm_list_title: "Список покупок",
+  mm_list_empty: "Покупать нечего – все запасы в норме.",
+  mm_share: "Поделиться списком",
+  mm_copy: "Копировать",
+  mm_toast_low: "Запас ниже минимума: {name} ({n} из {min})",
+  mm_restock_note: "Докупить: цель {n} бутылок",
   loc_slot: "Место",
   rack_cap_low: "На этом ярусе в одном месте лежит до {n} бутылок.",
   sync_code_notfound: "Код не найден – проверьте его",
@@ -5552,6 +5897,23 @@ it: {
   shelf_moveall_confirm: "Spostare {n} bottiglia/e da {from} a {to}?",
   shelf_moveall_rest: "{n} non trovano posto lì e restano dove sono.",
   shelf_moveall_done: "Bottiglie spostate: {n} ✓",
+  photo_label: "Foto personale",
+  photo_btn: "📷  Scatta / scegli foto",
+  photo_remove: "Rimuovi foto",
+  photo_saved: "Foto salvata ✓",
+  photo_fail: "Impossibile salvare la foto",
+  photo_hint: "La foto resta su questo dispositivo e non viene sincronizzata.",
+  l_stock: "Scorta (bottiglie)",
+  mm_stock: "Scorta",
+  mm_min: "Min",
+  mm_max: "Max",
+  mm_filter: "🛒 Riordina",
+  mm_list_title: "Lista della spesa",
+  mm_list_empty: "Niente da acquistare – tutte le scorte sono nei limiti.",
+  mm_share: "Condividi lista",
+  mm_copy: "Copia",
+  mm_toast_low: "Scorta sotto il minimo: {name} ({n} su {min})",
+  mm_restock_note: "Riacquista: obiettivo {n} bottiglie",
   loc_slot: "Posto",
   rack_cap_low: "Su questo ripiano ci sono fino a {n} bottiglie in un posto.",
   sync_code_notfound: "Codice non trovato – controllalo",
@@ -5896,6 +6258,23 @@ fr: {
   shelf_moveall_confirm: "Déplacer {n} bouteille(s) de {from} vers {to} ?",
   shelf_moveall_rest: "{n} n'ont pas de place là-bas et restent où elles sont.",
   shelf_moveall_done: "{n} bouteille(s) déplacée(s) ✓",
+  photo_label: "Photo personnelle",
+  photo_btn: "📷  Prendre / choisir une photo",
+  photo_remove: "Supprimer la photo",
+  photo_saved: "Photo enregistrée ✓",
+  photo_fail: "La photo n'a pas pu être enregistrée",
+  photo_hint: "La photo reste sur cet appareil et n'est pas synchronisée.",
+  l_stock: "Stock (bouteilles)",
+  mm_stock: "Stock",
+  mm_min: "Min",
+  mm_max: "Max",
+  mm_filter: "🛒 À racheter",
+  mm_list_title: "Liste de courses",
+  mm_list_empty: "Rien à acheter – tous les stocks sont dans la plage.",
+  mm_share: "Partager la liste",
+  mm_copy: "Copier",
+  mm_toast_low: "Stock sous le minimum : {name} ({n} sur {min})",
+  mm_restock_note: "À racheter : objectif {n} bouteilles",
   loc_slot: "Place",
   rack_cap_low: "Sur ce niveau, jusqu'à {n} bouteilles sont rangées dans un emplacement.",
   sync_code_notfound: "Code introuvable – vérifiez-le",
@@ -6240,6 +6619,23 @@ pl: {
   shelf_moveall_confirm: "Przenieść butelki ({n}) z {from} na {to}?",
   shelf_moveall_rest: "{n} nie mieści się tam i zostaje na miejscu.",
   shelf_moveall_done: "Przeniesiono butelki: {n} ✓",
+  photo_label: "Własne zdjęcie",
+  photo_btn: "📷  Zrób / wybierz zdjęcie",
+  photo_remove: "Usuń zdjęcie",
+  photo_saved: "Zdjęcie zapisane ✓",
+  photo_fail: "Nie udało się zapisać zdjęcia",
+  photo_hint: "Zdjęcie zostaje na tym urządzeniu i nie jest synchronizowane.",
+  l_stock: "Zapas (butelki)",
+  mm_stock: "Zapas",
+  mm_min: "Min",
+  mm_max: "Maks",
+  mm_filter: "🛒 Do uzupełnienia",
+  mm_list_title: "Lista zakupów",
+  mm_list_empty: "Nic do kupienia – wszystkie zapasy są w normie.",
+  mm_share: "Udostępnij listę",
+  mm_copy: "Kopiuj",
+  mm_toast_low: "Zapas poniżej minimum: {name} ({n} z {min})",
+  mm_restock_note: "Dokup: cel {n} butelek",
   loc_slot: "Miejsce",
   rack_cap_low: "Na tym poziomie w jednym miejscu leży do {n} butelek.",
   sync_code_notfound: "Nie znaleziono kodu – sprawdź go",
@@ -6584,6 +6980,23 @@ hu: {
   shelf_moveall_confirm: "{n} palack áthelyezése: {from} → {to}?",
   shelf_moveall_rest: "{n} nem fér el ott, ezért marad, ahol van.",
   shelf_moveall_done: "{n} palack áthelyezve ✓",
+  photo_label: "Saját fotó",
+  photo_btn: "📷  Fotó készítése / kiválasztása",
+  photo_remove: "Fotó törlése",
+  photo_saved: "Fotó mentve ✓",
+  photo_fail: "A fotót nem sikerült menteni",
+  photo_hint: "A fotó ezen az eszközön marad, és nem szinkronizálódik.",
+  l_stock: "Készlet (palack)",
+  mm_stock: "Készlet",
+  mm_min: "Min",
+  mm_max: "Max",
+  mm_filter: "🛒 Utánrendelés",
+  mm_list_title: "Bevásárlólista",
+  mm_list_empty: "Nincs mit venni – minden készlet a megfelelő tartományban van.",
+  mm_share: "Lista megosztása",
+  mm_copy: "Másolás",
+  mm_toast_low: "Készlet a minimum alatt: {name} ({n}/{min})",
+  mm_restock_note: "Utánvásárlás: cél {n} palack",
   loc_slot: "Hely",
   rack_cap_low: "Ezen a szinten egy helyen legfeljebb {n} üveg van.",
   sync_code_notfound: "A kód nem található – ellenőrizd",
@@ -6928,6 +7341,23 @@ cs: {
   shelf_moveall_confirm: "Přesunout lahve ({n}) z {from} na {to}?",
   shelf_moveall_rest: "{n} se tam nevejde a zůstane na místě.",
   shelf_moveall_done: "Přesunuto lahví: {n} ✓",
+  photo_label: "Vlastní foto",
+  photo_btn: "📷  Vyfotit / vybrat foto",
+  photo_remove: "Odebrat foto",
+  photo_saved: "Foto uloženo ✓",
+  photo_fail: "Foto se nepodařilo uložit",
+  photo_hint: "Foto zůstane v tomto zařízení a nesynchronizuje se.",
+  l_stock: "Zásoba (lahve)",
+  mm_stock: "Zásoba",
+  mm_min: "Min",
+  mm_max: "Max",
+  mm_filter: "🛒 Dokoupit",
+  mm_list_title: "Nákupní seznam",
+  mm_list_empty: "Není co nakoupit – všechny zásoby jsou v pořádku.",
+  mm_share: "Sdílet seznam",
+  mm_copy: "Kopírovat",
+  mm_toast_low: "Zásoba pod minimem: {name} ({n} z {min})",
+  mm_restock_note: "Dokoupit: cíl {n} lahví",
   loc_slot: "Místo",
   rack_cap_low: "Na této úrovni je na jednom místě až {n} lahví.",
   sync_code_notfound: "Kód nebyl nalezen – zkontrolujte jej",
@@ -7272,6 +7702,23 @@ sk: {
   shelf_moveall_confirm: "Presunúť fľaše ({n}) z {from} na {to}?",
   shelf_moveall_rest: "{n} sa tam nezmestí a zostane na mieste.",
   shelf_moveall_done: "Presunuté fľaše: {n} ✓",
+  photo_label: "Vlastné foto",
+  photo_btn: "📷  Odfotiť / vybrať foto",
+  photo_remove: "Odstrániť foto",
+  photo_saved: "Foto uložené ✓",
+  photo_fail: "Foto sa nepodarilo uložiť",
+  photo_hint: "Foto zostane v tomto zariadení a nesynchronizuje sa.",
+  l_stock: "Zásoba (fľaše)",
+  mm_stock: "Zásoba",
+  mm_min: "Min",
+  mm_max: "Max",
+  mm_filter: "🛒 Dokúpiť",
+  mm_list_title: "Nákupný zoznam",
+  mm_list_empty: "Nie je čo nakúpiť – všetky zásoby sú v poriadku.",
+  mm_share: "Zdieľať zoznam",
+  mm_copy: "Kopírovať",
+  mm_toast_low: "Zásoba pod minimom: {name} ({n} z {min})",
+  mm_restock_note: "Dokúpiť: cieľ {n} fliaš",
   loc_slot: "Miesto",
   rack_cap_low: "Na tejto úrovni je na jednom mieste až {n} fliaš.",
   sync_code_notfound: "Kód sa nenašiel – skontrolujte ho",
@@ -7616,6 +8063,23 @@ ro: {
   shelf_moveall_confirm: "Muți {n} sticlă/sticle de la {from} la {to}?",
   shelf_moveall_rest: "{n} nu încap acolo și rămân pe loc.",
   shelf_moveall_done: "Sticle mutate: {n} ✓",
+  photo_label: "Fotografie proprie",
+  photo_btn: "📷  Fă / alege o fotografie",
+  photo_remove: "Elimină fotografia",
+  photo_saved: "Fotografie salvată ✓",
+  photo_fail: "Fotografia nu a putut fi salvată",
+  photo_hint: "Fotografia rămâne pe acest dispozitiv și nu este sincronizată.",
+  l_stock: "Stoc (sticle)",
+  mm_stock: "Stoc",
+  mm_min: "Min",
+  mm_max: "Max",
+  mm_filter: "🛒 De recumpărat",
+  mm_list_title: "Listă de cumpărături",
+  mm_list_empty: "Nimic de cumpărat – toate stocurile sunt în limite.",
+  mm_share: "Partajează lista",
+  mm_copy: "Copiază",
+  mm_toast_low: "Stoc sub minim: {name} ({n} din {min})",
+  mm_restock_note: "Cumpără din nou: țintă {n} sticle",
   loc_slot: "Loc",
   rack_cap_low: "Pe acest nivel, într-un loc sunt până la {n} sticle.",
   sync_code_notfound: "Codul nu a fost găsit – verifică-l",
@@ -7960,6 +8424,23 @@ hr: {
   shelf_moveall_confirm: "Premjestiti boce ({n}) s {from} na {to}?",
   shelf_moveall_rest: "{n} ne stane tamo i ostaje na mjestu.",
   shelf_moveall_done: "Premješteno boca: {n} ✓",
+  photo_label: "Vlastita fotografija",
+  photo_btn: "📷  Snimi / odaberi fotografiju",
+  photo_remove: "Ukloni fotografiju",
+  photo_saved: "Fotografija spremljena ✓",
+  photo_fail: "Fotografiju nije moguće spremiti",
+  photo_hint: "Fotografija ostaje na ovom uređaju i ne sinkronizira se.",
+  l_stock: "Zalihe (boce)",
+  mm_stock: "Zalihe",
+  mm_min: "Min",
+  mm_max: "Maks",
+  mm_filter: "🛒 Dokupi",
+  mm_list_title: "Popis za kupnju",
+  mm_list_empty: "Nema što kupiti – sve su zalihe u rasponu.",
+  mm_share: "Podijeli popis",
+  mm_copy: "Kopiraj",
+  mm_toast_low: "Zalihe ispod minimuma: {name} ({n} od {min})",
+  mm_restock_note: "Dokupi: cilj {n} boca",
   loc_slot: "Mjesto",
   rack_cap_low: "Na ovoj razini u jednom je mjestu do {n} boca.",
   sync_code_notfound: "Kod nije pronađen – provjerite ga",
@@ -8304,6 +8785,23 @@ pt: {
   shelf_moveall_confirm: "Mover {n} garrafa(s) de {from} para {to}?",
   shelf_moveall_rest: "{n} não cabem lá e ficam onde estão.",
   shelf_moveall_done: "{n} garrafa(s) movida(s) ✓",
+  photo_label: "Foto própria",
+  photo_btn: "📷  Tirar / escolher foto",
+  photo_remove: "Remover foto",
+  photo_saved: "Foto guardada ✓",
+  photo_fail: "Não foi possível guardar a foto",
+  photo_hint: "A foto fica neste dispositivo e não é sincronizada.",
+  l_stock: "Stock (garrafas)",
+  mm_stock: "Stock",
+  mm_min: "Mín",
+  mm_max: "Máx",
+  mm_filter: "🛒 Repor",
+  mm_list_title: "Lista de compras",
+  mm_list_empty: "Nada para comprar – todos os stocks estão dentro do intervalo.",
+  mm_share: "Partilhar lista",
+  mm_copy: "Copiar",
+  mm_toast_low: "Stock abaixo do mínimo: {name} ({n} de {min})",
+  mm_restock_note: "Comprar de novo: objetivo {n} garrafas",
   loc_slot: "Lugar",
   rack_cap_low: "Neste nível há até {n} garrafas num lugar.",
   sync_code_notfound: "Código não encontrado – verifique-o",
@@ -8648,6 +9146,23 @@ no: {
   shelf_moveall_confirm: "Flytte {n} flaske(r) fra {from} til {to}?",
   shelf_moveall_rest: "{n} får ikke plass der og blir liggende.",
   shelf_moveall_done: "{n} flaske(r) flyttet ✓",
+  photo_label: "Eget bilde",
+  photo_btn: "📷  Ta / velg bilde",
+  photo_remove: "Fjern bilde",
+  photo_saved: "Bilde lagret ✓",
+  photo_fail: "Bildet kunne ikke lagres",
+  photo_hint: "Bildet blir på denne enheten og synkroniseres ikke.",
+  l_stock: "Beholdning (flasker)",
+  mm_stock: "Beholdning",
+  mm_min: "Min",
+  mm_max: "Maks",
+  mm_filter: "🛒 Etterfyll",
+  mm_list_title: "Handleliste",
+  mm_list_empty: "Ingenting å kjøpe – alle beholdninger er innenfor grensene.",
+  mm_share: "Del liste",
+  mm_copy: "Kopier",
+  mm_toast_low: "Beholdning under minimum: {name} ({n} av {min})",
+  mm_restock_note: "Kjøp igjen: mål {n} flasker",
   loc_slot: "Plass",
   rack_cap_low: "På denne hyllen ligger opptil {n} flasker på én plass.",
   sync_code_notfound: "Koden ble ikke funnet – sjekk den",
@@ -8992,6 +9507,23 @@ nl: {
   shelf_moveall_confirm: "{n} fles(sen) van {from} naar {to} verplaatsen?",
   shelf_moveall_rest: "{n} passen daar niet en blijven liggen.",
   shelf_moveall_done: "{n} fles(sen) verplaatst ✓",
+  photo_label: "Eigen foto",
+  photo_btn: "📷  Foto maken / kiezen",
+  photo_remove: "Foto verwijderen",
+  photo_saved: "Foto opgeslagen ✓",
+  photo_fail: "Foto kon niet worden opgeslagen",
+  photo_hint: "De foto blijft op dit apparaat en wordt niet gesynchroniseerd.",
+  l_stock: "Voorraad (flessen)",
+  mm_stock: "Voorraad",
+  mm_min: "Min",
+  mm_max: "Max",
+  mm_filter: "🛒 Bijbestellen",
+  mm_list_title: "Boodschappenlijst",
+  mm_list_empty: "Niets te kopen – alle voorraden zijn op peil.",
+  mm_share: "Lijst delen",
+  mm_copy: "Kopiëren",
+  mm_toast_low: "Voorraad onder minimum: {name} ({n} van {min})",
+  mm_restock_note: "Bijkopen: doel {n} flessen",
   loc_slot: "Plaats",
   rack_cap_low: "Op dit niveau liggen tot {n} flessen op één plek.",
   sync_code_notfound: "Code niet gevonden – controleer hem",
@@ -9336,6 +9868,23 @@ el: {
   shelf_moveall_confirm: "Μετακίνηση μπουκαλιών ({n}) από {from} σε {to};",
   shelf_moveall_rest: "{n} δεν χωρούν εκεί και μένουν όπου είναι.",
   shelf_moveall_done: "Μετακινήθηκαν μπουκάλια: {n} ✓",
+  photo_label: "Δική μου φωτογραφία",
+  photo_btn: "📷  Λήψη / επιλογή φωτογραφίας",
+  photo_remove: "Αφαίρεση φωτογραφίας",
+  photo_saved: "Η φωτογραφία αποθηκεύτηκε ✓",
+  photo_fail: "Δεν ήταν δυνατή η αποθήκευση της φωτογραφίας",
+  photo_hint: "Η φωτογραφία παραμένει σε αυτή τη συσκευή και δεν συγχρονίζεται.",
+  l_stock: "Απόθεμα (φιάλες)",
+  mm_stock: "Απόθεμα",
+  mm_min: "Ελάχ.",
+  mm_max: "Μέγ.",
+  mm_filter: "🛒 Αναπλήρωση",
+  mm_list_title: "Λίστα αγορών",
+  mm_list_empty: "Τίποτα για αγορά – όλα τα αποθέματα είναι εντός ορίων.",
+  mm_share: "Κοινοποίηση λίστας",
+  mm_copy: "Αντιγραφή",
+  mm_toast_low: "Απόθεμα κάτω από το ελάχιστο: {name} ({n} από {min})",
+  mm_restock_note: "Αγορά ξανά: στόχος {n} φιάλες",
   loc_slot: "Θέση",
   rack_cap_low: "Σε αυτό το επίπεδο αποθηκεύονται έως {n} φιάλες σε μία θέση.",
   sync_code_notfound: "Ο κωδικός δεν βρέθηκε – ελέγξτε τον",
@@ -9680,6 +10229,23 @@ uk: {
   shelf_moveall_confirm: "Перемістити пляшки ({n}) з {from} на {to}?",
   shelf_moveall_rest: "{n} не вміщуються туди й залишаються на місці.",
   shelf_moveall_done: "Переміщено пляшок: {n} ✓",
+  photo_label: "Власне фото",
+  photo_btn: "📷  Зробити / вибрати фото",
+  photo_remove: "Видалити фото",
+  photo_saved: "Фото збережено ✓",
+  photo_fail: "Не вдалося зберегти фото",
+  photo_hint: "Фото залишається на цьому пристрої й не синхронізується.",
+  l_stock: "Запас (пляшок)",
+  mm_stock: "Запас",
+  mm_min: "Мін",
+  mm_max: "Макс",
+  mm_filter: "🛒 Докупити",
+  mm_list_title: "Список покупок",
+  mm_list_empty: "Купувати нічого – усі запаси в нормі.",
+  mm_share: "Поділитися списком",
+  mm_copy: "Копіювати",
+  mm_toast_low: "Запас нижче мінімуму: {name} ({n} з {min})",
+  mm_restock_note: "Докупити: ціль {n} пляшок",
   loc_slot: "Місце",
   rack_cap_low: "На цьому рівні в одному місці зберігається до {n} пляшок.",
   sync_code_notfound: "Код не знайдено – перевірте його",
@@ -10024,6 +10590,23 @@ ja: {
   shelf_moveall_confirm: "{n}本のボトルを{from}から{to}へ移動しますか？",
   shelf_moveall_rest: "{n}本は入りきらないため、そのまま残ります。",
   shelf_moveall_done: "{n}本のボトルを移動しました ✓",
+  photo_label: "自分の写真",
+  photo_btn: "📷  写真を撮る / 選ぶ",
+  photo_remove: "写真を削除",
+  photo_saved: "写真を保存しました ✓",
+  photo_fail: "写真を保存できませんでした",
+  photo_hint: "写真はこの端末にのみ保存され、同期されません。",
+  l_stock: "在庫（本数）",
+  mm_stock: "在庫",
+  mm_min: "最小",
+  mm_max: "最大",
+  mm_filter: "🛒 買い足し",
+  mm_list_title: "買い物リスト",
+  mm_list_empty: "買うものはありません。すべての在庫が適正範囲内です。",
+  mm_share: "リストを共有",
+  mm_copy: "コピー",
+  mm_toast_low: "在庫が最小値未満: {name} ({n}/{min})",
+  mm_restock_note: "買い足し: 目標 {n} 本",
   loc_slot: "場所",
   rack_cap_low: "この段では、1か所に最大{n}本まで保管されます。",
   sync_code_notfound: "コードが見つかりません – ご確認ください",
@@ -10368,6 +10951,23 @@ ko: {
   shelf_moveall_confirm: "{n}병을 {from}에서 {to}(으)로 이동할까요?",
   shelf_moveall_rest: "{n}병은 자리가 없어 그대로 남습니다.",
   shelf_moveall_done: "{n}병 이동 완료 ✓",
+  photo_label: "내 사진",
+  photo_btn: "📷  사진 촬영 / 선택",
+  photo_remove: "사진 삭제",
+  photo_saved: "사진을 저장했어요 ✓",
+  photo_fail: "사진을 저장하지 못했어요",
+  photo_hint: "사진은 이 기기에만 보관되며 동기화되지 않아요.",
+  l_stock: "재고 (병)",
+  mm_stock: "재고",
+  mm_min: "최소",
+  mm_max: "최대",
+  mm_filter: "🛒 재주문",
+  mm_list_title: "장보기 목록",
+  mm_list_empty: "살 것이 없어요 – 모든 재고가 적정 범위예요.",
+  mm_share: "목록 공유",
+  mm_copy: "복사",
+  mm_toast_low: "재고가 최소 미만: {name} ({n}/{min})",
+  mm_restock_note: "다시 구매: 목표 {n}병",
   loc_slot: "칸",
   rack_cap_low: "이 단에서는 한 칸에 최대 {n}병이 보관돼요.",
   sync_code_notfound: "코드를 찾을 수 없어요 – 확인해 주세요",
@@ -10712,6 +11312,23 @@ zh: {
   shelf_moveall_confirm: "将 {n} 瓶酒从 {from} 移到 {to}？",
   shelf_moveall_rest: "有 {n} 瓶放不下，留在原处。",
   shelf_moveall_done: "已移动 {n} 瓶 ✓",
+  photo_label: "自己的照片",
+  photo_btn: "📷  拍照 / 选择照片",
+  photo_remove: "删除照片",
+  photo_saved: "照片已保存 ✓",
+  photo_fail: "无法保存照片",
+  photo_hint: "照片仅保留在此设备上，不会同步。",
+  l_stock: "库存（瓶）",
+  mm_stock: "库存",
+  mm_min: "最低",
+  mm_max: "最高",
+  mm_filter: "🛒 补货",
+  mm_list_title: "购物清单",
+  mm_list_empty: "无需购买 – 所有库存都在正常范围内。",
+  mm_share: "分享清单",
+  mm_copy: "复制",
+  mm_toast_low: "库存低于最低值：{name} ({n}/{min})",
+  mm_restock_note: "补货：目标 {n} 瓶",
   loc_slot: "位",
   rack_cap_low: "此层每个位最多存放 {n} 瓶。",
   sync_code_notfound: "未找到同步码 – 请检查",
@@ -11056,6 +11673,23 @@ hi: {
   shelf_moveall_confirm: "{n} बोतल(ें) {from} से {to} में स्थानांतरित करें?",
   shelf_moveall_rest: "{n} वहाँ नहीं आ पातीं और वहीं रहेंगी।",
   shelf_moveall_done: "{n} बोतल(ें) स्थानांतरित ✓",
+  photo_label: "अपनी फ़ोटो",
+  photo_btn: "📷  फ़ोटो लें / चुनें",
+  photo_remove: "फ़ोटो हटाएँ",
+  photo_saved: "फ़ोटो सहेजी गई ✓",
+  photo_fail: "फ़ोटो सहेजी नहीं जा सकी",
+  photo_hint: "फ़ोटो इसी डिवाइस पर रहती है और सिंक नहीं होती।",
+  l_stock: "स्टॉक (बोतलें)",
+  mm_stock: "स्टॉक",
+  mm_min: "न्यूनतम",
+  mm_max: "अधिकतम",
+  mm_filter: "🛒 दोबारा मँगाएँ",
+  mm_list_title: "ख़रीदारी सूची",
+  mm_list_empty: "कुछ ख़रीदना नहीं है – सभी स्टॉक सही सीमा में हैं।",
+  mm_share: "सूची साझा करें",
+  mm_copy: "कॉपी करें",
+  mm_toast_low: "स्टॉक न्यूनतम से कम: {name} ({n}/{min})",
+  mm_restock_note: "दोबारा ख़रीदें: लक्ष्य {n} बोतलें",
   loc_slot: "स्थान",
   rack_cap_low: "इस स्तर पर एक स्थान में अधिकतम {n} बोतलें रखी जाती हैं।",
   sync_code_notfound: "कोड नहीं मिला – कृपया जाँच लें",
@@ -11339,6 +11973,7 @@ function wineImgFallback(img) {
   a.replaceWith(span);
 }
 function wineImgHtml(w, cls) {
+  if (w.photo && photoCache.has(w.photo)) return `<a class="${cls}" href="#" onclick="event.stopPropagation();showPhoto('${esc(w.photo)}');return false" title="${esc(t('img_open'))}"><img src="${photoCache.get(w.photo)}" alt="" loading="lazy"></a>`;
   if (!shownImage(w)) return winePlaceholderHtml(cls);
   const u = esc(shownImage(w));
   return `<a class="${cls}" href="${u}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(t('img_open'))}"><img src="${u}" alt="" loading="lazy" onerror="wineImgFallback(this)"></a>`;
@@ -11382,6 +12017,7 @@ function renderKeller() {
     <button class="filter-chip ${activeFilter===ty?'active':''}" onclick="setFilter('${ty}')">${TYPE_LABELS[ty]}</button>
   `).join('') + `
     <button class="filter-chip ${viewMode==='list'?'active':''}" onclick="toggleViewMode()">${t('list_chip')}</button>
+    ${shoppingChipHtml()}
   `;
 
   // list
@@ -11461,6 +12097,7 @@ function renderKeller() {
         ${loc?`<div class="wine-region">📍 ${esc(loc)}</div>`:''}
         <div class="wine-count-badge">${w.count||1} ${t('fl')}</div>
       </div>
+      ${mmBadgeHtml(w)}
       ${ripe ? `
       <div class="wine-ripeness">
         <div class="wine-ripeness-bar ${ripe.cls}" style="width:${ripe.pct}%"></div>
@@ -11551,7 +12188,7 @@ function confirmDrink() {
   const ref = drinkSlotRef; drinkSlotRef = null;
   const rr = ref && rackById(ref.rack);
   const where = rr ? t('ph_regal') + ' ' + rr.name + ' · ' + t('ph_ebene') + ' ' + ref.e + ' · ' + t('loc_slot') + ' ' + ref.p : null;   // aus dem Regal getrunken: genau dieser Platz kommt in die Historie
-  if ((w.count||1) <= 1) wines = wines.filter(x => x.id !== drinkId);
+  if ((w.count||1) <= 1) { wines = wines.filter(x => x.id !== drinkId); addRestockWish(w); }
   else {
     w.count = (w.count||1) - 1;
     if (ref) {   // der Platz der getrunkenen Flasche wird frei
@@ -11570,6 +12207,8 @@ function confirmDrink() {
   else if (active && active.id === 'tab-racks') { rackFilledSlot = null; renderRacks(); }
   else renderKeller();
   showToast(t('toast_prost'));
+  const lowRow = wines.includes(w) ? mmInfo(w).find(r => r.low) : null;
+  if (lowRow) setTimeout(() => showToast(t('mm_toast_low', { name: w.name, n: lowRow.stock, min: lowRow.min })), 1800);
 }
 
 function recordDrunk(w, companions, occasions, locText) {
@@ -11668,8 +12307,12 @@ function editWine(id) {
   document.getElementById('f-drink-from').value = w.drinkFrom||'';
   document.getElementById('f-drink-to').value = w.drinkTo||'';
   document.getElementById('f-price').value = w.price||'';
-  document.getElementById('f-image').value = shownImage(w) || '';
+  document.getElementById('f-image').value = urlImage(w) || '';
   document.getElementById('f-ean').value = w.ean || '';
+  document.getElementById('f-photo').value = w.photo || '';
+  formPhotoPending = null;
+  updateFormPhoto();
+  renderMinMaxFields(w);
   updateImagePreview();
   document.getElementById('f-note').value = w.note||'';
   setStar(w.rating||0);
@@ -11685,8 +12328,10 @@ function openAddModal() {
   editId = null;
   autoDrink = { from: null, to: null };
   lastAutoLookupKey = '';
-  ['f-name','f-year','f-region','f-country','f-grape','f-loc-regal','f-loc-ebene','f-loc-platz','f-note','f-drink-from','f-drink-to','f-price','f-image','f-ean'].forEach(id => document.getElementById(id).value = '');
+  ['f-name','f-year','f-region','f-country','f-grape','f-loc-regal','f-loc-ebene','f-loc-platz','f-note','f-drink-from','f-drink-to','f-price','f-image','f-ean','f-photo'].forEach(id => document.getElementById(id).value = '');
   updateImagePreview();
+  if (formPhotoPending) photoDel(formPhotoPending);
+  formPhotoPending = null; updateFormPhoto(); renderMinMaxFields(null);
   document.getElementById('f-count').value = 1;
   document.getElementById('f-type').value = 'rot';
   setStar(0);
@@ -11694,7 +12339,7 @@ function openAddModal() {
   document.getElementById('add-modal').classList.add('show');
 }
 
-function closeModal(id) { if (id === 'add-modal') formToken++; document.getElementById(id).classList.remove('show'); }
+function closeModal(id) { if (id === 'add-modal') { formToken++; if (formPhotoPending) { photoDel(formPhotoPending); formPhotoPending = null; } } document.getElementById(id).classList.remove('show'); }
 
 function setStar(n) {
   currentStar = n;
@@ -11734,6 +12379,8 @@ function saveWine() {
     rating: currentStar||null,
     note: document.getElementById('f-note').value.trim()||null,
     ean: document.getElementById('f-ean').value || null,
+    photo: document.getElementById('f-photo').value || null,
+    minMax: readMinMaxFields(),
     added: editId ? (wines.find(w=>w.id===editId)||{}).added : new Date().toISOString()
   });
   // Ort der ersten Flasche kommt aus dem Formular; weitere Flaschen (placements) bleiben beim Bearbeiten erhalten.
@@ -11770,9 +12417,10 @@ function saveWine() {
     const existing = wines.find(w => norm(w.name) === norm(wine.name) && (w.year||null) === (wine.year||null));
     if (existing) {
       existing.count = (existing.count||1) + (wine.count||1);
-      ['region','country','grape','locRegal','locEbene','locPlatz','drinkFrom','drinkTo','price','image','rating','note','ean'].forEach(k => {
+      ['region','country','grape','locRegal','locEbene','locPlatz','drinkFrom','drinkTo','price','image','rating','note','ean','photo'].forEach(k => {
         if (!existing[k] && wine[k]) existing[k] = wine[k];
       });
+      if (!Object.keys(existing.minMax || {}).length && Object.keys(wine.minMax || {}).length) existing.minMax = wine.minMax;
       const addPl = (wine.placements || []).filter(x => { const rr = rackById(x.rack); return rr && (slotMapFor(x.rack).get(x.e + '|' + x.p) || []).length < rackCap(rr, x.e); });
       if (addPl.length) setPlacements(existing, validPlacements(existing).concat(addPl));
       showToast(t('toast_count', {n: existing.count}));
@@ -11782,6 +12430,7 @@ function saveWine() {
     }
   }
   save();
+  formPhotoPending = null;
   closeModal('add-modal');   // beendet auch die Formular-Sitzung (formToken)
   renderKeller();
 }
@@ -13161,7 +13810,7 @@ function wishToKeller(id) {
   const norm = s => String(s||'').toLowerCase().replace(/\s+/g,' ').trim();
   const ex = wines.find(x => norm(x.name) === norm(w.name) && (x.year||null) === (w.year||null));
   if (ex) { ex.count = (ex.count||1) + 1; if (!ex.note && w.note) ex.note = w.note; }
-  else wines.push(cleanWine({ id: Date.now().toString(), name: w.name, year: w.year, count: 1, type: w.type, region: w.region, country: w.country, grape: w.grape, note: w.note, added: new Date().toISOString() }));
+  else wines.push(cleanWine({ id: Date.now().toString(), name: w.name, year: w.year, count: 1, type: w.type, region: w.region, country: w.country, grape: w.grape, note: w.note, minMax: w.minMax, added: new Date().toISOString() }));
   save();
   wishes = wishes.filter(x=>x.id!==id);
   saveWishes();
@@ -13263,7 +13912,7 @@ async function exportPDF() {
 }
 
 async function exportJSON() {
-  const backup = { app: 'weinkeller', version: 2, dv: 2, exportedAt: new Date().toISOString(), wines, wishes, drunkWines, racks: settings.racks || [], cellars: settings.cellars || [], owner: settings.owner || '' };
+  const backup = { app: 'weinkeller', version: 2, dv: 2, exportedAt: new Date().toISOString(), wines, wishes, drunkWines, racks: settings.racks || [], cellars: settings.cellars || [], owner: settings.owner || '', photos: Object.fromEntries(wines.filter(w => w.photo && photoCache.has(w.photo)).map(w => [w.photo, photoCache.get(w.photo)])) };
   try {
     await saveFile('weinkeller_backup.json', new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json;charset=utf-8' }));
     showToast(t('toast_backup'));
@@ -13290,7 +13939,7 @@ function importJSON(e) {
       const nw = hasW ? cleanWines(data.wines) : null, nwish = hasWish ? cleanWishes(data.wishes) : null, nd = hasD ? cleanDrunk(data.drunkWines) : null;
       if ((wines.length || wishes.length || drunkWines.length) &&
           !confirm(t('import_replace_confirm', { cur: wines.length, n: nw ? nw.length : wines.length }))) { input.value = ''; return; }
-      if (nw) { wines = nw; save(); }
+      if (nw) { wines = nw; save(); restorePhotos(data.photos, nw).then(() => { try { rerenderActive(); } catch (e) {} }); }
       if (nwish) { wishes = nwish; saveWishes(); }
       if (nd) { drunkWines = nd; saveDrunk(); }
       if (Array.isArray(data.racks)) { settings.cellars = cleanCellars(data.cellars); settings.racks = cleanRacks(data.racks); fixRackCellars(); saveSettings(); }
