@@ -13639,7 +13639,6 @@ function showTab(name, btn) {
 // ═══════════════════════════════════════
 // KELLER
 // ═══════════════════════════════════════
-const TYPE_COLORS = { rot:'dot-rot', weiß:'dot-weiß', rosé:'dot-rosé', sekt:'dot-sekt', other:'dot-other' };
 const TYPES = ['alle','rot','weiß','rosé','sekt','other'];
 // Kleines Weintrauben-Symbol in der Typ-Farbe (ersetzt den farbigen Punkt)
 function grapeSvg(fill) {
@@ -13716,11 +13715,6 @@ function wineRegionLinks(w) {
   const reg = w.region ? `<a class="wine-region-link" href="${mapUrl({ region: w.region, country: w.country })}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(t('map_open'))}">${esc(w.region)}</a>` : '';
   const cty = w.country ? `<a class="wine-region-link" href="${countryMapUrl(w)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(t('map_regions_open'))}">${esc(w.country)}</a>` : '';
   return reg && cty ? reg + ', ' + cty : (reg || cty);
-}
-// Region und Land als Text; antippen öffnet die Karte (ohne eigenes Symbol)
-function wineRegionLink(w, text) {
-  if (!w.region && !w.country) return esc(text);
-  return `<a class="wine-region-link" href="${mapUrl(w)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(t('map_open'))}">${esc(text)}</a>`;
 }
 // Wikipedia-Link zur Rebsorte (bzw. zum Wein) – in der eingestellten Sprache
 function wikiUrl(w) {
@@ -13856,7 +13850,6 @@ function getRipenessInfo(w) {
   const from = w.drinkFrom || now;
   const to = w.drinkTo || from + 5;
   const peak = Math.round(from + (to - from) * 0.6);
-  const span = to - (w.year || from) + 2;
   if (now < from) {
     const pct = Math.min(100, ((now - (w.year||from)) / (from - (w.year||from) + 1)) * 40);
     return { cls: 'ripeness-jung', pct };
@@ -16170,11 +16163,13 @@ function exportFailed(err) { if (!(err && /cancel/i.test(String(err.message || e
 // ═══════════════════════════════════════
 // UTILS
 // ═══════════════════════════════════════
+let toastTimer = null;
 function showToast(msg) {
   const el = document.getElementById('toast');
   el.textContent = msg;
   el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2500);
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
 }
 function esc(str) {
   return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -16195,6 +16190,15 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && Date.now() - lastVisSync > 20000) { lastVisSync = Date.now(); syncNow(true); recoverPurchases(); }
 });
 splashInit();
+// Fenster: für Screenreader als Dialog kennzeichnen; am PC schließt Escape das oberste offene Fenster (der Scanner hat eine eigene Abbrechen-Taste)
+document.querySelectorAll('.modal-overlay').forEach((ov) => { ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); });
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape' || e.defaultPrevented) return;
+  const open = document.querySelectorAll('.modal-overlay.show');
+  if (!open.length) return;
+  e.preventDefault();
+  closeModal(open[open.length - 1].id);
+});
 // Externe Links (Datenschutz, Karte, Wikipedia, Flaschenbild): in der nativen App im eingebetteten Safari-Fenster mit "Fertig"-Knopf öffnen,
 // damit man zur App zurückkommt (ein Link im WebView der App würde sonst die App-Seite ersetzen). Im Browser bleibt target="_blank".
 document.addEventListener('click', (e) => {
