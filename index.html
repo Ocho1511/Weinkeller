@@ -506,6 +506,8 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
   font-size: 13px;
   cursor: pointer;
 }
+.barcode-miss { margin: 4px 0 10px; padding: 10px 12px; border: 1px solid var(--gold); border-radius: 12px; background: var(--card); font-size: 13px; line-height: 1.4; color: var(--text); }
+.barcode-miss .scan-btn { margin: 8px 0 0; }
 .scan-btn {
   width: 100%;
   padding: 8px;
@@ -1573,6 +1575,10 @@ input[type="file"] { display: none; }
       🔖  Barcode scannen
     </button>
     <input type="hidden" id="f-ean">
+    <div class="barcode-miss" id="barcode-miss" style="display:none">
+      <div data-i18n="barcode_miss_text">Dieser Barcode steht nicht in der Datenbank. Die Nummer wird trotzdem am Wein gespeichert, damit die Flasche beim nächsten Scan erkannt wird. Jetzt das Etikett fotografieren?</div>
+      <button type="button" class="scan-btn" onclick="barcodeMissScan()" data-i18n="m_scan">📷  Etikett scannen (KI)</button>
+    </div>
     <div class="form-group">
       <label data-i18n="l_name">Name / Weingut</label>
       <input id="f-name" placeholder="" type="text">
@@ -1978,14 +1984,27 @@ function cleanCellars(arr) {
   if (!ids.has(DEFAULT_CELLAR_ID)) out.unshift({ id: DEFAULT_CELLAR_ID, name: 'Keller' });
   return out;
 }
+// Trinkfenster plausibel machen (KI-Schätzungen sind manchmal unsinnig, z. B. Jahrgang 2025, trinken ab 2023): "ab" liegt nie vor dem Jahrgang, "bis" nie vor "ab".
+// Ein ungültiger Wert wird durch die Faustregel nach Rebsorte/Weinart ersetzt (dieselbe wie beim Eintippen des Jahrgangs).
+function fixDrinkWindow(year, type, grape, from, to) {
+  if (!year || year < 1900 || year > 2100) return { from, to };
+  let off;
+  try { off = maturationOffset(grape, type); } catch (e) { off = ({ rot: [3, 12], 'weiß': [1, 5], 'rosé': [0, 2], sekt: [1, 6] })[type] || [2, 8]; }
+  let f = from, tt = to;
+  if (f && f < year) f = year + off[0];
+  if (tt && (tt < year || (f && tt < f))) tt = Math.max(year + off[1], (f || year) + 1);
+  return { from: f, to: tt };
+}
 function cleanWine(w, used) {
   if (!w || typeof w !== 'object' || Array.isArray(w)) return null;
   const name = cleanStr(w.name, 200).trim();
   if (!name) return null;
   const count = Math.max(1, Math.min(9999, parseInt(w.count) || 1));
+  const yearV = cleanInt(w.year, 1000, 2200);
+  const dw = fixDrinkWindow(yearV, w.type, w.grape, cleanInt(w.drinkFrom, 1000, 2300), cleanInt(w.drinkTo, 1000, 2300));
   return {
     id: cleanId(w.id, used), name,
-    year: cleanInt(w.year, 1000, 2200),
+    year: yearV,
     count,
     type: VALID_TYPES.includes(w.type) ? w.type : 'other',
     region: cleanText(w.region, 120), country: cleanText(w.country, 120), grape: cleanText(w.grape, 120),
@@ -1995,7 +2014,7 @@ function cleanWine(w, used) {
     photo: ID_RE.test(String(w.photo || '')) ? String(w.photo) : null,
     minMax: cleanMinMax(w.minMax),
     location: cleanText(w.location, 200),
-    drinkFrom: cleanInt(w.drinkFrom, 1000, 2300), drinkTo: cleanInt(w.drinkTo, 1000, 2300),
+    drinkFrom: dw.from, drinkTo: dw.to,
     ...cleanTemps(w),
     price: parsePrice(w.price), image: cleanImage(w.image), imageUser: !!w.imageUser,
     rating: Math.min(5, Math.max(0, parseInt(w.rating) || 0)) || null,
@@ -2741,6 +2760,13 @@ function maturationOffset(grape, type) {
   return MATURATION_TYPE[type] || MATURATION_TYPE.other;
 }
 let autoDrink = { from: null, to: null };
+function fixFormDrinkWindow() {
+  const y = parseInt(document.getElementById('f-year').value);
+  const dfEl = document.getElementById('f-drink-from'), dtEl = document.getElementById('f-drink-to');
+  const fx = fixDrinkWindow(y, document.getElementById('f-type').value, document.getElementById('f-grape').value, parseInt(dfEl.value) || null, parseInt(dtEl.value) || null);
+  if (fx.from && String(fx.from) !== dfEl.value) dfEl.value = fx.from;
+  if (fx.to && String(fx.to) !== dtEl.value) dtEl.value = fx.to;
+}
 function autoFillDrinkWindow() {
   const y = parseInt(document.getElementById('f-year').value);
   if (!y || y < 1900 || y > 2100) return;
@@ -3110,7 +3136,7 @@ async function lookupWineData(name, year) {
       model: 'claude-sonnet-4-6',
       max_tokens: 1200,
       tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 3 }],
-      system: `Du bist ein Wein-Experte. Recherchiere den aktuellen durchschnittlichen Marktpreis (Endverbraucher, 0,75-l-Flasche) mit der Websuche. Antworte am Ende mit GENAU EINEM JSON-Objekt (ohne Markdown) mit den Feldern: type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), land (Herkunftsland auf Deutsch oder null), grape (Hauptrebsorte oder null), drinkFrom (Jahr als Zahl oder null), drinkTo (Jahr als Zahl oder null), tempFrom (empfohlene Trinktemperatur, untere Grenze in °C als ganze Zahl, z. B. 16, oder null), tempTo (obere Grenze in °C als ganze Zahl, z. B. 18, oder null), price (aktueller Durchschnittspreis pro Flasche in ${currencyName()} als Zahl ohne Währungssymbol, gerundet, oder null), image (eine direkte, öffentlich erreichbare URL zu einem Foto DER FLASCHE, die direkt auf eine Bilddatei zeigt und auf .jpg/.jpeg/.png/.webp endet; nur eine URL, die du über die Websuche tatsächlich gesehen hast, sonst null), page (die URL EINER Webseite, auf der die Flasche abgebildet ist – bevorzugt Wikipedia, die Seite des Weinguts oder ein Wein-Shop/Vivino; eine echte, über die Websuche gefundene Seiten-URL, sonst null). Für Beschreibungsfelder nutze dein Wissen; für Preis, Bild und Seite die Websuche. Nutze null nur wenn keine sinnvolle Angabe möglich ist.`,
+      system: `Du bist ein Wein-Experte. Recherchiere den aktuellen durchschnittlichen Marktpreis (Endverbraucher, 0,75-l-Flasche) mit der Websuche. Antworte am Ende mit GENAU EINEM JSON-Objekt (ohne Markdown) mit den Feldern: type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), land (Herkunftsland auf Deutsch oder null), grape (Hauptrebsorte oder null), drinkFrom (Jahr als Zahl oder null), drinkTo (Jahr als Zahl oder null), tempFrom (empfohlene Trinktemperatur, untere Grenze in °C als ganze Zahl, z. B. 16, oder null), tempTo (obere Grenze in °C als ganze Zahl, z. B. 18, oder null), price (aktueller Durchschnittspreis pro Flasche in ${currencyName()} als Zahl ohne Währungssymbol, gerundet, oder null), image (eine direkte, öffentlich erreichbare URL zu einem Foto DER FLASCHE, die direkt auf eine Bilddatei zeigt und auf .jpg/.jpeg/.png/.webp endet; nur eine URL, die du über die Websuche tatsächlich gesehen hast, sonst null), page (die URL EINER Webseite, auf der die Flasche abgebildet ist – bevorzugt Wikipedia, die Seite des Weinguts oder ein Wein-Shop/Vivino; eine echte, über die Websuche gefundene Seiten-URL, sonst null). Für Beschreibungsfelder nutze dein Wissen; für Preis, Bild und Seite die Websuche. Nutze null nur wenn keine sinnvolle Angabe möglich ist. Das Trinkfenster beginnt nie vor dem Jahrgang, und drinkTo liegt immer nach drinkFrom.`,
       messages: [{ role: 'user', content: `Wein: ${name}${year ? ' (Jahrgang ' + year + ')' : ''}. Nenne Typ, Region, Land, Hauptrebsorte, ein geschätztes Trinkfenster, den aktuellen Durchschnittspreis pro Flasche in ${currencyName()}, eine direkte Bild-URL der Flasche und die URL einer Webseite, auf der die Flasche abgebildet ist.` }]
     })
   });
@@ -3139,6 +3165,7 @@ async function lookupWine() {
     setIfEmpty('f-grape', info.grape);
     setIfEmpty('f-drink-from', info.drinkFrom);
     setIfEmpty('f-drink-to', info.drinkTo);
+    fixFormDrinkWindow();
     setIfEmpty('f-temp-from', info.tempFrom != null ? tempToDisplay(info.tempFrom) : null);
     setIfEmpty('f-temp-to', info.tempTo != null ? tempToDisplay(info.tempTo) : null);
     if (info.price != null) setIfEmpty('f-price', info.price);
@@ -3180,6 +3207,7 @@ async function maybeAutoLookup() {
     setIfEmpty('f-grape', info.grape);
     setIfEmpty('f-drink-from', info.drinkFrom);
     setIfEmpty('f-drink-to', info.drinkTo);
+    fixFormDrinkWindow();
     setIfEmpty('f-temp-from', info.tempFrom != null ? tempToDisplay(info.tempFrom) : null);
     setIfEmpty('f-temp-to', info.tempTo != null ? tempToDisplay(info.tempTo) : null);
     if (info.price != null) { setIfEmpty('f-price', info.price); showToast(t('toast_price_ok', {p: fmtMoney(Math.round(info.price))})); }
@@ -3315,6 +3343,7 @@ async function enrichAllWines() {
             if (!w.grape && info.grape) { w.grape = info.grape; changed = true; }
             if (!w.drinkFrom && info.drinkFrom) { w.drinkFrom = parseInt(info.drinkFrom)||null; changed = true; }
             if (!w.drinkTo && info.drinkTo) { w.drinkTo = parseInt(info.drinkTo)||null; changed = true; }
+            { const fx = fixDrinkWindow(w.year, w.type, w.grape, w.drinkFrom, w.drinkTo); if (fx.from !== w.drinkFrom || fx.to !== w.drinkTo) { w.drinkFrom = fx.from; w.drinkTo = fx.to; changed = true; } }
             if ((w.tempFrom == null || overwriteTemp) && info.tempFrom != null) { const tt = cleanTemps({ tempFrom: info.tempFrom, tempTo: info.tempTo }); if (tt.tempFrom != null && (tt.tempFrom !== w.tempFrom || tt.tempTo !== w.tempTo)) { w.tempFrom = tt.tempFrom; w.tempTo = tt.tempTo; changed = true; } }
             if (!w.price && info.price != null) { w.price = parseFloat(info.price)||null; changed = true; }
             // Falls Vivino kein Bild hatte: KI-Direktbild / og:image als Rückfall (mit jetzt ggf. ergänzten Kriterien)
@@ -3604,6 +3633,7 @@ de: {
   store_filter: "Einlagern: {name} · {n} Fl. – freies Fach antippen",
   store_filter_off: "Alle anzeigen",
   store_back: "← Zum Keller",
+  barcode_miss_text: "Dieser Barcode steht nicht in der Datenbank. Die Nummer wird trotzdem am Wein gespeichert, damit die Flasche beim nächsten Scan erkannt wird. Jetzt das Etikett fotografieren?",
   confirm_enrich_temp: "Auch bereits vorhandene Trinktemperaturen durch KI-Werte ersetzen (auch selbst eingetragene)?\n\nOK = ersetzen (jeder Wein wird per KI abgefragt, das dauert länger)\nAbbrechen = nur fehlende Temperaturen ergänzen",
   cur_auto_set: "Währung automatisch auf {name} gestellt – änderbar unter „Währung“.",
   cur_auto_kept: "Währung bleibt {name}, weil schon Preise eingetragen sind (es wird nicht umgerechnet). Bei Bedarf unter „Währung“ ändern.",
@@ -4022,6 +4052,7 @@ en: {
   store_filter: "Store: {name} · {n} btl. – tap a free slot",
   store_filter_off: "Show all",
   store_back: "← To cellar",
+  barcode_miss_text: "This barcode is not in the database. The number is still saved with the wine so the bottle is recognised next time. Photograph the label now?",
   confirm_enrich_temp: "Also replace serving temperatures that already exist with AI values (including ones you entered yourself)?\n\nOK = replace (every wine is queried by AI, which takes longer)\nCancel = only fill in missing temperatures",
   cur_auto_set: "Currency automatically set to {name} – you can change it under “Currency”.",
   cur_auto_kept: "Currency stays {name} because prices have already been entered (nothing is converted). Change it under “Currency” if needed.",
@@ -4440,6 +4471,7 @@ es: {
   store_filter: "Colocar: {name} · {n} bot. – toca un hueco libre",
   store_filter_off: "Mostrar todo",
   store_back: "← A la bodega",
+  barcode_miss_text: "Este código de barras no está en la base de datos. El número se guarda igualmente con el vino para reconocer la botella la próxima vez. ¿Fotografiar la etiqueta ahora?",
   confirm_enrich_temp: "¿Reemplazar también las temperaturas de servicio ya existentes por valores de la IA (incluidas las que introdujiste tú)?\n\nAceptar = reemplazar (se consulta cada vino con la IA, tarda más)\nCancelar = completar solo las temperaturas que faltan",
   cur_auto_set: "Moneda cambiada automáticamente a {name} – puedes cambiarla en «Moneda».",
   cur_auto_kept: "La moneda sigue siendo {name} porque ya hay precios introducidos (no se convierte nada). Si lo necesitas, cámbiala en «Moneda».",
@@ -4858,6 +4890,7 @@ sv: {
   store_filter: "Placera: {name} · {n} fl. – tryck på en ledig plats",
   store_filter_off: "Visa alla",
   store_back: "← Till källaren",
+  barcode_miss_text: "Den här streckkoden finns inte i databasen. Numret sparas ändå med vinet så att flaskan känns igen nästa gång. Fotografera etiketten nu?",
   confirm_enrich_temp: "Ersätta även befintliga serveringstemperaturer med AI-värden (även sådana du angett själv)?\n\nOK = ersätt (varje vin frågas av AI, det tar längre tid)\nAvbryt = komplettera bara saknade temperaturer",
   cur_auto_set: "Valutan ställdes automatiskt in på {name} – kan ändras under ”Valuta”.",
   cur_auto_kept: "Valutan förblir {name} eftersom priser redan har angetts (inget räknas om). Ändra under ”Valuta” vid behov.",
@@ -5276,6 +5309,7 @@ da: {
   store_filter: "Placér: {name} · {n} fl. – tryk på en ledig plads",
   store_filter_off: "Vis alle",
   store_back: "← Til kælderen",
+  barcode_miss_text: "Denne stregkode findes ikke i databasen. Nummeret gemmes alligevel sammen med vinen, så flasken genkendes næste gang. Skal etiketten fotograferes nu?",
   confirm_enrich_temp: "Skal eksisterende serveringstemperaturer også erstattes med AI-værdier (også dem, du selv har indtastet)?\n\nOK = erstat (hver vin forespørges via AI, det tager længere tid)\nAnnuller = udfyld kun manglende temperaturer",
   cur_auto_set: "Valutaen er automatisk sat til {name} – kan ændres under »Valuta«.",
   cur_auto_kept: "Valutaen forbliver {name}, fordi der allerede er indtastet priser (der omregnes ikke). Ændr den under »Valuta«, hvis det er nødvendigt.",
@@ -5694,6 +5728,7 @@ fi: {
   store_filter: "Sijoita: {name} · {n} pul. – napauta vapaata paikkaa",
   store_filter_off: "Näytä kaikki",
   store_back: "← Kellariin",
+  barcode_miss_text: "Tätä viivakoodia ei löydy tietokannasta. Numero tallennetaan silti viinin mukana, jotta pullo tunnistetaan ensi kerralla. Kuvataanko etiketti nyt?",
   confirm_enrich_temp: "Korvataanko myös jo olemassa olevat tarjoilulämpötilat tekoälyn arvoilla (myös itse syöttämäsi)?\n\nOK = korvaa (jokainen viini kysytään tekoälyltä, mikä kestää kauemmin)\nPeruuta = täydennä vain puuttuvat lämpötilat",
   cur_auto_set: "Valuutaksi asetettiin automaattisesti {name} – muutettavissa kohdassa ”Valuutta”.",
   cur_auto_kept: "Valuutta pysyy muodossa {name}, koska hintoja on jo syötetty (mitään ei muunneta). Muuta tarvittaessa kohdassa ”Valuutta”.",
@@ -6112,6 +6147,7 @@ ru: {
   store_filter: "Разместить: {name} · {n} бут. – коснитесь свободной ячейки",
   store_filter_off: "Показать все",
   store_back: "← В погреб",
+  barcode_miss_text: "Этого штрихкода нет в базе данных. Номер всё равно сохранится вместе с вином, чтобы бутылку узнали при следующем сканировании. Сфотографировать этикетку сейчас?",
   confirm_enrich_temp: "Заменить также уже имеющиеся температуры подачи значениями ИИ (в том числе введённые вами вручную)?\n\nОК = заменить (по каждому вину запрашивается ИИ, это дольше)\nОтмена = дополнить только отсутствующие температуры",
   cur_auto_set: "Валюта автоматически изменена на {name} – её можно изменить в разделе «Валюта».",
   cur_auto_kept: "Валюта остаётся {name}, так как цены уже введены (пересчёт не выполняется). При необходимости измените её в разделе «Валюта».",
@@ -6530,6 +6566,7 @@ it: {
   store_filter: "Riponi: {name} · {n} bott. – tocca uno scomparto libero",
   store_filter_off: "Mostra tutto",
   store_back: "← Alla cantina",
+  barcode_miss_text: "Questo codice a barre non è nel database. Il numero viene comunque salvato con il vino, così la bottiglia viene riconosciuta la prossima volta. Fotografare ora l'etichetta?",
   confirm_enrich_temp: "Sostituire anche le temperature di servizio già presenti con i valori dell'IA (comprese quelle inserite da te)?\n\nOK = sostituisci (ogni vino viene interrogato con l'IA, richiede più tempo)\nAnnulla = completa solo le temperature mancanti",
   cur_auto_set: "Valuta impostata automaticamente su {name} – modificabile in «Valuta».",
   cur_auto_kept: "La valuta resta {name} perché sono già stati inseriti dei prezzi (non viene eseguita alcuna conversione). Se necessario, modificala in «Valuta».",
@@ -6948,6 +6985,7 @@ fr: {
   store_filter: "Ranger : {name} · {n} bout. – touchez un emplacement libre",
   store_filter_off: "Tout afficher",
   store_back: "← Vers la cave",
+  barcode_miss_text: "Ce code-barres n'est pas dans la base de données. Le numéro est tout de même enregistré avec le vin pour reconnaître la bouteille la prochaine fois. Photographier l'étiquette maintenant ?",
   confirm_enrich_temp: "Remplacer aussi les températures de service déjà présentes par les valeurs de l'IA (y compris celles que vous avez saisies vous-même) ?\n\nOK = remplacer (chaque vin est interrogé via l'IA, ce qui prend plus de temps)\nAnnuler = compléter uniquement les températures manquantes",
   cur_auto_set: "Devise définie automatiquement sur {name} – modifiable sous « Devise ».",
   cur_auto_kept: "La devise reste {name}, car des prix ont déjà été saisis (aucune conversion n’est effectuée). Modifiez-la au besoin sous « Devise ».",
@@ -7366,6 +7404,7 @@ pl: {
   store_filter: "Ułóż: {name} · {n} but. – dotknij wolne miejsce",
   store_filter_off: "Pokaż wszystko",
   store_back: "← Do piwnicy",
+  barcode_miss_text: "Tego kodu kreskowego nie ma w bazie danych. Numer i tak zostanie zapisany przy winie, aby butelka została rozpoznana następnym razem. Sfotografować teraz etykietę?",
   confirm_enrich_temp: "Czy zastąpić także istniejące temperatury podawania wartościami z AI (również te wpisane przez Ciebie)?\n\nOK = zastąp (każde wino jest sprawdzane przez AI, trwa to dłużej)\nAnuluj = uzupełnij tylko brakujące temperatury",
   cur_auto_set: "Waluta została automatycznie ustawiona na {name} – można ją zmienić w „Waluta”.",
   cur_auto_kept: "Waluta pozostaje {name}, ponieważ wprowadzono już ceny (nie następuje przeliczenie). W razie potrzeby zmień ją w „Waluta”.",
@@ -7784,6 +7823,7 @@ hu: {
   store_filter: "Elhelyezés: {name} · {n} üveg – koppints egy szabad helyre",
   store_filter_off: "Összes mutatása",
   store_back: "← A pincéhez",
+  barcode_miss_text: "Ez a vonalkód nincs az adatbázisban. A számot ettől még elmentjük a borral, hogy az üveget legközelebb felismerje. Lefényképezed most a címkét?",
   confirm_enrich_temp: "A már meglévő tálalási hőmérsékleteket is lecseréljük MI-értékekre (a saját magad által megadottakat is)?\n\nOK = csere (minden bort lekérdez az MI, ez tovább tart)\nMégse = csak a hiányzó hőmérsékletek kiegészítése",
   cur_auto_set: "A pénznem automatikusan {name} lett – módosítható a „Pénznem” alatt.",
   cur_auto_kept: "A pénznem marad {name}, mert már vannak megadott árak (átváltás nem történik). Szükség esetén módosítsd a „Pénznem” alatt.",
@@ -8202,6 +8242,7 @@ cs: {
   store_filter: "Uložit: {name} · {n} lahví – klepni na volné místo",
   store_filter_off: "Zobrazit vše",
   store_back: "← Do sklepa",
+  barcode_miss_text: "Tento čárový kód není v databázi. Číslo se přesto uloží u vína, aby se láhev příště poznala. Vyfotit etiketu nyní?",
   confirm_enrich_temp: "Nahradit i již existující teploty podávání hodnotami od AI (včetně těch, které jste zadali sami)?\n\nOK = nahradit (u každého vína se dotazuje AI, trvá to déle)\nZrušit = doplnit jen chybějící teploty",
   cur_auto_set: "Měna byla automaticky nastavena na {name} – lze ji změnit v části „Měna“.",
   cur_auto_kept: "Měna zůstává {name}, protože již byly zadány ceny (nic se nepřepočítává). V případě potřeby ji změňte v části „Měna“.",
@@ -8620,6 +8661,7 @@ sk: {
   store_filter: "Uložiť: {name} · {n} fliaš – ťukni na voľné miesto",
   store_filter_off: "Zobraziť všetko",
   store_back: "← Do pivnice",
+  barcode_miss_text: "Tento čiarový kód nie je v databáze. Číslo sa napriek tomu uloží pri víne, aby sa fľaša nabudúce spoznala. Odfotiť etiketu teraz?",
   confirm_enrich_temp: "Nahradiť aj už existujúce teploty podávania hodnotami od AI (vrátane tých, ktoré ste zadali sami)?\n\nOK = nahradiť (pri každom víne sa pýta AI, trvá to dlhšie)\nZrušiť = doplniť len chýbajúce teploty",
   cur_auto_set: "Mena bola automaticky nastavená na {name} – dá sa zmeniť v časti „Mena“.",
   cur_auto_kept: "Mena zostáva {name}, pretože už boli zadané ceny (nič sa neprepočítava). V prípade potreby ju zmeňte v časti „Mena“.",
@@ -9038,6 +9080,7 @@ ro: {
   store_filter: "Așază: {name} · {n} stic. – atinge un loc liber",
   store_filter_off: "Arată tot",
   store_back: "← La pivniță",
+  barcode_miss_text: "Acest cod de bare nu se află în baza de date. Numărul se salvează oricum la vin, ca sticla să fie recunoscută data viitoare. Fotografiezi acum eticheta?",
   confirm_enrich_temp: "Înlocuiți și temperaturile de servire deja existente cu valorile AI (inclusiv cele introduse de dvs.)?\n\nOK = înlocuiește (fiecare vin este interogat prin AI, durează mai mult)\nAnulează = completează doar temperaturile lipsă",
   cur_auto_set: "Moneda a fost setată automat la {name} – poate fi modificată la „Monedă”.",
   cur_auto_kept: "Moneda rămâne {name}, deoarece au fost deja introduse prețuri (nu se face nicio conversie). Dacă este nevoie, modific-o la „Monedă”.",
@@ -9456,6 +9499,7 @@ hr: {
   store_filter: "Pohrani: {name} · {n} boc. – dodirni slobodno mjesto",
   store_filter_off: "Prikaži sve",
   store_back: "← U podrum",
+  barcode_miss_text: "Ovaj barkod nije u bazi podataka. Broj se ipak sprema uz vino kako bi se boca sljedeći put prepoznala. Fotografirati etiketu sada?",
   confirm_enrich_temp: "Zamijeniti i već postojeće temperature posluživanja vrijednostima umjetne inteligencije (uključujući one koje ste sami unijeli)?\n\nU redu = zamijeni (za svako vino upituje se AI, to traje dulje)\nOtkaži = dopuni samo temperature koje nedostaju",
   cur_auto_set: "Valuta je automatski postavljena na {name} – može se promijeniti pod „Valuta“.",
   cur_auto_kept: "Valuta ostaje {name} jer su cijene već unesene (ništa se ne preračunava). Prema potrebi je promijenite pod „Valuta“.",
@@ -9874,6 +9918,7 @@ pt: {
   store_filter: "Arrumar: {name} · {n} gar. – toca num lugar livre",
   store_filter_off: "Mostrar tudo",
   store_back: "← Para a adega",
+  barcode_miss_text: "Este código de barras não está na base de dados. O número é guardado na mesma com o vinho para reconhecer a garrafa da próxima vez. Fotografar o rótulo agora?",
   confirm_enrich_temp: "Substituir também as temperaturas de serviço já existentes por valores da IA (incluindo as que introduziu manualmente)?\n\nOK = substituir (cada vinho é consultado pela IA, demora mais)\nCancelar = completar apenas as temperaturas em falta",
   cur_auto_set: "Moeda definida automaticamente para {name} – pode ser alterada em «Moeda».",
   cur_auto_kept: "A moeda mantém-se {name}, porque já foram introduzidos preços (nada é convertido). Se necessário, altere-a em «Moeda».",
@@ -10292,6 +10337,7 @@ no: {
   store_filter: "Plasser: {name} · {n} fl. – trykk på en ledig plass",
   store_filter_off: "Vis alle",
   store_back: "← Til kjelleren",
+  barcode_miss_text: "Denne strekkoden finnes ikke i databasen. Nummeret lagres likevel sammen med vinen, slik at flasken gjenkjennes neste gang. Fotografere etiketten nå?",
   confirm_enrich_temp: "Skal eksisterende serveringstemperaturer også erstattes med AI-verdier (også de du selv har skrevet inn)?\n\nOK = erstatt (hver vin spørres via AI, det tar lengre tid)\nAvbryt = fyll bare ut manglende temperaturer",
   cur_auto_set: "Valutaen ble automatisk satt til {name} – kan endres under «Valuta».",
   cur_auto_kept: "Valutaen forblir {name}, fordi priser allerede er lagt inn (ingenting omregnes). Endre den under «Valuta» ved behov.",
@@ -10710,6 +10756,7 @@ nl: {
   store_filter: "Opbergen: {name} · {n} fl. – tik op een vrij vak",
   store_filter_off: "Toon alles",
   store_back: "← Naar de kelder",
+  barcode_miss_text: "Deze barcode staat niet in de database. Het nummer wordt toch bij de wijn bewaard, zodat de fles de volgende keer wordt herkend. Het etiket nu fotograferen?",
   confirm_enrich_temp: "Ook reeds bestaande serveertemperaturen vervangen door AI-waarden (ook die je zelf hebt ingevoerd)?\n\nOK = vervangen (elke wijn wordt via AI opgevraagd, dat duurt langer)\nAnnuleren = alleen ontbrekende temperaturen aanvullen",
   cur_auto_set: "Valuta automatisch ingesteld op {name} – te wijzigen onder „Valuta”.",
   cur_auto_kept: "De valuta blijft {name}, omdat er al prijzen zijn ingevoerd (er wordt niets omgerekend). Wijzig dit indien nodig onder „Valuta”.",
@@ -11128,6 +11175,7 @@ el: {
   store_filter: "Τοποθέτηση: {name} · {n} φιάλ. – πατήστε μια ελεύθερη θέση",
   store_filter_off: "Εμφάνιση όλων",
   store_back: "← Στο κελάρι",
+  barcode_miss_text: "Αυτός ο γραμμωτός κωδικός δεν υπάρχει στη βάση δεδομένων. Ο αριθμός αποθηκεύεται παρ' όλα αυτά με το κρασί, ώστε το μπουκάλι να αναγνωριστεί την επόμενη φορά. Να φωτογραφίσετε την ετικέτα τώρα;",
   confirm_enrich_temp: "Να αντικατασταθούν και οι ήδη υπάρχουσες θερμοκρασίες σερβιρίσματος με τιμές της ΤΝ (ακόμη και αυτές που εισαγάγατε εσείς);\n\nΟΚ = αντικατάσταση (κάθε κρασί ερωτάται μέσω ΤΝ, διαρκεί περισσότερο)\nΑκύρωση = συμπλήρωση μόνο των θερμοκρασιών που λείπουν",
   cur_auto_set: "Το νόμισμα ορίστηκε αυτόματα σε {name} – μπορεί να αλλάξει στο «Νόμισμα».",
   cur_auto_kept: "Το νόμισμα παραμένει {name}, επειδή έχουν ήδη καταχωριστεί τιμές (δεν γίνεται μετατροπή). Αν χρειάζεται, αλλάξτε το στο «Νόμισμα».",
@@ -11546,6 +11594,7 @@ uk: {
   store_filter: "Розмістити: {name} · {n} пл. – торкніться вільного місця",
   store_filter_off: "Показати все",
   store_back: "← До погреба",
+  barcode_miss_text: "Цього штрихкоду немає в базі даних. Номер усе одно збережеться разом із вином, щоб пляшку впізнали наступного разу. Сфотографувати етикетку зараз?",
   confirm_enrich_temp: "Замінити також наявні температури подачі значеннями ШІ (зокрема введені вами вручну)?\n\nОК = замінити (щодо кожного вина запитується ШІ, це довше)\nСкасувати = доповнити лише відсутні температури",
   cur_auto_set: "Валюту автоматично змінено на {name} – її можна змінити в розділі «Валюта».",
   cur_auto_kept: "Валюта залишається {name}, оскільки ціни вже введено (перерахунок не виконується). За потреби змініть її в розділі «Валюта».",
@@ -11964,6 +12013,7 @@ ja: {
   store_filter: "配置: {name} · {n}本 – 空いている場所をタップ",
   store_filter_off: "すべて表示",
   store_back: "← セラーへ戻る",
+  barcode_miss_text: "このバーコードはデータベースにありません。番号はワインと一緒に保存されるので、次回からボトルを認識できます。今すぐラベルを撮影しますか？",
   confirm_enrich_temp: "すでに入力されている適温も AI の値で置き換えますか（ご自身で入力したものを含む）？\n\nOK = 置き換える（すべてのワインを AI に問い合わせるため、時間がかかります）\nキャンセル = 未入力の適温だけを補完する",
   cur_auto_set: "通貨を自動的に{name}に設定しました。「通貨」で変更できます。",
   cur_auto_kept: "すでに価格が入力されているため、通貨は{name}のままです（換算は行われません）。必要に応じて「通貨」で変更してください。",
@@ -12382,6 +12432,7 @@ ko: {
   store_filter: "보관: {name} · {n}병 – 빈 칸을 탭하세요",
   store_filter_off: "모두 보기",
   store_back: "← 셀러로",
+  barcode_miss_text: "이 바코드는 데이터베이스에 없습니다. 번호는 와인과 함께 저장되어 다음에 병을 알아볼 수 있습니다. 지금 라벨을 촬영할까요?",
   confirm_enrich_temp: "이미 입력된 적정 서빙 온도도 AI 값으로 바꿀까요(직접 입력한 값 포함)?\n\n확인 = 바꾸기(모든 와인을 AI에 조회하므로 시간이 더 걸립니다)\n취소 = 비어 있는 온도만 채우기",
   cur_auto_set: "통화가 자동으로 {name}(으)로 설정되었습니다. “통화”에서 변경할 수 있습니다.",
   cur_auto_kept: "이미 가격이 입력되어 있으므로 통화는 {name}(으)로 유지됩니다(환산되지 않음). 필요하면 “통화”에서 변경하세요.",
@@ -12800,6 +12851,7 @@ zh: {
   store_filter: "存放：{name} · {n} 瓶 – 请点按空位",
   store_filter_off: "显示全部",
   store_back: "← 返回酒窖",
+  barcode_miss_text: "数据库中没有这个条形码。号码仍会随酒一起保存，下次就能识别这瓶酒。现在拍摄酒标吗？",
   confirm_enrich_temp: "是否也用 AI 的数值替换已有的适饮温度（包括您自己输入的）？\n\n确定 = 替换（每款酒都会向 AI 查询，耗时更长）\n取消 = 仅补全缺失的温度",
   cur_auto_set: "货币已自动设置为{name}，可在“货币”中更改。",
   cur_auto_kept: "由于已录入价格，货币仍保持为{name}（不会进行换算）。如有需要，请在“货币”中更改。",
@@ -13218,6 +13270,7 @@ hi: {
   store_filter: "रखें: {name} · {n} बोतल – खाली स्थान पर टैप करें",
   store_filter_off: "सब दिखाएँ",
   store_back: "← सेलर पर",
+  barcode_miss_text: "यह बारकोड डेटाबेस में नहीं है। नंबर फिर भी वाइन के साथ सहेजा जाएगा, ताकि अगली बार बोतल पहचानी जा सके। क्या अभी लेबल की फ़ोटो लें?",
   confirm_enrich_temp: "क्या पहले से मौजूद सर्विंग तापमान को भी AI के मानों से बदलें (आपके खुद दर्ज किए गए तापमान सहित)?\n\nठीक है = बदलें (हर वाइन के लिए AI से पूछा जाएगा, इसमें अधिक समय लगेगा)\nरद्द करें = केवल गायब तापमान भरें",
   cur_auto_set: "मुद्रा अपने-आप {name} पर सेट की गई – इसे “मुद्रा” में बदला जा सकता है।",
   cur_auto_kept: "मुद्रा {name} ही रहेगी, क्योंकि कीमतें पहले से दर्ज हैं (कोई रूपांतरण नहीं किया जाएगा)। ज़रूरत हो तो “मुद्रा” में बदलें।",
@@ -13871,7 +13924,8 @@ function renderKeller() {
   }).join('');
 }
 
-function setFilter(f) { activeFilter = f; renderKeller(); }
+// Ein Klick auf einen Sortenfilter (Rot, Weiß …) leert auch die Suche, damit die alte Suchanfrage die Liste nicht unbemerkt weiter einschränkt
+function setFilter(f) { activeFilter = f; const s = document.getElementById('search-input'); if (s) s.value = ''; renderKeller(); }
 function toggleViewMode() { viewMode = viewMode === 'list' ? 'card' : 'list'; renderKeller(); }
 function setSort(s) { sortMode = s; renderKeller(); }
 
@@ -14052,6 +14106,7 @@ function deleteWine(id) {
 function editWine(id) {
   const w = wines.find(x => x.id === id);
   if (!w) return;
+  showBarcodeMiss(false);
   formToken++;
   editId = id;
   document.getElementById('f-name').value = w.name||'';
@@ -14095,6 +14150,7 @@ function startStoreFromScan() {
   document.getElementById('camera-input').click();   // im selben Tipp, damit iOS die Kamera zulässt
 }
 function openAddModal() {
+  showBarcodeMiss(false);
   formToken++;
   editId = null;
   autoDrink = { from: null, to: null };
@@ -14262,6 +14318,7 @@ async function handleScan(e) {
   if (!file) return;
   const loading = document.getElementById('scan-loading');
   loading.style.display = 'block';
+  showBarcodeMiss(false);
   try {
     const base64 = await imageToBase64(file);
     const resp = await aiFetch(SCAN_PROXY_URL, {
@@ -14270,7 +14327,7 @@ async function handleScan(e) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 1000,
-        system: 'Du bist ein Weinetikett- und Trinkreife-Experte. Antworte NUR mit einem JSON-Objekt ohne Markdown-Backticks. Felder: name (Weingut + Weinname), year (Jahrgang als Zahl oder null), type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), land (Herkunftsland auf Deutsch, z.B. Frankreich, oder null), grape (Rebsorte oder null), drinkFrom (Jahr als Zahl, ab dem der Wein grob geschätzt trinkreif ist, basierend auf Rebsorte/Region/Jahrgang, oder null), drinkTo (Jahr als Zahl, bis zu dem er grob geschätzt getrunken werden sollte, oder null), tempFrom und tempTo (empfohlene Trinktemperatur als untere und obere Grenze in °C, ganze Zahlen, z. B. 16 und 18, passend zu Weinart und Rebsorte, oder null). drinkFrom/drinkTo sind nur grobe Schätzungen, keine Angabe vom Etikett selbst. Wenn etwas nicht erkennbar ist oder keine sinnvolle Schätzung möglich ist, nutze null.',
+        system: 'Du bist ein Weinetikett- und Trinkreife-Experte. Antworte NUR mit einem JSON-Objekt ohne Markdown-Backticks. Felder: name (Weingut + Weinname), year (Jahrgang als Zahl oder null), type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), land (Herkunftsland auf Deutsch, z.B. Frankreich, oder null), grape (Rebsorte oder null), drinkFrom (Jahr als Zahl, ab dem der Wein grob geschätzt trinkreif ist, basierend auf Rebsorte/Region/Jahrgang, oder null), drinkTo (Jahr als Zahl, bis zu dem er grob geschätzt getrunken werden sollte, oder null), tempFrom und tempTo (empfohlene Trinktemperatur als untere und obere Grenze in °C, ganze Zahlen, z. B. 16 und 18, passend zu Weinart und Rebsorte, oder null). drinkFrom/drinkTo sind nur grobe Schätzungen, keine Angabe vom Etikett selbst. drinkFrom liegt nie vor dem Jahrgang (year), und drinkTo liegt immer nach drinkFrom. Wenn etwas nicht erkennbar ist oder keine sinnvolle Schätzung möglich ist, nutze null.',
         messages: [{ role: 'user', content: [
           { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: base64 } },
           { type: 'text', text: 'Analysiere dieses Weinetikett.' }
@@ -14289,6 +14346,7 @@ async function handleScan(e) {
     if (info.grape) document.getElementById('f-grape').value = info.grape;
     if (info.drinkFrom) document.getElementById('f-drink-from').value = info.drinkFrom;
     if (info.drinkTo) document.getElementById('f-drink-to').value = info.drinkTo;
+    fixFormDrinkWindow();
     if (info.tempFrom != null) document.getElementById('f-temp-from').value = tempToDisplay(info.tempFrom);
     if (info.tempTo != null) document.getElementById('f-temp-to').value = tempToDisplay(info.tempTo);
     showToast(info.drinkFrom || info.drinkTo ? t('toast_label_ripe') : t('toast_label'));
@@ -14365,7 +14423,16 @@ async function scanWeb(kind) {
 }
 // Wein hinzufügen per Flaschen-Barcode: Name/Marke/Typ aus Open Food Facts (über unseren Server, kostenlos);
 // Region, Rebsorte, Trinkfenster und Preis ergänzt danach wie gewohnt die KI.
+// Hinweis "Barcode unbekannt – Etikett fotografieren?": der Knopf darin ist ein eigener Tipp, damit iOS die Kamera öffnen darf
+function showBarcodeMiss(on) {
+  const b = document.getElementById('barcode-miss');
+  if (!b) return;
+  b.style.display = on ? 'block' : 'none';
+  if (on) { try { b.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) {} }
+}
+function barcodeMissScan() { showBarcodeMiss(false); document.getElementById('camera-input').click(); }
 async function scanBarcodeForWine() {
+  showBarcodeMiss(false);
   const r = await scanCode('barcode');
   if (!r) return;
   const ean = r.text.replace(/\s+/g, '');
@@ -14385,7 +14452,7 @@ async function scanBarcodeForWine() {
     if (!resp.ok) throw new Error('http ' + resp.status);
     const d = await resp.json();
     if (tok !== formToken) return;
-    if (!d.found) { showToast(t('barcode_notfound')); return; }
+    if (!d.found) { showBarcodeMiss(true); return; }
     if (d.notWine) { document.getElementById('f-ean').value = ''; showToast(t('barcode_notwine')); return; }
     let name = d.name || d.brand || '';
     if (d.brand && d.name && !d.name.toLowerCase().includes(d.brand.toLowerCase())) name = d.brand + ' – ' + d.name;
