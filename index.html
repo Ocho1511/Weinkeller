@@ -973,6 +973,47 @@ input[type="file"] { display: none; }
   color: var(--text-muted);
   margin-top: 12px;
 }
+/* ── GROSSE BILDSCHIRME ──────────────────────────────────────────────────────────
+   Handy: unverändert (Spalte bis 430 px, untere Leiste, Fenster von unten).
+   iPad/Tablet (ab 700 px): breitere Spalte, Karten in zwei Spalten, Fenster als Dialog in der Mitte.
+   PC / iPad quer (ab 1100 px): Seitenleiste links statt unterer Leiste, drei Kartenspalten. */
+@media (min-width: 700px) {
+  body { max-width: 780px; }
+  .bottom-nav { max-width: 780px; }
+  .page-header { padding-top: 30px; }
+  .wine-list, .wish-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; }
+  #trinkreife-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+  #trinkreife-list > .empty-state, #trinkreife-list > .stats-title { grid-column: 1 / -1; }
+  .ripeness-card { margin: 0 8px 12px 16px; }
+  #trinkreife-list > :nth-child(even) .ripeness-card, #trinkreife-list > .ripeness-card:nth-child(even) { margin: 0 16px 12px 8px; }
+  #rack-chips { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .stats-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .modal-overlay { align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay .modal { max-width: 620px; margin: 0; border-radius: 24px; max-height: 90vh; }
+  .modal-handle { display: none; }
+  .fab { right: calc(50% - 390px + 20px); }
+}
+/* Handy quer (wenig Höhe): Kopfzeile scrollt mit statt oben zu kleben, Fenster dürfen fast die ganze Höhe nutzen, Schwebe-Knöpfe näher an die Leiste */
+@media (max-height: 500px) and (orientation: landscape) {
+  .page-header { position: static; padding: 14px 20px 10px; }
+  .modal-overlay { padding: 8px 20px; }
+  .modal-overlay .modal { max-height: 96vh; }
+  .fab { bottom: 62px; }
+  .fab-drink { bottom: 120px; }
+}
+@media (min-width: 1100px) {
+  body { max-width: none; margin: 0 0 0 100px; padding-bottom: 28px; }
+  .tab { max-width: 1120px; margin: 0 auto; }
+  .bottom-nav { top: 0; bottom: auto; left: 0; height: 100vh; transform: none; width: 100px; max-width: none; flex-direction: column; justify-content: flex-start; gap: 4px; padding: 22px 0 0; border-top: none; border-right: 1px solid var(--border); }
+  .nav-btn { flex: 0 0 auto; padding: 14px 4px; font-size: 10px; }
+  .nav-icon { font-size: 22px; }
+  .wine-list, .wish-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #trinkreife-list { grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 0 10px; }
+  .ripeness-card, #trinkreife-list > :nth-child(even) .ripeness-card, #trinkreife-list > .ripeness-card:nth-child(even) { margin: 0 6px 12px 6px; }
+  #rack-chips { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .fab { bottom: 28px; right: 32px; }
+  .fab-drink { bottom: 96px; }
+}
 </style>
 </head>
 <body>
