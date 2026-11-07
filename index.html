@@ -560,6 +560,11 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .rack-tile-sel.active { background: #1c9a8d; border-color: #1c9a8d; color: #fff; }
 .rack-tile-sel.active .rts-sub { color: rgba(255,255,255,.85); }
 .rack-tile-sel:active { transform: scale(.97); filter: brightness(1.25); }
+.rack-tile-sel { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.rack-tile-sel.dragging { position: relative; z-index: 6; box-shadow: 0 8px 22px rgba(0,0,0,.6); opacity: .95; transition: none; cursor: grabbing; }
+.rack-tile-sel.dragging:active { transform: none; filter: none; }
+.rack-tile-sel.dragging:not(.active) { background: var(--card); }
+.rack-tile-sel.drop-target { border-color: var(--gold); box-shadow: inset 0 0 0 2px var(--gold); }
 .rack-scanbar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 10px; }
 .rack-scanbar .rack-tile { margin-bottom: 0; width: auto; min-height: 68px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 12px; font-weight: 600; line-height: 1.2; text-align: center; overflow-wrap: anywhere; }
 .rack-tile .rtile-ico { font-size: 20px; line-height: 1; }
@@ -14850,7 +14855,7 @@ function renderRacks() {
   }
   if (rackActive >= racks.length) rackActive = 0;
   // Regalauswahl als Raster: gleich große Kacheln mit Name und Belegung (belegt / Plätze), statt Chips in wechselnder Breite
-  chips.innerHTML = racks.map((r,i) => { const f = rackFillCounts(r); return `<button class="rack-tile-sel${i===rackActive?' active':''}" onclick="setRackActive(${i})"><span class="rts-name">${esc(r.name)}</span><span class="rts-sub">${f.filled} / ${f.total}</span></button>`; }).join('');
+  chips.innerHTML = racks.map((r,i) => { const f = rackFillCounts(r); return `<button class="rack-tile-sel${i===rackActive?' active':''}" onclick="setRackActive(${i})"${racks.length > 1 ? ` title="${esc(t('rack_drag_hint'))}"` : ''}><span class="rts-name">${esc(r.name)}</span><span class="rts-sub">${f.filled} / ${f.total}</span></button>`; }).join('');
 
   const r = racks[rackActive];
   const maxCols = rackMaxCols(r);
@@ -15619,6 +15624,59 @@ function sortRacksAlpha() {
   };
   document.addEventListener('pointerup', end);
   document.addEventListener('pointercancel', end);
+})();
+// Kacheln auf dem Tab "Regale" verschieben: mit der Maus einfach ziehen; auf dem Touchscreen die Kachel kurz gedrückt halten, dann ziehen
+// (so bleibt normales Scrollen und Antippen möglich). Die Zielkachel wird goldfarben umrandet; beim Loslassen wird umsortiert (gilt auch für die Liste im Setup).
+(function () {
+  const LONG = 380, MOVE = 8;
+  let d = null, noClick = false;
+  const clearMarks = () => document.querySelectorAll('#rack-chips .drop-target').forEach(el => el.classList.remove('drop-target'));
+  const startDrag = () => {
+    if (!d || d.active) return;
+    d.active = true;
+    d.rects = d.tiles.map(el => el.getBoundingClientRect());
+    d.tile.classList.add('dragging');
+    try { d.tile.setPointerCapture(d.pid); } catch (e) {}
+    if (navigator.vibrate) { try { navigator.vibrate(12); } catch (e) {} }
+  };
+  const cancel = () => { if (!d) return; clearTimeout(d.timer); d.tile.style.transform = ''; d.tile.classList.remove('dragging'); clearMarks(); d = null; };
+  document.addEventListener('pointerdown', (ev) => {
+    if (ev.button > 0 || settings.racks.length < 2) return;
+    const tile = ev.target.closest && ev.target.closest('#rack-chips .rack-tile-sel');
+    if (!tile) return;
+    const tiles = [...tile.parentElement.querySelectorAll('.rack-tile-sel')];
+    d = { tile, tiles, from: tiles.indexOf(tile), to: tiles.indexOf(tile), x0: ev.clientX, y0: ev.clientY, pid: ev.pointerId, touch: ev.pointerType !== 'mouse', active: false, timer: null, rects: null };
+    if (d.touch) d.timer = setTimeout(startDrag, LONG);
+  });
+  document.addEventListener('pointermove', (ev) => {
+    if (!d || ev.pointerId !== d.pid) return;
+    const dx = ev.clientX - d.x0, dy = ev.clientY - d.y0;
+    if (!d.active) {
+      if (Math.hypot(dx, dy) <= MOVE) return;
+      if (d.touch) { cancel(); return; }   // vor dem langen Drücken bewegt: normales Scrollen, kein Ziehen
+      startDrag();
+    }
+    d.tile.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+    const k = d.rects.findIndex((r, idx) => idx !== d.from && ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom);
+    clearMarks();
+    if (k >= 0) { d.to = k; d.tiles[k].classList.add('drop-target'); } else d.to = d.from;
+    ev.preventDefault();
+  });
+  // Auf dem Touchscreen darf die Seite während des Ziehens nicht mitscrollen
+  document.addEventListener('touchmove', (ev) => { if (d && d.active) ev.preventDefault(); }, { passive: false });
+  document.addEventListener('contextmenu', (ev) => { if (d && (d.active || d.touch)) ev.preventDefault(); });
+  const end = (ev) => {
+    if (!d || (ev && ev.pointerId !== undefined && ev.pointerId !== d.pid)) return;
+    const { active, from, to } = d;
+    cancel();
+    if (active) {
+      noClick = true; setTimeout(() => { noClick = false; }, 60);   // das Loslassen darf die Kachel nicht auswählen
+      if (to !== from) moveRack(from, to);
+    }
+  };
+  document.addEventListener('pointerup', end);
+  document.addEventListener('pointercancel', end);
+  document.addEventListener('click', (ev) => { if (noClick && ev.target.closest && ev.target.closest('#rack-chips')) { ev.stopPropagation(); ev.preventDefault(); } }, true);
 })();
 function editRackLevels(i) { rackEditIdx = rackEditIdx === i ? -1 : i; renderRackSetup(); }
 // Name oder Flaschen pro Platz einer Ebene setzen (Kapazität nicht unter die aktuell dort vorhandene Belegung)
