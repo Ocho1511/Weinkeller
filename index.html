@@ -588,6 +588,9 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .loc-open, .loc-text { font-size: 11px; color: var(--text-muted); }
 .rack-clear-btn { border-color: var(--danger, #c0392b); color: var(--danger, #e57373); }
 .loc-chip.loc-store { border-color: var(--gold); color: var(--gold); }
+.rack-un-filter { margin-bottom: 10px; }
+.rack-un-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.rack-un-country { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; color: var(--text); font-family: inherit; font-size: 13px; }
 .rack-store-banner { display: flex; align-items: center; gap: 10px; justify-content: space-between; margin: 0 0 12px; padding: 10px 12px; border: 1px solid var(--gold); border-radius: 12px; background: var(--card); font-size: 13px; font-weight: 600; color: var(--gold-light, var(--gold)); }
 .rack-store-banner .wine-btn { flex: none; width: auto; padding: 6px 12px; }
 .rack-store-banner .rsb-btns { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
@@ -3407,6 +3410,9 @@ de: {
   store_filter: "Einlagern: {name} · {n} Fl. – freies Fach antippen",
   store_filter_off: "Alle anzeigen",
   store_back: "← Zum Keller",
+  rack_country_all: "Alle Länder",
+  rack_country_none: "Ohne Land",
+  rack_filter_none: "Keine Weine für diesen Filter.",
   rack_name_label: "Regalname",
   rack_cols_label: "Plätze pro Ebene",
   rack_add_top: "+ Ebene oben",
@@ -3807,6 +3813,9 @@ en: {
   store_filter: "Store: {name} · {n} btl. – tap a free slot",
   store_filter_off: "Show all",
   store_back: "← To cellar",
+  rack_country_all: "All countries",
+  rack_country_none: "No country",
+  rack_filter_none: "No wines match this filter.",
   rack_name_label: "Rack name",
   rack_cols_label: "Places per level",
   rack_add_top: "+ Level on top",
@@ -4207,6 +4216,9 @@ es: {
   store_filter: "Colocar: {name} · {n} bot. – toca un hueco libre",
   store_filter_off: "Mostrar todo",
   store_back: "← A la bodega",
+  rack_country_all: "Todos los países",
+  rack_country_none: "Sin país",
+  rack_filter_none: "No hay vinos para este filtro.",
   rack_name_label: "Nombre del botellero",
   rack_cols_label: "Huecos por nivel",
   rack_add_top: "+ Nivel arriba",
@@ -4607,6 +4619,9 @@ sv: {
   store_filter: "Placera: {name} · {n} fl. – tryck på en ledig plats",
   store_filter_off: "Visa alla",
   store_back: "← Till källaren",
+  rack_country_all: "Alla länder",
+  rack_country_none: "Inget land",
+  rack_filter_none: "Inga viner för detta filter.",
   rack_name_label: "Vinställets namn",
   rack_cols_label: "Platser per nivå",
   rack_add_top: "+ Nivå överst",
@@ -5007,6 +5022,9 @@ da: {
   store_filter: "Placér: {name} · {n} fl. – tryk på en ledig plads",
   store_filter_off: "Vis alle",
   store_back: "← Til kælderen",
+  rack_country_all: "Alle lande",
+  rack_country_none: "Uden land",
+  rack_filter_none: "Ingen vine for dette filter.",
   rack_name_label: "Reolens navn",
   rack_cols_label: "Pladser pr. niveau",
   rack_add_top: "+ Niveau øverst",
@@ -5407,6 +5425,9 @@ fi: {
   store_filter: "Sijoita: {name} · {n} pul. – napauta vapaata paikkaa",
   store_filter_off: "Näytä kaikki",
   store_back: "← Kellariin",
+  rack_country_all: "Kaikki maat",
+  rack_country_none: "Ei maata",
+  rack_filter_none: "Ei viinejä tälle suodattimelle.",
   rack_name_label: "Telineen nimi",
   rack_cols_label: "Paikkoja tasoa kohden",
   rack_add_top: "+ Taso ylös",
@@ -5807,6 +5828,9 @@ ru: {
   store_filter: "Разместить: {name} · {n} бут. – коснитесь свободной ячейки",
   store_filter_off: "Показать все",
   store_back: "← В погреб",
+  rack_country_all: "Все страны",
+  rack_country_none: "Без страны",
+  rack_filter_none: "Нет вин для этого фильтра.",
   rack_name_label: "Название стеллажа",
   rack_cols_label: "Мест на уровне",
   rack_add_top: "+ Уровень сверху",
@@ -6207,6 +6231,9 @@ it: {
   store_filter: "Riponi: {name} · {n} bott. – tocca uno scomparto libero",
   store_filter_off: "Mostra tutto",
   store_back: "← Alla cantina",
+  rack_country_all: "Tutti i paesi",
+  rack_country_none: "Senza paese",
+  rack_filter_none: "Nessun vino per questo filtro.",
   rack_name_label: "Nome dello scaffale",
   rack_cols_label: "Posti per livello",
   rack_add_top: "+ Livello in alto",
@@ -6607,6 +6634,9 @@ fr: {
   store_filter: "Ranger : {name} · {n} bout. – touchez un emplacement libre",
   store_filter_off: "Tout afficher",
   store_back: "← Vers la cave",
+  rack_country_all: "Tous les pays",
+  rack_country_none: "Sans pays",
+  rack_filter_none: "Aucun vin pour ce filtre.",
   rack_name_label: "Nom du casier",
   rack_cols_label: "Emplacements par niveau",
   rack_add_top: "+ Niveau en haut",
@@ -7007,6 +7037,9 @@ pl: {
   store_filter: "Ułóż: {name} · {n} but. – dotknij wolne miejsce",
   store_filter_off: "Pokaż wszystko",
   store_back: "← Do piwnicy",
+  rack_country_all: "Wszystkie kraje",
+  rack_country_none: "Bez kraju",
+  rack_filter_none: "Brak win dla tego filtra.",
   rack_name_label: "Nazwa regału",
   rack_cols_label: "Miejsc na poziom",
   rack_add_top: "+ Poziom na górze",
@@ -7407,6 +7440,9 @@ hu: {
   store_filter: "Elhelyezés: {name} · {n} üveg – koppints egy szabad helyre",
   store_filter_off: "Összes mutatása",
   store_back: "← A pincéhez",
+  rack_country_all: "Minden ország",
+  rack_country_none: "Ország nélkül",
+  rack_filter_none: "Nincs bor ehhez a szűrőhöz.",
   rack_name_label: "Állvány neve",
   rack_cols_label: "Hely szintenként",
   rack_add_top: "+ Szint felül",
@@ -7807,6 +7843,9 @@ cs: {
   store_filter: "Uložit: {name} · {n} lahví – klepni na volné místo",
   store_filter_off: "Zobrazit vše",
   store_back: "← Do sklepa",
+  rack_country_all: "Všechny země",
+  rack_country_none: "Bez země",
+  rack_filter_none: "Žádná vína pro tento filtr.",
   rack_name_label: "Název regálu",
   rack_cols_label: "Míst na úroveň",
   rack_add_top: "+ Úroveň nahoře",
@@ -8207,6 +8246,9 @@ sk: {
   store_filter: "Uložiť: {name} · {n} fliaš – ťukni na voľné miesto",
   store_filter_off: "Zobraziť všetko",
   store_back: "← Do pivnice",
+  rack_country_all: "Všetky krajiny",
+  rack_country_none: "Bez krajiny",
+  rack_filter_none: "Žiadne vína pre tento filter.",
   rack_name_label: "Názov regála",
   rack_cols_label: "Miest na úroveň",
   rack_add_top: "+ Úroveň hore",
@@ -8607,6 +8649,9 @@ ro: {
   store_filter: "Așază: {name} · {n} stic. – atinge un loc liber",
   store_filter_off: "Arată tot",
   store_back: "← La pivniță",
+  rack_country_all: "Toate țările",
+  rack_country_none: "Fără țară",
+  rack_filter_none: "Niciun vin pentru acest filtru.",
   rack_name_label: "Numele raftului",
   rack_cols_label: "Locuri pe nivel",
   rack_add_top: "+ Nivel sus",
@@ -9007,6 +9052,9 @@ hr: {
   store_filter: "Pohrani: {name} · {n} boc. – dodirni slobodno mjesto",
   store_filter_off: "Prikaži sve",
   store_back: "← U podrum",
+  rack_country_all: "Sve zemlje",
+  rack_country_none: "Bez zemlje",
+  rack_filter_none: "Nema vina za ovaj filtar.",
   rack_name_label: "Naziv regala",
   rack_cols_label: "Mjesta po razini",
   rack_add_top: "+ Razina gore",
@@ -9407,6 +9455,9 @@ pt: {
   store_filter: "Arrumar: {name} · {n} gar. – toca num lugar livre",
   store_filter_off: "Mostrar tudo",
   store_back: "← Para a adega",
+  rack_country_all: "Todos os países",
+  rack_country_none: "Sem país",
+  rack_filter_none: "Nenhum vinho para este filtro.",
   rack_name_label: "Nome da estante",
   rack_cols_label: "Lugares por nível",
   rack_add_top: "+ Nível em cima",
@@ -9807,6 +9858,9 @@ no: {
   store_filter: "Plasser: {name} · {n} fl. – trykk på en ledig plass",
   store_filter_off: "Vis alle",
   store_back: "← Til kjelleren",
+  rack_country_all: "Alle land",
+  rack_country_none: "Uten land",
+  rack_filter_none: "Ingen viner for dette filteret.",
   rack_name_label: "Navn på reolen",
   rack_cols_label: "Plasser per nivå",
   rack_add_top: "+ Nivå øverst",
@@ -10207,6 +10261,9 @@ nl: {
   store_filter: "Opbergen: {name} · {n} fl. – tik op een vrij vak",
   store_filter_off: "Toon alles",
   store_back: "← Naar de kelder",
+  rack_country_all: "Alle landen",
+  rack_country_none: "Zonder land",
+  rack_filter_none: "Geen wijnen voor dit filter.",
   rack_name_label: "Naam van het rek",
   rack_cols_label: "Plaatsen per niveau",
   rack_add_top: "+ Niveau boven",
@@ -10607,6 +10664,9 @@ el: {
   store_filter: "Τοποθέτηση: {name} · {n} φιάλ. – πατήστε μια ελεύθερη θέση",
   store_filter_off: "Εμφάνιση όλων",
   store_back: "← Στο κελάρι",
+  rack_country_all: "Όλες οι χώρες",
+  rack_country_none: "Χωρίς χώρα",
+  rack_filter_none: "Κανένα κρασί για αυτό το φίλτρο.",
   rack_name_label: "Όνομα ραφιού",
   rack_cols_label: "Θέσεις ανά επίπεδο",
   rack_add_top: "+ Επίπεδο πάνω",
@@ -11007,6 +11067,9 @@ uk: {
   store_filter: "Розмістити: {name} · {n} пл. – торкніться вільного місця",
   store_filter_off: "Показати все",
   store_back: "← До погреба",
+  rack_country_all: "Усі країни",
+  rack_country_none: "Без країни",
+  rack_filter_none: "Немає вин для цього фільтра.",
   rack_name_label: "Назва стелажа",
   rack_cols_label: "Місць на рівні",
   rack_add_top: "+ Рівень зверху",
@@ -11407,6 +11470,9 @@ ja: {
   store_filter: "配置: {name} · {n}本 – 空いている場所をタップ",
   store_filter_off: "すべて表示",
   store_back: "← セラーへ戻る",
+  rack_country_all: "すべての国",
+  rack_country_none: "国なし",
+  rack_filter_none: "このフィルターに該当するワインはありません。",
   rack_name_label: "ラック名",
   rack_cols_label: "1段あたりのスロット数",
   rack_add_top: "+ 段を上に追加",
@@ -11807,6 +11873,9 @@ ko: {
   store_filter: "보관: {name} · {n}병 – 빈 칸을 탭하세요",
   store_filter_off: "모두 보기",
   store_back: "← 셀러로",
+  rack_country_all: "모든 국가",
+  rack_country_none: "국가 없음",
+  rack_filter_none: "이 필터에 해당하는 와인이 없습니다.",
   rack_name_label: "랙 이름",
   rack_cols_label: "단당 자리 수",
   rack_add_top: "+ 위에 단 추가",
@@ -12207,6 +12276,9 @@ zh: {
   store_filter: "存放：{name} · {n} 瓶 – 请点按空位",
   store_filter_off: "显示全部",
   store_back: "← 返回酒窖",
+  rack_country_all: "所有国家",
+  rack_country_none: "无国家",
+  rack_filter_none: "没有符合此筛选条件的葡萄酒。",
   rack_name_label: "货架名称",
   rack_cols_label: "每层位置数",
   rack_add_top: "+ 在上方添加层",
@@ -12607,6 +12679,9 @@ hi: {
   store_filter: "रखें: {name} · {n} बोतल – खाली स्थान पर टैप करें",
   store_filter_off: "सब दिखाएँ",
   store_back: "← सेलर पर",
+  rack_country_all: "सभी देश",
+  rack_country_none: "देश नहीं",
+  rack_filter_none: "इस फ़िल्टर के लिए कोई वाइन नहीं है।",
   rack_name_label: "रैक का नाम",
   rack_cols_label: "प्रति स्तर स्थान",
   rack_add_top: "+ ऊपर स्तर",
@@ -13967,6 +14042,7 @@ let rackSelectedWineId = null;  // Wein aus „Nicht zugeordnet", der gerade ein
 let rackFilledSlot = null;      // markiertes belegtes Fach {rack, e, p}
 let rackMove = null;            // Flasche, die gerade umgelagert wird {id, rack, e, p}
 let rackStoreBackY = 0;         // Scrollstand der Keller-Liste, zu dem "Zum Keller" zurückkehrt
+let rackUnFilter = { type: 'alle', country: '*' };   // Filter der Liste "Nicht zugeordnet" (Sorte, Land; '*' = alle)
 let rackStoreFilter = null;     // Wein-ID: Regalkarte zeigt nur die noch nicht eingelagerten Flaschen dieses Weins (Einlagern-Knopf der Keller-Karte)
 function rackById(id) { return settings.racks.find(r => r.id === id) || null; }
 // Alle Ebenen haben gleich viele Plätze; Flaschen pro Platz: Standard des Regals, je Ebene überschreibbar (r.lv[Ebene].cap)
@@ -14002,6 +14078,8 @@ function setPlacements(w, list) {
   if (r) { w.locRegal = r.name; w.locEbene = String(f.e); w.locPlatz = String(f.p); }
   else if (!f) { w.locRegal = null; w.locEbene = null; w.locPlatz = null; w.location = null; }
 }
+function setRackUnType(ty) { rackUnFilter.type = ty; renderRacks(); }
+function setRackUnCountry(c) { rackUnFilter.country = c; renderRacks(); }
 function selectRackWine(id) {
   rackSelectedWineId = (rackSelectedWineId === id) ? null : id;
   rackFilledSlot = null; rackMove = null;
@@ -14271,13 +14349,32 @@ function renderRacks() {
   });
 
   // Nicht zugeordnet – Tippen zum Platzieren
-  const unplaced = wines.filter(w => unplacedCount(w) > 0 && (!sw || swOpen < 1 || w.id === sw.id));
-  if (rackSelectedWineId && !unplaced.some(w => w.id === rackSelectedWineId)) rackSelectedWineId = null;
-  html += `<div class="stats-title" style="margin:8px 0 10px">${t('racks_unassigned')} (${unplaced.length})</div>`;
-  if (unplaced.length) {
-    const selW = unplaced.find(w => w.id === rackSelectedWineId);
+  // Nicht eingelagerte Weine; Filter nach Sorte und Land beschleunigen das Einlagern (nicht im Einlagern-Modus eines einzelnen Weins)
+  const allUn = wines.filter(w => unplacedCount(w) > 0 && (!sw || swOpen < 1 || w.id === sw.id));
+  if (rackSelectedWineId && !allUn.some(w => w.id === rackSelectedWineId)) rackSelectedWineId = null;
+  const normCountry = (w) => String(w.country || '').trim().toLowerCase();
+  let unplaced = allUn, filterBar = '';
+  if (!(sw && swOpen > 0) && allUn.length > 1) {
+    const typesPresent = TYPES.filter(ty => ty !== 'alle' && allUn.some(w => (w.type || 'other') === ty));
+    if (rackUnFilter.type !== 'alle' && !typesPresent.includes(rackUnFilter.type)) rackUnFilter.type = 'alle';
+    const byType = allUn.filter(w => rackUnFilter.type === 'alle' || (w.type || 'other') === rackUnFilter.type);
+    const countries = new Map();
+    byType.forEach(w => { const k = normCountry(w), c = countries.get(k) || { label: String(w.country || '').trim(), n: 0 }; c.n++; countries.set(k, c); });
+    if (rackUnFilter.country !== '*' && !countries.has(rackUnFilter.country)) rackUnFilter.country = '*';
+    unplaced = byType.filter(w => rackUnFilter.country === '*' || normCountry(w) === rackUnFilter.country);
+    const chips = ['alle'].concat(typesPresent).map(ty => `<button class="filter-chip${rackUnFilter.type === ty ? ' active' : ''}" onclick="setRackUnType('${ty}')">${TYPE_LABELS[ty]}${ty === 'alle' ? '' : ' · ' + allUn.filter(w => (w.type || 'other') === ty).length}</button>`).join('');
+    const opts = [...countries].sort((a, b) => (a[0] === '') - (b[0] === '') || a[1].label.localeCompare(b[1].label))
+      .map(([k, c]) => `<option value="${esc(k)}"${rackUnFilter.country === k ? ' selected' : ''}>${esc(c.label || t('rack_country_none'))} (${c.n})</option>`).join('');
+    const sel = countries.size > 1 ? `<select class="rack-un-country" aria-label="${esc(t('rack_country_all'))}" onchange="setRackUnCountry(this.value)"><option value="*">${esc(t('rack_country_all'))}</option>${opts}</select>` : '';
+    filterBar = `<div class="rack-un-filter"><div class="rack-un-chips">${chips}</div>${sel}</div>`;
+  }
+  html += `<div class="stats-title" style="margin:8px 0 10px">${t('racks_unassigned')} (${unplaced.length}${unplaced.length !== allUn.length ? ' / ' + allUn.length : ''})</div>`;
+  if (allUn.length) {
+    const selW = allUn.find(w => w.id === rackSelectedWineId);
     if (selW) html += `<div class="rack-preview solo">${bottlePreviewHtml(selW)}</div>`;
     html += `<div style="font-size:12px;color:${selW?'var(--gold)':'var(--text-muted)'};margin-bottom:10px">${selW ? esc(t('rack_assign_sel', {name: selW.name})) : t('rack_assign_hint')}</div>`;
+    html += filterBar;
+    if (!unplaced.length) html += `<div style="font-size:13px;color:var(--text-muted)">${t('rack_filter_none')}</div>`;
     html += `<div class="rack-unassigned">` + unplaced.map(w => {
       const n = unplacedCount(w);
       return `<div class="rack-chip-wine${w.id===rackSelectedWineId?' selected':''}" onclick="selectRackWine('${w.id}')">${bottleVisual(w, 60, 'none')}<span>${esc(w.name)}${w.year?' · '+w.year:''}${n > 1 ? ' ×' + n : ''}</span></div>`;
