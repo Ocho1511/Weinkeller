@@ -2414,6 +2414,17 @@ function formCriteria() {
 }
 // Echtes Flaschenbild über Vivino-Suche (via Worker) – beste Quelle; es werden ALLE Kriterien gebündelt übergeben
 // meta.failed = true, wenn die Suche nicht antworten konnte (Begrenzung 429, Netzfehler, Serverfehler): dann gilt NICHT "es gibt kein Bild"
+// Passt der von Vivino gefundene Wein wirklich zum gesuchten? Rebsorten (primitivo, merlot …) und Allerweltswörter zählen nicht als Beleg: sonst gilt
+// "Li Veli Primonero Negroamaro" als Treffer für "Primodoro Negroamaro Primitivo". Bleibt kein unterscheidendes Namenswort übrig, wird jeder Treffer akzeptiert.
+const NAME_STOP = new Set(['weingut', 'weinkellerei', 'weinbau', 'winery', 'wine', 'wines', 'wein', 'weine', 'chateau', 'domaine', 'domaines', 'cantina', 'cantine', 'azienda', 'agricola', 'bodega', 'bodegas', 'tenuta', 'tenute', 'cave', 'caves', 'vineyard', 'vineyards', 'estate', 'estates', 'vino', 'vini', 'vins', 'vigneto', 'vigna', 'schloss', 'castello', 'castel', 'quinta', 'maison', 'riserva', 'reserve', 'reserva', 'classico', 'brut', 'rosso', 'bianco', 'blanc', 'rouge', 'blanco', 'tinto', 'cuvee', 'rose', 'rosato', 'secco', 'trocken', 'dry', 'superiore', 'selection', 'selezione', 'gran', 'grand', 'cru', 'premier', 'vieilles', 'vignes', 'vecchie', 'barrique']);
+const NAME_GRAPES = new Set(['primitivo', 'negroamaro', 'tempranillo', 'merlot', 'cabernet', 'sauvignon', 'chardonnay', 'riesling', 'pinot', 'noir', 'nero', 'grigio', 'gris', 'syrah', 'shiraz', 'grenache', 'garnacha', 'malbec', 'sangiovese', 'nebbiolo', 'barbera', 'montepulciano', 'zinfandel', 'carmenere', 'verdejo', 'albarino', 'gewurztraminer', 'muller', 'thurgau', 'silvaner', 'spatburgunder', 'grauburgunder', 'weissburgunder', 'lemberger', 'dornfelder', 'blaufrankisch', 'zweigelt', 'gruner', 'veltliner', 'chenin', 'viognier', 'mourvedre', 'cinsault', 'touriga', 'nacional', 'aglianico', 'sagrantino', 'vermentino', 'trebbiano', 'verdicchio', 'fiano', 'greco', 'falanghina', 'prosecco', 'glera', 'cava', 'champagne', 'moscato', 'muscat', 'sekt', 'cuvee', 'rotwein', 'weisswein', 'red', 'white', 'blend', 'bobal', 'monastrell', 'mencia', 'graciano', 'carignan', 'cannonau', 'nerello', 'mascalese', 'frappato', 'catarratto', 'grillo', 'inzolia', 'lambrusco', 'dolcetto', 'corvina', 'rondinella', 'molinara', 'pecorino', 'passerina', 'cesanese', 'lagrein', 'teroldego', 'schiava', 'trollinger', 'portugieser', 'regent', 'acolon', 'scheurebe', 'kerner', 'bacchus', 'ortega', 'muskateller']);
+function wineNameMatches(name, matched) {
+  const norm = (x) => String(x || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/&#?\w+;/g, ' ');
+  const toks = norm(name).replace(/[^a-z0-9\s-]/g, ' ').split(/[\s-]+/).filter(w => w.length >= 4 && !/^\d{4}$/.test(w) && !NAME_STOP.has(w) && !NAME_GRAPES.has(w));
+  if (!toks.length) return true;
+  const m = norm(matched);
+  return toks.some(w => m.includes(w));
+}
 let workerPaceMs = 1200, lastWorkerCall = 0;   // der Worker erlaubt 60 Anfragen pro Minute und IP: bei "Alle Weine aktualisieren" höchstens etwa jede 1,2 s anfragen
 async function workerPace() {
   if (!enrichRunning) return;
@@ -2428,6 +2439,7 @@ async function vivinoImageFor(crit, meta) {
     const r = await fetch(SCAN_PROXY_URL + '/wineimg', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: c.name || '', year: c.year || '', grape: c.grape || '', region: c.region || '', country: c.country || '' }) });
     let j = null; try { j = await r.json(); } catch {}
     if (meta && (!r.ok || !j || j.error)) meta.failed = true;
+    if (j && j.image && j.match && !wineNameMatches(c.name, j.match)) return null;   // anderer Wein: lieber kein Bild als eine falsche Flasche
     return j && j.image ? j.image : null;
   } catch { if (meta) meta.failed = true; return null; }
 }
@@ -2435,7 +2447,7 @@ async function vivinoImageFor(crit, meta) {
 // crit = { name, year, region, country, grape }
 async function resolveWineImage(info, crit, meta) {
   if (autoImagesOff()) return null;   // Store-Version: keine automatischen Fremdbilder
-  const viv = await vivinoImageFor(crit, meta);
+  const viv = (meta && meta.noVivino) ? null : await vivinoImageFor(crit, meta);
   if (viv) { if (await verifyImageLoads(viv)) return viv; if (meta) meta.failed = true; }   // Bild gefunden, aber gerade nicht ladbar: kein Urteil
   if (info && isImageUrl(info.image) && await verifyImageLoads(info.image.trim())) return info.image.trim();
   if (info && info.page) { const og = await ogImageFor(info.page); if (og && await verifyImageLoads(og)) return og; }
@@ -3245,7 +3257,8 @@ async function enrichAllWines() {
         // 2) Langsamen KI-Websuche-Aufruf nur, wenn Textfelder fehlen (sonst überspringen → Lauf bleibt schnell)
         const needsFields = !w.region || !w.country || !w.grape || !w.drinkFrom || !w.drinkTo || w.tempFrom == null || !w.price;
         // Ist das KI-Guthaben aufgebraucht, werden die übrigen Weine nur noch mit Bildern bearbeitet (kostenlos)
-        if (needsFields && !(isNativeApp() && aiOutOfCredits)) {
+        const needsImageFallback = !w.image && !autoImagesOff();
+        if ((needsFields || needsImageFallback) && !(isNativeApp() && aiOutOfCredits)) {
           await workerPace();
           const info = await lookupWineData(w.name, w.year);
           if (info) {
@@ -3257,7 +3270,7 @@ async function enrichAllWines() {
             if (w.tempFrom == null && info.tempFrom != null) { const tt = cleanTemps({ tempFrom: info.tempFrom, tempTo: info.tempTo }); if (tt.tempFrom != null) { w.tempFrom = tt.tempFrom; w.tempTo = tt.tempTo; changed = true; } }
             if (!w.price && info.price != null) { w.price = parseFloat(info.price)||null; changed = true; }
             // Falls Vivino kein Bild hatte: KI-Direktbild / og:image als Rückfall (mit jetzt ggf. ergänzten Kriterien)
-            if (!w.image && !autoImagesOff()) { const alt = await resolveWineImage(info, wineCriteria(w)); if (alt) { w.image = alt; changed = true; } }
+            if (!w.image && !autoImagesOff()) { const alt = await resolveWineImage(info, wineCriteria(w), { noVivino: true }); if (alt) { w.image = alt; changed = true; } }
           }
         }
         if (changed) { updated++; save(); }
@@ -3543,6 +3556,8 @@ de: {
   store_filter: "Einlagern: {name} · {n} Fl. – freies Fach antippen",
   store_filter_off: "Alle anzeigen",
   store_back: "← Zum Keller",
+  cur_auto_set: "Währung automatisch auf {name} gestellt – änderbar unter „Währung“.",
+  cur_auto_kept: "Währung bleibt {name}, weil schon Preise eingetragen sind (es wird nicht umgerechnet). Bei Bedarf unter „Währung“ ändern.",
   map_regions_q: "Weinregionen Karte",
   map_regions_open: "Weinregionen-Karte öffnen",
   setup_tempunit: "Temperatureinheit",
@@ -3958,6 +3973,8 @@ en: {
   store_filter: "Store: {name} · {n} btl. – tap a free slot",
   store_filter_off: "Show all",
   store_back: "← To cellar",
+  cur_auto_set: "Currency automatically set to {name} – you can change it under “Currency”.",
+  cur_auto_kept: "Currency stays {name} because prices have already been entered (nothing is converted). Change it under “Currency” if needed.",
   map_regions_q: "wine regions map",
   map_regions_open: "Open wine regions map",
   setup_tempunit: "Temperature unit",
@@ -4373,6 +4390,8 @@ es: {
   store_filter: "Colocar: {name} · {n} bot. – toca un hueco libre",
   store_filter_off: "Mostrar todo",
   store_back: "← A la bodega",
+  cur_auto_set: "Moneda cambiada automáticamente a {name} – puedes cambiarla en «Moneda».",
+  cur_auto_kept: "La moneda sigue siendo {name} porque ya hay precios introducidos (no se convierte nada). Si lo necesitas, cámbiala en «Moneda».",
   map_regions_q: "mapa regiones vinícolas",
   map_regions_open: "Abrir mapa de regiones vinícolas",
   setup_tempunit: "Unidad de temperatura",
@@ -4788,6 +4807,8 @@ sv: {
   store_filter: "Placera: {name} · {n} fl. – tryck på en ledig plats",
   store_filter_off: "Visa alla",
   store_back: "← Till källaren",
+  cur_auto_set: "Valutan ställdes automatiskt in på {name} – kan ändras under ”Valuta”.",
+  cur_auto_kept: "Valutan förblir {name} eftersom priser redan har angetts (inget räknas om). Ändra under ”Valuta” vid behov.",
   map_regions_q: "vinregioner karta",
   map_regions_open: "Öppna karta över vinregioner",
   setup_tempunit: "Temperaturenhet",
@@ -5203,6 +5224,8 @@ da: {
   store_filter: "Placér: {name} · {n} fl. – tryk på en ledig plads",
   store_filter_off: "Vis alle",
   store_back: "← Til kælderen",
+  cur_auto_set: "Valutaen er automatisk sat til {name} – kan ændres under »Valuta«.",
+  cur_auto_kept: "Valutaen forbliver {name}, fordi der allerede er indtastet priser (der omregnes ikke). Ændr den under »Valuta«, hvis det er nødvendigt.",
   map_regions_q: "vinregioner kort",
   map_regions_open: "Åbn kort over vinregioner",
   setup_tempunit: "Temperaturenhed",
@@ -5618,6 +5641,8 @@ fi: {
   store_filter: "Sijoita: {name} · {n} pul. – napauta vapaata paikkaa",
   store_filter_off: "Näytä kaikki",
   store_back: "← Kellariin",
+  cur_auto_set: "Valuutaksi asetettiin automaattisesti {name} – muutettavissa kohdassa ”Valuutta”.",
+  cur_auto_kept: "Valuutta pysyy muodossa {name}, koska hintoja on jo syötetty (mitään ei muunneta). Muuta tarvittaessa kohdassa ”Valuutta”.",
   map_regions_q: "viinialueet kartta",
   map_regions_open: "Avaa viinialueiden kartta",
   setup_tempunit: "Lämpötilayksikkö",
@@ -6033,6 +6058,8 @@ ru: {
   store_filter: "Разместить: {name} · {n} бут. – коснитесь свободной ячейки",
   store_filter_off: "Показать все",
   store_back: "← В погреб",
+  cur_auto_set: "Валюта автоматически изменена на {name} – её можно изменить в разделе «Валюта».",
+  cur_auto_kept: "Валюта остаётся {name}, так как цены уже введены (пересчёт не выполняется). При необходимости измените её в разделе «Валюта».",
   map_regions_q: "карта винодельческих регионов",
   map_regions_open: "Открыть карту винодельческих регионов",
   setup_tempunit: "Единица температуры",
@@ -6448,6 +6475,8 @@ it: {
   store_filter: "Riponi: {name} · {n} bott. – tocca uno scomparto libero",
   store_filter_off: "Mostra tutto",
   store_back: "← Alla cantina",
+  cur_auto_set: "Valuta impostata automaticamente su {name} – modificabile in «Valuta».",
+  cur_auto_kept: "La valuta resta {name} perché sono già stati inseriti dei prezzi (non viene eseguita alcuna conversione). Se necessario, modificala in «Valuta».",
   map_regions_q: "mappa regioni vinicole",
   map_regions_open: "Apri la mappa delle regioni vinicole",
   setup_tempunit: "Unità di temperatura",
@@ -6863,6 +6892,8 @@ fr: {
   store_filter: "Ranger : {name} · {n} bout. – touchez un emplacement libre",
   store_filter_off: "Tout afficher",
   store_back: "← Vers la cave",
+  cur_auto_set: "Devise définie automatiquement sur {name} – modifiable sous « Devise ».",
+  cur_auto_kept: "La devise reste {name}, car des prix ont déjà été saisis (aucune conversion n’est effectuée). Modifiez-la au besoin sous « Devise ».",
   map_regions_q: "carte régions viticoles",
   map_regions_open: "Ouvrir la carte des régions viticoles",
   setup_tempunit: "Unité de température",
@@ -7278,6 +7309,8 @@ pl: {
   store_filter: "Ułóż: {name} · {n} but. – dotknij wolne miejsce",
   store_filter_off: "Pokaż wszystko",
   store_back: "← Do piwnicy",
+  cur_auto_set: "Waluta została automatycznie ustawiona na {name} – można ją zmienić w „Waluta”.",
+  cur_auto_kept: "Waluta pozostaje {name}, ponieważ wprowadzono już ceny (nie następuje przeliczenie). W razie potrzeby zmień ją w „Waluta”.",
   map_regions_q: "mapa regionów winiarskich",
   map_regions_open: "Otwórz mapę regionów winiarskich",
   setup_tempunit: "Jednostka temperatury",
@@ -7693,6 +7726,8 @@ hu: {
   store_filter: "Elhelyezés: {name} · {n} üveg – koppints egy szabad helyre",
   store_filter_off: "Összes mutatása",
   store_back: "← A pincéhez",
+  cur_auto_set: "A pénznem automatikusan {name} lett – módosítható a „Pénznem” alatt.",
+  cur_auto_kept: "A pénznem marad {name}, mert már vannak megadott árak (átváltás nem történik). Szükség esetén módosítsd a „Pénznem” alatt.",
   map_regions_q: "borvidékek térkép",
   map_regions_open: "Borvidékek térképének megnyitása",
   setup_tempunit: "Hőmérséklet-mértékegység",
@@ -8108,6 +8143,8 @@ cs: {
   store_filter: "Uložit: {name} · {n} lahví – klepni na volné místo",
   store_filter_off: "Zobrazit vše",
   store_back: "← Do sklepa",
+  cur_auto_set: "Měna byla automaticky nastavena na {name} – lze ji změnit v části „Měna“.",
+  cur_auto_kept: "Měna zůstává {name}, protože již byly zadány ceny (nic se nepřepočítává). V případě potřeby ji změňte v části „Měna“.",
   map_regions_q: "mapa vinařských oblastí",
   map_regions_open: "Otevřít mapu vinařských oblastí",
   setup_tempunit: "Jednotka teploty",
@@ -8523,6 +8560,8 @@ sk: {
   store_filter: "Uložiť: {name} · {n} fliaš – ťukni na voľné miesto",
   store_filter_off: "Zobraziť všetko",
   store_back: "← Do pivnice",
+  cur_auto_set: "Mena bola automaticky nastavená na {name} – dá sa zmeniť v časti „Mena“.",
+  cur_auto_kept: "Mena zostáva {name}, pretože už boli zadané ceny (nič sa neprepočítava). V prípade potreby ju zmeňte v časti „Mena“.",
   map_regions_q: "mapa vinohradníckych oblastí",
   map_regions_open: "Otvoriť mapu vinohradníckych oblastí",
   setup_tempunit: "Jednotka teploty",
@@ -8938,6 +8977,8 @@ ro: {
   store_filter: "Așază: {name} · {n} stic. – atinge un loc liber",
   store_filter_off: "Arată tot",
   store_back: "← La pivniță",
+  cur_auto_set: "Moneda a fost setată automat la {name} – poate fi modificată la „Monedă”.",
+  cur_auto_kept: "Moneda rămâne {name}, deoarece au fost deja introduse prețuri (nu se face nicio conversie). Dacă este nevoie, modific-o la „Monedă”.",
   map_regions_q: "harta regiunilor viticole",
   map_regions_open: "Deschide harta regiunilor viticole",
   setup_tempunit: "Unitate de temperatură",
@@ -9353,6 +9394,8 @@ hr: {
   store_filter: "Pohrani: {name} · {n} boc. – dodirni slobodno mjesto",
   store_filter_off: "Prikaži sve",
   store_back: "← U podrum",
+  cur_auto_set: "Valuta je automatski postavljena na {name} – može se promijeniti pod „Valuta“.",
+  cur_auto_kept: "Valuta ostaje {name} jer su cijene već unesene (ništa se ne preračunava). Prema potrebi je promijenite pod „Valuta“.",
   map_regions_q: "karta vinogradarskih regija",
   map_regions_open: "Otvori kartu vinogradarskih regija",
   setup_tempunit: "Jedinica temperature",
@@ -9768,6 +9811,8 @@ pt: {
   store_filter: "Arrumar: {name} · {n} gar. – toca num lugar livre",
   store_filter_off: "Mostrar tudo",
   store_back: "← Para a adega",
+  cur_auto_set: "Moeda definida automaticamente para {name} – pode ser alterada em «Moeda».",
+  cur_auto_kept: "A moeda mantém-se {name}, porque já foram introduzidos preços (nada é convertido). Se necessário, altere-a em «Moeda».",
   map_regions_q: "mapa regiões vinícolas",
   map_regions_open: "Abrir mapa das regiões vinícolas",
   setup_tempunit: "Unidade de temperatura",
@@ -10183,6 +10228,8 @@ no: {
   store_filter: "Plasser: {name} · {n} fl. – trykk på en ledig plass",
   store_filter_off: "Vis alle",
   store_back: "← Til kjelleren",
+  cur_auto_set: "Valutaen ble automatisk satt til {name} – kan endres under «Valuta».",
+  cur_auto_kept: "Valutaen forblir {name}, fordi priser allerede er lagt inn (ingenting omregnes). Endre den under «Valuta» ved behov.",
   map_regions_q: "vinregioner kart",
   map_regions_open: "Åpne kart over vinregioner",
   setup_tempunit: "Temperaturenhet",
@@ -10598,6 +10645,8 @@ nl: {
   store_filter: "Opbergen: {name} · {n} fl. – tik op een vrij vak",
   store_filter_off: "Toon alles",
   store_back: "← Naar de kelder",
+  cur_auto_set: "Valuta automatisch ingesteld op {name} – te wijzigen onder „Valuta”.",
+  cur_auto_kept: "De valuta blijft {name}, omdat er al prijzen zijn ingevoerd (er wordt niets omgerekend). Wijzig dit indien nodig onder „Valuta”.",
   map_regions_q: "wijnregio's kaart",
   map_regions_open: "Open kaart van wijnregio's",
   setup_tempunit: "Temperatuureenheid",
@@ -11013,6 +11062,8 @@ el: {
   store_filter: "Τοποθέτηση: {name} · {n} φιάλ. – πατήστε μια ελεύθερη θέση",
   store_filter_off: "Εμφάνιση όλων",
   store_back: "← Στο κελάρι",
+  cur_auto_set: "Το νόμισμα ορίστηκε αυτόματα σε {name} – μπορεί να αλλάξει στο «Νόμισμα».",
+  cur_auto_kept: "Το νόμισμα παραμένει {name}, επειδή έχουν ήδη καταχωριστεί τιμές (δεν γίνεται μετατροπή). Αν χρειάζεται, αλλάξτε το στο «Νόμισμα».",
   map_regions_q: "χάρτης οινοπαραγωγικές περιοχές",
   map_regions_open: "Άνοιγμα χάρτη οινοπαραγωγικών περιοχών",
   setup_tempunit: "Μονάδα θερμοκρασίας",
@@ -11428,6 +11479,8 @@ uk: {
   store_filter: "Розмістити: {name} · {n} пл. – торкніться вільного місця",
   store_filter_off: "Показати все",
   store_back: "← До погреба",
+  cur_auto_set: "Валюту автоматично змінено на {name} – її можна змінити в розділі «Валюта».",
+  cur_auto_kept: "Валюта залишається {name}, оскільки ціни вже введено (перерахунок не виконується). За потреби змініть її в розділі «Валюта».",
   map_regions_q: "карта винних регіонів",
   map_regions_open: "Відкрити карту винних регіонів",
   setup_tempunit: "Одиниця температури",
@@ -11843,6 +11896,8 @@ ja: {
   store_filter: "配置: {name} · {n}本 – 空いている場所をタップ",
   store_filter_off: "すべて表示",
   store_back: "← セラーへ戻る",
+  cur_auto_set: "通貨を自動的に{name}に設定しました。「通貨」で変更できます。",
+  cur_auto_kept: "すでに価格が入力されているため、通貨は{name}のままです（換算は行われません）。必要に応じて「通貨」で変更してください。",
   map_regions_q: "ワイン産地 地図",
   map_regions_open: "ワイン産地の地図を開く",
   setup_tempunit: "温度の単位",
@@ -12258,6 +12313,8 @@ ko: {
   store_filter: "보관: {name} · {n}병 – 빈 칸을 탭하세요",
   store_filter_off: "모두 보기",
   store_back: "← 셀러로",
+  cur_auto_set: "통화가 자동으로 {name}(으)로 설정되었습니다. “통화”에서 변경할 수 있습니다.",
+  cur_auto_kept: "이미 가격이 입력되어 있으므로 통화는 {name}(으)로 유지됩니다(환산되지 않음). 필요하면 “통화”에서 변경하세요.",
   map_regions_q: "와인 산지 지도",
   map_regions_open: "와인 산지 지도 열기",
   setup_tempunit: "온도 단위",
@@ -12673,6 +12730,8 @@ zh: {
   store_filter: "存放：{name} · {n} 瓶 – 请点按空位",
   store_filter_off: "显示全部",
   store_back: "← 返回酒窖",
+  cur_auto_set: "货币已自动设置为{name}，可在“货币”中更改。",
+  cur_auto_kept: "由于已录入价格，货币仍保持为{name}（不会进行换算）。如有需要，请在“货币”中更改。",
   map_regions_q: "葡萄酒产区 地图",
   map_regions_open: "打开葡萄酒产区地图",
   setup_tempunit: "温度单位",
@@ -13088,6 +13147,8 @@ hi: {
   store_filter: "रखें: {name} · {n} बोतल – खाली स्थान पर टैप करें",
   store_filter_off: "सब दिखाएँ",
   store_back: "← सेलर पर",
+  cur_auto_set: "मुद्रा अपने-आप {name} पर सेट की गई – इसे “मुद्रा” में बदला जा सकता है।",
+  cur_auto_kept: "मुद्रा {name} ही रहेगी, क्योंकि कीमतें पहले से दर्ज हैं (कोई रूपांतरण नहीं किया जाएगा)। ज़रूरत हो तो “मुद्रा” में बदलें।",
   map_regions_q: "वाइन क्षेत्र मानचित्र",
   map_regions_open: "वाइन क्षेत्रों का मानचित्र खोलें",
   setup_tempunit: "तापमान की इकाई",
@@ -13480,7 +13541,23 @@ function celebrate() {
 }
 
 function setCurrency(c) { settings.currency = c; saveSettings(); applyI18n(); touchData(); }
-function setLanguage(l) { settings.lang = l; saveSettings(); applyI18n(); touchData(); }
+// Zur Sprache passende Währungen (erste = Vorschlag). Beim Sprachwechsel wird die Währung nur dann umgestellt, wenn die gewählte nicht passt:
+// Deutsch/Französisch/Italienisch behalten auch CHF, Französisch auch C$. Englisch ist an kein Land gebunden (null = nie ändern), ebenso Ungarisch/Tschechisch/Rumänisch (deren Währung gibt es in der Liste nicht).
+const LANG_CURRENCY = { de: ['€', 'CHF'], en: null, es: ['€'], sv: ['SEK'], da: ['DKK'], fi: ['€'], ru: ['RUB'], it: ['€', 'CHF'], fr: ['€', 'CHF', 'C$'], pl: ['PLN'], hu: null, cs: null, sk: ['€'], ro: null, hr: ['€'], pt: ['€'], no: ['NOK'], nl: ['€'], el: ['€'], uk: ['UAH'], ja: ['JPY'], ko: ['KRW'], zh: ['CNY'], hi: ['INR'] };
+// Die App rechnet Preise NICHT um: eine andere Währung würde die vorhandenen Beträge nur umbenennen. Deshalb nur automatisch umstellen, solange keine Preise eingetragen sind.
+const hasPriceData = () => wines.some(w => w.price) || drunkWines.some(d => d.price);
+function setLanguage(l) {
+  settings.lang = l;
+  const fit = LANG_CURRENCY[l];
+  let note = null;
+  if (fit && !fit.includes(settings.currency)) {
+    if (hasPriceData()) note = ['cur_auto_kept', settings.currency];
+    else { settings.currency = fit[0]; note = ['cur_auto_set', fit[0]]; }
+  }
+  saveSettings(); applyI18n(); touchData();
+  const sel = document.getElementById('setup-currency'); if (sel) sel.value = settings.currency;
+  if (note && CURRENCIES[note[1]]) showToast(t(note[0], { name: t(CURRENCIES[note[1]].key) }));
+}
 function setOwner(v) { settings.owner = (v||'').trim(); saveSettings(); touchData(); applyI18n(); }
 
 // ═══════════════════════════════════════
