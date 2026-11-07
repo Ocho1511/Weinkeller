@@ -551,7 +551,10 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .qr-hint { font-size: 12px; color: var(--text-muted); }
 .qr-cuts { display: flex; align-items: center; gap: 8px; font-size: 13px; margin-bottom: 12px; }
 .rack-qr-all { margin-top: 10px; }
-.rack-scanbar { margin-bottom: 10px; }
+/* Regalkarte: Aktionsknöpfe und Blink-Schalter als Raster (Tabelle) statt untereinander */
+.rack-scanbar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 10px; }
+.rack-scanbar .rack-tile { margin-bottom: 0; width: auto; min-height: 68px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 12px; font-weight: 600; line-height: 1.2; text-align: center; overflow-wrap: anywhere; }
+.rack-tile .rtile-ico { font-size: 20px; line-height: 1; }
 #photo-overlay { display: none; position: fixed; inset: 0; z-index: 420; background: rgba(0,0,0,.92); align-items: center; justify-content: center; }
 #photo-overlay.show { display: flex; }
 #photo-overlay img { max-width: 96vw; max-height: 92vh; border-radius: 10px; }
@@ -605,10 +608,10 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .rack-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: -6px 0 14px; font-size: 11px; color: var(--text-muted); }
 .rack-legend span { display: inline-flex; align-items: center; gap: 5px; }
 .rack-ripe-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; border: 1px solid rgba(255,255,255,.7); }
-.rack-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-bottom: 10px; }
-.rack-toolbar-lbl { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+.rack-toolbar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; gap: 8px; margin-bottom: 10px; }
+.rack-toolbar-lbl { grid-column: 1 / -1; font-size: 12px; font-weight: 600; color: var(--text-muted); }
 .rack-toggle .rack-ripe-dot { margin-right: -2px; }
-.rack-toggle { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--border); background: var(--card); color: var(--text-muted); font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.rack-toggle { display: inline-flex; align-items: center; justify-content: flex-start; gap: 8px; padding: 8px 10px; border-radius: 12px; white-space: normal; line-height: 1.25; text-align: left; border: 1px solid var(--border); background: var(--card); color: var(--text-muted); font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
 .rack-toggle .rt-dot { width: 22px; height: 12px; border-radius: 6px; background: var(--border); position: relative; transition: background .2s; }
 .rack-toggle .rt-dot::after { content: ''; position: absolute; top: 2px; left: 2px; width: 8px; height: 8px; border-radius: 50%; background: #fff; transition: transform .2s; }
 .rack-toggle.active { color: var(--text); border-color: var(--red-alert); }
@@ -14336,6 +14339,11 @@ function bottlePreviewHtml(w) {
   const sub = [w.year, w.grape].filter(Boolean).join(' · ');
   return vis + `<div class="bottle-cap" style="display:none"><strong>${esc(w.name)}</strong>${sub ? `<span>${esc(sub)}</span>` : ''}</div>`;
 }
+// Aktionsknöpfe der Regalkarte als gleich große Kacheln nebeneinander: Symbol oben, Text darunter (das Symbol steht in den Übersetzungen vorn im Text)
+function rackTile(cls, onclick, txt) {
+  const m = String(txt).trim().match(/^(\p{Extended_Pictographic}\uFE0F?|▦)\s*(.*)$/su);
+  return `<button class="scan-btn rack-tile ${cls}" onclick="${onclick}"><span class="rtile-ico">${m ? m[1] : ''}</span><span class="rtile-txt">${esc(m ? m[2] : txt)}</span></button>`;
+}
 function renderRacks() {
   const chips = document.getElementById('rack-chips');
   const el = document.getElementById('racks-content');
@@ -14378,7 +14386,7 @@ function renderRacks() {
   const swOpen = sw ? unplacedCount(sw) : 0, swName = sw ? sw.name + (sw.year ? ' ' + sw.year : '') : '';
   if (sw && swOpen < 1 && rackSelectedWineId === sw.id) rackSelectedWineId = null;
   else if (sw && swOpen > 0 && !rackSelectedWineId) rackSelectedWineId = sw.id;
-  let html = (sw ? `<div class="rack-store-banner"><span>${swOpen ? '📥 ' + esc(t('store_filter', { name: swName, n: swOpen })) : esc(t('store_done', { name: swName }))}</span><span class="rsb-btns">${swOpen ? `<button class="wine-btn" onclick="clearStoreFilter()">${t('store_filter_off')}</button>` : (rackStoreScan ? `<button class="wine-btn" onclick="startStoreFromScan()">${t('store_scan_btn')}</button>` : '')}<button class="wine-btn primary" onclick="backFromStore()">${t('store_back')}</button></span></div>` : '') + `<div class="rack-scanbar"><button class="scan-btn store-scan-btn" onclick="startStoreFromScan()">${t('store_scan_btn')}</button><button class="scan-btn" onclick="scanShelf()">${t('shelf_scan')}</button><button class="scan-btn rack-clear-btn" onclick="clearRack(rackActive)">🧹 ${t('rack_clear_btn')}</button></div><div class="rack-toolbar"><span class="rack-toolbar-lbl">${t('rack_blink_lbl')}</span>`
+  let html = (sw ? `<div class="rack-store-banner"><span>${swOpen ? '📥 ' + esc(t('store_filter', { name: swName, n: swOpen })) : esc(t('store_done', { name: swName }))}</span><span class="rsb-btns">${swOpen ? `<button class="wine-btn" onclick="clearStoreFilter()">${t('store_filter_off')}</button>` : (rackStoreScan ? `<button class="wine-btn" onclick="startStoreFromScan()">${t('store_scan_btn')}</button>` : '')}<button class="wine-btn primary" onclick="backFromStore()">${t('store_back')}</button></span></div>` : '') + `<div class="rack-scanbar">${rackTile('store-scan-btn', 'startStoreFromScan()', t('store_scan_btn'))}${rackTile('', 'scanShelf()', t('shelf_scan'))}${rackTile('rack-clear-btn', 'clearRack(rackActive)', '🧹 ' + t('rack_clear_btn'))}</div><div class="rack-toolbar"><span class="rack-toolbar-lbl">${t('rack_blink_lbl')}</span>`
     + BLINKS.map(([key, label, st]) => `<button class="rack-toggle${blinkOn[key] ? ' active' : ''}" onclick="toggleRackBlink('${key}')" aria-pressed="${blinkOn[key]}"><span class="rt-dot"></span>${st ? `<i class="rack-ripe-dot ripeness-${RIPE_CLASS[st]}"></i>` : ''}${esc(label)}${blinkN[key] ? ' · ' + blinkN[key] : ''}</button>`).join('')
     + `</div>`
     + (blinkOn.Urgent ? `<div class="rack-blink-hint">${t('rack_blink_hint')}</div>` : '')
