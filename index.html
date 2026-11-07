@@ -698,6 +698,13 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .rack-slot.moving > :not(.rack-ripe):not(.rack-slot-count) { opacity: .55; }
 /* Rückmeldung beim Antippen aller Schaltflächen */
 .wine-btn:active, .scan-btn:active, .btn-primary:active, .btn-secondary:active, .filter-chip:active, .wish-action-btn:active, .rack-setup-edit:active, .rack-setup-del:active, .rack-toggle:active, .rle-del:active, .loc-chip:active { transform: scale(.96); filter: brightness(1.25); }
+.rack-setup-item { position: relative; }
+.rack-drag { flex-shrink: 0; width: 22px; text-align: center; color: var(--text-dim); font-size: 18px; line-height: 1; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; padding: 6px 0; }
+.rack-drag:active { cursor: grabbing; color: var(--gold); }
+.rack-setup-item.dragging { z-index: 5; background: var(--card); box-shadow: 0 6px 18px rgba(0,0,0,.55); border-radius: 10px; opacity: .96; }
+.rack-setup-item.drop-before { box-shadow: 0 -2px 0 var(--gold); }
+.rack-setup-item.drop-after { box-shadow: 0 2px 0 var(--gold); }
+.rack-qr-all { display: flex; flex-wrap: wrap; gap: 8px; }
 .rack-setup-del { flex-shrink: 0; width: 30px; height: 30px; border-radius: 8px; border: none; background: var(--red-alert); color: #fff; font-size: 13px; cursor: pointer; }
 .input-with-scan { display: flex; gap: 8px; }
 .input-with-scan input { flex: 1; min-width: 0; }
@@ -3436,6 +3443,9 @@ de: {
   store_filter: "Einlagern: {name} · {n} Fl. – freies Fach antippen",
   store_filter_off: "Alle anzeigen",
   store_back: "← Zum Keller",
+  rack_sort_az: "A–Z sortieren",
+  rack_sorted_az: "Regale alphabetisch sortiert",
+  rack_drag_hint: "Zum Sortieren ziehen",
   store_scan_btn: "📷 Wein scannen & einlagern",
   store_save_btn: "Speichern & einlagern",
   store_modal_title: "Wein einlagern",
@@ -3842,6 +3852,9 @@ en: {
   store_filter: "Store: {name} · {n} btl. – tap a free slot",
   store_filter_off: "Show all",
   store_back: "← To cellar",
+  rack_sort_az: "Sort A–Z",
+  rack_sorted_az: "Racks sorted alphabetically",
+  rack_drag_hint: "Drag to reorder",
   store_scan_btn: "📷 Scan wine & store",
   store_save_btn: "Save & store",
   store_modal_title: "Store wine",
@@ -4248,6 +4261,9 @@ es: {
   store_filter: "Colocar: {name} · {n} bot. – toca un hueco libre",
   store_filter_off: "Mostrar todo",
   store_back: "← A la bodega",
+  rack_sort_az: "Ordenar A–Z",
+  rack_sorted_az: "Estantes ordenados alfabéticamente",
+  rack_drag_hint: "Arrastra para ordenar",
   store_scan_btn: "📷 Escanear vino y colocar",
   store_save_btn: "Guardar y colocar",
   store_modal_title: "Colocar vino",
@@ -4654,6 +4670,9 @@ sv: {
   store_filter: "Placera: {name} · {n} fl. – tryck på en ledig plats",
   store_filter_off: "Visa alla",
   store_back: "← Till källaren",
+  rack_sort_az: "Sortera A–Ö",
+  rack_sorted_az: "Hyllor sorterade alfabetiskt",
+  rack_drag_hint: "Dra för att sortera",
   store_scan_btn: "📷 Skanna vin & lagra",
   store_save_btn: "Spara & lagra",
   store_modal_title: "Lagra vin",
@@ -5060,6 +5079,9 @@ da: {
   store_filter: "Placér: {name} · {n} fl. – tryk på en ledig plads",
   store_filter_off: "Vis alle",
   store_back: "← Til kælderen",
+  rack_sort_az: "Sortér A–Å",
+  rack_sorted_az: "Reoler sorteret alfabetisk",
+  rack_drag_hint: "Træk for at sortere",
   store_scan_btn: "📷 Scan vin & opbevar",
   store_save_btn: "Gem & opbevar",
   store_modal_title: "Opbevar vin",
@@ -5466,6 +5488,9 @@ fi: {
   store_filter: "Sijoita: {name} · {n} pul. – napauta vapaata paikkaa",
   store_filter_off: "Näytä kaikki",
   store_back: "← Kellariin",
+  rack_sort_az: "Lajittele A–Ö",
+  rack_sorted_az: "Hyllyt lajiteltu aakkosjärjestykseen",
+  rack_drag_hint: "Järjestä vetämällä",
   store_scan_btn: "📷 Skannaa viini & varastoi",
   store_save_btn: "Tallenna & varastoi",
   store_modal_title: "Varastoi viini",
@@ -5872,6 +5897,9 @@ ru: {
   store_filter: "Разместить: {name} · {n} бут. – коснитесь свободной ячейки",
   store_filter_off: "Показать все",
   store_back: "← В погреб",
+  rack_sort_az: "Сортировать А–Я",
+  rack_sorted_az: "Стеллажи отсортированы по алфавиту",
+  rack_drag_hint: "Перетащите для сортировки",
   store_scan_btn: "📷 Сканировать вино и разместить",
   store_save_btn: "Сохранить и разместить",
   store_modal_title: "Разместить вино",
@@ -6278,6 +6306,9 @@ it: {
   store_filter: "Riponi: {name} · {n} bott. – tocca uno scomparto libero",
   store_filter_off: "Mostra tutto",
   store_back: "← Alla cantina",
+  rack_sort_az: "Ordina A–Z",
+  rack_sorted_az: "Scaffali ordinati alfabeticamente",
+  rack_drag_hint: "Trascina per ordinare",
   store_scan_btn: "📷 Scansiona vino e riponi",
   store_save_btn: "Salva e riponi",
   store_modal_title: "Riponi vino",
@@ -6684,6 +6715,9 @@ fr: {
   store_filter: "Ranger : {name} · {n} bout. – touchez un emplacement libre",
   store_filter_off: "Tout afficher",
   store_back: "← Vers la cave",
+  rack_sort_az: "Trier de A à Z",
+  rack_sorted_az: "Casiers triés par ordre alphabétique",
+  rack_drag_hint: "Faire glisser pour trier",
   store_scan_btn: "📷 Scanner le vin & ranger",
   store_save_btn: "Enregistrer & ranger",
   store_modal_title: "Ranger le vin",
@@ -7090,6 +7124,9 @@ pl: {
   store_filter: "Ułóż: {name} · {n} but. – dotknij wolne miejsce",
   store_filter_off: "Pokaż wszystko",
   store_back: "← Do piwnicy",
+  rack_sort_az: "Sortuj A–Z",
+  rack_sorted_az: "Regały posortowane alfabetycznie",
+  rack_drag_hint: "Przeciągnij, aby zmienić kolejność",
   store_scan_btn: "📷 Skanuj wino i umieść",
   store_save_btn: "Zapisz i umieść",
   store_modal_title: "Umieść wino",
@@ -7496,6 +7533,9 @@ hu: {
   store_filter: "Elhelyezés: {name} · {n} üveg – koppints egy szabad helyre",
   store_filter_off: "Összes mutatása",
   store_back: "← A pincéhez",
+  rack_sort_az: "Rendezés A–Z",
+  rack_sorted_az: "Állványok ábécé szerint rendezve",
+  rack_drag_hint: "Húzza az átrendezéshez",
   store_scan_btn: "📷 Bor beolvasása és berakás",
   store_save_btn: "Mentés és berakás",
   store_modal_title: "Bor berakása",
@@ -7902,6 +7942,9 @@ cs: {
   store_filter: "Uložit: {name} · {n} lahví – klepni na volné místo",
   store_filter_off: "Zobrazit vše",
   store_back: "← Do sklepa",
+  rack_sort_az: "Seřadit A–Z",
+  rack_sorted_az: "Regály seřazeny abecedně",
+  rack_drag_hint: "Přetažením změníte pořadí",
   store_scan_btn: "📷 Naskenovat víno a uskladnit",
   store_save_btn: "Uložit a uskladnit",
   store_modal_title: "Uskladnit víno",
@@ -8308,6 +8351,9 @@ sk: {
   store_filter: "Uložiť: {name} · {n} fliaš – ťukni na voľné miesto",
   store_filter_off: "Zobraziť všetko",
   store_back: "← Do pivnice",
+  rack_sort_az: "Zoradiť A–Z",
+  rack_sorted_az: "Regály zoradené abecedne",
+  rack_drag_hint: "Presunutím zmeníte poradie",
   store_scan_btn: "📷 Naskenovať víno a uskladniť",
   store_save_btn: "Uložiť a uskladniť",
   store_modal_title: "Uskladniť víno",
@@ -8714,6 +8760,9 @@ ro: {
   store_filter: "Așază: {name} · {n} stic. – atinge un loc liber",
   store_filter_off: "Arată tot",
   store_back: "← La pivniță",
+  rack_sort_az: "Sortează A–Z",
+  rack_sorted_az: "Rafturi sortate alfabetic",
+  rack_drag_hint: "Trageți pentru a sorta",
   store_scan_btn: "📷 Scanează vinul și depozitează",
   store_save_btn: "Salvează și depozitează",
   store_modal_title: "Depozitează vinul",
@@ -9120,6 +9169,9 @@ hr: {
   store_filter: "Pohrani: {name} · {n} boc. – dodirni slobodno mjesto",
   store_filter_off: "Prikaži sve",
   store_back: "← U podrum",
+  rack_sort_az: "Sortiraj A–Ž",
+  rack_sorted_az: "Regali sortirani abecedno",
+  rack_drag_hint: "Povucite za sortiranje",
   store_scan_btn: "📷 Skeniraj vino i pohrani",
   store_save_btn: "Spremi i pohrani",
   store_modal_title: "Pohrani vino",
@@ -9526,6 +9578,9 @@ pt: {
   store_filter: "Arrumar: {name} · {n} gar. – toca num lugar livre",
   store_filter_off: "Mostrar tudo",
   store_back: "← Para a adega",
+  rack_sort_az: "Ordenar A–Z",
+  rack_sorted_az: "Prateleiras ordenadas alfabeticamente",
+  rack_drag_hint: "Arraste para ordenar",
   store_scan_btn: "📷 Digitalizar vinho e guardar",
   store_save_btn: "Salvar e guardar",
   store_modal_title: "Guardar vinho",
@@ -9932,6 +9987,9 @@ no: {
   store_filter: "Plasser: {name} · {n} fl. – trykk på en ledig plass",
   store_filter_off: "Vis alle",
   store_back: "← Til kjelleren",
+  rack_sort_az: "Sorter A–Å",
+  rack_sorted_az: "Reoler sortert alfabetisk",
+  rack_drag_hint: "Dra for å sortere",
   store_scan_btn: "📷 Skann vin og legg på plass",
   store_save_btn: "Lagre og legg på plass",
   store_modal_title: "Legg vin på plass",
@@ -10338,6 +10396,9 @@ nl: {
   store_filter: "Opbergen: {name} · {n} fl. – tik op een vrij vak",
   store_filter_off: "Toon alles",
   store_back: "← Naar de kelder",
+  rack_sort_az: "Sorteer A–Z",
+  rack_sorted_az: "Rekken alfabetisch gesorteerd",
+  rack_drag_hint: "Sleep om te sorteren",
   store_scan_btn: "📷 Wijn scannen & opbergen",
   store_save_btn: "Opslaan & opbergen",
   store_modal_title: "Wijn opbergen",
@@ -10744,6 +10805,9 @@ el: {
   store_filter: "Τοποθέτηση: {name} · {n} φιάλ. – πατήστε μια ελεύθερη θέση",
   store_filter_off: "Εμφάνιση όλων",
   store_back: "← Στο κελάρι",
+  rack_sort_az: "Ταξινόμηση Α–Ω",
+  rack_sorted_az: "Τα ράφια ταξινομήθηκαν αλφαβητικά",
+  rack_drag_hint: "Σύρετε για ταξινόμηση",
   store_scan_btn: "📷 Σάρωση κρασιού & τοποθέτηση",
   store_save_btn: "Αποθήκευση & τοποθέτηση",
   store_modal_title: "Τοποθέτηση κρασιού",
@@ -11150,6 +11214,9 @@ uk: {
   store_filter: "Розмістити: {name} · {n} пл. – торкніться вільного місця",
   store_filter_off: "Показати все",
   store_back: "← До погреба",
+  rack_sort_az: "Сортувати А–Я",
+  rack_sorted_az: "Стелажі відсортовано за алфавітом",
+  rack_drag_hint: "Перетягніть для сортування",
   store_scan_btn: "📷 Сканувати вино та розмістити",
   store_save_btn: "Зберегти та розмістити",
   store_modal_title: "Розмістити вино",
@@ -11556,6 +11623,9 @@ ja: {
   store_filter: "配置: {name} · {n}本 – 空いている場所をタップ",
   store_filter_off: "すべて表示",
   store_back: "← セラーへ戻る",
+  rack_sort_az: "A–Zで並べ替え",
+  rack_sorted_az: "ラックをアルファベット順に並べ替えました",
+  rack_drag_hint: "ドラッグして並べ替え",
   store_scan_btn: "📷 ワインをスキャンして保管",
   store_save_btn: "保存して保管",
   store_modal_title: "ワインを保管",
@@ -11962,6 +12032,9 @@ ko: {
   store_filter: "보관: {name} · {n}병 – 빈 칸을 탭하세요",
   store_filter_off: "모두 보기",
   store_back: "← 셀러로",
+  rack_sort_az: "A–Z 정렬",
+  rack_sorted_az: "랙을 알파벳순으로 정렬했습니다",
+  rack_drag_hint: "드래그하여 정렬",
   store_scan_btn: "📷 와인 스캔 후 보관",
   store_save_btn: "저장 후 보관",
   store_modal_title: "와인 보관",
@@ -12368,6 +12441,9 @@ zh: {
   store_filter: "存放：{name} · {n} 瓶 – 请点按空位",
   store_filter_off: "显示全部",
   store_back: "← 返回酒窖",
+  rack_sort_az: "按 A–Z 排序",
+  rack_sorted_az: "货架已按字母顺序排序",
+  rack_drag_hint: "拖动以排序",
   store_scan_btn: "📷 扫描葡萄酒并存放",
   store_save_btn: "保存并存放",
   store_modal_title: "存放葡萄酒",
@@ -12774,6 +12850,9 @@ hi: {
   store_filter: "रखें: {name} · {n} बोतल – खाली स्थान पर टैप करें",
   store_filter_off: "सब दिखाएँ",
   store_back: "← सेलर पर",
+  rack_sort_az: "A–Z क्रमबद्ध करें",
+  rack_sorted_az: "रैक वर्णानुक्रम में क्रमबद्ध किए गए",
+  rack_drag_hint: "क्रमबद्ध करने के लिए खींचें",
   store_scan_btn: "📷 वाइन स्कैन करें और रखें",
   store_save_btn: "सहेजें और रखें",
   store_modal_title: "वाइन रखें",
@@ -14984,7 +15063,7 @@ function renderRackSetup() {
   const list = document.getElementById('rack-setup-list');
   if (!list) return;
   list.innerHTML = settings.racks.map((r,i) => {
-    let h = `<div class="rack-setup-item${i === rackEditIdx ? ' editing' : ''}"><span class="n">${esc(r.name)}</span><span class="d">${r.rows} × ${r.cols}${r.cap > 1 ? ' · ×' + r.cap : ''}${Object.keys(r.lv || {}).length ? ' *' : ''}</span><button class="rack-setup-edit" onclick="openQrLabels(${i})" title="${esc(t('qr_btn'))}">▦</button><button class="rack-setup-edit${i === rackEditIdx ? ' active' : ''}" aria-pressed="${i === rackEditIdx}" onclick="editRackLevels(${i})">✏️</button><button class="rack-setup-edit" onclick="clearRack(${i})" title="${esc(t('rack_clear_btn'))}">🧹</button><button class="rack-setup-del" onclick="removeRack(${i})">🗑</button></div>`;
+    let h = `<div class="rack-setup-item${i === rackEditIdx ? ' editing' : ''}">${settings.racks.length > 1 ? `<span class="rack-drag" title="${esc(t('rack_drag_hint'))}" aria-hidden="true">⠿</span>` : ''}<span class="n">${esc(r.name)}</span><span class="d">${r.rows} × ${r.cols}${r.cap > 1 ? ' · ×' + r.cap : ''}${Object.keys(r.lv || {}).length ? ' *' : ''}</span><button class="rack-setup-edit" onclick="openQrLabels(${i})" title="${esc(t('qr_btn'))}">▦</button><button class="rack-setup-edit${i === rackEditIdx ? ' active' : ''}" aria-pressed="${i === rackEditIdx}" onclick="editRackLevels(${i})">✏️</button><button class="rack-setup-edit" onclick="clearRack(${i})" title="${esc(t('rack_clear_btn'))}">🧹</button><button class="rack-setup-del" onclick="removeRack(${i})">🗑</button></div>`;
     if (i === rackEditIdx) {
       h += `<div class="rack-level-editor">`;
       h += `<div class="rle-fld"><span>${t('rack_name_label')}</span><input type="text" maxlength="60" value="${esc(r.name)}" onchange="renameRack(${i},this.value)"></div>`;
@@ -14996,7 +15075,7 @@ function renderRackSetup() {
       h += '</div>';
     }
     return h;
-  }).join('') + (settings.racks.length ? `<div class="rack-qr-all"><button class="wine-btn" onclick="openQrLabels(-1)">▦ ${t('qr_all')}</button></div>` : '');
+  }).join('') + (settings.racks.length ? `<div class="rack-qr-all"><button class="wine-btn" onclick="openQrLabels(-1)">▦ ${t('qr_all')}</button>${settings.racks.length > 1 ? `<button class="wine-btn" onclick="sortRacksAlpha()">↓ ${t('rack_sort_az')}</button>` : ''}</div>` : '');
 }
 const RACK_MAX_ROWS = 30, RACK_MAX_COLS = 40;   // wie beim Anlegen eines Regals
 // Nach jeder Regal-Änderung: speichern und die offene Ansicht neu zeichnen
@@ -15077,6 +15156,70 @@ function setRackCols(i, v) {
   afterRackEdit();
   showToast(t('rack_cols_set', { n: cols }));
 }
+// Regale umsortieren: Reihenfolge der Liste (und damit der Kacheln auf der Regalkarte, der QR-Etiketten usw.). Die Belegung hängt an der Regal-ID und bleibt unberührt.
+function rackIdxKeep() { return { active: (settings.racks[rackActive] || {}).id, edit: (settings.racks[rackEditIdx] || {}).id }; }
+function rackIdxRestore(k) {
+  const racks = settings.racks;
+  rackActive = Math.max(0, racks.findIndex(x => x.id === k.active));
+  rackEditIdx = k.edit ? racks.findIndex(x => x.id === k.edit) : -1;
+}
+function moveRack(from, to) {
+  const racks = settings.racks;
+  if (from === to || from < 0 || to < 0 || from >= racks.length || to >= racks.length) return;
+  const k = rackIdxKeep();
+  const [r] = racks.splice(from, 1); racks.splice(to, 0, r);
+  rackIdxRestore(k);
+  afterRackEdit();
+}
+function sortRacksAlpha() {
+  const racks = settings.racks;
+  if (racks.length < 2) return;
+  const k = rackIdxKeep();
+  const cmp = (a, b) => { try { return a.name.localeCompare(b.name, settings.lang || 'de', { numeric: true, sensitivity: 'base' }); } catch (e) { return a.name.localeCompare(b.name); } };
+  racks.sort(cmp);
+  rackIdxRestore(k);
+  afterRackEdit();
+  showToast(t('rack_sorted_az'));
+}
+// Ziehen am Griff (Maus und Touch): die Zeile folgt dem Finger, eine goldene Linie zeigt die Zielstelle; beim Loslassen wird umsortiert
+(function () {
+  let d = null;
+  const clearMarks = () => document.querySelectorAll('#rack-setup-list .drop-before, #rack-setup-list .drop-after').forEach(el => el.classList.remove('drop-before', 'drop-after'));
+  document.addEventListener('pointerdown', (ev) => {
+    const h = ev.target.closest && ev.target.closest('.rack-drag');
+    if (!h) return;
+    const item = h.closest('.rack-setup-item');
+    if (!item) return;
+    const ed = item.nextElementSibling && item.nextElementSibling.classList.contains('rack-level-editor') ? item.nextElementSibling : null;
+    if (ed) ed.style.display = 'none';   // Editor des gezogenen Regals für die Dauer des Ziehens ausblenden
+    const items = [...item.parentElement.querySelectorAll('.rack-setup-item')];
+    const rects = items.map(el => el.getBoundingClientRect());
+    d = { item, ed, items, from: items.indexOf(item), to: items.indexOf(item), y0: ev.clientY, pid: ev.pointerId, centers: rects.map(r => r.top + r.height / 2) };
+    item.classList.add('dragging');
+    try { h.setPointerCapture(ev.pointerId); } catch (e) {}
+    ev.preventDefault();
+  });
+  document.addEventListener('pointermove', (ev) => {
+    if (!d || ev.pointerId !== d.pid) return;
+    const dy = ev.clientY - d.y0;
+    d.item.style.transform = 'translateY(' + dy + 'px)';
+    const mid = d.centers[d.from] + dy;
+    d.to = d.centers.filter((c, k) => k !== d.from && c < mid).length;   // Platz in der Liste ohne die gezogene Zeile
+    const others = d.items.filter((_, k) => k !== d.from);
+    clearMarks();
+    if (d.to < others.length) others[d.to].classList.add('drop-before'); else if (others.length) others[others.length - 1].classList.add('drop-after');
+    ev.preventDefault();
+  });
+  const end = (ev) => {
+    if (!d || (ev && ev.pointerId !== undefined && ev.pointerId !== d.pid)) return;
+    const { item, ed, from, to } = d; d = null;
+    item.style.transform = ''; item.classList.remove('dragging'); clearMarks();
+    if (ed) ed.style.display = '';
+    if (to !== from) moveRack(from, to);
+  };
+  document.addEventListener('pointerup', end);
+  document.addEventListener('pointercancel', end);
+})();
 function editRackLevels(i) { rackEditIdx = rackEditIdx === i ? -1 : i; renderRackSetup(); }
 // Name oder Flaschen pro Platz einer Ebene setzen (Kapazität nicht unter die aktuell dort vorhandene Belegung)
 function setLevelProp(i, e, prop, v) {
