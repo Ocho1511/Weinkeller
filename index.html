@@ -792,6 +792,7 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
   margin-bottom: 4px;
 }
 .ripeness-meta { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 12px; }
+.ripeness-window { font-size: 12px; font-weight: 600; color: var(--text); margin: -6px 0 8px; }
 .ripeness-timeline {
   display: flex;
   gap: 0;
@@ -16034,6 +16035,7 @@ function renderTrinkreife() {
     <div class="ripeness-card" onclick="goToWine('${w.id}')" style="cursor:pointer">
       <div class="ripeness-wine-name">${esc(w.name)}</div>
       <div class="ripeness-meta">${w.year||''} ${w.type?' · '+esc(TYPE_LABELS[w.type]||w.type):''}</div>
+      ${w.drinkFrom || w.drinkTo ? `<div class="ripeness-window">📅 ${[w.drinkFrom ? esc(t('l_from')) + ' ' + w.drinkFrom : '', w.drinkTo ? esc(t('l_to')) + ' ' + w.drinkTo : ''].filter(Boolean).join(' · ')}</div>` : ''}
       ${serveTempHtml(w, 'ripeness-temp')}
       ${wineSlotChips(w)}
       <div style="display:flex;gap:0;border-radius:6px;overflow:hidden;height:18px;margin-bottom:6px">
