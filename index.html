@@ -14355,17 +14355,20 @@ function renderRacks() {
   const normCountry = (w) => String(w.country || '').trim().toLowerCase();
   let unplaced = allUn, filterBar = '';
   if (!(sw && swOpen > 0) && allUn.length > 1) {
-    const typesPresent = TYPES.filter(ty => ty !== 'alle' && allUn.some(w => (w.type || 'other') === ty));
+    // Sorte und Land filtern unabhängig voneinander; die Zahlen in Chips und Auswahl zeigen jeweils, was mit dem anderen Filter noch übrig ist
+    const typeOf = (w) => w.type || 'other';
+    const typesPresent = TYPES.filter(ty => ty !== 'alle' && allUn.some(w => typeOf(w) === ty));
     if (rackUnFilter.type !== 'alle' && !typesPresent.includes(rackUnFilter.type)) rackUnFilter.type = 'alle';
-    const byType = allUn.filter(w => rackUnFilter.type === 'alle' || (w.type || 'other') === rackUnFilter.type);
+    const matchT = (w) => rackUnFilter.type === 'alle' || typeOf(w) === rackUnFilter.type;
     const countries = new Map();
-    byType.forEach(w => { const k = normCountry(w), c = countries.get(k) || { label: String(w.country || '').trim(), n: 0 }; c.n++; countries.set(k, c); });
+    allUn.forEach(w => { const k = normCountry(w), c = countries.get(k) || { label: String(w.country || '').trim(), n: 0 }; if (matchT(w)) c.n++; countries.set(k, c); });
     if (rackUnFilter.country !== '*' && !countries.has(rackUnFilter.country)) rackUnFilter.country = '*';
-    unplaced = byType.filter(w => rackUnFilter.country === '*' || normCountry(w) === rackUnFilter.country);
-    const chips = ['alle'].concat(typesPresent).map(ty => `<button class="filter-chip${rackUnFilter.type === ty ? ' active' : ''}" onclick="setRackUnType('${ty}')">${TYPE_LABELS[ty]}${ty === 'alle' ? '' : ' · ' + allUn.filter(w => (w.type || 'other') === ty).length}</button>`).join('');
+    const matchC = (w) => rackUnFilter.country === '*' || normCountry(w) === rackUnFilter.country;
+    unplaced = allUn.filter(w => matchT(w) && matchC(w));
+    const chips = ['alle'].concat(typesPresent).map(ty => `<button class="filter-chip${rackUnFilter.type === ty ? ' active' : ''}" onclick="setRackUnType('${ty}')">${TYPE_LABELS[ty]}${ty === 'alle' ? '' : ' · ' + allUn.filter(w => typeOf(w) === ty && matchC(w)).length}</button>`).join('');
     const opts = [...countries].sort((a, b) => (a[0] === '') - (b[0] === '') || a[1].label.localeCompare(b[1].label))
-      .map(([k, c]) => `<option value="${esc(k)}"${rackUnFilter.country === k ? ' selected' : ''}>${esc(c.label || t('rack_country_none'))} (${c.n})</option>`).join('');
-    const sel = countries.size > 1 ? `<select class="rack-un-country" aria-label="${esc(t('rack_country_all'))}" onchange="setRackUnCountry(this.value)"><option value="*">${esc(t('rack_country_all'))}</option>${opts}</select>` : '';
+      .map(([k, c]) => `<option value="${esc(k)}"${rackUnFilter.country === k ? ' selected' : ''}${c.n === 0 && rackUnFilter.country !== k ? ' disabled' : ''}>${esc(c.label || t('rack_country_none'))} (${c.n})</option>`).join('');
+    const sel = `<select class="rack-un-country" aria-label="${esc(t('rack_country_all'))}" onchange="setRackUnCountry(this.value)"><option value="*">${esc(t('rack_country_all'))}</option>${opts}</select>`;
     filterBar = `<div class="rack-un-filter"><div class="rack-un-chips">${chips}</div>${sel}</div>`;
   }
   html += `<div class="stats-title" style="margin:8px 0 10px">${t('racks_unassigned')} (${unplaced.length}${unplaced.length !== allUn.length ? ' / ' + allUn.length : ''})</div>`;
