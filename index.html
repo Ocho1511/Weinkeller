@@ -552,6 +552,14 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .qr-cuts { display: flex; align-items: center; gap: 8px; font-size: 13px; margin-bottom: 12px; }
 .rack-qr-all { margin-top: 10px; }
 /* Regalkarte: Aktionsknöpfe und Blink-Schalter als Raster (Tabelle) statt untereinander */
+#rack-chips { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.rack-tile-sel { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--border); background: none; color: var(--text); font-family: inherit; text-align: left; cursor: pointer; min-width: 0; }
+.rack-tile-sel:only-child { grid-column: 1 / -1; }
+.rack-tile-sel .rts-name { font-size: 13px; font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.rack-tile-sel .rts-sub { font-size: 11px; font-weight: 600; color: var(--text-dim); }
+.rack-tile-sel.active { background: #1c9a8d; border-color: #1c9a8d; color: #fff; }
+.rack-tile-sel.active .rts-sub { color: rgba(255,255,255,.85); }
+.rack-tile-sel:active { transform: scale(.97); filter: brightness(1.25); }
 .rack-scanbar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 10px; }
 .rack-scanbar .rack-tile { margin-bottom: 0; width: auto; min-height: 68px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 12px; font-weight: 600; line-height: 1.2; text-align: center; overflow-wrap: anywhere; }
 .rack-tile .rtile-ico { font-size: 20px; line-height: 1; }
@@ -14340,6 +14348,13 @@ function bottlePreviewHtml(w) {
   const sub = [w.year, w.grape].filter(Boolean).join(' · ');
   return vis + `<div class="bottle-cap" style="display:none"><strong>${esc(w.name)}</strong>${sub ? `<span>${esc(sub)}</span>` : ''}</div>`;
 }
+// Belegung eines Regals: eingelagerte Flaschen / Plätze (Plätze x Flaschen pro Platz je Ebene)
+function rackFillCounts(r) {
+  let total = 0, filled = 0;
+  for (let e = 1; e <= r.rows; e++) total += rackCols(r, e) * rackCap(r, e);
+  validPlacements({ placements: wines.flatMap(w => (w.placements || []).filter(x => x.rack === r.id)) }).forEach(() => { filled++; });
+  return { filled, total };
+}
 // Aktionsknöpfe der Regalkarte als gleich große Kacheln nebeneinander: Symbol oben, Text darunter (das Symbol steht in den Übersetzungen vorn im Text)
 function rackTile(cls, onclick, txt) {
   const m = String(txt).trim().match(/^(\p{Extended_Pictographic}\uFE0F?|▦)\s*(.*)$/su);
@@ -14355,7 +14370,8 @@ function renderRacks() {
     return;
   }
   if (rackActive >= racks.length) rackActive = 0;
-  chips.innerHTML = racks.map((r,i) => `<button class="filter-chip ${i===rackActive?'active':''}" onclick="setRackActive(${i})">${esc(r.name)}</button>`).join('');
+  // Regalauswahl als Raster: gleich große Kacheln mit Name und Belegung (belegt / Plätze), statt Chips in wechselnder Breite
+  chips.innerHTML = racks.map((r,i) => { const f = rackFillCounts(r); return `<button class="rack-tile-sel${i===rackActive?' active':''}" onclick="setRackActive(${i})"><span class="rts-name">${esc(r.name)}</span><span class="rts-sub">${f.filled} / ${f.total}</span></button>`; }).join('');
 
   const r = racks[rackActive];
   const maxCols = rackMaxCols(r);
