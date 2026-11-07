@@ -1487,6 +1487,13 @@ input[type="file"] { display: none; }
           <div class="desc" data-i18n="enrich_desc">Fehlende Region, Land, Rebsorte, Trinkfenster & Preis ergänzen</div>
         </div>
       </div>
+      <div class="export-card" id="drinkrule-btn" onclick="recalcDrinkWindows()" style="margin-top:10px">
+        <div class="export-icon">📅</div>
+        <div class="export-info">
+          <div class="title" data-i18n="drinkrule_btn">Trinkfenster neu berechnen</div>
+          <div class="desc" data-i18n="drinkrule_desc">Trinken ab = Jahrgang + 1; Trinken bis nach Weinart und Rebsorte</div>
+        </div>
+      </div>
       <div id="enrich-progress" style="display:none; margin-top:12px">
         <div class="enrich-prog-head">
           <span id="enrich-prog-label">0 / 0</span>
@@ -1985,13 +1992,15 @@ function cleanCellars(arr) {
   return out;
 }
 // Trinkfenster plausibel machen (KI-Schätzungen sind manchmal unsinnig, z. B. Jahrgang 2025, trinken ab 2023): "ab" liegt nie vor dem Jahrgang, "bis" nie vor "ab".
-// Ein ungültiger Wert wird durch die Faustregel nach Rebsorte/Weinart ersetzt (dieselbe wie beim Eintippen des Jahrgangs).
+// Regel: "Trinken ab" = Jahrgang + 1; "Trinken bis" richtet sich nach Weinart und Rebsorte (Tabelle MATURATION_*, ab dem Jahrgang gerechnet).
+const drinkYearOk = (y) => y >= 1900 && y <= 2100;
+const ruleFrom = (year, other) => drinkYearOk(year) ? year + 1 : other;   // mit gültigem Jahrgang gilt immer die Regel, KI-Schätzungen für "ab" werden ignoriert
 function fixDrinkWindow(year, type, grape, from, to) {
   if (!year || year < 1900 || year > 2100) return { from, to };
   let off;
   try { off = maturationOffset(grape, type); } catch (e) { off = ({ rot: [3, 12], 'weiß': [1, 5], 'rosé': [0, 2], sekt: [1, 6] })[type] || [2, 8]; }
   let f = from, tt = to;
-  if (f && f < year) f = year + off[0];
+  if (f && f < year) f = year + 1;
   if (tt && (tt < year || (f && tt < f))) tt = Math.max(year + off[1], (f || year) + 1);
   return { from: f, to: tt };
 }
@@ -2760,6 +2769,24 @@ function maturationOffset(grape, type) {
   return MATURATION_TYPE[type] || MATURATION_TYPE.other;
 }
 let autoDrink = { from: null, to: null };
+// Einmalig für alle Weine: "ab" = Jahrgang + 1 (auch von Hand eingetragene Werte werden überschrieben); "bis" bleibt, wenn es nach "ab" liegt, sonst Tabellenwert nach Weinart/Rebsorte. Weine ohne Jahrgang bleiben unverändert.
+function recalcDrinkWindows() {
+  const plan = [];
+  wines.forEach(w => {
+    if (!drinkYearOk(w.year)) return;
+    const from = w.year + 1;
+    let to = w.drinkTo;
+    if (!to || to <= from) to = Math.max(w.year + maturationOffset(w.grape, w.type)[1], from + 1);
+    if (w.drinkFrom !== from || w.drinkTo !== to) plan.push([w, from, to]);
+  });
+  if (!plan.length) { showToast(t('drinkrule_done', { n: 0 })); return; }
+  if (!confirm(t('drinkrule_confirm', { n: plan.length }))) return;
+  plan.forEach(([w, from, to]) => { w.drinkFrom = from; w.drinkTo = to; });
+  save();
+  renderKeller();
+  if (typeof renderTrinkreife === 'function') renderTrinkreife();
+  showToast(t('drinkrule_done', { n: plan.length }));
+}
 function fixFormDrinkWindow() {
   const y = parseInt(document.getElementById('f-year').value);
   const dfEl = document.getElementById('f-drink-from'), dtEl = document.getElementById('f-drink-to');
@@ -2770,8 +2797,8 @@ function fixFormDrinkWindow() {
 function autoFillDrinkWindow() {
   const y = parseInt(document.getElementById('f-year').value);
   if (!y || y < 1900 || y > 2100) return;
-  const [off1, off2] = maturationOffset(document.getElementById('f-grape').value, document.getElementById('f-type').value);
-  const nf = y + off1, nt = y + off2;
+  const off2 = maturationOffset(document.getElementById('f-grape').value, document.getElementById('f-type').value)[1];
+  const nf = y + 1, nt = Math.max(y + off2, y + 2);
   const dfEl = document.getElementById('f-drink-from'), dtEl = document.getElementById('f-drink-to');
   if (!dfEl.value || String(dfEl.value) === String(autoDrink.from)) dfEl.value = nf;
   if (!dtEl.value || String(dtEl.value) === String(autoDrink.to)) dtEl.value = nt;
@@ -3145,7 +3172,12 @@ async function lookupWineData(name, year) {
   const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n');
   const m = text.match(/\{[\s\S]*\}/);
   if (!m) return null;
-  try { return JSON.parse(m[0]); } catch { return null; }
+  try {
+    const info = JSON.parse(m[0]);
+    const y = parseInt(year);
+    if (info && drinkYearOk(y)) info.drinkFrom = ruleFrom(y, info.drinkFrom);
+    return info;
+  } catch { return null; }
 }
 
 async function lookupWine() {
@@ -3633,6 +3665,10 @@ de: {
   store_filter: "Einlagern: {name} · {n} Fl. – freies Fach antippen",
   store_filter_off: "Alle anzeigen",
   store_back: "← Zum Keller",
+  drinkrule_btn: "Trinkfenster neu berechnen",
+  drinkrule_desc: "Trinken ab = Jahrgang + 1; Trinken bis nach Weinart und Rebsorte",
+  drinkrule_confirm: "Für {n} Weine wird „Trinken ab“ auf Jahrgang + 1 gesetzt (auch von Hand eingetragene Werte werden überschrieben) und „Trinken bis“ bei Bedarf nach Weinart und Rebsorte angepasst. Weine ohne Jahrgang bleiben unverändert. Tipp: vorher ein JSON-Backup exportieren. Fortfahren?",
+  drinkrule_done: "{n} Wein(e) aktualisiert ✓",
   barcode_miss_text: "Dieser Barcode steht nicht in der Datenbank. Die Nummer wird trotzdem am Wein gespeichert, damit die Flasche beim nächsten Scan erkannt wird. Jetzt das Etikett fotografieren?",
   confirm_enrich_temp: "Auch bereits vorhandene Trinktemperaturen durch KI-Werte ersetzen (auch selbst eingetragene)?\n\nOK = ersetzen (jeder Wein wird per KI abgefragt, das dauert länger)\nAbbrechen = nur fehlende Temperaturen ergänzen",
   cur_auto_set: "Währung automatisch auf {name} gestellt – änderbar unter „Währung“.",
@@ -4052,6 +4088,10 @@ en: {
   store_filter: "Store: {name} · {n} btl. – tap a free slot",
   store_filter_off: "Show all",
   store_back: "← To cellar",
+  drinkrule_btn: "Recalculate drinking windows",
+  drinkrule_desc: "Drink from = vintage + 1; drink until by wine type and grape",
+  drinkrule_confirm: "For {n} wines, “drink from” will be set to vintage + 1 (values you entered by hand are overwritten) and “drink until” adjusted by wine type and grape where needed. Wines without a vintage stay unchanged. Tip: export a JSON backup first. Continue?",
+  drinkrule_done: "{n} wine(s) updated ✓",
   barcode_miss_text: "This barcode is not in the database. The number is still saved with the wine so the bottle is recognised next time. Photograph the label now?",
   confirm_enrich_temp: "Also replace serving temperatures that already exist with AI values (including ones you entered yourself)?\n\nOK = replace (every wine is queried by AI, which takes longer)\nCancel = only fill in missing temperatures",
   cur_auto_set: "Currency automatically set to {name} – you can change it under “Currency”.",
@@ -4471,6 +4511,10 @@ es: {
   store_filter: "Colocar: {name} · {n} bot. – toca un hueco libre",
   store_filter_off: "Mostrar todo",
   store_back: "← A la bodega",
+  drinkrule_btn: "Recalcular ventana de consumo",
+  drinkrule_desc: "Beber desde = añada + 1; beber hasta según tipo de vino y uva",
+  drinkrule_confirm: "En {n} vinos, «beber desde» se fijará en añada + 1 (también se sobrescriben los valores escritos a mano) y «beber hasta» se ajustará según el tipo de vino y la uva cuando haga falta. Los vinos sin añada no cambian. Consejo: exporta antes una copia JSON. ¿Continuar?",
+  drinkrule_done: "{n} vino(s) actualizados ✓",
   barcode_miss_text: "Este código de barras no está en la base de datos. El número se guarda igualmente con el vino para reconocer la botella la próxima vez. ¿Fotografiar la etiqueta ahora?",
   confirm_enrich_temp: "¿Reemplazar también las temperaturas de servicio ya existentes por valores de la IA (incluidas las que introdujiste tú)?\n\nAceptar = reemplazar (se consulta cada vino con la IA, tarda más)\nCancelar = completar solo las temperaturas que faltan",
   cur_auto_set: "Moneda cambiada automáticamente a {name} – puedes cambiarla en «Moneda».",
@@ -4890,6 +4934,10 @@ sv: {
   store_filter: "Placera: {name} · {n} fl. – tryck på en ledig plats",
   store_filter_off: "Visa alla",
   store_back: "← Till källaren",
+  drinkrule_btn: "Räkna om dryckesfönster",
+  drinkrule_desc: "Dricka från = årgång + 1; dricka till efter vintyp och druva",
+  drinkrule_confirm: "För {n} viner sätts ”dricka från” till årgång + 1 (även värden du skrivit in själv skrivs över) och ”dricka till” justeras vid behov efter vintyp och druva. Viner utan årgång lämnas oförändrade. Tips: exportera en JSON-säkerhetskopia först. Fortsätta?",
+  drinkrule_done: "{n} vin(er) uppdaterade ✓",
   barcode_miss_text: "Den här streckkoden finns inte i databasen. Numret sparas ändå med vinet så att flaskan känns igen nästa gång. Fotografera etiketten nu?",
   confirm_enrich_temp: "Ersätta även befintliga serveringstemperaturer med AI-värden (även sådana du angett själv)?\n\nOK = ersätt (varje vin frågas av AI, det tar längre tid)\nAvbryt = komplettera bara saknade temperaturer",
   cur_auto_set: "Valutan ställdes automatiskt in på {name} – kan ändras under ”Valuta”.",
@@ -5309,6 +5357,10 @@ da: {
   store_filter: "Placér: {name} · {n} fl. – tryk på en ledig plads",
   store_filter_off: "Vis alle",
   store_back: "← Til kælderen",
+  drinkrule_btn: "Genberegn drikkevindue",
+  drinkrule_desc: "Drik fra = årgang + 1; drik til efter vintype og drue",
+  drinkrule_confirm: "For {n} vine sættes »drik fra« til årgang + 1 (også værdier, du selv har indtastet, overskrives), og »drik til« justeres efter behov efter vintype og drue. Vine uden årgang forbliver uændrede. Tip: eksportér en JSON-sikkerhedskopi først. Fortsæt?",
+  drinkrule_done: "{n} vin(e) opdateret ✓",
   barcode_miss_text: "Denne stregkode findes ikke i databasen. Nummeret gemmes alligevel sammen med vinen, så flasken genkendes næste gang. Skal etiketten fotograferes nu?",
   confirm_enrich_temp: "Skal eksisterende serveringstemperaturer også erstattes med AI-værdier (også dem, du selv har indtastet)?\n\nOK = erstat (hver vin forespørges via AI, det tager længere tid)\nAnnuller = udfyld kun manglende temperaturer",
   cur_auto_set: "Valutaen er automatisk sat til {name} – kan ændres under »Valuta«.",
@@ -5728,6 +5780,10 @@ fi: {
   store_filter: "Sijoita: {name} · {n} pul. – napauta vapaata paikkaa",
   store_filter_off: "Näytä kaikki",
   store_back: "← Kellariin",
+  drinkrule_btn: "Laske juomaikkuna uudelleen",
+  drinkrule_desc: "Juo alkaen = vuosikerta + 1; juo asti viinityypin ja rypäleen mukaan",
+  drinkrule_confirm: "{n} viinille ”juo alkaen” asetetaan arvoon vuosikerta + 1 (myös itse kirjoitetut arvot korvataan) ja ”juo asti” sovitetaan tarvittaessa viinityypin ja rypäleen mukaan. Viinit ilman vuosikertaa pysyvät ennallaan. Vinkki: vie ensin JSON-varmuuskopio. Jatketaanko?",
+  drinkrule_done: "{n} viiniä päivitetty ✓",
   barcode_miss_text: "Tätä viivakoodia ei löydy tietokannasta. Numero tallennetaan silti viinin mukana, jotta pullo tunnistetaan ensi kerralla. Kuvataanko etiketti nyt?",
   confirm_enrich_temp: "Korvataanko myös jo olemassa olevat tarjoilulämpötilat tekoälyn arvoilla (myös itse syöttämäsi)?\n\nOK = korvaa (jokainen viini kysytään tekoälyltä, mikä kestää kauemmin)\nPeruuta = täydennä vain puuttuvat lämpötilat",
   cur_auto_set: "Valuutaksi asetettiin automaattisesti {name} – muutettavissa kohdassa ”Valuutta”.",
@@ -6147,6 +6203,10 @@ ru: {
   store_filter: "Разместить: {name} · {n} бут. – коснитесь свободной ячейки",
   store_filter_off: "Показать все",
   store_back: "← В погреб",
+  drinkrule_btn: "Пересчитать окно употребления",
+  drinkrule_desc: "Пить с = год урожая + 1; пить до — по типу вина и сорту",
+  drinkrule_confirm: "Для {n} вин «пить с» будет установлено на год урожая + 1 (введённые вручную значения тоже перезаписываются), а «пить до» при необходимости скорректируется по типу вина и сорту. Вина без года урожая не меняются. Совет: сначала экспортируйте резервную копию JSON. Продолжить?",
+  drinkrule_done: "Обновлено вин: {n} ✓",
   barcode_miss_text: "Этого штрихкода нет в базе данных. Номер всё равно сохранится вместе с вином, чтобы бутылку узнали при следующем сканировании. Сфотографировать этикетку сейчас?",
   confirm_enrich_temp: "Заменить также уже имеющиеся температуры подачи значениями ИИ (в том числе введённые вами вручную)?\n\nОК = заменить (по каждому вину запрашивается ИИ, это дольше)\nОтмена = дополнить только отсутствующие температуры",
   cur_auto_set: "Валюта автоматически изменена на {name} – её можно изменить в разделе «Валюта».",
@@ -6566,6 +6626,10 @@ it: {
   store_filter: "Riponi: {name} · {n} bott. – tocca uno scomparto libero",
   store_filter_off: "Mostra tutto",
   store_back: "← Alla cantina",
+  drinkrule_btn: "Ricalcola finestra di consumo",
+  drinkrule_desc: "Bere da = annata + 1; bere fino a in base a tipo di vino e uva",
+  drinkrule_confirm: "Per {n} vini «bere da» sarà impostato su annata + 1 (anche i valori inseriti a mano vengono sovrascritti) e «bere fino a» sarà adattato, se necessario, in base a tipo di vino e uva. I vini senza annata restano invariati. Consiglio: esporta prima un backup JSON. Continuare?",
+  drinkrule_done: "{n} vino/i aggiornati ✓",
   barcode_miss_text: "Questo codice a barre non è nel database. Il numero viene comunque salvato con il vino, così la bottiglia viene riconosciuta la prossima volta. Fotografare ora l'etichetta?",
   confirm_enrich_temp: "Sostituire anche le temperature di servizio già presenti con i valori dell'IA (comprese quelle inserite da te)?\n\nOK = sostituisci (ogni vino viene interrogato con l'IA, richiede più tempo)\nAnnulla = completa solo le temperature mancanti",
   cur_auto_set: "Valuta impostata automaticamente su {name} – modificabile in «Valuta».",
@@ -6985,6 +7049,10 @@ fr: {
   store_filter: "Ranger : {name} · {n} bout. – touchez un emplacement libre",
   store_filter_off: "Tout afficher",
   store_back: "← Vers la cave",
+  drinkrule_btn: "Recalculer la fenêtre de dégustation",
+  drinkrule_desc: "Boire à partir de = millésime + 1 ; boire jusqu'à selon le type de vin et le cépage",
+  drinkrule_confirm: "Pour {n} vins, « boire à partir de » sera fixé à millésime + 1 (les valeurs saisies à la main sont aussi écrasées) et « boire jusqu'à » sera ajusté si nécessaire selon le type de vin et le cépage. Les vins sans millésime restent inchangés. Conseil : exportez d'abord une sauvegarde JSON. Continuer ?",
+  drinkrule_done: "{n} vin(s) mis à jour ✓",
   barcode_miss_text: "Ce code-barres n'est pas dans la base de données. Le numéro est tout de même enregistré avec le vin pour reconnaître la bouteille la prochaine fois. Photographier l'étiquette maintenant ?",
   confirm_enrich_temp: "Remplacer aussi les températures de service déjà présentes par les valeurs de l'IA (y compris celles que vous avez saisies vous-même) ?\n\nOK = remplacer (chaque vin est interrogé via l'IA, ce qui prend plus de temps)\nAnnuler = compléter uniquement les températures manquantes",
   cur_auto_set: "Devise définie automatiquement sur {name} – modifiable sous « Devise ».",
@@ -7404,6 +7472,10 @@ pl: {
   store_filter: "Ułóż: {name} · {n} but. – dotknij wolne miejsce",
   store_filter_off: "Pokaż wszystko",
   store_back: "← Do piwnicy",
+  drinkrule_btn: "Przelicz okno spożycia",
+  drinkrule_desc: "Pić od = rocznik + 1; pić do wg rodzaju wina i szczepu",
+  drinkrule_confirm: "Dla {n} win „pić od” zostanie ustawione na rocznik + 1 (ręcznie wpisane wartości też zostaną nadpisane), a „pić do” w razie potrzeby dopasowane do rodzaju wina i szczepu. Wina bez rocznika pozostają bez zmian. Wskazówka: najpierw wyeksportuj kopię JSON. Kontynuować?",
+  drinkrule_done: "Zaktualizowano win: {n} ✓",
   barcode_miss_text: "Tego kodu kreskowego nie ma w bazie danych. Numer i tak zostanie zapisany przy winie, aby butelka została rozpoznana następnym razem. Sfotografować teraz etykietę?",
   confirm_enrich_temp: "Czy zastąpić także istniejące temperatury podawania wartościami z AI (również te wpisane przez Ciebie)?\n\nOK = zastąp (każde wino jest sprawdzane przez AI, trwa to dłużej)\nAnuluj = uzupełnij tylko brakujące temperatury",
   cur_auto_set: "Waluta została automatycznie ustawiona na {name} – można ją zmienić w „Waluta”.",
@@ -7823,6 +7895,10 @@ hu: {
   store_filter: "Elhelyezés: {name} · {n} üveg – koppints egy szabad helyre",
   store_filter_off: "Összes mutatása",
   store_back: "← A pincéhez",
+  drinkrule_btn: "Ivási időablak újraszámítása",
+  drinkrule_desc: "Inni kezdve = évjárat + 1; inni eddig a bor típusa és a szőlő szerint",
+  drinkrule_confirm: "{n} bornál az „inni kezdve” érték évjárat + 1 lesz (a kézzel beírt értékeket is felülírja), az „inni eddig” pedig szükség esetén a bor típusa és a szőlő szerint módosul. Az évjárat nélküli borok változatlanok maradnak. Tipp: előbb exportálj JSON-mentést. Folytatod?",
+  drinkrule_done: "{n} bor frissítve ✓",
   barcode_miss_text: "Ez a vonalkód nincs az adatbázisban. A számot ettől még elmentjük a borral, hogy az üveget legközelebb felismerje. Lefényképezed most a címkét?",
   confirm_enrich_temp: "A már meglévő tálalási hőmérsékleteket is lecseréljük MI-értékekre (a saját magad által megadottakat is)?\n\nOK = csere (minden bort lekérdez az MI, ez tovább tart)\nMégse = csak a hiányzó hőmérsékletek kiegészítése",
   cur_auto_set: "A pénznem automatikusan {name} lett – módosítható a „Pénznem” alatt.",
@@ -8242,6 +8318,10 @@ cs: {
   store_filter: "Uložit: {name} · {n} lahví – klepni na volné místo",
   store_filter_off: "Zobrazit vše",
   store_back: "← Do sklepa",
+  drinkrule_btn: "Přepočítat okno pití",
+  drinkrule_desc: "Pít od = ročník + 1; pít do podle druhu vína a odrůdy",
+  drinkrule_confirm: "U {n} vín se „pít od“ nastaví na ročník + 1 (přepíšou se i ručně zadané hodnoty) a „pít do“ se podle potřeby upraví podle druhu vína a odrůdy. Vína bez ročníku zůstanou beze změny. Tip: nejdřív exportujte zálohu JSON. Pokračovat?",
+  drinkrule_done: "Aktualizováno vín: {n} ✓",
   barcode_miss_text: "Tento čárový kód není v databázi. Číslo se přesto uloží u vína, aby se láhev příště poznala. Vyfotit etiketu nyní?",
   confirm_enrich_temp: "Nahradit i již existující teploty podávání hodnotami od AI (včetně těch, které jste zadali sami)?\n\nOK = nahradit (u každého vína se dotazuje AI, trvá to déle)\nZrušit = doplnit jen chybějící teploty",
   cur_auto_set: "Měna byla automaticky nastavena na {name} – lze ji změnit v části „Měna“.",
@@ -8661,6 +8741,10 @@ sk: {
   store_filter: "Uložiť: {name} · {n} fliaš – ťukni na voľné miesto",
   store_filter_off: "Zobraziť všetko",
   store_back: "← Do pivnice",
+  drinkrule_btn: "Prepočítať okno pitia",
+  drinkrule_desc: "Piť od = ročník + 1; piť do podľa druhu vína a odrody",
+  drinkrule_confirm: "Pri {n} vínach sa „piť od“ nastaví na ročník + 1 (prepíšu sa aj ručne zadané hodnoty) a „piť do“ sa podľa potreby upraví podľa druhu vína a odrody. Vína bez ročníka zostanú bez zmeny. Tip: najprv exportujte zálohu JSON. Pokračovať?",
+  drinkrule_done: "Aktualizovaných vín: {n} ✓",
   barcode_miss_text: "Tento čiarový kód nie je v databáze. Číslo sa napriek tomu uloží pri víne, aby sa fľaša nabudúce spoznala. Odfotiť etiketu teraz?",
   confirm_enrich_temp: "Nahradiť aj už existujúce teploty podávania hodnotami od AI (vrátane tých, ktoré ste zadali sami)?\n\nOK = nahradiť (pri každom víne sa pýta AI, trvá to dlhšie)\nZrušiť = doplniť len chýbajúce teploty",
   cur_auto_set: "Mena bola automaticky nastavená na {name} – dá sa zmeniť v časti „Mena“.",
@@ -9080,6 +9164,10 @@ ro: {
   store_filter: "Așază: {name} · {n} stic. – atinge un loc liber",
   store_filter_off: "Arată tot",
   store_back: "← La pivniță",
+  drinkrule_btn: "Recalculează intervalul de consum",
+  drinkrule_desc: "De băut din = anul recoltei + 1; de băut până în funcție de tipul de vin și soi",
+  drinkrule_confirm: "Pentru {n} vinuri, „de băut din” va fi setat la anul recoltei + 1 (valorile introduse manual sunt și ele suprascrise), iar „de băut până” se ajustează, la nevoie, după tipul de vin și soi. Vinurile fără anul recoltei rămân neschimbate. Sfat: exportă mai întâi o copie JSON. Continui?",
+  drinkrule_done: "{n} vin(uri) actualizate ✓",
   barcode_miss_text: "Acest cod de bare nu se află în baza de date. Numărul se salvează oricum la vin, ca sticla să fie recunoscută data viitoare. Fotografiezi acum eticheta?",
   confirm_enrich_temp: "Înlocuiți și temperaturile de servire deja existente cu valorile AI (inclusiv cele introduse de dvs.)?\n\nOK = înlocuiește (fiecare vin este interogat prin AI, durează mai mult)\nAnulează = completează doar temperaturile lipsă",
   cur_auto_set: "Moneda a fost setată automat la {name} – poate fi modificată la „Monedă”.",
@@ -9499,6 +9587,10 @@ hr: {
   store_filter: "Pohrani: {name} · {n} boc. – dodirni slobodno mjesto",
   store_filter_off: "Prikaži sve",
   store_back: "← U podrum",
+  drinkrule_btn: "Ponovno izračunaj razdoblje pijenja",
+  drinkrule_desc: "Piti od = berba + 1; piti do prema vrsti vina i sorti",
+  drinkrule_confirm: "Za {n} vina „piti od” postavlja se na berbu + 1 (prepisuju se i ručno unesene vrijednosti), a „piti do” prema potrebi prilagođava prema vrsti vina i sorti. Vina bez berbe ostaju nepromijenjena. Savjet: prvo izvezite JSON sigurnosnu kopiju. Nastaviti?",
+  drinkrule_done: "Ažurirano vina: {n} ✓",
   barcode_miss_text: "Ovaj barkod nije u bazi podataka. Broj se ipak sprema uz vino kako bi se boca sljedeći put prepoznala. Fotografirati etiketu sada?",
   confirm_enrich_temp: "Zamijeniti i već postojeće temperature posluživanja vrijednostima umjetne inteligencije (uključujući one koje ste sami unijeli)?\n\nU redu = zamijeni (za svako vino upituje se AI, to traje dulje)\nOtkaži = dopuni samo temperature koje nedostaju",
   cur_auto_set: "Valuta je automatski postavljena na {name} – može se promijeniti pod „Valuta“.",
@@ -9918,6 +10010,10 @@ pt: {
   store_filter: "Arrumar: {name} · {n} gar. – toca num lugar livre",
   store_filter_off: "Mostrar tudo",
   store_back: "← Para a adega",
+  drinkrule_btn: "Recalcular janela de consumo",
+  drinkrule_desc: "Beber a partir de = colheita + 1; beber até conforme o tipo de vinho e a uva",
+  drinkrule_confirm: "Em {n} vinhos, «beber a partir de» será definido como colheita + 1 (os valores introduzidos à mão também são substituídos) e «beber até» será ajustado, se necessário, conforme o tipo de vinho e a uva. Os vinhos sem colheita ficam inalterados. Dica: exporte antes uma cópia JSON. Continuar?",
+  drinkrule_done: "{n} vinho(s) atualizados ✓",
   barcode_miss_text: "Este código de barras não está na base de dados. O número é guardado na mesma com o vinho para reconhecer a garrafa da próxima vez. Fotografar o rótulo agora?",
   confirm_enrich_temp: "Substituir também as temperaturas de serviço já existentes por valores da IA (incluindo as que introduziu manualmente)?\n\nOK = substituir (cada vinho é consultado pela IA, demora mais)\nCancelar = completar apenas as temperaturas em falta",
   cur_auto_set: "Moeda definida automaticamente para {name} – pode ser alterada em «Moeda».",
@@ -10337,6 +10433,10 @@ no: {
   store_filter: "Plasser: {name} · {n} fl. – trykk på en ledig plass",
   store_filter_off: "Vis alle",
   store_back: "← Til kjelleren",
+  drinkrule_btn: "Beregn drikkevindu på nytt",
+  drinkrule_desc: "Drikk fra = årgang + 1; drikk til etter vintype og drue",
+  drinkrule_confirm: "For {n} viner settes «drikk fra» til årgang + 1 (også verdier du selv har skrevet inn overskrives), og «drikk til» justeres ved behov etter vintype og drue. Viner uten årgang forblir uendret. Tips: eksporter en JSON-sikkerhetskopi først. Fortsette?",
+  drinkrule_done: "{n} vin(er) oppdatert ✓",
   barcode_miss_text: "Denne strekkoden finnes ikke i databasen. Nummeret lagres likevel sammen med vinen, slik at flasken gjenkjennes neste gang. Fotografere etiketten nå?",
   confirm_enrich_temp: "Skal eksisterende serveringstemperaturer også erstattes med AI-verdier (også de du selv har skrevet inn)?\n\nOK = erstatt (hver vin spørres via AI, det tar lengre tid)\nAvbryt = fyll bare ut manglende temperaturer",
   cur_auto_set: "Valutaen ble automatisk satt til {name} – kan endres under «Valuta».",
@@ -10756,6 +10856,10 @@ nl: {
   store_filter: "Opbergen: {name} · {n} fl. – tik op een vrij vak",
   store_filter_off: "Toon alles",
   store_back: "← Naar de kelder",
+  drinkrule_btn: "Drinkvenster opnieuw berekenen",
+  drinkrule_desc: "Drinken vanaf = jaargang + 1; drinken tot naar wijnsoort en druif",
+  drinkrule_confirm: "Bij {n} wijnen wordt „drinken vanaf” op jaargang + 1 gezet (ook met de hand ingevoerde waarden worden overschreven) en „drinken tot” zo nodig aangepast naar wijnsoort en druif. Wijnen zonder jaargang blijven ongewijzigd. Tip: exporteer eerst een JSON-back-up. Doorgaan?",
+  drinkrule_done: "{n} wijn(en) bijgewerkt ✓",
   barcode_miss_text: "Deze barcode staat niet in de database. Het nummer wordt toch bij de wijn bewaard, zodat de fles de volgende keer wordt herkend. Het etiket nu fotograferen?",
   confirm_enrich_temp: "Ook reeds bestaande serveertemperaturen vervangen door AI-waarden (ook die je zelf hebt ingevoerd)?\n\nOK = vervangen (elke wijn wordt via AI opgevraagd, dat duurt langer)\nAnnuleren = alleen ontbrekende temperaturen aanvullen",
   cur_auto_set: "Valuta automatisch ingesteld op {name} – te wijzigen onder „Valuta”.",
@@ -11175,6 +11279,10 @@ el: {
   store_filter: "Τοποθέτηση: {name} · {n} φιάλ. – πατήστε μια ελεύθερη θέση",
   store_filter_off: "Εμφάνιση όλων",
   store_back: "← Στο κελάρι",
+  drinkrule_btn: "Επανυπολογισμός παραθύρου κατανάλωσης",
+  drinkrule_desc: "Πίνετε από = έτος συγκομιδής + 1· πίνετε έως ανάλογα με τον τύπο κρασιού και την ποικιλία",
+  drinkrule_confirm: "Για {n} κρασιά, το «πίνετε από» θα οριστεί σε έτος συγκομιδής + 1 (αντικαθίστανται και οι τιμές που έχετε εισαγάγει με το χέρι) και το «πίνετε έως» θα προσαρμοστεί όπου χρειάζεται ανάλογα με τον τύπο κρασιού και την ποικιλία. Τα κρασιά χωρίς έτος συγκομιδής μένουν αμετάβλητα. Συμβουλή: εξαγάγετε πρώτα αντίγραφο JSON. Συνέχεια;",
+  drinkrule_done: "Ενημερώθηκαν {n} κρασί(ά) ✓",
   barcode_miss_text: "Αυτός ο γραμμωτός κωδικός δεν υπάρχει στη βάση δεδομένων. Ο αριθμός αποθηκεύεται παρ' όλα αυτά με το κρασί, ώστε το μπουκάλι να αναγνωριστεί την επόμενη φορά. Να φωτογραφίσετε την ετικέτα τώρα;",
   confirm_enrich_temp: "Να αντικατασταθούν και οι ήδη υπάρχουσες θερμοκρασίες σερβιρίσματος με τιμές της ΤΝ (ακόμη και αυτές που εισαγάγατε εσείς);\n\nΟΚ = αντικατάσταση (κάθε κρασί ερωτάται μέσω ΤΝ, διαρκεί περισσότερο)\nΑκύρωση = συμπλήρωση μόνο των θερμοκρασιών που λείπουν",
   cur_auto_set: "Το νόμισμα ορίστηκε αυτόματα σε {name} – μπορεί να αλλάξει στο «Νόμισμα».",
@@ -11594,6 +11702,10 @@ uk: {
   store_filter: "Розмістити: {name} · {n} пл. – торкніться вільного місця",
   store_filter_off: "Показати все",
   store_back: "← До погреба",
+  drinkrule_btn: "Перерахувати вікно вживання",
+  drinkrule_desc: "Пити з = рік урожаю + 1; пити до — за типом вина та сортом",
+  drinkrule_confirm: "Для {n} вин «пити з» буде встановлено на рік урожаю + 1 (введені вручну значення теж перезаписуються), а «пити до» за потреби скоригується за типом вина та сортом. Вина без року урожаю не змінюються. Порада: спершу експортуйте резервну копію JSON. Продовжити?",
+  drinkrule_done: "Оновлено вин: {n} ✓",
   barcode_miss_text: "Цього штрихкоду немає в базі даних. Номер усе одно збережеться разом із вином, щоб пляшку впізнали наступного разу. Сфотографувати етикетку зараз?",
   confirm_enrich_temp: "Замінити також наявні температури подачі значеннями ШІ (зокрема введені вами вручну)?\n\nОК = замінити (щодо кожного вина запитується ШІ, це довше)\nСкасувати = доповнити лише відсутні температури",
   cur_auto_set: "Валюту автоматично змінено на {name} – її можна змінити в розділі «Валюта».",
@@ -12013,6 +12125,10 @@ ja: {
   store_filter: "配置: {name} · {n}本 – 空いている場所をタップ",
   store_filter_off: "すべて表示",
   store_back: "← セラーへ戻る",
+  drinkrule_btn: "飲み頃を再計算",
+  drinkrule_desc: "飲み頃の開始 = ヴィンテージ + 1、終了はワインの種類とぶどう品種で決定",
+  drinkrule_confirm: "{n} 本のワインで「飲み頃の開始」をヴィンテージ + 1 に設定します（手入力した値も上書きされます）。「飲み頃の終了」は必要に応じてワインの種類とぶどう品種に合わせて調整します。ヴィンテージのないワインは変更されません。ヒント：先に JSON バックアップを書き出してください。続行しますか？",
+  drinkrule_done: "{n} 件のワインを更新しました ✓",
   barcode_miss_text: "このバーコードはデータベースにありません。番号はワインと一緒に保存されるので、次回からボトルを認識できます。今すぐラベルを撮影しますか？",
   confirm_enrich_temp: "すでに入力されている適温も AI の値で置き換えますか（ご自身で入力したものを含む）？\n\nOK = 置き換える（すべてのワインを AI に問い合わせるため、時間がかかります）\nキャンセル = 未入力の適温だけを補完する",
   cur_auto_set: "通貨を自動的に{name}に設定しました。「通貨」で変更できます。",
@@ -12432,6 +12548,10 @@ ko: {
   store_filter: "보관: {name} · {n}병 – 빈 칸을 탭하세요",
   store_filter_off: "모두 보기",
   store_back: "← 셀러로",
+  drinkrule_btn: "음용 시기 다시 계산",
+  drinkrule_desc: "마시기 시작 = 빈티지 + 1, 마시는 기한은 와인 종류와 품종에 따라",
+  drinkrule_confirm: "와인 {n}개의 ‘마시기 시작’을 빈티지 + 1로 설정합니다(직접 입력한 값도 덮어씁니다). ‘마시는 기한’은 필요하면 와인 종류와 품종에 맞게 조정합니다. 빈티지가 없는 와인은 그대로 둡니다. 팁: 먼저 JSON 백업을 내보내세요. 계속할까요?",
+  drinkrule_done: "와인 {n}개 업데이트 완료 ✓",
   barcode_miss_text: "이 바코드는 데이터베이스에 없습니다. 번호는 와인과 함께 저장되어 다음에 병을 알아볼 수 있습니다. 지금 라벨을 촬영할까요?",
   confirm_enrich_temp: "이미 입력된 적정 서빙 온도도 AI 값으로 바꿀까요(직접 입력한 값 포함)?\n\n확인 = 바꾸기(모든 와인을 AI에 조회하므로 시간이 더 걸립니다)\n취소 = 비어 있는 온도만 채우기",
   cur_auto_set: "통화가 자동으로 {name}(으)로 설정되었습니다. “통화”에서 변경할 수 있습니다.",
@@ -12851,6 +12971,10 @@ zh: {
   store_filter: "存放：{name} · {n} 瓶 – 请点按空位",
   store_filter_off: "显示全部",
   store_back: "← 返回酒窖",
+  drinkrule_btn: "重新计算适饮期",
+  drinkrule_desc: "适饮起点 = 年份 + 1；终点按酒的类型和葡萄品种确定",
+  drinkrule_confirm: "将为 {n} 款酒把“适饮起点”设为年份 + 1（手动输入的值也会被覆盖），并在需要时按酒的类型和葡萄品种调整“适饮终点”。没有年份的酒保持不变。提示：请先导出 JSON 备份。继续吗？",
+  drinkrule_done: "已更新 {n} 款酒 ✓",
   barcode_miss_text: "数据库中没有这个条形码。号码仍会随酒一起保存，下次就能识别这瓶酒。现在拍摄酒标吗？",
   confirm_enrich_temp: "是否也用 AI 的数值替换已有的适饮温度（包括您自己输入的）？\n\n确定 = 替换（每款酒都会向 AI 查询，耗时更长）\n取消 = 仅补全缺失的温度",
   cur_auto_set: "货币已自动设置为{name}，可在“货币”中更改。",
@@ -13270,6 +13394,10 @@ hi: {
   store_filter: "रखें: {name} · {n} बोतल – खाली स्थान पर टैप करें",
   store_filter_off: "सब दिखाएँ",
   store_back: "← सेलर पर",
+  drinkrule_btn: "पीने की अवधि दोबारा गणना करें",
+  drinkrule_desc: "पीना शुरू = विंटेज + 1; पीने की अंतिम सीमा वाइन के प्रकार और अंगूर के अनुसार",
+  drinkrule_confirm: "{n} वाइन के लिए “पीना शुरू” विंटेज + 1 पर सेट होगा (हाथ से दर्ज मान भी बदल जाएंगे) और “पीने की अंतिम सीमा” ज़रूरत पड़ने पर वाइन के प्रकार और अंगूर के अनुसार समायोजित होगी। बिना विंटेज वाली वाइन अपरिवर्तित रहेंगी। सुझाव: पहले JSON बैकअप निर्यात करें। जारी रखें?",
+  drinkrule_done: "{n} वाइन अपडेट की गईं ✓",
   barcode_miss_text: "यह बारकोड डेटाबेस में नहीं है। नंबर फिर भी वाइन के साथ सहेजा जाएगा, ताकि अगली बार बोतल पहचानी जा सके। क्या अभी लेबल की फ़ोटो लें?",
   confirm_enrich_temp: "क्या पहले से मौजूद सर्विंग तापमान को भी AI के मानों से बदलें (आपके खुद दर्ज किए गए तापमान सहित)?\n\nठीक है = बदलें (हर वाइन के लिए AI से पूछा जाएगा, इसमें अधिक समय लगेगा)\nरद्द करें = केवल गायब तापमान भरें",
   cur_auto_set: "मुद्रा अपने-आप {name} पर सेट की गई – इसे “मुद्रा” में बदला जा सकता है।",
@@ -14344,7 +14472,7 @@ async function handleScan(e) {
     if (info.region) document.getElementById('f-region').value = info.region;
     if (info.land) document.getElementById('f-country').value = info.land;
     if (info.grape) document.getElementById('f-grape').value = info.grape;
-    if (info.drinkFrom) document.getElementById('f-drink-from').value = info.drinkFrom;
+    { const yy = parseInt(document.getElementById('f-year').value); const df = ruleFrom(yy, info.drinkFrom); if (df) document.getElementById('f-drink-from').value = df; }
     if (info.drinkTo) document.getElementById('f-drink-to').value = info.drinkTo;
     fixFormDrinkWindow();
     if (info.tempFrom != null) document.getElementById('f-temp-from').value = tempToDisplay(info.tempFrom);
