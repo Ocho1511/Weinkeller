@@ -672,6 +672,16 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .rack-level-editor .rle-head > span:not(:first-child) { flex: 1; text-align: right; }
 .rack-level-editor .rle-row input.rle-name { flex: 1; width: auto; text-align: left; }
 .rack-level-editor .rle-row input { width: 80px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px; color: var(--text); font-size: 13px; text-align: right; }
+/* Aktiv-Zustand: Stift mit geöffnetem Editor, Regal-Zeile, Editor-Rahmen */
+.rack-setup-item.editing { border-bottom-color: transparent; }
+.rack-setup-item.editing .n { color: var(--gold-light, var(--gold)); }
+.rack-setup-edit.active { background: rgba(196,162,74,.28); border-color: var(--gold); box-shadow: 0 0 0 2px rgba(196,162,74,.35); }
+.rack-setup-item.editing + .rack-level-editor { border-color: var(--gold); }
+/* Flasche, die gerade umgelagert wird */
+.rack-slot.moving { outline: 2px solid var(--gold-light, var(--gold)); outline-offset: 2px; border-radius: 6px; background: rgba(196,162,74,.22); }
+.rack-slot.moving > :not(.rack-ripe):not(.rack-slot-count) { opacity: .55; }
+/* Rückmeldung beim Antippen aller Schaltflächen */
+.wine-btn:active, .scan-btn:active, .btn-primary:active, .btn-secondary:active, .filter-chip:active, .wish-action-btn:active, .rack-setup-edit:active, .rack-setup-del:active, .rack-toggle:active, .rle-del:active, .loc-chip:active { transform: scale(.96); filter: brightness(1.25); }
 .rack-setup-del { flex-shrink: 0; width: 30px; height: 30px; border-radius: 8px; border: none; background: var(--red-alert); color: #fff; font-size: 13px; cursor: pointer; }
 .input-with-scan { display: flex; gap: 8px; }
 .input-with-scan input { flex: 1; min-width: 0; }
@@ -14306,11 +14316,12 @@ function renderRacks() {
       if (entries) {
         const w = entries[0].w;
         const picked = rackFilledSlot && rackFilledSlot.rack === r.id && rackFilledSlot.e === e && rackFilledSlot.p === p;
+        const moving = !!rackMove && rackMove.rack === r.id && rackMove.e === e && rackMove.p === p;
         const badge = cap > 1 ? `<span class="rack-slot-count">${entries.length}/${cap}</span>` : '';
         let topKey = null, urgent = false;   // im Fach (Kiste) zählt der dringendste Wein
         entries.forEach(x => { const ri = ripeInfo(x.w); if (!ri) return; if (matchBlink(ri)) urgent = true; if (!topKey || RIPE_PRIO[ri.key] > RIPE_PRIO[topKey]) topKey = ri.key; });
         const dot = topKey ? `<span class="rack-ripe ripeness-${RIPE_CLASS[topKey]}"></span>` : '';
-        html += `<div class="rack-slot filled${picked?' picked':''}${dropping && entries.length < cap ? ' droppable' : ''}${urgent ? ' blinking' : ''}${slotW < 30 ? ' tiny' : ''}" data-slot="${e}|${p}" style="width:${slotW}px;height:${slotH}px" onclick="slotClick(${e},${p})" title="${esc(w.name)}${w.year?' · '+w.year:''}">${bottleVisual(w, slotW, slotMode)}${badge}${dot}</div>`;
+        html += `<div class="rack-slot filled${picked?' picked':''}${moving?' moving':''}${dropping && entries.length < cap ? ' droppable' : ''}${urgent ? ' blinking' : ''}${slotW < 30 ? ' tiny' : ''}" data-slot="${e}|${p}" style="width:${slotW}px;height:${slotH}px" onclick="slotClick(${e},${p})" title="${esc(w.name)}${w.year?' · '+w.year:''}">${bottleVisual(w, slotW, slotMode)}${badge}${dot}</div>`;
       } else html += `<div class="rack-slot${dropping?' droppable':''}" style="width:${slotW}px;height:${slotH}px" onclick="slotClick(${e},${p})"><div class="rack-empty" style="height:${Math.max(15, slotH-7)}px"></div></div>`;
     }
   }
@@ -14852,7 +14863,7 @@ function renderRackSetup() {
   const list = document.getElementById('rack-setup-list');
   if (!list) return;
   list.innerHTML = settings.racks.map((r,i) => {
-    let h = `<div class="rack-setup-item"><span class="n">${esc(r.name)}</span><span class="d">${r.rows} × ${r.cols}${r.cap > 1 ? ' · ×' + r.cap : ''}${Object.keys(r.lv || {}).length ? ' *' : ''}</span><button class="rack-setup-edit" onclick="openQrLabels(${i})" title="${esc(t('qr_btn'))}">▦</button><button class="rack-setup-edit" onclick="editRackLevels(${i})">✏️</button><button class="rack-setup-edit" onclick="clearRack(${i})" title="${esc(t('rack_clear_btn'))}">🧹</button><button class="rack-setup-del" onclick="removeRack(${i})">🗑</button></div>`;
+    let h = `<div class="rack-setup-item${i === rackEditIdx ? ' editing' : ''}"><span class="n">${esc(r.name)}</span><span class="d">${r.rows} × ${r.cols}${r.cap > 1 ? ' · ×' + r.cap : ''}${Object.keys(r.lv || {}).length ? ' *' : ''}</span><button class="rack-setup-edit" onclick="openQrLabels(${i})" title="${esc(t('qr_btn'))}">▦</button><button class="rack-setup-edit${i === rackEditIdx ? ' active' : ''}" aria-pressed="${i === rackEditIdx}" onclick="editRackLevels(${i})">✏️</button><button class="rack-setup-edit" onclick="clearRack(${i})" title="${esc(t('rack_clear_btn'))}">🧹</button><button class="rack-setup-del" onclick="removeRack(${i})">🗑</button></div>`;
     if (i === rackEditIdx) {
       h += `<div class="rack-level-editor">`;
       h += `<div class="rle-fld"><span>${t('rack_name_label')}</span><input type="text" maxlength="60" value="${esc(r.name)}" onchange="renameRack(${i},this.value)"></div>`;
