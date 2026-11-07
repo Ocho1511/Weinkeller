@@ -1870,7 +1870,7 @@ function applyTempLabels() {
   document.querySelectorAll('[data-i18n="l_temp_from"],[data-i18n="l_temp_to"]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')).replace('°C', f ? '°F' : '°C'); });
   ['f-temp-from', 'f-temp-to'].forEach(id => { const e = document.getElementById(id); if (e) { e.min = f ? 32 : 0; e.max = f ? 86 : 30; } });
 }
-function setTempUnit(u) { settings.tempUnit = u === 'F' ? 'F' : 'C'; saveSettings(); applyTempLabels(); rerenderActive(); }
+function setTempUnit(u) { settings.tempUnit = u === 'F' ? 'F' : 'C'; saveSettings(); applyTempLabels(); rerenderActive(); touchData(); }
 const serveTempHtml = (w, cls) => { const x = serveTempText(w); return x ? `<div class="${cls}" title="${esc(t('l_temp_from'))}">🌡 ${x}</div>` : ''; };
 function cleanInt(v, min, max) { const n = parseInt(v); return Number.isFinite(n) && n >= min && n <= max ? n : null; }
 // Preis aus Text: versteht "12,50", "1.234,50", "1,234.50" und Währungszeichen
@@ -2075,7 +2075,34 @@ function touchData() {
 // CLOUD-SYNC (newest wins)
 // ═══════════════════════════════════════
 function collectData() {
-  return { dv: 2, wines, wishes, drunkWines, racks: settings.racks || [], cellars: settings.cellars || [], owner: settings.owner || '' };
+  return { dv: 3, wines, wishes, drunkWines, racks: settings.racks || [], cellars: settings.cellars || [], owner: settings.owner || '', prefs: collectPrefs() };
+}
+// Einstellungen, die mit in die Cloud gehen (gerätegebundenes bleibt draußen: Sync-Code und Speicherort, E-Mail, KI-Einwilligung, Gerätekennung)
+const PREF_KEYS = ['lang', 'currency', 'font', 'celeb', 'tempUnit', 'blinkUrgent', 'blinkOver', 'blinkPeak', 'blinkOptimal'];
+function collectPrefs() { const p = {}; PREF_KEYS.forEach(k => { if (settings[k] !== undefined) p[k] = settings[k]; }); return p; }
+function cleanPrefs(p) {
+  const o = {};
+  if (!p || typeof p !== 'object' || Array.isArray(p)) return o;
+  if (typeof p.lang === 'string' && I18N[p.lang]) o.lang = p.lang;
+  if (typeof p.currency === 'string' && CURRENCIES[p.currency]) o.currency = p.currency;
+  if (typeof p.font === 'string' && FONTS[p.font]) o.font = p.font;
+  if (['both', 'confetti', 'off'].includes(p.celeb)) o.celeb = p.celeb;
+  if (p.tempUnit === 'C' || p.tempUnit === 'F') o.tempUnit = p.tempUnit;
+  ['blinkUrgent', 'blinkOver', 'blinkPeak', 'blinkOptimal'].forEach(k => { if (typeof p[k] === 'boolean') o[k] = p[k]; });
+  return o;
+}
+// Einstellungen aus der Cloud übernehmen (nur beim Übernehmen des Cloud-Stands; beim Zusammenführen gewinnen die lokalen)
+function adoptPrefs(p) {
+  const c = cleanPrefs(p);
+  let changed = false;
+  Object.keys(c).forEach(k => { if (settings[k] !== c[k]) { settings[k] = c[k]; changed = true; } });
+  if (!changed) return;
+  saveSettings();
+  try {
+    const set = (id, v) => { const e = document.getElementById(id); if (e && v != null) e.value = v; };
+    set('setup-lang', settings.lang); set('setup-currency', settings.currency); set('setup-font', settings.font || 'inter'); set('setup-celeb', settings.celeb || 'both'); set('setup-tempunit', settings.tempUnit === 'F' ? 'F' : 'C');
+    applyI18n();
+  } catch (e) {}
 }
 function persistAll() {
   safeSet(STORE_KEY, JSON.stringify(wines));
@@ -2092,6 +2119,7 @@ function applyData(d) {
   fixRackCellars();
   settings.owner = cleanStr(d.owner, 60);
   persistAll();
+  adoptPrefs(d.prefs);
 }
 // Cloud-Stand mit den lokalen Daten zusammenführen: Vereinigung nach id, bei gleicher id gewinnt die lokale Version
 function mergeById(local, remote) {
@@ -13370,13 +13398,13 @@ function applyFont() {
   if (settings.font && settings.font !== 'inter') root.style.setProperty('--heading-font', FONTS[settings.font]);
   else root.style.removeProperty('--heading-font');
 }
-function setFont(f) { settings.font = f; saveSettings(); applyFont(); }
+function setFont(f) { settings.font = f; saveSettings(); applyFont(); touchData(); }
 
 // ═══════════════════════════════════════
 // FEIER BEIM TRINKEN: Konfetti von oben + kurzer Jubel-Sound.
 // Alles selbst erzeugt (Canvas und Web Audio): keine Sound-Dateien, keine Bibliotheken, keine Rechte Dritter.
 // ═══════════════════════════════════════
-function setCelebrate(v) { settings.celeb = v; saveSettings(); }
+function setCelebrate(v) { settings.celeb = v; saveSettings(); touchData(); }
 let audioCtx = null;
 function audioContext() {
   const AC = window.AudioContext || window.webkitAudioContext;
@@ -13451,8 +13479,8 @@ function celebrate() {
   } catch (e) { /* die Feier ist nur eine Zugabe und darf das Trinken nie stören */ }
 }
 
-function setCurrency(c) { settings.currency = c; saveSettings(); applyI18n(); }
-function setLanguage(l) { settings.lang = l; saveSettings(); applyI18n(); }
+function setCurrency(c) { settings.currency = c; saveSettings(); applyI18n(); touchData(); }
+function setLanguage(l) { settings.lang = l; saveSettings(); applyI18n(); touchData(); }
 function setOwner(v) { settings.owner = (v||'').trim(); saveSettings(); touchData(); applyI18n(); }
 
 // ═══════════════════════════════════════
@@ -14901,7 +14929,7 @@ function deleteWineFromRack(id) {
   wines = wines.filter(x => x.id !== id);
   save(); rackFilledSlot = null; renderRacks(); showToast(t('toast_removed'));
 }
-function toggleRackBlink(key) { key = 'blink' + (key || 'Urgent'); settings[key] = !settings[key]; saveSettings(); renderRacks(); }
+function toggleRackBlink(key) { key = 'blink' + (key || 'Urgent'); settings[key] = !settings[key]; saveSettings(); touchData(); renderRacks(); }
 // Trinkreife eines Weins fürs Regal: Zustand (wie in der Trinkreife-Ansicht) und "dringend" = überschritten
 // oder spätestens nächstes Jahr am Ende des Trinkfensters; null ohne Angabe
 const RIPE_PRIO = { young: 0, optimal: 1, peak: 2, over: 3 };
