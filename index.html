@@ -655,8 +655,14 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .rack-setup-edit { flex-shrink: 0; width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); font-size: 13px; cursor: pointer; }
 .rack-level-editor { margin: 4px 0 10px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--card); }
 .rack-level-editor .rle-title { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
-.rack-level-editor .rle-add { margin-top: 10px; }
-.rack-level-editor .rle-add .wine-btn { width: 100%; }
+.rack-level-editor .rle-add { display: flex; gap: 8px; margin-top: 10px; }
+.rack-level-editor .rle-add .wine-btn { flex: 1; width: auto; }
+.rack-level-editor .rle-fld { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 4px 0; font-size: 13px; color: var(--text); }
+.rack-level-editor .rle-fld input { width: 150px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px; color: var(--text); font-size: 13px; }
+.rack-level-editor .rle-fld input[type=number] { width: 80px; text-align: right; }
+.rack-level-editor .rle-title { margin-top: 8px; }
+.rack-level-editor .rle-del { flex-shrink: 0; width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--text-muted); font-size: 12px; cursor: pointer; }
+.rack-level-editor .rle-del:disabled { opacity: .35; cursor: default; }
 .rack-level-editor .rle-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 4px 0; font-size: 13px; color: var(--text); }
 .rack-level-editor .rle-row > span:first-child { width: 28px; color: var(--text-muted); }
 .rack-level-editor .rle-head { font-size: 11px; color: var(--text-muted); }
@@ -3401,6 +3407,19 @@ de: {
   store_filter: "Einlagern: {name} · {n} Fl. – freies Fach antippen",
   store_filter_off: "Alle anzeigen",
   store_back: "← Zum Keller",
+  rack_name_label: "Regalname",
+  rack_cols_label: "Plätze pro Ebene",
+  rack_add_top: "+ Ebene oben",
+  rack_add_bottom: "+ Ebene unten",
+  rack_remove_level: "Ebene entfernen",
+  rack_remove_head: "Ebene {e} von „{name}“ entfernen?",
+  rack_remove_bottles: "{n} Flaschen werden aus dem Regal genommen und gelten danach als „nicht eingelagert“. Die Weine selbst bleiben im Keller erhalten.",
+  rack_add_bottom_head: "Unten eine neue Ebene hinzufügen?",
+  rack_renumber_note: "Dabei ändern sich die Nummern der anderen Ebenen. Die Belegung bleibt erhalten. Bereits gedruckte QR-Etiketten der Ebenen müssen neu gedruckt werden.",
+  rack_cols_confirm: "Plätze pro Ebene von {old} auf {new} verringern?\n\n{n} Flaschen in den wegfallenden Plätzen werden aus dem Regal genommen und gelten danach als „nicht eingelagert“.",
+  rack_renamed: "Regal umbenannt: {name}",
+  rack_level_removed: "Ebene {e} entfernt",
+  rack_cols_set: "{n} Plätze pro Ebene",
   rack_add_level: "Ebene hinzufügen",
   rack_level_added: "Ebene {e} mit {n} Plätzen hinzugefügt",
   rack_clear_btn: "Regal leeren",
@@ -3788,6 +3807,19 @@ en: {
   store_filter: "Store: {name} · {n} btl. – tap a free slot",
   store_filter_off: "Show all",
   store_back: "← To cellar",
+  rack_name_label: "Rack name",
+  rack_cols_label: "Places per level",
+  rack_add_top: "+ Level on top",
+  rack_add_bottom: "+ Level at bottom",
+  rack_remove_level: "Remove level",
+  rack_remove_head: "Remove level {e} from “{name}”?",
+  rack_remove_bottles: "{n} bottles will be taken out of the rack and will then count as “not stored”. The wines themselves remain in the cellar.",
+  rack_add_bottom_head: "Add a new level at the bottom?",
+  rack_renumber_note: "This changes the numbers of the other levels. The occupancy is kept. QR labels of the levels that have already been printed must be printed again.",
+  rack_cols_confirm: "Reduce places per level from {old} to {new}?\n\n{n} bottles in the places that are removed will be taken out of the rack and will then count as “not stored”.",
+  rack_renamed: "Rack renamed: {name}",
+  rack_level_removed: "Level {e} removed",
+  rack_cols_set: "{n} places per level",
   rack_add_level: "Add level",
   rack_level_added: "Level {e} with {n} places added",
   rack_clear_btn: "Empty rack",
@@ -4175,6 +4207,19 @@ es: {
   store_filter: "Colocar: {name} · {n} bot. – toca un hueco libre",
   store_filter_off: "Mostrar todo",
   store_back: "← A la bodega",
+  rack_name_label: "Nombre del botellero",
+  rack_cols_label: "Huecos por nivel",
+  rack_add_top: "+ Nivel arriba",
+  rack_add_bottom: "+ Nivel abajo",
+  rack_remove_level: "Quitar nivel",
+  rack_remove_head: "¿Quitar el nivel {e} de «{name}»?",
+  rack_remove_bottles: "{n} botellas se sacarán del botellero y pasarán a considerarse «no almacenadas». Los vinos en sí se conservan en la bodega.",
+  rack_add_bottom_head: "¿Añadir un nivel nuevo abajo?",
+  rack_renumber_note: "Esto cambia la numeración de los demás niveles. La ocupación se mantiene. Las etiquetas QR de los niveles ya impresas deben imprimirse de nuevo.",
+  rack_cols_confirm: "¿Reducir los huecos por nivel de {old} a {new}?\n\n{n} botellas de los huecos que desaparecen se sacarán del botellero y pasarán a considerarse «no almacenadas».",
+  rack_renamed: "Botellero renombrado: {name}",
+  rack_level_removed: "Nivel {e} eliminado",
+  rack_cols_set: "{n} huecos por nivel",
   rack_add_level: "Añadir nivel",
   rack_level_added: "Nivel {e} con {n} huecos añadido",
   rack_clear_btn: "Vaciar estante",
@@ -4562,6 +4607,19 @@ sv: {
   store_filter: "Placera: {name} · {n} fl. – tryck på en ledig plats",
   store_filter_off: "Visa alla",
   store_back: "← Till källaren",
+  rack_name_label: "Vinställets namn",
+  rack_cols_label: "Platser per nivå",
+  rack_add_top: "+ Nivå överst",
+  rack_add_bottom: "+ Nivå nederst",
+  rack_remove_level: "Ta bort nivå",
+  rack_remove_head: "Ta bort nivå {e} från ”{name}”?",
+  rack_remove_bottles: "{n} flaskor tas ut ur vinstället och räknas därefter som ”ej inlagrade”. Själva vinerna finns kvar i källaren.",
+  rack_add_bottom_head: "Lägga till en ny nivå nederst?",
+  rack_renumber_note: "Då ändras numren på de andra nivåerna. Beläggningen behålls. Redan utskrivna QR-etiketter för nivåerna måste skrivas ut på nytt.",
+  rack_cols_confirm: "Minska platser per nivå från {old} till {new}?\n\n{n} flaskor på de platser som tas bort tas ut ur vinstället och räknas därefter som ”ej inlagrade”.",
+  rack_renamed: "Vinställ omdöpt: {name}",
+  rack_level_removed: "Nivå {e} borttagen",
+  rack_cols_set: "{n} platser per nivå",
   rack_add_level: "Lägg till nivå",
   rack_level_added: "Nivå {e} med {n} platser tillagd",
   rack_clear_btn: "Töm hyllan",
@@ -4949,6 +5007,19 @@ da: {
   store_filter: "Placér: {name} · {n} fl. – tryk på en ledig plads",
   store_filter_off: "Vis alle",
   store_back: "← Til kælderen",
+  rack_name_label: "Reolens navn",
+  rack_cols_label: "Pladser pr. niveau",
+  rack_add_top: "+ Niveau øverst",
+  rack_add_bottom: "+ Niveau nederst",
+  rack_remove_level: "Fjern niveau",
+  rack_remove_head: "Fjern niveau {e} fra »{name}«?",
+  rack_remove_bottles: "{n} flasker tages ud af reolen og regnes derefter som »ikke lagret«. Selve vinene bliver i kælderen.",
+  rack_add_bottom_head: "Tilføj et nyt niveau nederst?",
+  rack_renumber_note: "Det ændrer numrene på de andre niveauer. Belægningen bevares. Allerede udskrevne QR-etiketter til niveauerne skal udskrives igen.",
+  rack_cols_confirm: "Reducer pladser pr. niveau fra {old} til {new}?\n\n{n} flasker på de pladser, der bortfalder, tages ud af reolen og regnes derefter som »ikke lagret«.",
+  rack_renamed: "Reol omdøbt: {name}",
+  rack_level_removed: "Niveau {e} fjernet",
+  rack_cols_set: "{n} pladser pr. niveau",
   rack_add_level: "Tilføj niveau",
   rack_level_added: "Niveau {e} med {n} pladser tilføjet",
   rack_clear_btn: "Tøm reol",
@@ -5336,6 +5407,19 @@ fi: {
   store_filter: "Sijoita: {name} · {n} pul. – napauta vapaata paikkaa",
   store_filter_off: "Näytä kaikki",
   store_back: "← Kellariin",
+  rack_name_label: "Telineen nimi",
+  rack_cols_label: "Paikkoja tasoa kohden",
+  rack_add_top: "+ Taso ylös",
+  rack_add_bottom: "+ Taso alas",
+  rack_remove_level: "Poista taso",
+  rack_remove_head: "Poistetaanko taso {e} telineestä ”{name}”?",
+  rack_remove_bottles: "{n} pulloa otetaan pois telineestä, ja niiden katsotaan sen jälkeen olevan ”ei varastoituna”. Viinit itse säilyvät kellarissa.",
+  rack_add_bottom_head: "Lisätäänkö uusi taso alas?",
+  rack_renumber_note: "Tällöin muiden tasojen numerot muuttuvat. Paikkojen täyttö säilyy. Jo tulostetut tasojen QR-tarrat on tulostettava uudelleen.",
+  rack_cols_confirm: "Vähennetäänkö paikkoja tasoa kohden? ({old} → {new})\n\n{n} pulloa poistuvilla paikoilla otetaan pois telineestä, ja niiden katsotaan sen jälkeen olevan ”ei varastoituna”.",
+  rack_renamed: "Teline nimetty uudelleen: {name}",
+  rack_level_removed: "Taso {e} poistettu",
+  rack_cols_set: "{n} paikkaa tasoa kohden",
   rack_add_level: "Lisää taso",
   rack_level_added: "Taso {e} ja {n} paikkaa lisätty",
   rack_clear_btn: "Tyhjennä hylly",
@@ -5723,6 +5807,19 @@ ru: {
   store_filter: "Разместить: {name} · {n} бут. – коснитесь свободной ячейки",
   store_filter_off: "Показать все",
   store_back: "← В погреб",
+  rack_name_label: "Название стеллажа",
+  rack_cols_label: "Мест на уровне",
+  rack_add_top: "+ Уровень сверху",
+  rack_add_bottom: "+ Уровень снизу",
+  rack_remove_level: "Удалить уровень",
+  rack_remove_head: "Удалить уровень {e} стеллажа «{name}»?",
+  rack_remove_bottles: "{n} бутылок будут извлечены из стеллажа и после этого будут считаться «не на хранении». Сами вина остаются в погребе.",
+  rack_add_bottom_head: "Добавить новый уровень снизу?",
+  rack_renumber_note: "При этом изменятся номера остальных уровней. Заполнение сохранится. Уже распечатанные QR-этикетки уровней нужно будет напечатать заново.",
+  rack_cols_confirm: "Уменьшить число мест на уровне с {old} до {new}?\n\n{n} бутылок на удаляемых местах будут извлечены из стеллажа и после этого будут считаться «не на хранении».",
+  rack_renamed: "Стеллаж переименован: {name}",
+  rack_level_removed: "Уровень {e} удалён",
+  rack_cols_set: "Мест на уровне: {n}",
   rack_add_level: "Добавить уровень",
   rack_level_added: "Уровень {e} с {n} местами добавлен",
   rack_clear_btn: "Очистить стеллаж",
@@ -6110,6 +6207,19 @@ it: {
   store_filter: "Riponi: {name} · {n} bott. – tocca uno scomparto libero",
   store_filter_off: "Mostra tutto",
   store_back: "← Alla cantina",
+  rack_name_label: "Nome dello scaffale",
+  rack_cols_label: "Posti per livello",
+  rack_add_top: "+ Livello in alto",
+  rack_add_bottom: "+ Livello in basso",
+  rack_remove_level: "Rimuovi livello",
+  rack_remove_head: "Rimuovere il livello {e} di «{name}»?",
+  rack_remove_bottles: "{n} bottiglie verranno tolte dallo scaffale e da quel momento risulteranno «non stoccate». I vini stessi restano in cantina.",
+  rack_add_bottom_head: "Aggiungere un nuovo livello in basso?",
+  rack_renumber_note: "Cambieranno i numeri degli altri livelli. L'occupazione viene mantenuta. Le etichette QR dei livelli già stampate dovranno essere stampate di nuovo.",
+  rack_cols_confirm: "Ridurre i posti per livello da {old} a {new}?\n\n{n} bottiglie nei posti che vengono eliminati verranno tolte dallo scaffale e da quel momento risulteranno «non stoccate».",
+  rack_renamed: "Scaffale rinominato: {name}",
+  rack_level_removed: "Livello {e} rimosso",
+  rack_cols_set: "{n} posti per livello",
   rack_add_level: "Aggiungi livello",
   rack_level_added: "Livello {e} con {n} posti aggiunto",
   rack_clear_btn: "Svuota scaffale",
@@ -6497,6 +6607,19 @@ fr: {
   store_filter: "Ranger : {name} · {n} bout. – touchez un emplacement libre",
   store_filter_off: "Tout afficher",
   store_back: "← Vers la cave",
+  rack_name_label: "Nom du casier",
+  rack_cols_label: "Emplacements par niveau",
+  rack_add_top: "+ Niveau en haut",
+  rack_add_bottom: "+ Niveau en bas",
+  rack_remove_level: "Supprimer le niveau",
+  rack_remove_head: "Supprimer le niveau {e} de « {name} » ?",
+  rack_remove_bottles: "{n} bouteilles seront retirées du casier et seront ensuite considérées comme « non stockées ». Les vins eux-mêmes restent dans la cave.",
+  rack_add_bottom_head: "Ajouter un nouveau niveau en bas ?",
+  rack_renumber_note: "Les numéros des autres niveaux vont changer. L’occupation est conservée. Les étiquettes QR des niveaux déjà imprimées devront être réimprimées.",
+  rack_cols_confirm: "Réduire les emplacements par niveau de {old} à {new} ?\n\n{n} bouteilles situées dans les emplacements supprimés seront retirées du casier et seront ensuite considérées comme « non stockées ».",
+  rack_renamed: "Casier renommé : {name}",
+  rack_level_removed: "Niveau {e} supprimé",
+  rack_cols_set: "{n} emplacements par niveau",
   rack_add_level: "Ajouter un niveau",
   rack_level_added: "Niveau {e} avec {n} emplacements ajouté",
   rack_clear_btn: "Vider l’étagère",
@@ -6884,6 +7007,19 @@ pl: {
   store_filter: "Ułóż: {name} · {n} but. – dotknij wolne miejsce",
   store_filter_off: "Pokaż wszystko",
   store_back: "← Do piwnicy",
+  rack_name_label: "Nazwa regału",
+  rack_cols_label: "Miejsc na poziom",
+  rack_add_top: "+ Poziom na górze",
+  rack_add_bottom: "+ Poziom na dole",
+  rack_remove_level: "Usuń poziom",
+  rack_remove_head: "Usunąć poziom {e} z regału „{name}”?",
+  rack_remove_bottles: "{n} butelek zostanie zdjętych z regału i od tej chwili będzie uznawanych za „niezmagazynowane”. Same wina pozostają w piwnicy.",
+  rack_add_bottom_head: "Dodać nowy poziom na dole?",
+  rack_renumber_note: "Zmienią się numery pozostałych poziomów. Zajętość miejsc zostanie zachowana. Wydrukowane już etykiety QR poziomów trzeba będzie wydrukować ponownie.",
+  rack_cols_confirm: "Zmniejszyć liczbę miejsc na poziom z {old} do {new}?\n\n{n} butelek na likwidowanych miejscach zostanie zdjętych z regału i od tej chwili będzie uznawanych za „niezmagazynowane”.",
+  rack_renamed: "Zmieniono nazwę regału: {name}",
+  rack_level_removed: "Usunięto poziom {e}",
+  rack_cols_set: "Miejsc na poziom: {n}",
   rack_add_level: "Dodaj poziom",
   rack_level_added: "Dodano poziom {e} z {n} miejscami",
   rack_clear_btn: "Opróżnij regał",
@@ -7271,6 +7407,19 @@ hu: {
   store_filter: "Elhelyezés: {name} · {n} üveg – koppints egy szabad helyre",
   store_filter_off: "Összes mutatása",
   store_back: "← A pincéhez",
+  rack_name_label: "Állvány neve",
+  rack_cols_label: "Hely szintenként",
+  rack_add_top: "+ Szint felül",
+  rack_add_bottom: "+ Szint alul",
+  rack_remove_level: "Szint eltávolítása",
+  rack_remove_head: "Eltávolítja az {e}. szintet a(z) „{name}” állványról?",
+  rack_remove_bottles: "{n} palack kikerül az állványból, és ezután „nem tárolt” állapotúnak számít. Maguk a borok megmaradnak a pincében.",
+  rack_add_bottom_head: "Hozzáad egy új szintet alulra?",
+  rack_renumber_note: "Ezzel a többi szint száma megváltozik. A kihelyezés megmarad. A szintek már kinyomtatott QR-címkéit újra ki kell nyomtatni.",
+  rack_cols_confirm: "Csökkenti a szintenkénti helyek számát? ({old} → {new})\n\nA megszűnő helyeken lévő {n} palack kikerül az állványból, és ezután „nem tárolt” állapotúnak számít.",
+  rack_renamed: "Állvány átnevezve: {name}",
+  rack_level_removed: "{e}. szint eltávolítva",
+  rack_cols_set: "{n} hely szintenként",
   rack_add_level: "Szint hozzáadása",
   rack_level_added: "{e}. szint {n} hellyel hozzáadva",
   rack_clear_btn: "Állvány kiürítése",
@@ -7658,6 +7807,19 @@ cs: {
   store_filter: "Uložit: {name} · {n} lahví – klepni na volné místo",
   store_filter_off: "Zobrazit vše",
   store_back: "← Do sklepa",
+  rack_name_label: "Název regálu",
+  rack_cols_label: "Míst na úroveň",
+  rack_add_top: "+ Úroveň nahoře",
+  rack_add_bottom: "+ Úroveň dole",
+  rack_remove_level: "Odebrat úroveň",
+  rack_remove_head: "Odebrat úroveň {e} z regálu „{name}“?",
+  rack_remove_bottles: "{n} lahví bude vyjmuto z regálu a poté se budou považovat za „neuskladněné“. Samotná vína zůstanou ve sklepě.",
+  rack_add_bottom_head: "Přidat dole novou úroveň?",
+  rack_renumber_note: "Tím se změní čísla ostatních úrovní. Obsazení zůstane zachováno. Již vytištěné QR štítky úrovní je třeba vytisknout znovu.",
+  rack_cols_confirm: "Snížit počet míst na úroveň z {old} na {new}?\n\n{n} lahví na zanikajících místech bude vyjmuto z regálu a poté se budou považovat za „neuskladněné“.",
+  rack_renamed: "Regál přejmenován: {name}",
+  rack_level_removed: "Úroveň {e} odebrána",
+  rack_cols_set: "Míst na úroveň: {n}",
   rack_add_level: "Přidat úroveň",
   rack_level_added: "Úroveň {e} s {n} místy přidána",
   rack_clear_btn: "Vyprázdnit regál",
@@ -8045,6 +8207,19 @@ sk: {
   store_filter: "Uložiť: {name} · {n} fliaš – ťukni na voľné miesto",
   store_filter_off: "Zobraziť všetko",
   store_back: "← Do pivnice",
+  rack_name_label: "Názov regála",
+  rack_cols_label: "Miest na úroveň",
+  rack_add_top: "+ Úroveň hore",
+  rack_add_bottom: "+ Úroveň dole",
+  rack_remove_level: "Odstrániť úroveň",
+  rack_remove_head: "Odstrániť úroveň {e} z regála „{name}“?",
+  rack_remove_bottles: "{n} fliaš sa vyberie z regála a potom sa budú považovať za „neuskladnené“. Samotné vína zostanú v pivnici.",
+  rack_add_bottom_head: "Pridať dole novú úroveň?",
+  rack_renumber_note: "Tým sa zmenia čísla ostatných úrovní. Obsadenie zostane zachované. Už vytlačené QR štítky úrovní treba vytlačiť znova.",
+  rack_cols_confirm: "Znížiť počet miest na úroveň z {old} na {new}?\n\n{n} fliaš na miestach, ktoré zaniknú, sa vyberie z regála a potom sa budú považovať za „neuskladnené“.",
+  rack_renamed: "Regál premenovaný: {name}",
+  rack_level_removed: "Úroveň {e} odstránená",
+  rack_cols_set: "Miest na úroveň: {n}",
   rack_add_level: "Pridať úroveň",
   rack_level_added: "Úroveň {e} s {n} miestami pridaná",
   rack_clear_btn: "Vyprázdniť regál",
@@ -8432,6 +8607,19 @@ ro: {
   store_filter: "Așază: {name} · {n} stic. – atinge un loc liber",
   store_filter_off: "Arată tot",
   store_back: "← La pivniță",
+  rack_name_label: "Numele raftului",
+  rack_cols_label: "Locuri pe nivel",
+  rack_add_top: "+ Nivel sus",
+  rack_add_bottom: "+ Nivel jos",
+  rack_remove_level: "Elimină nivelul",
+  rack_remove_head: "Elimini nivelul {e} din „{name}”?",
+  rack_remove_bottles: "{n} sticle vor fi scoase din raft și vor fi considerate apoi „nedepozitate”. Vinurile în sine rămân în pivniță.",
+  rack_add_bottom_head: "Adaugi un nivel nou jos?",
+  rack_renumber_note: "Se modifică astfel numerele celorlalte niveluri. Ocuparea se păstrează. Etichetele QR ale nivelurilor deja tipărite trebuie tipărite din nou.",
+  rack_cols_confirm: "Reduci locurile pe nivel de la {old} la {new}?\n\n{n} sticle din locurile care dispar vor fi scoase din raft și vor fi considerate apoi „nedepozitate”.",
+  rack_renamed: "Raft redenumit: {name}",
+  rack_level_removed: "Nivelul {e} a fost eliminat",
+  rack_cols_set: "{n} locuri pe nivel",
   rack_add_level: "Adaugă nivel",
   rack_level_added: "Nivelul {e} cu {n} locuri a fost adăugat",
   rack_clear_btn: "Golește raftul",
@@ -8819,6 +9007,19 @@ hr: {
   store_filter: "Pohrani: {name} · {n} boc. – dodirni slobodno mjesto",
   store_filter_off: "Prikaži sve",
   store_back: "← U podrum",
+  rack_name_label: "Naziv regala",
+  rack_cols_label: "Mjesta po razini",
+  rack_add_top: "+ Razina gore",
+  rack_add_bottom: "+ Razina dolje",
+  rack_remove_level: "Ukloni razinu",
+  rack_remove_head: "Ukloniti razinu {e} iz regala „{name}“?",
+  rack_remove_bottles: "Iz regala će se izvaditi {n} boca, koje se nakon toga smatraju „nepohranjenima“. Sama vina ostaju u podrumu.",
+  rack_add_bottom_head: "Dodati novu razinu dolje?",
+  rack_renumber_note: "Time se mijenjaju brojevi ostalih razina. Popunjenost ostaje sačuvana. Već ispisane QR oznake razina treba ponovno ispisati.",
+  rack_cols_confirm: "Smanjiti broj mjesta po razini s {old} na {new}?\n\nIz regala će se izvaditi {n} boca s mjesta koja otpadaju, a nakon toga se smatraju „nepohranjenima“.",
+  rack_renamed: "Regal preimenovan: {name}",
+  rack_level_removed: "Razina {e} uklonjena",
+  rack_cols_set: "Mjesta po razini: {n}",
   rack_add_level: "Dodaj razinu",
   rack_level_added: "Razina {e} s {n} mjesta dodana",
   rack_clear_btn: "Isprazni regal",
@@ -9206,6 +9407,19 @@ pt: {
   store_filter: "Arrumar: {name} · {n} gar. – toca num lugar livre",
   store_filter_off: "Mostrar tudo",
   store_back: "← Para a adega",
+  rack_name_label: "Nome da estante",
+  rack_cols_label: "Lugares por nível",
+  rack_add_top: "+ Nível em cima",
+  rack_add_bottom: "+ Nível em baixo",
+  rack_remove_level: "Remover nível",
+  rack_remove_head: "Remover o nível {e} de «{name}»?",
+  rack_remove_bottles: "{n} garrafas serão retiradas da estante e passarão a contar como «não armazenadas». Os vinhos em si permanecem na adega.",
+  rack_add_bottom_head: "Adicionar um novo nível em baixo?",
+  rack_renumber_note: "Os números dos outros níveis serão alterados. A ocupação mantém-se. As etiquetas QR dos níveis já impressas têm de ser impressas novamente.",
+  rack_cols_confirm: "Reduzir os lugares por nível de {old} para {new}?\n\n{n} garrafas nos lugares que deixam de existir serão retiradas da estante e passarão a contar como «não armazenadas».",
+  rack_renamed: "Estante renomeada: {name}",
+  rack_level_removed: "Nível {e} removido",
+  rack_cols_set: "{n} lugares por nível",
   rack_add_level: "Adicionar nível",
   rack_level_added: "Nível {e} com {n} lugares adicionado",
   rack_clear_btn: "Esvaziar estante",
@@ -9593,6 +9807,19 @@ no: {
   store_filter: "Plasser: {name} · {n} fl. – trykk på en ledig plass",
   store_filter_off: "Vis alle",
   store_back: "← Til kjelleren",
+  rack_name_label: "Navn på reolen",
+  rack_cols_label: "Plasser per nivå",
+  rack_add_top: "+ Nivå øverst",
+  rack_add_bottom: "+ Nivå nederst",
+  rack_remove_level: "Fjern nivå",
+  rack_remove_head: "Fjerne nivå {e} fra «{name}»?",
+  rack_remove_bottles: "{n} flasker tas ut av reolen og regnes deretter som «ikke lagret». Selve vinene blir værende i kjelleren.",
+  rack_add_bottom_head: "Legge til et nytt nivå nederst?",
+  rack_renumber_note: "Da endres numrene på de andre nivåene. Belegget beholdes. QR-etiketter for nivåene som allerede er skrevet ut, må skrives ut på nytt.",
+  rack_cols_confirm: "Redusere plasser per nivå fra {old} til {new}?\n\n{n} flasker på plassene som faller bort, tas ut av reolen og regnes deretter som «ikke lagret».",
+  rack_renamed: "Reol omdøpt: {name}",
+  rack_level_removed: "Nivå {e} fjernet",
+  rack_cols_set: "{n} plasser per nivå",
   rack_add_level: "Legg til nivå",
   rack_level_added: "Nivå {e} med {n} plasser lagt til",
   rack_clear_btn: "Tøm hylle",
@@ -9980,6 +10207,19 @@ nl: {
   store_filter: "Opbergen: {name} · {n} fl. – tik op een vrij vak",
   store_filter_off: "Toon alles",
   store_back: "← Naar de kelder",
+  rack_name_label: "Naam van het rek",
+  rack_cols_label: "Plaatsen per niveau",
+  rack_add_top: "+ Niveau boven",
+  rack_add_bottom: "+ Niveau onder",
+  rack_remove_level: "Niveau verwijderen",
+  rack_remove_head: "Niveau {e} van „{name}” verwijderen?",
+  rack_remove_bottles: "{n} flessen worden uit het rek gehaald en tellen daarna als „niet opgeslagen”. De wijnen zelf blijven in de kelder behouden.",
+  rack_add_bottom_head: "Onderaan een nieuw niveau toevoegen?",
+  rack_renumber_note: "Hierdoor veranderen de nummers van de andere niveaus. De bezetting blijft behouden. Al afgedrukte QR-labels van de niveaus moeten opnieuw worden afgedrukt.",
+  rack_cols_confirm: "Plaatsen per niveau verlagen van {old} naar {new}?\n\n{n} flessen op de vervallende plaatsen worden uit het rek gehaald en tellen daarna als „niet opgeslagen”.",
+  rack_renamed: "Rek hernoemd: {name}",
+  rack_level_removed: "Niveau {e} verwijderd",
+  rack_cols_set: "{n} plaatsen per niveau",
   rack_add_level: "Niveau toevoegen",
   rack_level_added: "Niveau {e} met {n} plaatsen toegevoegd",
   rack_clear_btn: "Rek legen",
@@ -10367,6 +10607,19 @@ el: {
   store_filter: "Τοποθέτηση: {name} · {n} φιάλ. – πατήστε μια ελεύθερη θέση",
   store_filter_off: "Εμφάνιση όλων",
   store_back: "← Στο κελάρι",
+  rack_name_label: "Όνομα ραφιού",
+  rack_cols_label: "Θέσεις ανά επίπεδο",
+  rack_add_top: "+ Επίπεδο πάνω",
+  rack_add_bottom: "+ Επίπεδο κάτω",
+  rack_remove_level: "Αφαίρεση επιπέδου",
+  rack_remove_head: "Να αφαιρεθεί το επίπεδο {e} από το «{name}»;",
+  rack_remove_bottles: "{n} φιάλες θα αφαιρεθούν από το ράφι και στη συνέχεια θα θεωρούνται «μη αποθηκευμένες». Τα ίδια τα κρασιά παραμένουν στο κελάρι.",
+  rack_add_bottom_head: "Να προστεθεί νέο επίπεδο στο κάτω μέρος;",
+  rack_renumber_note: "Οι αριθμοί των άλλων επιπέδων θα αλλάξουν. Η πληρότητα διατηρείται. Οι ήδη εκτυπωμένες ετικέτες QR των επιπέδων πρέπει να εκτυπωθούν ξανά.",
+  rack_cols_confirm: "Να μειωθούν οι θέσεις ανά επίπεδο από {old} σε {new};\n\n{n} φιάλες στις θέσεις που καταργούνται θα αφαιρεθούν από το ράφι και στη συνέχεια θα θεωρούνται «μη αποθηκευμένες».",
+  rack_renamed: "Το ράφι μετονομάστηκε: {name}",
+  rack_level_removed: "Το επίπεδο {e} αφαιρέθηκε",
+  rack_cols_set: "{n} θέσεις ανά επίπεδο",
   rack_add_level: "Προσθήκη επιπέδου",
   rack_level_added: "Προστέθηκε επίπεδο {e} με {n} θέσεις",
   rack_clear_btn: "Άδειασμα ραφιού",
@@ -10754,6 +11007,19 @@ uk: {
   store_filter: "Розмістити: {name} · {n} пл. – торкніться вільного місця",
   store_filter_off: "Показати все",
   store_back: "← До погреба",
+  rack_name_label: "Назва стелажа",
+  rack_cols_label: "Місць на рівні",
+  rack_add_top: "+ Рівень зверху",
+  rack_add_bottom: "+ Рівень знизу",
+  rack_remove_level: "Видалити рівень",
+  rack_remove_head: "Видалити рівень {e} зі стелажа «{name}»?",
+  rack_remove_bottles: "{n} пляшок буде вилучено зі стелажа, і після цього вони вважатимуться «не на зберіганні». Самі вина залишаються в погребі.",
+  rack_add_bottom_head: "Додати новий рівень знизу?",
+  rack_renumber_note: "Номери інших рівнів зміняться. Заповнення збережеться. Уже надруковані QR-етикетки рівнів потрібно буде надрукувати знову.",
+  rack_cols_confirm: "Зменшити кількість місць на рівні з {old} до {new}?\n\n{n} пляшок на місцях, що зникають, буде вилучено зі стелажа, і після цього вони вважатимуться «не на зберіганні».",
+  rack_renamed: "Стелаж перейменовано: {name}",
+  rack_level_removed: "Рівень {e} видалено",
+  rack_cols_set: "Місць на рівні: {n}",
   rack_add_level: "Додати рівень",
   rack_level_added: "Рівень {e} з {n} місцями додано",
   rack_clear_btn: "Очистити стелаж",
@@ -11141,6 +11407,19 @@ ja: {
   store_filter: "配置: {name} · {n}本 – 空いている場所をタップ",
   store_filter_off: "すべて表示",
   store_back: "← セラーへ戻る",
+  rack_name_label: "ラック名",
+  rack_cols_label: "1段あたりのスロット数",
+  rack_add_top: "+ 段を上に追加",
+  rack_add_bottom: "+ 段を下に追加",
+  rack_remove_level: "段を削除",
+  rack_remove_head: "「{name}」の段{e}を削除しますか？",
+  rack_remove_bottles: "{n}本のボトルがラックから取り出され、その後は「未保管」として扱われます。ワイン自体はセラーに残ります。",
+  rack_add_bottom_head: "下に新しい段を追加しますか？",
+  rack_renumber_note: "他の段の番号が変わります。収納状況は保持されます。印刷済みの段のQRラベルは再印刷が必要です。",
+  rack_cols_confirm: "1段あたりのスロット数を {old} から {new} に減らしますか？\n\nなくなるスロットにある{n}本のボトルはラックから取り出され、その後は「未保管」として扱われます。",
+  rack_renamed: "ラック名を変更しました: {name}",
+  rack_level_removed: "段{e}を削除しました",
+  rack_cols_set: "1段あたり{n}スロット",
   rack_add_level: "段を追加",
   rack_level_added: "{e}段目（{n}か所）を追加しました",
   rack_clear_btn: "ラックを空にする",
@@ -11528,6 +11807,19 @@ ko: {
   store_filter: "보관: {name} · {n}병 – 빈 칸을 탭하세요",
   store_filter_off: "모두 보기",
   store_back: "← 셀러로",
+  rack_name_label: "랙 이름",
+  rack_cols_label: "단당 자리 수",
+  rack_add_top: "+ 위에 단 추가",
+  rack_add_bottom: "+ 아래에 단 추가",
+  rack_remove_level: "단 삭제",
+  rack_remove_head: "“{name}”의 {e}단을 삭제할까요?",
+  rack_remove_bottles: "{n}병이 랙에서 빠지며 이후 “미보관”으로 처리됩니다. 와인 자체는 셀러에 그대로 남습니다.",
+  rack_add_bottom_head: "아래에 새 단을 추가할까요?",
+  rack_renumber_note: "다른 단의 번호가 바뀝니다. 배치 상태는 유지됩니다. 이미 인쇄한 단의 QR 라벨은 다시 인쇄해야 합니다.",
+  rack_cols_confirm: "단당 자리 수를 {old}개에서 {new}개로 줄일까요?\n\n없어지는 자리에 있는 {n}병이 랙에서 빠지며 이후 “미보관”으로 처리됩니다.",
+  rack_renamed: "랙 이름 변경됨: {name}",
+  rack_level_removed: "{e}단 삭제됨",
+  rack_cols_set: "단당 {n}자리",
   rack_add_level: "단 추가",
   rack_level_added: "{e}단({n}자리)이 추가되었습니다",
   rack_clear_btn: "랙 비우기",
@@ -11915,6 +12207,19 @@ zh: {
   store_filter: "存放：{name} · {n} 瓶 – 请点按空位",
   store_filter_off: "显示全部",
   store_back: "← 返回酒窖",
+  rack_name_label: "货架名称",
+  rack_cols_label: "每层位置数",
+  rack_add_top: "+ 在上方添加层",
+  rack_add_bottom: "+ 在下方添加层",
+  rack_remove_level: "删除层",
+  rack_remove_head: "要从“{name}”中删除第 {e} 层吗？",
+  rack_remove_bottles: "{n} 瓶酒将从货架中取出，之后视为“未存放”。酒款本身仍保留在酒窖中。",
+  rack_add_bottom_head: "要在下方添加新的一层吗？",
+  rack_renumber_note: "其他层的编号将随之改变。存放情况保持不变。已打印的层二维码标签需要重新打印。",
+  rack_cols_confirm: "要将每层位置数从 {old} 减少到 {new} 吗？\n\n将被移除的位置上的 {n} 瓶酒将从货架中取出，之后视为“未存放”。",
+  rack_renamed: "货架已重命名：{name}",
+  rack_level_removed: "已删除第 {e} 层",
+  rack_cols_set: "每层 {n} 个位置",
   rack_add_level: "添加层",
   rack_level_added: "已添加第{e}层，共{n}个位置",
   rack_clear_btn: "清空酒架",
@@ -12302,6 +12607,19 @@ hi: {
   store_filter: "रखें: {name} · {n} बोतल – खाली स्थान पर टैप करें",
   store_filter_off: "सब दिखाएँ",
   store_back: "← सेलर पर",
+  rack_name_label: "रैक का नाम",
+  rack_cols_label: "प्रति स्तर स्थान",
+  rack_add_top: "+ ऊपर स्तर",
+  rack_add_bottom: "+ नीचे स्तर",
+  rack_remove_level: "स्तर हटाएँ",
+  rack_remove_head: "क्या “{name}” से स्तर {e} हटाएँ?",
+  rack_remove_bottles: "{n} बोतलें रैक से निकाल ली जाएँगी और उसके बाद “संग्रहीत नहीं” मानी जाएँगी। वाइन स्वयं सेलर में बनी रहेंगी।",
+  rack_add_bottom_head: "क्या नीचे एक नया स्तर जोड़ें?",
+  rack_renumber_note: "इससे अन्य स्तरों के नंबर बदल जाएँगे। बोतलों की स्थिति बनी रहेगी। स्तरों के पहले से छपे QR लेबल दोबारा प्रिंट करने होंगे।",
+  rack_cols_confirm: "क्या प्रति स्तर स्थान {old} से घटाकर {new} करें?\n\nहटने वाले स्थानों की {n} बोतलें रैक से निकाल ली जाएँगी और उसके बाद “संग्रहीत नहीं” मानी जाएँगी।",
+  rack_renamed: "रैक का नाम बदला गया: {name}",
+  rack_level_removed: "स्तर {e} हटाया गया",
+  rack_cols_set: "प्रति स्तर {n} स्थान",
   rack_add_level: "स्तर जोड़ें",
   rack_level_added: "{n} स्थानों वाला स्तर {e} जोड़ा गया",
   rack_clear_btn: "रैक खाली करें",
@@ -14436,27 +14754,96 @@ function renderRackSetup() {
   list.innerHTML = settings.racks.map((r,i) => {
     let h = `<div class="rack-setup-item"><span class="n">${esc(r.name)}</span><span class="d">${r.rows} × ${r.cols}${r.cap > 1 ? ' · ×' + r.cap : ''}${Object.keys(r.lv || {}).length ? ' *' : ''}</span><button class="rack-setup-edit" onclick="openQrLabels(${i})" title="${esc(t('qr_btn'))}">▦</button><button class="rack-setup-edit" onclick="editRackLevels(${i})">✏️</button><button class="rack-setup-edit" onclick="clearRack(${i})" title="${esc(t('rack_clear_btn'))}">🧹</button><button class="rack-setup-del" onclick="removeRack(${i})">🗑</button></div>`;
     if (i === rackEditIdx) {
-      h += `<div class="rack-level-editor"><div class="rle-title">${t('rack_levels_title')}</div>`;
-      h += `<div class="rle-row rle-head"><span></span><span>${t('rack_level_name')}</span><span>${t('rack_ph_cap')}</span></div>`;
-      for (let e = r.rows; e >= 1; e--) h += `<div class="rle-row"><span>E${e}</span><input type="text" class="rle-name" maxlength="6" placeholder="E${e}" value="${esc((r.lv && r.lv[e] && r.lv[e].name) || '')}" onchange="setLevelProp(${i},${e},'name',this.value)"><input type="number" min="1" max="500" value="${rackCap(r, e)}" onchange="setLevelProp(${i},${e},'cap',this.value)"></div>`;
-      h += `<div class="rle-add"><button class="wine-btn" onclick="addRackLevel(${i})"${r.rows >= RACK_MAX_ROWS ? ' disabled' : ''}>+ ${t('rack_add_level')}</button></div>`;
+      h += `<div class="rack-level-editor">`;
+      h += `<div class="rle-fld"><span>${t('rack_name_label')}</span><input type="text" maxlength="60" value="${esc(r.name)}" onchange="renameRack(${i},this.value)"></div>`;
+      h += `<div class="rle-fld"><span>${t('rack_cols_label')}</span><input type="number" min="1" max="${RACK_MAX_COLS}" value="${r.cols}" onchange="setRackCols(${i},this.value)"></div>`;
+      h += `<div class="rle-title">${t('rack_levels_title')}</div>`;
+      h += `<div class="rle-row rle-head"><span></span><span>${t('rack_level_name')}</span><span>${t('rack_ph_cap')}</span><span></span></div>`;
+      for (let e = r.rows; e >= 1; e--) h += `<div class="rle-row"><span>E${e}</span><input type="text" class="rle-name" maxlength="6" placeholder="E${e}" value="${esc((r.lv && r.lv[e] && r.lv[e].name) || '')}" onchange="setLevelProp(${i},${e},'name',this.value)"><input type="number" min="1" max="500" value="${rackCap(r, e)}" onchange="setLevelProp(${i},${e},'cap',this.value)"><button class="rle-del" title="${esc(t('rack_remove_level'))}" onclick="removeRackLevel(${i},${e})"${r.rows <= 1 ? ' disabled' : ''}>✕</button></div>`;
+      h += `<div class="rle-add"><button class="wine-btn" onclick="addRackLevel(${i},'top')"${r.rows >= RACK_MAX_ROWS ? ' disabled' : ''}>${t('rack_add_top')}</button><button class="wine-btn" onclick="addRackLevel(${i},'bottom')"${r.rows >= RACK_MAX_ROWS ? ' disabled' : ''}>${t('rack_add_bottom')}</button></div>`;
       h += '</div>';
     }
     return h;
   }).join('') + (settings.racks.length ? `<div class="rack-qr-all"><button class="wine-btn" onclick="openQrLabels(-1)">▦ ${t('qr_all')}</button></div>` : '');
 }
-const RACK_MAX_ROWS = 30;   // wie beim Anlegen eines Regals
-// Regal um eine Ebene erweitern: sie kommt oben dazu (neue höchste Nummer), hat dieselbe Platzzahl wie die übrigen Ebenen und die Standard-Flaschenzahl pro Platz des Regals (änderbar im selben Editor).
-// Bestehende Ebenen behalten Nummer, Name und Belegung.
-function addRackLevel(i) {
-  const r = settings.racks[i];
-  if (!r || r.rows >= RACK_MAX_ROWS) return;
-  r.rows++;
+const RACK_MAX_ROWS = 30, RACK_MAX_COLS = 40;   // wie beim Anlegen eines Regals
+// Nach jeder Regal-Änderung: speichern und die offene Ansicht neu zeichnen
+function afterRackEdit() {
   saveSettings(); touchData();
   renderRackSetup();
   const active = document.querySelector('.tab.active');
-  if (active && active.id === 'tab-racks') renderRacks();
-  showToast(t('rack_level_added', { e: r.rows, n: r.cols }));
+  if (active && active.id === 'tab-racks') renderRacks(); else if (active && active.id === 'tab-keller') renderKeller();
+}
+// Ebenen eines Regals umnummerieren: Plätze der Flaschen, Namen/Kapazitäten (lv) und die Altfelder der Weine ziehen mit.
+// map(e) liefert die neue Ebenen-Nummer oder null, wenn die Ebene entfällt (ihre Flaschen werden aus dem Regal genommen, die Weine bleiben).
+function remapRackLevels(r, map) {
+  wines.forEach(w => {
+    if (!(w.placements || []).some(x => x.rack === r.id)) return;
+    const list = w.placements.map(x => { if (x.rack !== r.id) return x; const ne = map(x.e); return ne == null ? null : { rack: x.rack, e: ne, p: x.p }; }).filter(Boolean);
+    setPlacements(w, list);
+  });
+  const lv = {};
+  Object.keys(r.lv || {}).forEach(k => { const ne = map(+k); if (ne != null) lv[ne] = r.lv[k]; });
+  r.lv = lv;
+  rackFilledSlot = null;
+  if (rackMove && rackMove.rack === r.id) rackMove = null;
+}
+// Regal um eine Ebene erweitern. Oben: neue höchste Nummer, alles andere bleibt. Unten: neue Ebene 1, die bisherigen rücken eine Nummer hoch (Belegung, Namen und Kapazitäten ziehen mit).
+// Die neue Ebene hat dieselbe Platzzahl wie die übrigen Ebenen (alle Ebenen eines Regals teilen sie) und die Standard-Flaschenzahl pro Platz des Regals.
+function addRackLevel(i, where) {
+  const r = settings.racks[i];
+  if (!r || r.rows >= RACK_MAX_ROWS) return;
+  if (where === 'bottom') {
+    if (!confirm(t('rack_add_bottom_head') + '\n\n' + t('rack_renumber_note'))) return;
+    remapRackLevels(r, e => e + 1);
+    r.rows++; save();
+  } else r.rows++;
+  afterRackEdit();
+  showToast(t('rack_level_added', { e: where === 'bottom' ? 1 : r.rows, n: r.cols }));
+}
+// Ebene entfernen: Flaschen darauf werden aus dem Regal genommen (Weine bleiben im Keller), höhere Ebenen rücken eine Nummer nach unten
+function removeRackLevel(i, e) {
+  const r = settings.racks[i];
+  if (!r || r.rows <= 1 || !(e >= 1 && e <= r.rows)) return;
+  let n = 0;
+  wines.forEach(w => (w.placements || []).forEach(x => { if (x.rack === r.id && x.e === e) n++; }));
+  const msg = t('rack_remove_head', { e, name: r.name }) + (n ? '\n\n' + t('rack_remove_bottles', { n }) : '') + (e < r.rows ? '\n\n' + t('rack_renumber_note') : '');
+  if (!confirm(msg)) return;
+  remapRackLevels(r, x => x === e ? null : x > e ? x - 1 : x);
+  r.rows--; save();
+  afterRackEdit();
+  showToast(t('rack_level_removed', { e }));
+}
+// Regal umbenennen: die interne ID bleibt, damit Belegung und gedruckte QR-Etiketten weiter passen; nur der angezeigte Name (und die Altfelder der Weine) ändert sich
+function renameRack(i, v) {
+  const r = settings.racks[i];
+  if (!r) return;
+  const name = String(v || '').trim().slice(0, 60);
+  if (!name) { showToast(t('rack_invalid')); renderRackSetup(); return; }
+  if (name === r.name) return;
+  if (settings.racks.some((x, k) => k !== i && x.name === name)) { showToast(t('rack_dup')); renderRackSetup(); return; }
+  r.name = name;
+  wines.forEach(w => { if ((w.placements || []).some(x => x.rack === r.id)) setPlacements(w, w.placements); });
+  save();
+  afterRackEdit();
+  showToast(t('rack_renamed', { name }));
+}
+// Plätze pro Ebene ändern. Mehr Plätze: nur Platz dazu. Weniger: Flaschen auf den wegfallenden Plätzen werden aus dem Regal genommen (nach Rückfrage).
+function setRackCols(i, v) {
+  const r = settings.racks[i];
+  if (!r) return;
+  const cols = Math.max(1, Math.min(RACK_MAX_COLS, parseInt(v) || 0));
+  if (!cols || cols === r.cols) { renderRackSetup(); return; }
+  let n = 0;
+  wines.forEach(w => (w.placements || []).forEach(x => { if (x.rack === r.id && x.p > cols) n++; }));
+  if (n && !confirm(t('rack_cols_confirm', { old: r.cols, new: cols, n }))) { renderRackSetup(); return; }
+  if (n) wines.forEach(w => { if ((w.placements || []).some(x => x.rack === r.id && x.p > cols)) setPlacements(w, w.placements.filter(x => !(x.rack === r.id && x.p > cols))); });
+  r.cols = cols;
+  rackFilledSlot = null;
+  if (rackMove && rackMove.rack === r.id) rackMove = null;
+  if (n) save();
+  afterRackEdit();
+  showToast(t('rack_cols_set', { n: cols }));
 }
 function editRackLevels(i) { rackEditIdx = rackEditIdx === i ? -1 : i; renderRackSetup(); }
 // Name oder Flaschen pro Platz einer Ebene setzen (Kapazität nicht unter die aktuell dort vorhandene Belegung)
