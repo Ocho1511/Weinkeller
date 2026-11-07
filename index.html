@@ -602,6 +602,7 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .loc-open, .loc-text { font-size: 11px; color: var(--text-muted); }
 .store-scan-btn { background: #1f5c30; color: #fff; border: none; font-weight: 700; }
 .rack-clear-btn { border-color: var(--danger, #c0392b); color: var(--danger, #e57373); }
+.wine-temp, .ripeness-temp { font-size: 12px; font-weight: 600; color: var(--sparkling); margin: 0 0 8px; }
 .loc-chip.loc-store { border-color: var(--gold); color: var(--gold); }
 .rack-un-filter { margin-bottom: 10px; }
 .rack-un-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
@@ -1586,6 +1587,16 @@ input[type="file"] { display: none; }
     </div>
     <div class="form-row">
       <div class="form-group">
+        <label data-i18n="l_temp_from">Trinktemperatur ab (°C)</label>
+        <input id="f-temp-from" placeholder="" type="number" min="0" max="30">
+      </div>
+      <div class="form-group">
+        <label data-i18n="l_temp_to">bis (°C)</label>
+        <input id="f-temp-to" placeholder="" type="number" min="0" max="30">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
         <label id="price-label">Preis (€)</label>
         <input id="f-price" placeholder="" type="number" step="0.01">
       </div>
@@ -1826,6 +1837,19 @@ function cleanId(v, used) {
   if (used) used.add(id);
   return id;
 }
+// Trinktemperatur in °C als Spanne (z. B. 16-18); nur plausible Werte, Reihenfolge wird bei Bedarf getauscht
+function cleanTemps(w) {
+  let a = cleanInt(w.tempFrom, 0, 30), b = cleanInt(w.tempTo, 0, 30);
+  if (a != null && b != null && b < a) [a, b] = [b, a];
+  return { tempFrom: a, tempTo: b };
+}
+function serveTempText(w) {
+  const a = w && w.tempFrom, b = w && w.tempTo;
+  if (a == null && b == null) return '';
+  if (a != null && b != null && a !== b) return a + '–' + b + ' °C';
+  return (a != null ? a : b) + ' °C';
+}
+const serveTempHtml = (w, cls) => { const x = serveTempText(w); return x ? `<div class="${cls}" title="${esc(t('l_temp_from'))}">🌡 ${x}</div>` : ''; };
 function cleanInt(v, min, max) { const n = parseInt(v); return Number.isFinite(n) && n >= min && n <= max ? n : null; }
 // Preis aus Text: versteht "12,50", "1.234,50", "1,234.50" und Währungszeichen
 function parsePrice(v) {
@@ -1904,6 +1928,7 @@ function cleanWine(w, used) {
     minMax: cleanMinMax(w.minMax),
     location: cleanText(w.location, 200),
     drinkFrom: cleanInt(w.drinkFrom, 1000, 2300), drinkTo: cleanInt(w.drinkTo, 1000, 2300),
+    ...cleanTemps(w),
     price: parsePrice(w.price), image: cleanImage(w.image), imageUser: !!w.imageUser,
     rating: Math.min(5, Math.max(0, parseInt(w.rating) || 0)) || null,
     note: cleanText(w.note, 5000),
@@ -2977,7 +3002,7 @@ async function lookupWineData(name, year) {
       model: 'claude-sonnet-4-6',
       max_tokens: 1200,
       tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 3 }],
-      system: `Du bist ein Wein-Experte. Recherchiere den aktuellen durchschnittlichen Marktpreis (Endverbraucher, 0,75-l-Flasche) mit der Websuche. Antworte am Ende mit GENAU EINEM JSON-Objekt (ohne Markdown) mit den Feldern: type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), land (Herkunftsland auf Deutsch oder null), grape (Hauptrebsorte oder null), drinkFrom (Jahr als Zahl oder null), drinkTo (Jahr als Zahl oder null), price (aktueller Durchschnittspreis pro Flasche in ${currencyName()} als Zahl ohne Währungssymbol, gerundet, oder null), image (eine direkte, öffentlich erreichbare URL zu einem Foto DER FLASCHE, die direkt auf eine Bilddatei zeigt und auf .jpg/.jpeg/.png/.webp endet; nur eine URL, die du über die Websuche tatsächlich gesehen hast, sonst null), page (die URL EINER Webseite, auf der die Flasche abgebildet ist – bevorzugt Wikipedia, die Seite des Weinguts oder ein Wein-Shop/Vivino; eine echte, über die Websuche gefundene Seiten-URL, sonst null). Für Beschreibungsfelder nutze dein Wissen; für Preis, Bild und Seite die Websuche. Nutze null nur wenn keine sinnvolle Angabe möglich ist.`,
+      system: `Du bist ein Wein-Experte. Recherchiere den aktuellen durchschnittlichen Marktpreis (Endverbraucher, 0,75-l-Flasche) mit der Websuche. Antworte am Ende mit GENAU EINEM JSON-Objekt (ohne Markdown) mit den Feldern: type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), land (Herkunftsland auf Deutsch oder null), grape (Hauptrebsorte oder null), drinkFrom (Jahr als Zahl oder null), drinkTo (Jahr als Zahl oder null), tempFrom (empfohlene Trinktemperatur, untere Grenze in °C als ganze Zahl, z. B. 16, oder null), tempTo (obere Grenze in °C als ganze Zahl, z. B. 18, oder null), price (aktueller Durchschnittspreis pro Flasche in ${currencyName()} als Zahl ohne Währungssymbol, gerundet, oder null), image (eine direkte, öffentlich erreichbare URL zu einem Foto DER FLASCHE, die direkt auf eine Bilddatei zeigt und auf .jpg/.jpeg/.png/.webp endet; nur eine URL, die du über die Websuche tatsächlich gesehen hast, sonst null), page (die URL EINER Webseite, auf der die Flasche abgebildet ist – bevorzugt Wikipedia, die Seite des Weinguts oder ein Wein-Shop/Vivino; eine echte, über die Websuche gefundene Seiten-URL, sonst null). Für Beschreibungsfelder nutze dein Wissen; für Preis, Bild und Seite die Websuche. Nutze null nur wenn keine sinnvolle Angabe möglich ist.`,
       messages: [{ role: 'user', content: `Wein: ${name}${year ? ' (Jahrgang ' + year + ')' : ''}. Nenne Typ, Region, Land, Hauptrebsorte, ein geschätztes Trinkfenster, den aktuellen Durchschnittspreis pro Flasche in ${currencyName()}, eine direkte Bild-URL der Flasche und die URL einer Webseite, auf der die Flasche abgebildet ist.` }]
     })
   });
@@ -3006,11 +3031,13 @@ async function lookupWine() {
     setIfEmpty('f-grape', info.grape);
     setIfEmpty('f-drink-from', info.drinkFrom);
     setIfEmpty('f-drink-to', info.drinkTo);
+    setIfEmpty('f-temp-from', info.tempFrom);
+    setIfEmpty('f-temp-to', info.tempTo);
     if (info.price != null) setIfEmpty('f-price', info.price);
     const img = await resolveWineImage(info, formCriteria());
     if (tok !== formToken) return;
     if (img) { setIfEmpty('f-image', img); updateImagePreview(); }
-    const found = info.region || info.land || info.grape || info.drinkFrom || info.drinkTo || info.price != null;
+    const found = info.region || info.land || info.grape || info.drinkFrom || info.drinkTo || info.tempFrom != null || info.price != null;
     showToast(found ? t('toast_lookup_ok') : t('toast_lookup_none'));
   } catch {
     showToast(t('toast_scanfail'));
@@ -3045,6 +3072,8 @@ async function maybeAutoLookup() {
     setIfEmpty('f-grape', info.grape);
     setIfEmpty('f-drink-from', info.drinkFrom);
     setIfEmpty('f-drink-to', info.drinkTo);
+    setIfEmpty('f-temp-from', info.tempFrom);
+    setIfEmpty('f-temp-to', info.tempTo);
     if (info.price != null) { setIfEmpty('f-price', info.price); showToast(t('toast_price_ok', {p: fmtMoney(Math.round(info.price))})); }
     const img = await resolveWineImage(info, formCriteria());
     if (tok !== formToken) return;
@@ -3128,7 +3157,7 @@ async function enrichAllWines() {
   if (!ensureAiConsent()) return;
   // Native App: reicht das KI-Guthaben nicht für alle Weine mit fehlenden Angaben, vorher darauf hinweisen
   if (isNativeApp() && typeof aiCredits === 'number') {
-    const needAi = targets.filter(w => !w.region || !w.country || !w.grape || !w.drinkFrom || !w.drinkTo || !w.price).length;
+    const needAi = targets.filter(w => !w.region || !w.country || !w.grape || !w.drinkFrom || !w.drinkTo || w.tempFrom == null || !w.price).length;
     if (needAi > aiCredits && !confirm(t('credits_enrich_warn', { n: needAi, c: aiCredits }))) return;
   }
   enrichRunning = true;
@@ -3164,7 +3193,7 @@ async function enrichAllWines() {
           }
         }   // Store-Version: Bilder bleiben unangetastet (auch von der Web-App synchronisierte)
         // 2) Langsamen KI-Websuche-Aufruf nur, wenn Textfelder fehlen (sonst überspringen → Lauf bleibt schnell)
-        const needsFields = !w.region || !w.country || !w.grape || !w.drinkFrom || !w.drinkTo || !w.price;
+        const needsFields = !w.region || !w.country || !w.grape || !w.drinkFrom || !w.drinkTo || w.tempFrom == null || !w.price;
         // Ist das KI-Guthaben aufgebraucht, werden die übrigen Weine nur noch mit Bildern bearbeitet (kostenlos)
         if (needsFields && !(isNativeApp() && aiOutOfCredits)) {
           await workerPace();
@@ -3175,6 +3204,7 @@ async function enrichAllWines() {
             if (!w.grape && info.grape) { w.grape = info.grape; changed = true; }
             if (!w.drinkFrom && info.drinkFrom) { w.drinkFrom = parseInt(info.drinkFrom)||null; changed = true; }
             if (!w.drinkTo && info.drinkTo) { w.drinkTo = parseInt(info.drinkTo)||null; changed = true; }
+            if (w.tempFrom == null && info.tempFrom != null) { const tt = cleanTemps({ tempFrom: info.tempFrom, tempTo: info.tempTo }); if (tt.tempFrom != null) { w.tempFrom = tt.tempFrom; w.tempTo = tt.tempTo; changed = true; } }
             if (!w.price && info.price != null) { w.price = parseFloat(info.price)||null; changed = true; }
             // Falls Vivino kein Bild hatte: KI-Direktbild / og:image als Rückfall (mit jetzt ggf. ergänzten Kriterien)
             if (!w.image && !autoImagesOff()) { const alt = await resolveWineImage(info, wineCriteria(w)); if (alt) { w.image = alt; changed = true; } }
@@ -3386,7 +3416,7 @@ de: {
   toast_price_ok: "Preis gefunden: {p} ✓",
   setup_db: "Weindatenbank",
   enrich_btn: "Alle Weine aktualisieren (KI)",
-  enrich_desc: "Fehlende Region, Land, Rebsorte, Trinkfenster & Preis ergänzen",
+  enrich_desc: "Fehlende Region, Land, Rebsorte, Trinkfenster, Trinktemperatur & Preis ergänzen",
   confirm_enrich: "{n} Wein(e) werden per KI aktualisiert (fehlende Angaben). Fortfahren? (kostet minimal pro Wein)",
   toast_enrich_none: "Keine Weine vorhanden",
   toast_enrich_prog: "⏳ Ergänze {done}/{total}…",
@@ -3463,6 +3493,8 @@ de: {
   store_filter: "Einlagern: {name} · {n} Fl. – freies Fach antippen",
   store_filter_off: "Alle anzeigen",
   store_back: "← Zum Keller",
+  l_temp_from: "Trinktemperatur ab (°C)",
+  l_temp_to: "bis (°C)",
   enrich_img_fail: "Bei {n} Weinen war die Bildsuche gerade nicht erreichbar – deren Bilder blieben unverändert. Bitte später noch einmal starten.",
   rack_sort_az: "A–Z sortieren",
   rack_sorted_az: "Regale alphabetisch sortiert",
@@ -3796,7 +3828,7 @@ en: {
   toast_price_ok: "Price found: {p} ✓",
   setup_db: "Wine database",
   enrich_btn: "Update all wines (AI)",
-  enrich_desc: "Fill in missing region, country, grape, drinking window & price",
+  enrich_desc: "Fill in missing region, country, grape, drinking window, serving temperature & price",
   confirm_enrich: "{n} wine(s) will be updated via AI (missing details). Continue? (small cost per wine)",
   toast_enrich_none: "No wines yet",
   toast_enrich_prog: "⏳ Enriching {done}/{total}…",
@@ -3873,6 +3905,8 @@ en: {
   store_filter: "Store: {name} · {n} btl. – tap a free slot",
   store_filter_off: "Show all",
   store_back: "← To cellar",
+  l_temp_from: "Serving temperature from (°C)",
+  l_temp_to: "to (°C)",
   enrich_img_fail: "For {n} wines the picture search was temporarily unavailable – their pictures were left unchanged. Please run it again later.",
   rack_sort_az: "Sort A–Z",
   rack_sorted_az: "Racks sorted alphabetically",
@@ -4206,7 +4240,7 @@ es: {
   toast_price_ok: "Precio encontrado: {p} ✓",
   setup_db: "Base de datos de vinos",
   enrich_btn: "Actualizar todos los vinos (IA)",
-  enrich_desc: "Completar región, país, uva, ventana de consumo y precio faltantes",
+  enrich_desc: "Completar región, país, uva, ventana de consumo, temperatura de servicio y precio faltantes",
   confirm_enrich: "{n} vino(s) se actualizarán con IA (datos faltantes). ¿Continuar? (coste mínimo por vino)",
   toast_enrich_none: "Aún no hay vinos",
   toast_enrich_prog: "⏳ Completando {done}/{total}…",
@@ -4283,6 +4317,8 @@ es: {
   store_filter: "Colocar: {name} · {n} bot. – toca un hueco libre",
   store_filter_off: "Mostrar todo",
   store_back: "← A la bodega",
+  l_temp_from: "Temperatura de servicio desde (°C)",
+  l_temp_to: "hasta (°C)",
   enrich_img_fail: "Para {n} vinos la búsqueda de imágenes no estaba disponible en ese momento: sus imágenes se mantuvieron sin cambios. Vuelve a iniciarlo más tarde.",
   rack_sort_az: "Ordenar A–Z",
   rack_sorted_az: "Estantes ordenados alfabéticamente",
@@ -4616,7 +4652,7 @@ sv: {
   toast_price_ok: "Pris hittat: {p} ✓",
   setup_db: "Vindatabas",
   enrich_btn: "Uppdatera alla viner (AI)",
-  enrich_desc: "Komplettera region, land, druva, dryckesfönster och pris som saknas",
+  enrich_desc: "Komplettera region, land, druva, dryckesfönster, serveringstemperatur och pris som saknas",
   confirm_enrich: "{n} vin(er) uppdateras med AI (saknade uppgifter). Fortsätta? (liten kostnad per vin)",
   toast_enrich_none: "Inga viner finns",
   toast_enrich_prog: "⏳ Kompletterar {done}/{total}…",
@@ -4693,6 +4729,8 @@ sv: {
   store_filter: "Placera: {name} · {n} fl. – tryck på en ledig plats",
   store_filter_off: "Visa alla",
   store_back: "← Till källaren",
+  l_temp_from: "Serveringstemperatur från (°C)",
+  l_temp_to: "till (°C)",
   enrich_img_fail: "För {n} viner gick det inte att nå bildsökningen just nu – deras bilder lämnades oförändrade. Starta om igen senare.",
   rack_sort_az: "Sortera A–Ö",
   rack_sorted_az: "Hyllor sorterade alfabetiskt",
@@ -5026,7 +5064,7 @@ da: {
   toast_price_ok: "Pris fundet: {p} ✓",
   setup_db: "Vindatabase",
   enrich_btn: "Opdater alle vine (AI)",
-  enrich_desc: "Udfyld manglende region, land, drue, drikkevindue og pris",
+  enrich_desc: "Udfyld manglende region, land, drue, drikkevindue, serveringstemperatur og pris",
   confirm_enrich: "{n} vin(e) opdateres med AI (manglende oplysninger). Fortsæt? (lille omkostning pr. vin)",
   toast_enrich_none: "Ingen vine findes",
   toast_enrich_prog: "⏳ Udfylder {done}/{total}…",
@@ -5103,6 +5141,8 @@ da: {
   store_filter: "Placér: {name} · {n} fl. – tryk på en ledig plads",
   store_filter_off: "Vis alle",
   store_back: "← Til kælderen",
+  l_temp_from: "Serveringstemperatur fra (°C)",
+  l_temp_to: "til (°C)",
   enrich_img_fail: "For {n} vine kunne billedsøgningen ikke nås lige nu – deres billeder blev ikke ændret. Start igen senere.",
   rack_sort_az: "Sortér A–Å",
   rack_sorted_az: "Reoler sorteret alfabetisk",
@@ -5436,7 +5476,7 @@ fi: {
   toast_price_ok: "Hinta löytyi: {p} ✓",
   setup_db: "Viinitietokanta",
   enrich_btn: "Päivitä kaikki viinit (tekoäly)",
-  enrich_desc: "Täydennä puuttuva alue, maa, rypäle, juoma-aikaikkuna ja hinta",
+  enrich_desc: "Täydennä puuttuva alue, maa, rypäle, juoma-aikaikkuna, tarjoilulämpötila ja hinta",
   confirm_enrich: "{n} viiniä päivitetään tekoälyllä (puuttuvat tiedot). Jatketaanko? (pieni kustannus per viini)",
   toast_enrich_none: "Ei viinejä",
   toast_enrich_prog: "⏳ Täydennetään {done}/{total}…",
@@ -5513,6 +5553,8 @@ fi: {
   store_filter: "Sijoita: {name} · {n} pul. – napauta vapaata paikkaa",
   store_filter_off: "Näytä kaikki",
   store_back: "← Kellariin",
+  l_temp_from: "Tarjoilulämpötila alkaen (°C)",
+  l_temp_to: "asti (°C)",
   enrich_img_fail: "{n} viinin kohdalla kuvahaku ei ollut juuri nyt saatavilla – niiden kuvat jäivät ennalleen. Käynnistä uudelleen myöhemmin.",
   rack_sort_az: "Lajittele A–Ö",
   rack_sorted_az: "Hyllyt lajiteltu aakkosjärjestykseen",
@@ -5846,7 +5888,7 @@ ru: {
   toast_price_ok: "Цена найдена: {p} ✓",
   setup_db: "База вин",
   enrich_btn: "Обновить все вина (ИИ)",
-  enrich_desc: "Дополнить регион, страну, сорт, окно потребления и цену",
+  enrich_desc: "Дополнить регион, страну, сорт, окно потребления, температуру подачи и цену",
   confirm_enrich: "{n} вино(вин) будут обновлены через ИИ (недостающие данные). Продолжить? (небольшая плата за вино)",
   toast_enrich_none: "Вин нет",
   toast_enrich_prog: "⏳ Дополняю {done}/{total}…",
@@ -5923,6 +5965,8 @@ ru: {
   store_filter: "Разместить: {name} · {n} бут. – коснитесь свободной ячейки",
   store_filter_off: "Показать все",
   store_back: "← В погреб",
+  l_temp_from: "Температура подачи от (°C)",
+  l_temp_to: "до (°C)",
   enrich_img_fail: "Для {n} вин поиск изображений был временно недоступен – их изображения остались без изменений. Запустите обновление ещё раз позже.",
   rack_sort_az: "Сортировать А–Я",
   rack_sorted_az: "Стеллажи отсортированы по алфавиту",
@@ -6256,7 +6300,7 @@ it: {
   toast_price_ok: "Prezzo trovato: {p} ✓",
   setup_db: "Database vini",
   enrich_btn: "Aggiorna tutti i vini (IA)",
-  enrich_desc: "Completa regione, paese, vitigno, finestra di consumo e prezzo mancanti",
+  enrich_desc: "Completa regione, paese, vitigno, finestra di consumo, temperatura di servizio e prezzo mancanti",
   confirm_enrich: "{n} vino/i verranno aggiornati con IA (dati mancanti). Continuare? (piccolo costo per vino)",
   toast_enrich_none: "Nessun vino presente",
   toast_enrich_prog: "⏳ Completo {done}/{total}…",
@@ -6333,6 +6377,8 @@ it: {
   store_filter: "Riponi: {name} · {n} bott. – tocca uno scomparto libero",
   store_filter_off: "Mostra tutto",
   store_back: "← Alla cantina",
+  l_temp_from: "Temperatura di servizio da (°C)",
+  l_temp_to: "a (°C)",
   enrich_img_fail: "Per {n} vini la ricerca delle immagini non era raggiungibile al momento – le loro immagini sono rimaste invariate. Riavvia più tardi.",
   rack_sort_az: "Ordina A–Z",
   rack_sorted_az: "Scaffali ordinati alfabeticamente",
@@ -6666,7 +6712,7 @@ fr: {
   toast_price_ok: "Prix trouvé : {p} ✓",
   setup_db: "Base de vins",
   enrich_btn: "Mettre à jour tous les vins (IA)",
-  enrich_desc: "Compléter la région, le pays, le cépage, la fenêtre de dégustation et le prix manquants",
+  enrich_desc: "Compléter la région, le pays, le cépage, la fenêtre de dégustation, la température de service et le prix manquants",
   confirm_enrich: "{n} vin(s) seront mis à jour par IA (données manquantes). Continuer ? (petit coût par vin)",
   toast_enrich_none: "Aucun vin",
   toast_enrich_prog: "⏳ Complète {done}/{total}…",
@@ -6743,6 +6789,8 @@ fr: {
   store_filter: "Ranger : {name} · {n} bout. – touchez un emplacement libre",
   store_filter_off: "Tout afficher",
   store_back: "← Vers la cave",
+  l_temp_from: "Température de service de (°C)",
+  l_temp_to: "à (°C)",
   enrich_img_fail: "Pour {n} vins, la recherche d'images était momentanément indisponible – leurs images sont restées inchangées. Veuillez relancer plus tard.",
   rack_sort_az: "Trier de A à Z",
   rack_sorted_az: "Casiers triés par ordre alphabétique",
@@ -7076,7 +7124,7 @@ pl: {
   toast_price_ok: "Znaleziono cenę: {p} ✓",
   setup_db: "Baza win",
   enrich_btn: "Zaktualizuj wszystkie wina (AI)",
-  enrich_desc: "Uzupełnij brakujący region, kraj, szczep, okno picia i cenę",
+  enrich_desc: "Uzupełnij brakujący region, kraj, szczep, okno picia, temperaturę podawania i cenę",
   confirm_enrich: "{n} win zostanie zaktualizowanych przez AI (brakujące dane). Kontynuować? (niewielki koszt za wino)",
   toast_enrich_none: "Brak win",
   toast_enrich_prog: "⏳ Uzupełniam {done}/{total}…",
@@ -7153,6 +7201,8 @@ pl: {
   store_filter: "Ułóż: {name} · {n} but. – dotknij wolne miejsce",
   store_filter_off: "Pokaż wszystko",
   store_back: "← Do piwnicy",
+  l_temp_from: "Temperatura podawania od (°C)",
+  l_temp_to: "do (°C)",
   enrich_img_fail: "Dla {n} win wyszukiwanie obrazów było chwilowo niedostępne – ich obrazy pozostały bez zmian. Uruchom ponownie później.",
   rack_sort_az: "Sortuj A–Z",
   rack_sorted_az: "Regały posortowane alfabetycznie",
@@ -7486,7 +7536,7 @@ hu: {
   toast_price_ok: "Ár megtalálva: {p} ✓",
   setup_db: "Boradatbázis",
   enrich_btn: "Összes bor frissítése (MI)",
-  enrich_desc: "Hiányzó régió, ország, szőlő, fogyasztási időszak és ár kiegészítése",
+  enrich_desc: "Hiányzó régió, ország, szőlő, fogyasztási időszak, felszolgálási hőmérséklet és ár kiegészítése",
   confirm_enrich: "{n} bort frissít az MI (hiányzó adatok). Folytatod? (boronként csekély költség)",
   toast_enrich_none: "Nincs bor",
   toast_enrich_prog: "⏳ Kiegészítés {done}/{total}…",
@@ -7563,6 +7613,8 @@ hu: {
   store_filter: "Elhelyezés: {name} · {n} üveg – koppints egy szabad helyre",
   store_filter_off: "Összes mutatása",
   store_back: "← A pincéhez",
+  l_temp_from: "Felszolgálási hőmérséklet, min. (°C)",
+  l_temp_to: "max. (°C)",
   enrich_img_fail: "{n} bor esetében a képkeresés éppen nem volt elérhető – ezek képei változatlanok maradtak. Kérjük, indítsd újra később.",
   rack_sort_az: "Rendezés A–Z",
   rack_sorted_az: "Állványok ábécé szerint rendezve",
@@ -7896,7 +7948,7 @@ cs: {
   toast_price_ok: "Cena nalezena: {p} ✓",
   setup_db: "Databáze vín",
   enrich_btn: "Aktualizovat všechna vína (AI)",
-  enrich_desc: "Doplnit chybějící region, zemi, odrůdu, okno pití a cenu",
+  enrich_desc: "Doplnit chybějící region, zemi, odrůdu, okno pití, teplotu podávání a cenu",
   confirm_enrich: "{n} vín bude aktualizováno pomocí AI (chybějící údaje). Pokračovat? (malý náklad na víno)",
   toast_enrich_none: "Žádná vína",
   toast_enrich_prog: "⏳ Doplňuji {done}/{total}…",
@@ -7973,6 +8025,8 @@ cs: {
   store_filter: "Uložit: {name} · {n} lahví – klepni na volné místo",
   store_filter_off: "Zobrazit vše",
   store_back: "← Do sklepa",
+  l_temp_from: "Teplota podávání od (°C)",
+  l_temp_to: "do (°C)",
   enrich_img_fail: "U {n} vín nebylo vyhledávání obrázků právě dostupné – jejich obrázky zůstaly beze změny. Spusťte to prosím znovu později.",
   rack_sort_az: "Seřadit A–Z",
   rack_sorted_az: "Regály seřazeny abecedně",
@@ -8306,7 +8360,7 @@ sk: {
   toast_price_ok: "Cena nájdená: {p} ✓",
   setup_db: "Databáza vín",
   enrich_btn: "Aktualizovať všetky vína (AI)",
-  enrich_desc: "Doplniť chýbajúci región, krajinu, odrodu, okno pitia a cenu",
+  enrich_desc: "Doplniť chýbajúci región, krajinu, odrodu, okno pitia, teplotu podávania a cenu",
   confirm_enrich: "{n} vín bude aktualizovaných pomocou AI (chýbajúce údaje). Pokračovať? (malý náklad na víno)",
   toast_enrich_none: "Žiadne vína",
   toast_enrich_prog: "⏳ Dopĺňam {done}/{total}…",
@@ -8383,6 +8437,8 @@ sk: {
   store_filter: "Uložiť: {name} · {n} fliaš – ťukni na voľné miesto",
   store_filter_off: "Zobraziť všetko",
   store_back: "← Do pivnice",
+  l_temp_from: "Teplota podávania od (°C)",
+  l_temp_to: "do (°C)",
   enrich_img_fail: "Pri {n} vínach nebolo vyhľadávanie obrázkov práve dostupné – ich obrázky zostali nezmenené. Spustite to, prosím, znova neskôr.",
   rack_sort_az: "Zoradiť A–Z",
   rack_sorted_az: "Regály zoradené abecedne",
@@ -8716,7 +8772,7 @@ ro: {
   toast_price_ok: "Preț găsit: {p} ✓",
   setup_db: "Bază de date vinuri",
   enrich_btn: "Actualizează toate vinurile (IA)",
-  enrich_desc: "Completează regiunea, țara, soiul, fereastra de consum și prețul lipsă",
+  enrich_desc: "Completează regiunea, țara, soiul, fereastra de consum, temperatura de servire și prețul lipsă",
   confirm_enrich: "{n} vin(uri) vor fi actualizate prin IA (date lipsă). Continui? (cost mic per vin)",
   toast_enrich_none: "Niciun vin",
   toast_enrich_prog: "⏳ Completez {done}/{total}…",
@@ -8793,6 +8849,8 @@ ro: {
   store_filter: "Așază: {name} · {n} stic. – atinge un loc liber",
   store_filter_off: "Arată tot",
   store_back: "← La pivniță",
+  l_temp_from: "Temperatura de servire de la (°C)",
+  l_temp_to: "până la (°C)",
   enrich_img_fail: "Pentru {n} vinuri căutarea de imagini nu a fost disponibilă momentan – imaginile lor au rămas neschimbate. Te rugăm să pornești din nou mai târziu.",
   rack_sort_az: "Sortează A–Z",
   rack_sorted_az: "Rafturi sortate alfabetic",
@@ -9126,7 +9184,7 @@ hr: {
   toast_price_ok: "Cijena pronađena: {p} ✓",
   setup_db: "Baza vina",
   enrich_btn: "Ažuriraj sva vina (UI)",
-  enrich_desc: "Dopuni regiju, zemlju, sortu, razdoblje konzumacije i cijenu koji nedostaju",
+  enrich_desc: "Dopuni regiju, zemlju, sortu, razdoblje konzumacije, temperaturu posluživanja i cijenu koji nedostaju",
   confirm_enrich: "{n} vino(a) bit će ažurirano putem UI-a (podaci koji nedostaju). Nastaviti? (mali trošak po vinu)",
   toast_enrich_none: "Nema vina",
   toast_enrich_prog: "⏳ Dopunjavam {done}/{total}…",
@@ -9203,6 +9261,8 @@ hr: {
   store_filter: "Pohrani: {name} · {n} boc. – dodirni slobodno mjesto",
   store_filter_off: "Prikaži sve",
   store_back: "← U podrum",
+  l_temp_from: "Temperatura posluživanja od (°C)",
+  l_temp_to: "do (°C)",
   enrich_img_fail: "Za {n} vina pretraživanje slika trenutačno nije bilo dostupno – njihove slike ostale su nepromijenjene. Pokrenite ponovno kasnije.",
   rack_sort_az: "Sortiraj A–Ž",
   rack_sorted_az: "Regali sortirani abecedno",
@@ -9536,7 +9596,7 @@ pt: {
   toast_price_ok: "Preço encontrado: {p} ✓",
   setup_db: "Base de dados de vinhos",
   enrich_btn: "Atualizar todos os vinhos (IA)",
-  enrich_desc: "Completar região, país, casta, janela de consumo e preço em falta",
+  enrich_desc: "Completar região, país, casta, janela de consumo, temperatura de serviço e preço em falta",
   confirm_enrich: "{n} vinho(s) serão atualizados por IA (dados em falta). Continuar? (pequeno custo por vinho)",
   toast_enrich_none: "Nenhum vinho",
   toast_enrich_prog: "⏳ A completar {done}/{total}…",
@@ -9613,6 +9673,8 @@ pt: {
   store_filter: "Arrumar: {name} · {n} gar. – toca num lugar livre",
   store_filter_off: "Mostrar tudo",
   store_back: "← Para a adega",
+  l_temp_from: "Temperatura de serviço de (°C)",
+  l_temp_to: "até (°C)",
   enrich_img_fail: "Para {n} vinhos, a pesquisa de imagens estava temporariamente indisponível – as imagens deles permaneceram inalteradas. Inicie novamente mais tarde.",
   rack_sort_az: "Ordenar A–Z",
   rack_sorted_az: "Prateleiras ordenadas alfabeticamente",
@@ -9946,7 +10008,7 @@ no: {
   toast_price_ok: "Pris funnet: {p} ✓",
   setup_db: "Vindatabase",
   enrich_btn: "Oppdater alle viner (KI)",
-  enrich_desc: "Fyll ut manglende region, land, drue, drikkevindu og pris",
+  enrich_desc: "Fyll ut manglende region, land, drue, drikkevindu, serveringstemperatur og pris",
   confirm_enrich: "{n} vin(er) oppdateres med KI (manglende opplysninger). Fortsette? (liten kostnad per vin)",
   toast_enrich_none: "Ingen viner",
   toast_enrich_prog: "⏳ Fyller ut {done}/{total}…",
@@ -10023,6 +10085,8 @@ no: {
   store_filter: "Plasser: {name} · {n} fl. – trykk på en ledig plass",
   store_filter_off: "Vis alle",
   store_back: "← Til kjelleren",
+  l_temp_from: "Serveringstemperatur fra (°C)",
+  l_temp_to: "til (°C)",
   enrich_img_fail: "For {n} viner var bildesøket midlertidig utilgjengelig – bildene deres ble værende uendret. Start på nytt senere.",
   rack_sort_az: "Sorter A–Å",
   rack_sorted_az: "Reoler sortert alfabetisk",
@@ -10356,7 +10420,7 @@ nl: {
   toast_price_ok: "Prijs gevonden: {p} ✓",
   setup_db: "Wijndatabase",
   enrich_btn: "Alle wijnen bijwerken (AI)",
-  enrich_desc: "Ontbrekende regio, land, druif, drinkvenster en prijs aanvullen",
+  enrich_desc: "Ontbrekende regio, land, druif, drinkvenster, serveertemperatuur en prijs aanvullen",
   confirm_enrich: "{n} wijn(en) worden bijgewerkt via AI (ontbrekende gegevens). Doorgaan? (kleine kosten per wijn)",
   toast_enrich_none: "Geen wijnen aanwezig",
   toast_enrich_prog: "⏳ Aanvullen {done}/{total}…",
@@ -10433,6 +10497,8 @@ nl: {
   store_filter: "Opbergen: {name} · {n} fl. – tik op een vrij vak",
   store_filter_off: "Toon alles",
   store_back: "← Naar de kelder",
+  l_temp_from: "Serveertemperatuur vanaf (°C)",
+  l_temp_to: "tot (°C)",
   enrich_img_fail: "Bij {n} wijnen was de afbeeldingszoekopdracht even niet bereikbaar – hun afbeeldingen zijn ongewijzigd gebleven. Start later opnieuw.",
   rack_sort_az: "Sorteer A–Z",
   rack_sorted_az: "Rekken alfabetisch gesorteerd",
@@ -10766,7 +10832,7 @@ el: {
   toast_price_ok: "Βρέθηκε τιμή: {p} ✓",
   setup_db: "Βάση κρασιών",
   enrich_btn: "Ενημέρωση όλων των κρασιών (AI)",
-  enrich_desc: "Συμπλήρωση περιοχής, χώρας, ποικιλίας, παραθύρου κατανάλωσης & τιμής που λείπουν",
+  enrich_desc: "Συμπλήρωση περιοχής, χώρας, ποικιλίας, παραθύρου κατανάλωσης, θερμοκρασίας σερβιρίσματος & τιμής που λείπουν",
   confirm_enrich: "Θα ενημερωθούν μέσω AI {n} κρασί(ά) (στοιχεία που λείπουν). Συνέχεια; (μικρό κόστος ανά κρασί)",
   toast_enrich_none: "Δεν υπάρχουν κρασιά ακόμη",
   toast_enrich_prog: "⏳ Εμπλουτισμός {done}/{total}…",
@@ -10843,6 +10909,8 @@ el: {
   store_filter: "Τοποθέτηση: {name} · {n} φιάλ. – πατήστε μια ελεύθερη θέση",
   store_filter_off: "Εμφάνιση όλων",
   store_back: "← Στο κελάρι",
+  l_temp_from: "Θερμοκρασία σερβιρίσματος από (°C)",
+  l_temp_to: "έως (°C)",
   enrich_img_fail: "Για {n} κρασιά η αναζήτηση εικόνων δεν ήταν προσωρινά διαθέσιμη – οι εικόνες τους παρέμειναν αμετάβλητες. Ξεκινήστε ξανά αργότερα.",
   rack_sort_az: "Ταξινόμηση Α–Ω",
   rack_sorted_az: "Τα ράφια ταξινομήθηκαν αλφαβητικά",
@@ -11176,7 +11244,7 @@ uk: {
   toast_price_ok: "Ціну знайдено: {p} ✓",
   setup_db: "База вин",
   enrich_btn: "Оновити всі вина (ШІ)",
-  enrich_desc: "Заповнити відсутні регіон, країну, сорт, вікно споживання та ціну",
+  enrich_desc: "Заповнити відсутні регіон, країну, сорт, вікно споживання, температуру подачі та ціну",
   confirm_enrich: "Вин для оновлення через ШІ: {n} (відсутні дані). Продовжити? (невелика вартість за кожне вино)",
   toast_enrich_none: "Вин ще немає",
   toast_enrich_prog: "⏳ Оновлення {done}/{total}…",
@@ -11253,6 +11321,8 @@ uk: {
   store_filter: "Розмістити: {name} · {n} пл. – торкніться вільного місця",
   store_filter_off: "Показати все",
   store_back: "← До погреба",
+  l_temp_from: "Температура подачі від (°C)",
+  l_temp_to: "до (°C)",
   enrich_img_fail: "Для {n} вин пошук зображень був тимчасово недоступний – їхні зображення залишилися без змін. Запустіть оновлення ще раз пізніше.",
   rack_sort_az: "Сортувати А–Я",
   rack_sorted_az: "Стелажі відсортовано за алфавітом",
@@ -11586,7 +11656,7 @@ ja: {
   toast_price_ok: "価格が見つかりました: {p} ✓",
   setup_db: "ワインデータベース",
   enrich_btn: "すべてのワインを更新（AI）",
-  enrich_desc: "不足している地域、国、ぶどう品種、飲み頃、価格を補完します",
+  enrich_desc: "不足している地域、国、ぶどう品種、飲み頃、飲用温度、価格を補完します",
   confirm_enrich: "{n}件のワインをAIで更新します（不足情報）。続行しますか？（ワイン1件ごとに少額の費用がかかります）",
   toast_enrich_none: "ワインがまだありません",
   toast_enrich_prog: "⏳ 補完中 {done}/{total}…",
@@ -11663,6 +11733,8 @@ ja: {
   store_filter: "配置: {name} · {n}本 – 空いている場所をタップ",
   store_filter_off: "すべて表示",
   store_back: "← セラーへ戻る",
+  l_temp_from: "飲用温度 下限 (°C)",
+  l_temp_to: "上限 (°C)",
   enrich_img_fail: "{n}本のワインでは画像検索が一時的に利用できなかったため、画像は変更されていません。後でもう一度実行してください。",
   rack_sort_az: "A–Zで並べ替え",
   rack_sorted_az: "ラックをアルファベット順に並べ替えました",
@@ -11996,7 +12068,7 @@ ko: {
   toast_price_ok: "가격을 찾았어요: {p} ✓",
   setup_db: "와인 데이터베이스",
   enrich_btn: "모든 와인 업데이트 (AI)",
-  enrich_desc: "빠진 지역, 국가, 품종, 음용 적기, 가격을 채워요",
+  enrich_desc: "빠진 지역, 국가, 품종, 음용 적기, 음용 온도, 가격을 채워요",
   confirm_enrich: "와인 {n}개를 AI로 업데이트해요 (빠진 정보). 계속할까요? (와인당 소액의 비용이 들어요)",
   toast_enrich_none: "아직 와인이 없어요",
   toast_enrich_prog: "⏳ 보강 중 {done}/{total}…",
@@ -12073,6 +12145,8 @@ ko: {
   store_filter: "보관: {name} · {n}병 – 빈 칸을 탭하세요",
   store_filter_off: "모두 보기",
   store_back: "← 셀러로",
+  l_temp_from: "음용 온도 최소 (°C)",
+  l_temp_to: "최대 (°C)",
   enrich_img_fail: "와인 {n}개는 이미지 검색을 일시적으로 사용할 수 없어 기존 이미지가 그대로 유지되었습니다. 나중에 다시 실행해 주세요.",
   rack_sort_az: "A–Z 정렬",
   rack_sorted_az: "랙을 알파벳순으로 정렬했습니다",
@@ -12406,7 +12480,7 @@ zh: {
   toast_price_ok: "已找到价格：{p} ✓",
   setup_db: "葡萄酒数据库",
   enrich_btn: "更新所有葡萄酒（AI）",
-  enrich_desc: "补全缺失的产区、国家、葡萄品种、适饮期和价格",
+  enrich_desc: "补全缺失的产区、国家、葡萄品种、适饮期、适饮温度和价格",
   confirm_enrich: "将通过 AI 更新 {n} 款酒（补全缺失信息）。是否继续？（每款酒会产生少量费用）",
   toast_enrich_none: "还没有葡萄酒",
   toast_enrich_prog: "⏳ 正在补全 {done}/{total}…",
@@ -12483,6 +12557,8 @@ zh: {
   store_filter: "存放：{name} · {n} 瓶 – 请点按空位",
   store_filter_off: "显示全部",
   store_back: "← 返回酒窖",
+  l_temp_from: "适饮温度 最低 (°C)",
+  l_temp_to: "最高 (°C)",
   enrich_img_fail: "有 {n} 款葡萄酒的图片搜索暂时无法使用，其图片保持不变。请稍后再试。",
   rack_sort_az: "按 A–Z 排序",
   rack_sorted_az: "货架已按字母顺序排序",
@@ -12816,7 +12892,7 @@ hi: {
   toast_price_ok: "कीमत मिली: {p} ✓",
   setup_db: "वाइन डेटाबेस",
   enrich_btn: "सभी वाइन अपडेट करें (AI)",
-  enrich_desc: "छूटे हुए क्षेत्र, देश, अंगूर, पीने का समय और कीमत भरें",
+  enrich_desc: "छूटे हुए क्षेत्र, देश, अंगूर, पीने का समय, परोसने का तापमान और कीमत भरें",
   confirm_enrich: "{n} वाइन AI से अपडेट की जाएँगी (छूटी जानकारी)। जारी रखें? (हर वाइन पर मामूली खर्च)",
   toast_enrich_none: "अभी कोई वाइन नहीं है",
   toast_enrich_prog: "⏳ जानकारी भरी जा रही है {done}/{total}…",
@@ -12893,6 +12969,8 @@ hi: {
   store_filter: "रखें: {name} · {n} बोतल – खाली स्थान पर टैप करें",
   store_filter_off: "सब दिखाएँ",
   store_back: "← सेलर पर",
+  l_temp_from: "परोसने का तापमान न्यूनतम (°C)",
+  l_temp_to: "अधिकतम (°C)",
   enrich_img_fail: "{n} वाइन के लिए चित्र खोज अभी उपलब्ध नहीं थी – उनके चित्र अपरिवर्तित रहे। कृपया बाद में दोबारा चलाएँ।",
   rack_sort_az: "A–Z क्रमबद्ध करें",
   rack_sorted_az: "रैक वर्णानुक्रम में क्रमबद्ध किए गए",
@@ -13499,6 +13577,7 @@ function renderKeller() {
         ${regionCountry?`<div class="wine-region">${wineRegionLink(w, regionCountry)}</div>`:''}
         <div class="wine-count-badge">${w.count||1} ${t('fl')}</div>
       </div>
+      ${serveTempHtml(w, 'wine-temp')}
       ${loc || settings.racks.length ? `<div class="card-slots">${wineSlotChips(w)}</div>` : ''}
       ${mmBadgeHtml(w)}
       ${ripe ? `
@@ -13710,6 +13789,8 @@ function editWine(id) {
   document.getElementById('f-loc-platz').value = w.locPlatz||'';
   document.getElementById('f-drink-from').value = w.drinkFrom||'';
   document.getElementById('f-drink-to').value = w.drinkTo||'';
+  document.getElementById('f-temp-from').value = w.tempFrom != null ? w.tempFrom : '';
+  document.getElementById('f-temp-to').value = w.tempTo != null ? w.tempTo : '';
   document.getElementById('f-price').value = w.price||'';
   document.getElementById('f-image').value = urlImage(w) || '';
   document.getElementById('f-ean').value = w.ean || '';
@@ -13741,7 +13822,7 @@ function openAddModal() {
   editId = null;
   autoDrink = { from: null, to: null };
   lastAutoLookupKey = '';
-  ['f-name','f-year','f-region','f-country','f-grape','f-loc-regal','f-loc-ebene','f-loc-platz','f-note','f-drink-from','f-drink-to','f-price','f-image','f-ean','f-photo'].forEach(id => document.getElementById(id).value = '');
+  ['f-name','f-year','f-region','f-country','f-grape','f-loc-regal','f-loc-ebene','f-loc-platz','f-note','f-drink-from','f-drink-to','f-temp-from','f-temp-to','f-price','f-image','f-ean','f-photo'].forEach(id => document.getElementById(id).value = '');
   updateImagePreview();
   if (formPhotoPending) photoDel(formPhotoPending);
   formPhotoPending = null; updateFormPhoto(); renderMinMaxFields(null);
@@ -13829,6 +13910,7 @@ function saveWine() {
     location: editId ? ((wines.find(w=>w.id===editId)||{}).location||null) : null,
     drinkFrom: parseInt(document.getElementById('f-drink-from').value)||null,
     drinkTo: parseInt(document.getElementById('f-drink-to').value)||null,
+    tempFrom: document.getElementById('f-temp-from').value, tempTo: document.getElementById('f-temp-to').value,
     price: parseFloat(document.getElementById('f-price').value)||null,
     image: imgVal,
     imageUser: imgUser,
@@ -13872,7 +13954,7 @@ function saveWine() {
     savedId = existing ? existing.id : wine.id;
     if (existing) {
       existing.count = (existing.count||1) + (wine.count||1);
-      ['region','country','grape','locRegal','locEbene','locPlatz','drinkFrom','drinkTo','price','image','rating','note','ean','photo'].forEach(k => {
+      ['region','country','grape','locRegal','locEbene','locPlatz','drinkFrom','drinkTo','tempFrom','tempTo','price','image','rating','note','ean','photo'].forEach(k => {
         if (!existing[k] && wine[k]) existing[k] = wine[k];
       });
       if (!Object.keys(existing.minMax || {}).length && Object.keys(wine.minMax || {}).length) existing.minMax = wine.minMax;
@@ -13911,7 +13993,7 @@ async function handleScan(e) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 1000,
-        system: 'Du bist ein Weinetikett- und Trinkreife-Experte. Antworte NUR mit einem JSON-Objekt ohne Markdown-Backticks. Felder: name (Weingut + Weinname), year (Jahrgang als Zahl oder null), type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), land (Herkunftsland auf Deutsch, z.B. Frankreich, oder null), grape (Rebsorte oder null), drinkFrom (Jahr als Zahl, ab dem der Wein grob geschätzt trinkreif ist, basierend auf Rebsorte/Region/Jahrgang, oder null), drinkTo (Jahr als Zahl, bis zu dem er grob geschätzt getrunken werden sollte, oder null). drinkFrom/drinkTo sind nur grobe Schätzungen, keine Angabe vom Etikett selbst. Wenn etwas nicht erkennbar ist oder keine sinnvolle Schätzung möglich ist, nutze null.',
+        system: 'Du bist ein Weinetikett- und Trinkreife-Experte. Antworte NUR mit einem JSON-Objekt ohne Markdown-Backticks. Felder: name (Weingut + Weinname), year (Jahrgang als Zahl oder null), type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), land (Herkunftsland auf Deutsch, z.B. Frankreich, oder null), grape (Rebsorte oder null), drinkFrom (Jahr als Zahl, ab dem der Wein grob geschätzt trinkreif ist, basierend auf Rebsorte/Region/Jahrgang, oder null), drinkTo (Jahr als Zahl, bis zu dem er grob geschätzt getrunken werden sollte, oder null), tempFrom und tempTo (empfohlene Trinktemperatur als untere und obere Grenze in °C, ganze Zahlen, z. B. 16 und 18, passend zu Weinart und Rebsorte, oder null). drinkFrom/drinkTo sind nur grobe Schätzungen, keine Angabe vom Etikett selbst. Wenn etwas nicht erkennbar ist oder keine sinnvolle Schätzung möglich ist, nutze null.',
         messages: [{ role: 'user', content: [
           { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: base64 } },
           { type: 'text', text: 'Analysiere dieses Weinetikett.' }
@@ -13930,6 +14012,8 @@ async function handleScan(e) {
     if (info.grape) document.getElementById('f-grape').value = info.grape;
     if (info.drinkFrom) document.getElementById('f-drink-from').value = info.drinkFrom;
     if (info.drinkTo) document.getElementById('f-drink-to').value = info.drinkTo;
+    if (info.tempFrom != null) document.getElementById('f-temp-from').value = info.tempFrom;
+    if (info.tempTo != null) document.getElementById('f-temp-to').value = info.tempTo;
     showToast(info.drinkFrom || info.drinkTo ? t('toast_label_ripe') : t('toast_label'));
   } catch {
     showToast(t('toast_scanfail'));
@@ -15425,6 +15509,7 @@ function renderTrinkreife() {
     <div class="ripeness-card" onclick="goToWine('${w.id}')" style="cursor:pointer">
       <div class="ripeness-wine-name">${esc(w.name)}</div>
       <div class="ripeness-meta">${w.year||''} ${w.type?' · '+esc(TYPE_LABELS[w.type]||w.type):''}</div>
+      ${serveTempHtml(w, 'ripeness-temp')}
       ${wineSlotChips(w)}
       <div style="display:flex;gap:0;border-radius:6px;overflow:hidden;height:18px;margin-bottom:6px">
         ${from-(w.year||from-3) > 0 ? `<div class="rt-seg rt-jung" style="flex:${from-(w.year||from-3)}">${t('seg_young')}</div>` : ''}
