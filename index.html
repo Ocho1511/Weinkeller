@@ -586,6 +586,7 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .loc-chip { border: 1px solid var(--border); background: var(--bg, transparent); color: var(--gold-light); border-radius: 999px; padding: 4px 10px; font-family: inherit; font-size: 11px; font-weight: 600; cursor: pointer; }
 .loc-chip:active { background: var(--card); }
 .loc-open, .loc-text { font-size: 11px; color: var(--text-muted); }
+.store-scan-btn { background: #1f5c30; color: #fff; border: none; font-weight: 700; }
 .rack-clear-btn { border-color: var(--danger, #c0392b); color: var(--danger, #e57373); }
 .loc-chip.loc-store { border-color: var(--gold); color: var(--gold); }
 .rack-un-filter { margin-bottom: 10px; }
@@ -1597,7 +1598,7 @@ input[type="file"] { display: none; }
     </div>
     <div class="btn-row">
       <button class="btn-secondary" onclick="closeModal('add-modal')" data-i18n="btn_cancel">Abbrechen</button>
-      <button class="btn-primary" onclick="saveWine()" data-i18n="btn_save">Speichern</button>
+      <button class="btn-primary" id="add-save-btn" onclick="saveWine()" data-i18n="btn_save">Speichern</button>
     </div>
   </div>
 </div>
@@ -3420,6 +3421,9 @@ de: {
   store_filter: "Einlagern: {name} · {n} Fl. – freies Fach antippen",
   store_filter_off: "Alle anzeigen",
   store_back: "← Zum Keller",
+  store_scan_btn: "📷 Wein scannen & einlagern",
+  store_save_btn: "Speichern & einlagern",
+  store_modal_title: "Wein einlagern",
   rack_country_all: "Alle Länder",
   rack_country_none: "Ohne Land",
   rack_filter_none: "Keine Weine für diesen Filter.",
@@ -3823,6 +3827,9 @@ en: {
   store_filter: "Store: {name} · {n} btl. – tap a free slot",
   store_filter_off: "Show all",
   store_back: "← To cellar",
+  store_scan_btn: "📷 Scan wine & store",
+  store_save_btn: "Save & store",
+  store_modal_title: "Store wine",
   rack_country_all: "All countries",
   rack_country_none: "No country",
   rack_filter_none: "No wines match this filter.",
@@ -4226,6 +4233,9 @@ es: {
   store_filter: "Colocar: {name} · {n} bot. – toca un hueco libre",
   store_filter_off: "Mostrar todo",
   store_back: "← A la bodega",
+  store_scan_btn: "📷 Escanear vino y colocar",
+  store_save_btn: "Guardar y colocar",
+  store_modal_title: "Colocar vino",
   rack_country_all: "Todos los países",
   rack_country_none: "Sin país",
   rack_filter_none: "No hay vinos para este filtro.",
@@ -4629,6 +4639,9 @@ sv: {
   store_filter: "Placera: {name} · {n} fl. – tryck på en ledig plats",
   store_filter_off: "Visa alla",
   store_back: "← Till källaren",
+  store_scan_btn: "📷 Skanna vin & lagra",
+  store_save_btn: "Spara & lagra",
+  store_modal_title: "Lagra vin",
   rack_country_all: "Alla länder",
   rack_country_none: "Inget land",
   rack_filter_none: "Inga viner för detta filter.",
@@ -5032,6 +5045,9 @@ da: {
   store_filter: "Placér: {name} · {n} fl. – tryk på en ledig plads",
   store_filter_off: "Vis alle",
   store_back: "← Til kælderen",
+  store_scan_btn: "📷 Scan vin & opbevar",
+  store_save_btn: "Gem & opbevar",
+  store_modal_title: "Opbevar vin",
   rack_country_all: "Alle lande",
   rack_country_none: "Uden land",
   rack_filter_none: "Ingen vine for dette filter.",
@@ -5435,6 +5451,9 @@ fi: {
   store_filter: "Sijoita: {name} · {n} pul. – napauta vapaata paikkaa",
   store_filter_off: "Näytä kaikki",
   store_back: "← Kellariin",
+  store_scan_btn: "📷 Skannaa viini & varastoi",
+  store_save_btn: "Tallenna & varastoi",
+  store_modal_title: "Varastoi viini",
   rack_country_all: "Kaikki maat",
   rack_country_none: "Ei maata",
   rack_filter_none: "Ei viinejä tälle suodattimelle.",
@@ -5838,6 +5857,9 @@ ru: {
   store_filter: "Разместить: {name} · {n} бут. – коснитесь свободной ячейки",
   store_filter_off: "Показать все",
   store_back: "← В погреб",
+  store_scan_btn: "📷 Сканировать вино и разместить",
+  store_save_btn: "Сохранить и разместить",
+  store_modal_title: "Разместить вино",
   rack_country_all: "Все страны",
   rack_country_none: "Без страны",
   rack_filter_none: "Нет вин для этого фильтра.",
@@ -6241,6 +6263,9 @@ it: {
   store_filter: "Riponi: {name} · {n} bott. – tocca uno scomparto libero",
   store_filter_off: "Mostra tutto",
   store_back: "← Alla cantina",
+  store_scan_btn: "📷 Scansiona vino e riponi",
+  store_save_btn: "Salva e riponi",
+  store_modal_title: "Riponi vino",
   rack_country_all: "Tutti i paesi",
   rack_country_none: "Senza paese",
   rack_filter_none: "Nessun vino per questo filtro.",
@@ -6644,6 +6669,9 @@ fr: {
   store_filter: "Ranger : {name} · {n} bout. – touchez un emplacement libre",
   store_filter_off: "Tout afficher",
   store_back: "← Vers la cave",
+  store_scan_btn: "📷 Scanner le vin & ranger",
+  store_save_btn: "Enregistrer & ranger",
+  store_modal_title: "Ranger le vin",
   rack_country_all: "Tous les pays",
   rack_country_none: "Sans pays",
   rack_filter_none: "Aucun vin pour ce filtre.",
@@ -7047,6 +7075,9 @@ pl: {
   store_filter: "Ułóż: {name} · {n} but. – dotknij wolne miejsce",
   store_filter_off: "Pokaż wszystko",
   store_back: "← Do piwnicy",
+  store_scan_btn: "📷 Skanuj wino i umieść",
+  store_save_btn: "Zapisz i umieść",
+  store_modal_title: "Umieść wino",
   rack_country_all: "Wszystkie kraje",
   rack_country_none: "Bez kraju",
   rack_filter_none: "Brak win dla tego filtra.",
@@ -7450,6 +7481,9 @@ hu: {
   store_filter: "Elhelyezés: {name} · {n} üveg – koppints egy szabad helyre",
   store_filter_off: "Összes mutatása",
   store_back: "← A pincéhez",
+  store_scan_btn: "📷 Bor beolvasása és berakás",
+  store_save_btn: "Mentés és berakás",
+  store_modal_title: "Bor berakása",
   rack_country_all: "Minden ország",
   rack_country_none: "Ország nélkül",
   rack_filter_none: "Nincs bor ehhez a szűrőhöz.",
@@ -7853,6 +7887,9 @@ cs: {
   store_filter: "Uložit: {name} · {n} lahví – klepni na volné místo",
   store_filter_off: "Zobrazit vše",
   store_back: "← Do sklepa",
+  store_scan_btn: "📷 Naskenovat víno a uskladnit",
+  store_save_btn: "Uložit a uskladnit",
+  store_modal_title: "Uskladnit víno",
   rack_country_all: "Všechny země",
   rack_country_none: "Bez země",
   rack_filter_none: "Žádná vína pro tento filtr.",
@@ -8256,6 +8293,9 @@ sk: {
   store_filter: "Uložiť: {name} · {n} fliaš – ťukni na voľné miesto",
   store_filter_off: "Zobraziť všetko",
   store_back: "← Do pivnice",
+  store_scan_btn: "📷 Naskenovať víno a uskladniť",
+  store_save_btn: "Uložiť a uskladniť",
+  store_modal_title: "Uskladniť víno",
   rack_country_all: "Všetky krajiny",
   rack_country_none: "Bez krajiny",
   rack_filter_none: "Žiadne vína pre tento filter.",
@@ -8659,6 +8699,9 @@ ro: {
   store_filter: "Așază: {name} · {n} stic. – atinge un loc liber",
   store_filter_off: "Arată tot",
   store_back: "← La pivniță",
+  store_scan_btn: "📷 Scanează vinul și depozitează",
+  store_save_btn: "Salvează și depozitează",
+  store_modal_title: "Depozitează vinul",
   rack_country_all: "Toate țările",
   rack_country_none: "Fără țară",
   rack_filter_none: "Niciun vin pentru acest filtru.",
@@ -9062,6 +9105,9 @@ hr: {
   store_filter: "Pohrani: {name} · {n} boc. – dodirni slobodno mjesto",
   store_filter_off: "Prikaži sve",
   store_back: "← U podrum",
+  store_scan_btn: "📷 Skeniraj vino i pohrani",
+  store_save_btn: "Spremi i pohrani",
+  store_modal_title: "Pohrani vino",
   rack_country_all: "Sve zemlje",
   rack_country_none: "Bez zemlje",
   rack_filter_none: "Nema vina za ovaj filtar.",
@@ -9465,6 +9511,9 @@ pt: {
   store_filter: "Arrumar: {name} · {n} gar. – toca num lugar livre",
   store_filter_off: "Mostrar tudo",
   store_back: "← Para a adega",
+  store_scan_btn: "📷 Digitalizar vinho e guardar",
+  store_save_btn: "Salvar e guardar",
+  store_modal_title: "Guardar vinho",
   rack_country_all: "Todos os países",
   rack_country_none: "Sem país",
   rack_filter_none: "Nenhum vinho para este filtro.",
@@ -9868,6 +9917,9 @@ no: {
   store_filter: "Plasser: {name} · {n} fl. – trykk på en ledig plass",
   store_filter_off: "Vis alle",
   store_back: "← Til kjelleren",
+  store_scan_btn: "📷 Skann vin og legg på plass",
+  store_save_btn: "Lagre og legg på plass",
+  store_modal_title: "Legg vin på plass",
   rack_country_all: "Alle land",
   rack_country_none: "Uten land",
   rack_filter_none: "Ingen viner for dette filteret.",
@@ -10271,6 +10323,9 @@ nl: {
   store_filter: "Opbergen: {name} · {n} fl. – tik op een vrij vak",
   store_filter_off: "Toon alles",
   store_back: "← Naar de kelder",
+  store_scan_btn: "📷 Wijn scannen & opbergen",
+  store_save_btn: "Opslaan & opbergen",
+  store_modal_title: "Wijn opbergen",
   rack_country_all: "Alle landen",
   rack_country_none: "Zonder land",
   rack_filter_none: "Geen wijnen voor dit filter.",
@@ -10674,6 +10729,9 @@ el: {
   store_filter: "Τοποθέτηση: {name} · {n} φιάλ. – πατήστε μια ελεύθερη θέση",
   store_filter_off: "Εμφάνιση όλων",
   store_back: "← Στο κελάρι",
+  store_scan_btn: "📷 Σάρωση κρασιού & τοποθέτηση",
+  store_save_btn: "Αποθήκευση & τοποθέτηση",
+  store_modal_title: "Τοποθέτηση κρασιού",
   rack_country_all: "Όλες οι χώρες",
   rack_country_none: "Χωρίς χώρα",
   rack_filter_none: "Κανένα κρασί για αυτό το φίλτρο.",
@@ -11077,6 +11135,9 @@ uk: {
   store_filter: "Розмістити: {name} · {n} пл. – торкніться вільного місця",
   store_filter_off: "Показати все",
   store_back: "← До погреба",
+  store_scan_btn: "📷 Сканувати вино та розмістити",
+  store_save_btn: "Зберегти та розмістити",
+  store_modal_title: "Розмістити вино",
   rack_country_all: "Усі країни",
   rack_country_none: "Без країни",
   rack_filter_none: "Немає вин для цього фільтра.",
@@ -11480,6 +11541,9 @@ ja: {
   store_filter: "配置: {name} · {n}本 – 空いている場所をタップ",
   store_filter_off: "すべて表示",
   store_back: "← セラーへ戻る",
+  store_scan_btn: "📷 ワインをスキャンして保管",
+  store_save_btn: "保存して保管",
+  store_modal_title: "ワインを保管",
   rack_country_all: "すべての国",
   rack_country_none: "国なし",
   rack_filter_none: "このフィルターに該当するワインはありません。",
@@ -11883,6 +11947,9 @@ ko: {
   store_filter: "보관: {name} · {n}병 – 빈 칸을 탭하세요",
   store_filter_off: "모두 보기",
   store_back: "← 셀러로",
+  store_scan_btn: "📷 와인 스캔 후 보관",
+  store_save_btn: "저장 후 보관",
+  store_modal_title: "와인 보관",
   rack_country_all: "모든 국가",
   rack_country_none: "국가 없음",
   rack_filter_none: "이 필터에 해당하는 와인이 없습니다.",
@@ -12286,6 +12353,9 @@ zh: {
   store_filter: "存放：{name} · {n} 瓶 – 请点按空位",
   store_filter_off: "显示全部",
   store_back: "← 返回酒窖",
+  store_scan_btn: "📷 扫描葡萄酒并存放",
+  store_save_btn: "保存并存放",
+  store_modal_title: "存放葡萄酒",
   rack_country_all: "所有国家",
   rack_country_none: "无国家",
   rack_filter_none: "没有符合此筛选条件的葡萄酒。",
@@ -12689,6 +12759,9 @@ hi: {
   store_filter: "रखें: {name} · {n} बोतल – खाली स्थान पर टैप करें",
   store_filter_off: "सब दिखाएँ",
   store_back: "← सेलर पर",
+  store_scan_btn: "📷 वाइन स्कैन करें और रखें",
+  store_save_btn: "सहेजें और रखें",
+  store_modal_title: "वाइन रखें",
   rack_country_all: "सभी देश",
   rack_country_none: "देश नहीं",
   rack_filter_none: "इस फ़िल्टर के लिए कोई वाइन नहीं है।",
@@ -13075,6 +13148,7 @@ function setOwner(v) { settings.owner = (v||'').trim(); saveSettings(); touchDat
 // NAV
 // ═══════════════════════════════════════
 function showTab(name, btn) {
+  if (name !== 'racks') rackStoreScan = false;
   if (name !== 'racks' && rackStoreFilter) {   // Einlagern-Vorgang gilt nur für den Besuch der Regalkarte, der ihn ausgelöst hat: Filter und vorgewählten Wein verwerfen
     if (rackSelectedWineId === rackStoreFilter) rackSelectedWineId = null;
     rackStoreFilter = null;
@@ -13515,6 +13589,15 @@ function editWine(id) {
 // ═══════════════════════════════════════
 // MODAL
 // ═══════════════════════════════════════
+// Regalkarte: Etikett scannen, im Formular prüfen, speichern und gleich ein Fach antippen (statt erst im Keller anzulegen und dann über die Liste einzulagern)
+function startStoreFromScan() {
+  if (!settings.racks.length) { showToast(t('racks_none')); return; }
+  openAddModal();
+  storeFromScan = true; rackStoreScan = true;
+  document.getElementById('modal-title').textContent = t('store_modal_title');
+  const sb = document.getElementById('add-save-btn'); sb.dataset.i18n = 'store_save_btn'; sb.textContent = t('store_save_btn');
+  document.getElementById('camera-input').click();   // im selben Tipp, damit iOS die Kamera zulässt
+}
 function openAddModal() {
   formToken++;
   editId = null;
@@ -13531,7 +13614,7 @@ function openAddModal() {
   document.getElementById('add-modal').classList.add('show');
 }
 
-function closeModal(id) { if (id === 'add-modal') { formToken++; if (formPhotoPending) { photoDel(formPhotoPending); formPhotoPending = null; } } document.getElementById(id).classList.remove('show'); }
+function closeModal(id) { if (id === 'add-modal') { storeFromScan = false; const sb = document.getElementById('add-save-btn'); if (sb) { sb.dataset.i18n = 'btn_save'; sb.textContent = t('btn_save'); } formToken++; if (formPhotoPending) { photoDel(formPhotoPending); formPhotoPending = null; } } document.getElementById(id).classList.remove('show'); }
 
 // Fenster per Wischen nach unten schließen (wie iOS-Sheets). Gilt nur am Griff und am oberen Rand des Fensters (und nur ganz oben im Fenster),
 // damit das Scrollen im Fenster nie versehentlich schließt. Das Fenster folgt dem Finger, bei zu kurzem Zug schnappt es zurück.
@@ -13582,6 +13665,8 @@ function setStar(n) {
 }
 
 function saveWine() {
+  const goStore = storeFromScan && !editId;   // closeModal setzt den Ablauf zurück, daher hier merken
+  let savedId = null;
   const name = document.getElementById('f-name').value.trim();
   if (!name) { showToast(t('toast_name')); return; }
   // Bild: in der Store-Version zählt nur, was der Nutzer selbst einträgt; ein dort ausgeblendetes (von der Web-App stammendes) Bild bleibt beim Speichern erhalten
@@ -13646,6 +13731,7 @@ function saveWine() {
     showToast(t('toast_updated'));
   } else {
     const existing = wines.find(w => sameWine(w, wine));
+    savedId = existing ? existing.id : wine.id;
     if (existing) {
       existing.count = (existing.count||1) + (wine.count||1);
       ['region','country','grape','locRegal','locEbene','locPlatz','drinkFrom','drinkTo','price','image','rating','note','ean','photo'].forEach(k => {
@@ -13664,6 +13750,11 @@ function saveWine() {
   formPhotoPending = null;
   closeModal('add-modal');   // beendet auch die Formular-Sitzung (formToken)
   renderKeller();
+  if (goStore) {
+    const tw = wines.find(x => x.id === savedId);
+    if (tw && unplacedCount(tw) > 0) storeWine(savedId, 0);
+    else { const act = document.querySelector('.tab.active'); if (act && act.id === 'tab-racks') renderRacks(); }
+  }
 }
 
 // ═══════════════════════════════════════
@@ -14053,6 +14144,8 @@ let rackFilledSlot = null;      // markiertes belegtes Fach {rack, e, p}
 let rackMove = null;            // Flasche, die gerade umgelagert wird {id, rack, e, p}
 let rackStoreBackY = 0;         // Scrollstand der Keller-Liste, zu dem "Zum Keller" zurückkehrt
 let rackUnFilter = { type: 'alle', country: '*' };   // Filter der Liste "Nicht zugeordnet" (Sorte, Land; '*' = alle)
+let rackStoreScan = false;       // Einlagern kam aus "Wein scannen & einlagern": das Fertig-Banner bietet den nächsten Scan an
+let storeFromScan = false;      // das Formular "Wein hinzufügen" wurde von der Regalkarte aus geöffnet: nach dem Speichern gleich einlagern
 let rackStoreFilter = null;     // Wein-ID: Regalkarte zeigt nur die noch nicht eingelagerten Flaschen dieses Weins (Einlagern-Knopf der Keller-Karte)
 function rackById(id) { return settings.racks.find(r => r.id === id) || null; }
 // Alle Ebenen haben gleich viele Plätze; Flaschen pro Platz: Standard des Regals, je Ebene überschreibbar (r.lv[Ebene].cap)
@@ -14282,7 +14375,7 @@ function renderRacks() {
   const swOpen = sw ? unplacedCount(sw) : 0, swName = sw ? sw.name + (sw.year ? ' ' + sw.year : '') : '';
   if (sw && swOpen < 1 && rackSelectedWineId === sw.id) rackSelectedWineId = null;
   else if (sw && swOpen > 0 && !rackSelectedWineId) rackSelectedWineId = sw.id;
-  let html = (sw ? `<div class="rack-store-banner"><span>${swOpen ? '📥 ' + esc(t('store_filter', { name: swName, n: swOpen })) : esc(t('store_done', { name: swName }))}</span><span class="rsb-btns">${swOpen ? `<button class="wine-btn" onclick="clearStoreFilter()">${t('store_filter_off')}</button>` : ''}<button class="wine-btn primary" onclick="backFromStore()">${t('store_back')}</button></span></div>` : '') + `<div class="rack-scanbar"><button class="scan-btn" onclick="scanShelf()">${t('shelf_scan')}</button><button class="scan-btn rack-clear-btn" onclick="clearRack(rackActive)">🧹 ${t('rack_clear_btn')}</button></div><div class="rack-toolbar"><span class="rack-toolbar-lbl">${t('rack_blink_lbl')}</span>`
+  let html = (sw ? `<div class="rack-store-banner"><span>${swOpen ? '📥 ' + esc(t('store_filter', { name: swName, n: swOpen })) : esc(t('store_done', { name: swName }))}</span><span class="rsb-btns">${swOpen ? `<button class="wine-btn" onclick="clearStoreFilter()">${t('store_filter_off')}</button>` : (rackStoreScan ? `<button class="wine-btn" onclick="startStoreFromScan()">${t('store_scan_btn')}</button>` : '')}<button class="wine-btn primary" onclick="backFromStore()">${t('store_back')}</button></span></div>` : '') + `<div class="rack-scanbar"><button class="scan-btn store-scan-btn" onclick="startStoreFromScan()">${t('store_scan_btn')}</button><button class="scan-btn" onclick="scanShelf()">${t('shelf_scan')}</button><button class="scan-btn rack-clear-btn" onclick="clearRack(rackActive)">🧹 ${t('rack_clear_btn')}</button></div><div class="rack-toolbar"><span class="rack-toolbar-lbl">${t('rack_blink_lbl')}</span>`
     + BLINKS.map(([key, label, st]) => `<button class="rack-toggle${blinkOn[key] ? ' active' : ''}" onclick="toggleRackBlink('${key}')" aria-pressed="${blinkOn[key]}"><span class="rt-dot"></span>${st ? `<i class="rack-ripe-dot ripeness-${RIPE_CLASS[st]}"></i>` : ''}${esc(label)}${blinkN[key] ? ' · ' + blinkN[key] : ''}</button>`).join('')
     + `</div>`
     + (blinkOn.Urgent ? `<div class="rack-blink-hint">${t('rack_blink_hint')}</div>` : '')
