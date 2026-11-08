@@ -616,6 +616,12 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .rack-un-chips .filter-chip.zero:not(.active) { color: var(--text-dim); }
 .ripe-country { padding: 4px 16px 8px; }
 .ripe-country .rack-un-country { max-width: 360px; }
+.setup-fold > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px; -webkit-user-select: none; user-select: none; }
+.setup-fold > summary::-webkit-details-marker { display: none; }
+.setup-fold > summary::before { content: '▸'; color: var(--gold); font-size: 14px; transition: transform .15s; }
+.setup-fold[open] > summary::before { transform: rotate(90deg); }
+.setup-fold[open] > summary { margin-bottom: 4px; }
+.setup-fold .fold-count { font-weight: 600; color: var(--text-muted); font-size: 12px; letter-spacing: 0; }
 .rack-un-country { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; color: var(--text); font-family: inherit; font-size: 13px; }
 .rack-store-banner { display: flex; align-items: center; gap: 10px; justify-content: space-between; margin: 0 0 12px; padding: 10px 12px; border: 1px solid var(--gold); border-radius: 12px; background: var(--card); font-size: 13px; font-weight: 600; color: var(--gold-light, var(--gold)); }
 .rack-store-banner .wine-btn { flex: none; width: auto; padding: 6px 12px; }
@@ -1521,16 +1527,18 @@ input[type="file"] { display: none; }
       </div>
     </div>
     <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border)">
-      <div class="stats-title" style="margin-bottom:4px" data-i18n="setup_racks">Regale</div>
-      <div style="font-size:12px; font-weight:600; color:var(--text-muted); margin-bottom:12px" data-i18n="setup_racks_desc">Definiere deine Regale mit Ebenen und Plätzen für den Kellerplan.</div>
-      <div id="rack-setup-list"></div>
-      <div class="rack-add-row">
-        <input id="rack-new-name" type="text" placeholder="Regal-Name" data-i18n-ph="rack_ph_name">
-        <input id="rack-new-rows" type="number" min="1" max="30" placeholder="Ebenen" data-i18n-ph="rack_ph_rows">
-        <input id="rack-new-cols" type="number" min="1" max="40" placeholder="Plätze" data-i18n-ph="rack_ph_cols">
-        <input id="rack-new-cap" type="number" min="1" max="500" placeholder="Flaschen/Platz" data-i18n-ph="rack_ph_cap">
-        <button class="mini-scan-btn" onclick="addRack()" title="Regal hinzufügen">＋</button>
-      </div>
+      <details class="setup-fold" id="rack-setup-details">
+        <summary class="stats-title" style="margin-bottom:4px"><span data-i18n="setup_racks">Regale</span><span class="fold-count" id="rack-setup-count"></span></summary>
+        <div style="font-size:12px; font-weight:600; color:var(--text-muted); margin-bottom:12px" data-i18n="setup_racks_desc">Definiere deine Regale mit Ebenen und Plätzen für den Kellerplan.</div>
+        <div id="rack-setup-list"></div>
+        <div class="rack-add-row">
+          <input id="rack-new-name" type="text" placeholder="Regal-Name" data-i18n-ph="rack_ph_name">
+          <input id="rack-new-rows" type="number" min="1" max="30" placeholder="Ebenen" data-i18n-ph="rack_ph_rows">
+          <input id="rack-new-cols" type="number" min="1" max="40" placeholder="Plätze" data-i18n-ph="rack_ph_cols">
+          <input id="rack-new-cap" type="number" min="1" max="500" placeholder="Flaschen/Platz" data-i18n-ph="rack_ph_cap">
+          <button class="mini-scan-btn" onclick="addRack()" title="Regal hinzufügen">＋</button>
+        </div>
+      </details>
     </div>
     <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border)">
       <a class="export-card" href="https://ocho1511.github.io/Weinkeller/datenschutz.html" target="_blank" rel="noopener" style="text-decoration:none; color:inherit">
@@ -16624,6 +16632,8 @@ let rackEditIdx = -1;   // Regal, dessen Ebenen gerade bearbeitet werden
 function renderRackSetup() {
   const list = document.getElementById('rack-setup-list');
   if (!list) return;
+  const cnt = document.getElementById('rack-setup-count');
+  if (cnt) cnt.textContent = settings.racks.length ? '(' + settings.racks.length + ')' : '';
   list.innerHTML = settings.racks.map((r,i) => {
     let h = `<div class="rack-setup-item${i === rackEditIdx ? ' editing' : ''}">${settings.racks.length > 1 ? `<span class="rack-drag" title="${esc(t('rack_drag_hint'))}" aria-hidden="true">⠿</span>` : ''}<span class="n">${esc(r.name)}</span><span class="d">${r.rows} × ${r.cols}${r.cap > 1 ? ' · ×' + r.cap : ''}${Object.keys(r.lv || {}).length ? ' *' : ''}</span><button class="rack-setup-edit" onclick="openQrLabels(${i})" title="${esc(t('qr_btn'))}">▦</button><button class="rack-setup-edit${i === rackEditIdx ? ' active' : ''}" aria-pressed="${i === rackEditIdx}" onclick="editRackLevels(${i})">✏️</button><button class="rack-setup-edit" onclick="clearRack(${i})" title="${esc(t('rack_clear_btn'))}">🧹</button><button class="rack-setup-del" onclick="removeRack(${i})">🗑</button></div>`;
     if (i === rackEditIdx) {
@@ -17445,6 +17455,13 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && Date.now() - lastVisSync > 20000) { lastVisSync = Date.now(); syncNow(true); recoverPurchases(); }
 });
 splashInit();
+// Setup: Regale einklappbar; der Zustand wird nur auf diesem Gerät gemerkt (Bequemlichkeit, ohne Speicher funktioniert alles)
+(function () {
+  const d = document.getElementById('rack-setup-details');
+  if (!d) return;
+  try { if (localStorage.getItem('wk_fold_racks') === '1') d.open = true; } catch (e) {}
+  d.addEventListener('toggle', () => { try { localStorage.setItem('wk_fold_racks', d.open ? '1' : '0'); } catch (e) {} });
+})();
 // Fenster: für Screenreader als Dialog kennzeichnen; am PC schließt Escape das oberste offene Fenster (der Scanner hat eine eigene Abbrechen-Taste)
 document.querySelectorAll('.modal-overlay').forEach((ov) => { ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); });
 document.addEventListener('keydown', (e) => {
