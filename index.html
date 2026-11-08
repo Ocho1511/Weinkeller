@@ -614,6 +614,8 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .rack-un-filter { margin-bottom: 10px; }
 .rack-un-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
 .rack-un-chips .filter-chip.zero:not(.active) { color: var(--text-dim); }
+.ripe-country { padding: 4px 16px 8px; }
+.ripe-country .rack-un-country { max-width: 360px; }
 .rack-un-country { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; color: var(--text); font-family: inherit; font-size: 13px; }
 .rack-store-banner { display: flex; align-items: center; gap: 10px; justify-content: space-between; margin: 0 0 12px; padding: 10px 12px; border: 1px solid var(--gold); border-radius: 12px; background: var(--card); font-size: 13px; font-weight: 600; color: var(--gold-light, var(--gold)); }
 .rack-store-banner .wine-btn { flex: none; width: auto; padding: 6px 12px; }
@@ -1203,6 +1205,7 @@ input[type="file"] { display: none; }
   </div>
   <div class="filter-scroll" id="ripe-filter-type" style="padding-bottom:8px"></div>
   <div class="filter-scroll" id="ripe-filter-status"></div>
+  <div class="ripe-country" id="ripe-filter-country"></div>
   <div id="trinkreife-list"></div>
 </div>
 
@@ -2132,6 +2135,7 @@ let viewMode = 'card';
 let sortMode = 'added';
 let ripeFilterType = 'alle';
 let ripeFilterStatus = 'alle';
+let ripeFilterCountry = '*';   // Land-Filter der Trinkreife ('*' = alle)
 let histFilterType = 'alle';
 let histFilterOcc = 'alle';
 
@@ -16170,6 +16174,7 @@ function ripeOverdue(w) {
 
 function setRipeFilterType(v) { ripeFilterType = v; renderTrinkreife(); }
 function setRipeFilterStatus(v) { ripeFilterStatus = v; renderTrinkreife(); }
+function setRipeFilterCountry(v) { ripeFilterCountry = v; renderTrinkreife(); }
 
 function renderTrinkreife() {
   const now = new Date().getFullYear();
@@ -16184,9 +16189,21 @@ function renderTrinkreife() {
   `).join('');
 
   const allRipe = wines.filter(w => w.drinkFrom || w.drinkTo);
+  // Land-Auswahl: die Zahlen zeigen, was mit Sorte und Zustand noch übrig ist; Länder ohne Treffer sind ausgegraut
+  const normC = (w) => String(w.country || '').trim().toLowerCase();
+  const passTS = (w) => (ripeFilterType === 'alle' || w.type === ripeFilterType) && (ripeFilterStatus === 'alle' || ripeStatusKey(w) === ripeFilterStatus);
+  const cmap = new Map();
+  allRipe.forEach(w => { const k = normC(w), c = cmap.get(k) || { label: String(w.country || '').trim(), n: 0 }; if (passTS(w)) c.n++; cmap.set(k, c); });
+  if (ripeFilterCountry !== '*' && !cmap.has(ripeFilterCountry)) ripeFilterCountry = '*';
+  const cbox = document.getElementById('ripe-filter-country');
+  if (cbox) {
+    const copts = [...cmap].sort((a, b) => (a[0] === '') - (b[0] === '') || a[1].label.localeCompare(b[1].label))
+      .map(([k, c]) => `<option value="${esc(k)}"${ripeFilterCountry === k ? ' selected' : ''}${c.n === 0 && ripeFilterCountry !== k ? ' disabled' : ''}>${esc(c.label || t('rack_country_none'))} (${c.n})</option>`).join('');
+    cbox.innerHTML = allRipe.length ? `<select class="rack-un-country" aria-label="${esc(t('rack_country_all'))}" onchange="setRipeFilterCountry(this.value)"><option value="*">${esc(t('rack_country_all'))}</option>${copts}</select>` : '';
+  }
   const withRipe = allRipe
-    .filter(w => ripeFilterType === 'alle' || w.type === ripeFilterType)
-    .filter(w => ripeFilterStatus === 'alle' || ripeStatusKey(w) === ripeFilterStatus)
+    .filter(passTS)
+    .filter(w => ripeFilterCountry === '*' || normC(w) === ripeFilterCountry)
     .sort((a,b) => ripeOverdue(b) - ripeOverdue(a));
   const el = document.getElementById('trinkreife-list');
   if (!allRipe.length) {
