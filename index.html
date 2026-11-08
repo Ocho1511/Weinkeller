@@ -1358,7 +1358,9 @@ input[type="file"] { display: none; }
     <div class="subtitle" data-i18n="setup_sub">Einstellungen</div>
   </div>
   <div class="export-section">
-    <div class="form-group">
+    <details class="setup-fold" data-fold="general" data-open="1">
+      <summary class="stats-title" style="margin-bottom:4px"><span data-i18n="setup_general">Allgemein</span></summary>
+    <div class="form-group" style="margin-top:10px">
       <label data-i18n="setup_owner">Anzeigename (Titel)</label>
       <input id="setup-owner" type="text" placeholder="z.B. Peter" data-i18n-ph="setup_owner_ph" onchange="setOwner(this.value)">
       <div style="font-size:12px; font-weight:600; color:var(--text-muted); margin-top:4px" data-i18n="setup_owner_desc">Leer lassen für den Standardtitel.</div>
@@ -1439,8 +1441,10 @@ input[type="file"] { display: none; }
         <option value="F">°F (Fahrenheit)</option>
       </select>
     </div>
+    </details>
     <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border)">
-      <div class="stats-title" style="margin-bottom:4px" data-i18n="setup_storage">Speicherort</div>
+      <details class="setup-fold" data-fold="storage">
+      <summary class="stats-title" style="margin-bottom:4px"><span data-i18n="setup_storage">Speicherort</span></summary>
       <div style="font-size:12px; font-weight:600; color:var(--text-muted); margin-bottom:12px" data-i18n="setup_storage_desc">Cloud: Daten geräteübergreifend nutzbar (neueste Änderung gewinnt).</div>
       <div class="filter-scroll" style="padding:0 0 12px 0">
         <button class="filter-chip" id="storage-local" onclick="setStorage('local')" data-i18n="storage_local">Nur dieses Gerät</button>
@@ -1477,10 +1481,12 @@ input[type="file"] { display: none; }
           </div>
         </div>
       </div>
+      </details>
     </div>
     <!-- KI-Guthaben: nur in der nativen App sichtbar -->
     <div id="credits-card" style="display:none; margin-top:20px; padding-top:20px; border-top:1px solid var(--border)">
-      <div class="stats-title" style="margin-bottom:4px" data-i18n="credits_title">KI-Guthaben</div>
+      <details class="setup-fold" data-fold="credits">
+      <summary class="stats-title" style="margin-bottom:4px"><span data-i18n="credits_title">KI-Guthaben</span></summary>
       <div style="font-size:12px; font-weight:600; color:var(--text-muted); margin-bottom:12px" data-i18n="credits_info">Etikett scannen und Wein nachschlagen verbrauchen je 1 KI-Scan. Zum Start sind 50 inklusive.</div>
       <div class="export-card" style="cursor:default">
         <div class="export-icon">✨</div>
@@ -1500,9 +1506,12 @@ input[type="file"] { display: none; }
         <input id="unlock-code" type="password" autocomplete="off" autocapitalize="off" placeholder="Freischaltcode" data-i18n-ph="credits_unlock_ph" onkeydown="if(event.key==='Enter')submitUnlock()">
         <button class="mini-scan-btn" onclick="submitUnlock()" title="Freischalten">🔓</button>
       </div>
+      </details>
     </div>
     <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border)">
-      <div class="stats-title" style="margin-bottom:12px" data-i18n="setup_db">Weindatenbank</div>
+      <details class="setup-fold" data-fold="db">
+      <summary class="stats-title" style="margin-bottom:4px"><span data-i18n="setup_db">Weindatenbank</span></summary>
+      <div style="height:8px"></div>
       <div class="export-card" id="enrich-btn" onclick="enrichAllWines()">
         <div class="export-icon">🔄</div>
         <div class="export-info">
@@ -1525,9 +1534,10 @@ input[type="file"] { display: none; }
         <div class="enrich-prog-track"><div id="enrich-prog-bar" class="enrich-prog-bar"></div></div>
         <div id="enrich-prog-current" class="enrich-prog-current"></div>
       </div>
+      </details>
     </div>
     <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border)">
-      <details class="setup-fold" id="rack-setup-details">
+      <details class="setup-fold" id="rack-setup-details" data-fold="racks">
         <summary class="stats-title" style="margin-bottom:4px"><span data-i18n="setup_racks">Regale</span><span class="fold-count" id="rack-setup-count"></span></summary>
         <div style="font-size:12px; font-weight:600; color:var(--text-muted); margin-bottom:12px" data-i18n="setup_racks_desc">Definiere deine Regale mit Ebenen und Plätzen für den Kellerplan.</div>
         <div id="rack-setup-list"></div>
@@ -3069,6 +3079,7 @@ async function recoverPurchases() {
 function goToUnlock() {
   closeModal('credits-modal');
   showTab('setup', document.querySelector("[onclick=\"showTab('setup',this)\"]"));
+  openSetupFold('credits');
   const inp = document.getElementById('unlock-code'); if (inp) setTimeout(() => inp.focus(), 150);
 }
 async function submitUnlock() {
@@ -3694,6 +3705,7 @@ de: {
   store_filter: "Einlagern: {name} · {n} Fl. – freies Fach antippen",
   store_filter_off: "Alle anzeigen",
   store_back: "← Zum Keller",
+  setup_general: "Allgemein",
   s_over_warn: "{n} Flaschen sind überschritten – bald trinken",
   s_bycountry: "Nach Land",
   s_byregion: "Nach Region",
@@ -4149,6 +4161,7 @@ en: {
   store_filter: "Store: {name} · {n} btl. – tap a free slot",
   store_filter_off: "Show all",
   store_back: "← To cellar",
+  setup_general: "General",
   s_over_warn: "{n} bottles are past their window – drink soon",
   s_bycountry: "By country",
   s_byregion: "By region",
@@ -4604,6 +4617,7 @@ es: {
   store_filter: "Colocar: {name} · {n} bot. – toca un hueco libre",
   store_filter_off: "Mostrar todo",
   store_back: "← A la bodega",
+  setup_general: "General",
   s_over_warn: "{n} botellas han pasado su momento – a beber pronto",
   s_bycountry: "Por país",
   s_byregion: "Por región",
@@ -5059,6 +5073,7 @@ sv: {
   store_filter: "Placera: {name} · {n} fl. – tryck på en ledig plats",
   store_filter_off: "Visa alla",
   store_back: "← Till källaren",
+  setup_general: "Allmänt",
   s_over_warn: "{n} flaskor har passerat sitt fönster – drick snart",
   s_bycountry: "Per land",
   s_byregion: "Per region",
@@ -5514,6 +5529,7 @@ da: {
   store_filter: "Placér: {name} · {n} fl. – tryk på en ledig plads",
   store_filter_off: "Vis alle",
   store_back: "← Til kælderen",
+  setup_general: "Generelt",
   s_over_warn: "{n} flasker er over deres vindue – drik snart",
   s_bycountry: "Efter land",
   s_byregion: "Efter region",
@@ -5969,6 +5985,7 @@ fi: {
   store_filter: "Sijoita: {name} · {n} pul. – napauta vapaata paikkaa",
   store_filter_off: "Näytä kaikki",
   store_back: "← Kellariin",
+  setup_general: "Yleiset",
   s_over_warn: "{n} pulloa on ohittanut parhaan ajan – juo pian",
   s_bycountry: "Maittain",
   s_byregion: "Alueittain",
@@ -6424,6 +6441,7 @@ ru: {
   store_filter: "Разместить: {name} · {n} бут. – коснитесь свободной ячейки",
   store_filter_off: "Показать все",
   store_back: "← В погреб",
+  setup_general: "Общие",
   s_over_warn: "{n} бутылок прошли срок – пейте скорее",
   s_bycountry: "По странам",
   s_byregion: "По регионам",
@@ -6879,6 +6897,7 @@ it: {
   store_filter: "Riponi: {name} · {n} bott. – tocca uno scomparto libero",
   store_filter_off: "Mostra tutto",
   store_back: "← Alla cantina",
+  setup_general: "Generali",
   s_over_warn: "{n} bottiglie hanno superato la finestra – da bere presto",
   s_bycountry: "Per paese",
   s_byregion: "Per regione",
@@ -7334,6 +7353,7 @@ fr: {
   store_filter: "Ranger : {name} · {n} bout. – touchez un emplacement libre",
   store_filter_off: "Tout afficher",
   store_back: "← Vers la cave",
+  setup_general: "Général",
   s_over_warn: "{n} bouteilles ont dépassé leur apogée – à boire bientôt",
   s_bycountry: "Par pays",
   s_byregion: "Par région",
@@ -7789,6 +7809,7 @@ pl: {
   store_filter: "Ułóż: {name} · {n} but. – dotknij wolne miejsce",
   store_filter_off: "Pokaż wszystko",
   store_back: "← Do piwnicy",
+  setup_general: "Ogólne",
   s_over_warn: "{n} butelek przekroczyło okres – pij wkrótce",
   s_bycountry: "Wg kraju",
   s_byregion: "Wg regionu",
@@ -8244,6 +8265,7 @@ hu: {
   store_filter: "Elhelyezés: {name} · {n} üveg – koppints egy szabad helyre",
   store_filter_off: "Összes mutatása",
   store_back: "← A pincéhez",
+  setup_general: "Általános",
   s_over_warn: "{n} palack túllépte az ivási időszakot – igyál hamarosan",
   s_bycountry: "Ország szerint",
   s_byregion: "Régió szerint",
@@ -8699,6 +8721,7 @@ cs: {
   store_filter: "Uložit: {name} · {n} lahví – klepni na volné místo",
   store_filter_off: "Zobrazit vše",
   store_back: "← Do sklepa",
+  setup_general: "Obecné",
   s_over_warn: "{n} lahví překročilo své okno – pijte brzy",
   s_bycountry: "Podle země",
   s_byregion: "Podle regionu",
@@ -9154,6 +9177,7 @@ sk: {
   store_filter: "Uložiť: {name} · {n} fliaš – ťukni na voľné miesto",
   store_filter_off: "Zobraziť všetko",
   store_back: "← Do pivnice",
+  setup_general: "Všeobecné",
   s_over_warn: "{n} fliaš prekročilo svoje okno – pite čoskoro",
   s_bycountry: "Podľa krajiny",
   s_byregion: "Podľa regiónu",
@@ -9609,6 +9633,7 @@ ro: {
   store_filter: "Așază: {name} · {n} stic. – atinge un loc liber",
   store_filter_off: "Arată tot",
   store_back: "← La pivniță",
+  setup_general: "General",
   s_over_warn: "{n} sticle au depășit intervalul – de băut curând",
   s_bycountry: "După țară",
   s_byregion: "După regiune",
@@ -10064,6 +10089,7 @@ hr: {
   store_filter: "Pohrani: {name} · {n} boc. – dodirni slobodno mjesto",
   store_filter_off: "Prikaži sve",
   store_back: "← U podrum",
+  setup_general: "Općenito",
   s_over_warn: "{n} boca je prošlo svoje razdoblje – pijte uskoro",
   s_bycountry: "Po zemlji",
   s_byregion: "Po regiji",
@@ -10519,6 +10545,7 @@ pt: {
   store_filter: "Arrumar: {name} · {n} gar. – toca num lugar livre",
   store_filter_off: "Mostrar tudo",
   store_back: "← Para a adega",
+  setup_general: "Geral",
   s_over_warn: "{n} garrafas passaram do prazo – beber em breve",
   s_bycountry: "Por país",
   s_byregion: "Por região",
@@ -10974,6 +11001,7 @@ no: {
   store_filter: "Plasser: {name} · {n} fl. – trykk på en ledig plass",
   store_filter_off: "Vis alle",
   store_back: "← Til kjelleren",
+  setup_general: "Generelt",
   s_over_warn: "{n} flasker er over tiden – drikk snart",
   s_bycountry: "Etter land",
   s_byregion: "Etter region",
@@ -11429,6 +11457,7 @@ nl: {
   store_filter: "Opbergen: {name} · {n} fl. – tik op een vrij vak",
   store_filter_off: "Toon alles",
   store_back: "← Naar de kelder",
+  setup_general: "Algemeen",
   s_over_warn: "{n} flessen zijn over hun hoogtepunt – binnenkort drinken",
   s_bycountry: "Per land",
   s_byregion: "Per regio",
@@ -11884,6 +11913,7 @@ el: {
   store_filter: "Τοποθέτηση: {name} · {n} φιάλ. – πατήστε μια ελεύθερη θέση",
   store_filter_off: "Εμφάνιση όλων",
   store_back: "← Στο κελάρι",
+  setup_general: "Γενικά",
   s_over_warn: "{n} φιάλες έχουν περάσει το όριο – πιείτε σύντομα",
   s_bycountry: "Ανά χώρα",
   s_byregion: "Ανά περιοχή",
@@ -12339,6 +12369,7 @@ uk: {
   store_filter: "Розмістити: {name} · {n} пл. – торкніться вільного місця",
   store_filter_off: "Показати все",
   store_back: "← До погреба",
+  setup_general: "Загальні",
   s_over_warn: "{n} пляшок минули свій термін – пийте скоро",
   s_bycountry: "За країнами",
   s_byregion: "За регіонами",
@@ -12794,6 +12825,7 @@ ja: {
   store_filter: "配置: {name} · {n}本 – 空いている場所をタップ",
   store_filter_off: "すべて表示",
   store_back: "← セラーへ戻る",
+  setup_general: "一般",
   s_over_warn: "{n} 本が飲み頃を過ぎています – 早めにお飲みください",
   s_bycountry: "国別",
   s_byregion: "地域別",
@@ -13249,6 +13281,7 @@ ko: {
   store_filter: "보관: {name} · {n}병 – 빈 칸을 탭하세요",
   store_filter_off: "모두 보기",
   store_back: "← 셀러로",
+  setup_general: "일반",
   s_over_warn: "{n}병이 음용 시기를 지났습니다 – 곧 드세요",
   s_bycountry: "국가별",
   s_byregion: "지역별",
@@ -13704,6 +13737,7 @@ zh: {
   store_filter: "存放：{name} · {n} 瓶 – 请点按空位",
   store_filter_off: "显示全部",
   store_back: "← 返回酒窖",
+  setup_general: "通用",
   s_over_warn: "{n} 瓶已过适饮期 – 请尽快饮用",
   s_bycountry: "按国家",
   s_byregion: "按产区",
@@ -14159,6 +14193,7 @@ hi: {
   store_filter: "रखें: {name} · {n} बोतल – खाली स्थान पर टैप करें",
   store_filter_off: "सब दिखाएँ",
   store_back: "← सेलर पर",
+  setup_general: "सामान्य",
   s_over_warn: "{n} बोतलें अपनी अवधि पार कर चुकी हैं – जल्दी पिएँ",
   s_bycountry: "देश के अनुसार",
   s_byregion: "क्षेत्र के अनुसार",
@@ -17455,13 +17490,15 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && Date.now() - lastVisSync > 20000) { lastVisSync = Date.now(); syncNow(true); recoverPurchases(); }
 });
 splashInit();
-// Setup: Regale einklappbar; der Zustand wird nur auf diesem Gerät gemerkt (Bequemlichkeit, ohne Speicher funktioniert alles)
-(function () {
-  const d = document.getElementById('rack-setup-details');
-  if (!d) return;
-  try { if (localStorage.getItem('wk_fold_racks') === '1') d.open = true; } catch (e) {}
-  d.addEventListener('toggle', () => { try { localStorage.setItem('wk_fold_racks', d.open ? '1' : '0'); } catch (e) {} });
-})();
+// Setup: Abschnitte einklappbar; der Zustand wird nur auf diesem Gerät gemerkt (Bequemlichkeit, ohne Speicher funktioniert alles). "Allgemein" ist beim ersten Start offen, der Rest zu.
+document.querySelectorAll('details.setup-fold[data-fold]').forEach((d) => {
+  const key = 'wk_fold_' + d.dataset.fold;
+  let v = null;
+  try { v = localStorage.getItem(key); } catch (e) {}
+  if (v === '1' || (v === null && d.dataset.open === '1')) d.open = true;
+  d.addEventListener('toggle', () => { try { localStorage.setItem(key, d.open ? '1' : '0'); } catch (e) {} });
+});
+function openSetupFold(name) { const d = document.querySelector('details.setup-fold[data-fold="' + name + '"]'); if (d) d.open = true; }
 // Fenster: für Screenreader als Dialog kennzeichnen; am PC schließt Escape das oberste offene Fenster (der Scanner hat eine eigene Abbrechen-Taste)
 document.querySelectorAll('.modal-overlay').forEach((ov) => { ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); });
 document.addEventListener('keydown', (e) => {
