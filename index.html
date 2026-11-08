@@ -1365,6 +1365,7 @@ input[type="file"] { display: none; }
         <option value="da">🇩🇰 Dansk</option>
         <option value="de">🇩🇪 Deutsch</option>
         <option value="en">🇬🇧 English</option>
+        <option value="us">🇺🇸 English (US)</option>
         <option value="el">🇬🇷 Ελληνικά</option>
         <option value="es">🇪🇸 Español</option>
         <option value="fr">🇫🇷 Français</option>
@@ -2386,7 +2387,10 @@ const CURRENCIES = {
   'JPY': { key:'cur_jpy', tag:'¥',   name:'Japanischer Yen',     fmt:n=>'¥'+wholeNum(n) },
   'CNY': { key:'cur_cny', tag:'CN¥', name:'Chinesischer Yuan',   fmt:n=>'¥'+n },
   'KRW': { key:'cur_krw', tag:'₩',   name:'Südkoreanischer Won', fmt:n=>'₩'+wholeNum(n) },
-  'INR': { key:'cur_inr', tag:'₹',   name:'Indische Rupie',      fmt:n=>'₹'+n }
+  'INR': { key:'cur_inr', tag:'₹',   name:'Indische Rupie',      fmt:n=>'₹'+n },
+  'HUF': { key:'cur_huf', tag:'Ft',  name:'Ungarischer Forint',  fmt:n=>wholeNum(n)+' Ft' },
+  'CZK': { key:'cur_czk', tag:'Kč',  name:'Tschechische Krone',  fmt:n=>n+' Kč' },
+  'RON': { key:'cur_ron', tag:'lei', name:'Rumänischer Leu',     fmt:n=>n+' lei' }
 };
 function fmtMoney(n) { const c = CURRENCIES[settings.currency]; return c ? c.fmt(n) : settings.currency + n; }
 // Währungsauswahl mit übersetzten Namen füllen (Auswahl bleibt erhalten)
@@ -2398,7 +2402,7 @@ function renderCurrencyOptions() {
   sel.value = cur;
 }
 function dateLocale() {
-  const m = { de:'de-DE', en:'en-US', es:'es-ES', sv:'sv-SE', da:'da-DK', fi:'fi-FI', ru:'ru-RU', it:'it-IT', fr:'fr-FR', pl:'pl-PL', hu:'hu-HU', cs:'cs-CZ', sk:'sk-SK', ro:'ro-RO', hr:'hr-HR', pt:'pt-PT', no:'nb-NO', nl:'nl-NL', el:'el-GR', uk:'uk-UA', ja:'ja-JP', ko:'ko-KR', zh:'zh-CN', hi:'hi-IN' };
+  const m = { de:'de-DE', en:'en-US', us:'en-US', es:'es-ES', sv:'sv-SE', da:'da-DK', fi:'fi-FI', ru:'ru-RU', it:'it-IT', fr:'fr-FR', pl:'pl-PL', hu:'hu-HU', cs:'cs-CZ', sk:'sk-SK', ro:'ro-RO', hr:'hr-HR', pt:'pt-PT', no:'nb-NO', nl:'nl-NL', el:'el-GR', uk:'uk-UA', ja:'ja-JP', ko:'ko-KR', zh:'zh-CN', hi:'hi-IN' };
   return m[settings.lang] || 'en-US';
 }
 
@@ -2440,7 +2444,7 @@ function fillDatalist(id, items) {
 function buildWineData() {
   fillDatalist('dl-grape', DB_GRAPES);
   fillDatalist('dl-region', DB_REGIONS);
-  fillDatalist('dl-country', DB_COUNTRIES[settings.lang] || DB_COUNTRIES.de);
+  fillDatalist('dl-country', DB_COUNTRIES[baseLang()] || DB_COUNTRIES.de);
 }
 function setIfEmpty(id, val) {
   const el = document.getElementById(id);
@@ -3666,6 +3670,9 @@ de: {
   store_filter: "Einlagern: {name} · {n} Fl. – freies Fach antippen",
   store_filter_off: "Alle anzeigen",
   store_back: "← Zum Keller",
+  cur_huf: "Ungarischer Forint",
+  cur_czk: "Tschechische Krone",
+  cur_ron: "Rumänischer Leu",
   drinkrule_btn: "Trinkfenster neu berechnen",
   drinkrule_desc: "Trinken ab = Jahrgang + 1; Trinken bis nach Weinart und Rebsorte",
   drinkrule_confirm: "Für {n} Weine wird „Trinken ab“ auf Jahrgang + 1 gesetzt (auch von Hand eingetragene Werte werden überschrieben) und „Trinken bis“ bei Bedarf nach Weinart und Rebsorte angepasst. Weine ohne Jahrgang bleiben unverändert. Tipp: vorher ein JSON-Backup exportieren. Fortfahren?",
@@ -4089,6 +4096,9 @@ en: {
   store_filter: "Store: {name} · {n} btl. – tap a free slot",
   store_filter_off: "Show all",
   store_back: "← To cellar",
+  cur_huf: "Hungarian Forint",
+  cur_czk: "Czech Koruna",
+  cur_ron: "Romanian Leu",
   drinkrule_btn: "Recalculate drinking windows",
   drinkrule_desc: "Drink from = vintage + 1; drink until by wine type and grape",
   drinkrule_confirm: "For {n} wines, “drink from” will be set to vintage + 1 (values you entered by hand are overwritten) and “drink until” adjusted by wine type and grape where needed. Wines without a vintage stay unchanged. Tip: export a JSON backup first. Continue?",
@@ -4512,6 +4522,9 @@ es: {
   store_filter: "Colocar: {name} · {n} bot. – toca un hueco libre",
   store_filter_off: "Mostrar todo",
   store_back: "← A la bodega",
+  cur_huf: "Forinto húngaro",
+  cur_czk: "Corona checa",
+  cur_ron: "Leu rumano",
   drinkrule_btn: "Recalcular ventana de consumo",
   drinkrule_desc: "Beber desde = añada + 1; beber hasta según tipo de vino y uva",
   drinkrule_confirm: "En {n} vinos, «beber desde» se fijará en añada + 1 (también se sobrescriben los valores escritos a mano) y «beber hasta» se ajustará según el tipo de vino y la uva cuando haga falta. Los vinos sin añada no cambian. Consejo: exporta antes una copia JSON. ¿Continuar?",
@@ -4935,6 +4948,9 @@ sv: {
   store_filter: "Placera: {name} · {n} fl. – tryck på en ledig plats",
   store_filter_off: "Visa alla",
   store_back: "← Till källaren",
+  cur_huf: "Ungersk forint",
+  cur_czk: "Tjeckisk krona",
+  cur_ron: "Rumänsk leu",
   drinkrule_btn: "Räkna om dryckesfönster",
   drinkrule_desc: "Dricka från = årgång + 1; dricka till efter vintyp och druva",
   drinkrule_confirm: "För {n} viner sätts ”dricka från” till årgång + 1 (även värden du skrivit in själv skrivs över) och ”dricka till” justeras vid behov efter vintyp och druva. Viner utan årgång lämnas oförändrade. Tips: exportera en JSON-säkerhetskopia först. Fortsätta?",
@@ -5358,6 +5374,9 @@ da: {
   store_filter: "Placér: {name} · {n} fl. – tryk på en ledig plads",
   store_filter_off: "Vis alle",
   store_back: "← Til kælderen",
+  cur_huf: "Ungarsk forint",
+  cur_czk: "Tjekkisk koruna",
+  cur_ron: "Rumænsk leu",
   drinkrule_btn: "Genberegn drikkevindue",
   drinkrule_desc: "Drik fra = årgang + 1; drik til efter vintype og drue",
   drinkrule_confirm: "For {n} vine sættes »drik fra« til årgang + 1 (også værdier, du selv har indtastet, overskrives), og »drik til« justeres efter behov efter vintype og drue. Vine uden årgang forbliver uændrede. Tip: eksportér en JSON-sikkerhedskopi først. Fortsæt?",
@@ -5781,6 +5800,9 @@ fi: {
   store_filter: "Sijoita: {name} · {n} pul. – napauta vapaata paikkaa",
   store_filter_off: "Näytä kaikki",
   store_back: "← Kellariin",
+  cur_huf: "Unkarin forintti",
+  cur_czk: "Tšekin koruna",
+  cur_ron: "Romanian leu",
   drinkrule_btn: "Laske juomaikkuna uudelleen",
   drinkrule_desc: "Juo alkaen = vuosikerta + 1; juo asti viinityypin ja rypäleen mukaan",
   drinkrule_confirm: "{n} viinille ”juo alkaen” asetetaan arvoon vuosikerta + 1 (myös itse kirjoitetut arvot korvataan) ja ”juo asti” sovitetaan tarvittaessa viinityypin ja rypäleen mukaan. Viinit ilman vuosikertaa pysyvät ennallaan. Vinkki: vie ensin JSON-varmuuskopio. Jatketaanko?",
@@ -6204,6 +6226,9 @@ ru: {
   store_filter: "Разместить: {name} · {n} бут. – коснитесь свободной ячейки",
   store_filter_off: "Показать все",
   store_back: "← В погреб",
+  cur_huf: "Венгерский форинт",
+  cur_czk: "Чешская крона",
+  cur_ron: "Румынский лей",
   drinkrule_btn: "Пересчитать окно употребления",
   drinkrule_desc: "Пить с = год урожая + 1; пить до — по типу вина и сорту",
   drinkrule_confirm: "Для {n} вин «пить с» будет установлено на год урожая + 1 (введённые вручную значения тоже перезаписываются), а «пить до» при необходимости скорректируется по типу вина и сорту. Вина без года урожая не меняются. Совет: сначала экспортируйте резервную копию JSON. Продолжить?",
@@ -6627,6 +6652,9 @@ it: {
   store_filter: "Riponi: {name} · {n} bott. – tocca uno scomparto libero",
   store_filter_off: "Mostra tutto",
   store_back: "← Alla cantina",
+  cur_huf: "Fiorino ungherese",
+  cur_czk: "Corona ceca",
+  cur_ron: "Leu rumeno",
   drinkrule_btn: "Ricalcola finestra di consumo",
   drinkrule_desc: "Bere da = annata + 1; bere fino a in base a tipo di vino e uva",
   drinkrule_confirm: "Per {n} vini «bere da» sarà impostato su annata + 1 (anche i valori inseriti a mano vengono sovrascritti) e «bere fino a» sarà adattato, se necessario, in base a tipo di vino e uva. I vini senza annata restano invariati. Consiglio: esporta prima un backup JSON. Continuare?",
@@ -7050,6 +7078,9 @@ fr: {
   store_filter: "Ranger : {name} · {n} bout. – touchez un emplacement libre",
   store_filter_off: "Tout afficher",
   store_back: "← Vers la cave",
+  cur_huf: "Forint hongrois",
+  cur_czk: "Couronne tchèque",
+  cur_ron: "Leu roumain",
   drinkrule_btn: "Recalculer la fenêtre de dégustation",
   drinkrule_desc: "Boire à partir de = millésime + 1 ; boire jusqu'à selon le type de vin et le cépage",
   drinkrule_confirm: "Pour {n} vins, « boire à partir de » sera fixé à millésime + 1 (les valeurs saisies à la main sont aussi écrasées) et « boire jusqu'à » sera ajusté si nécessaire selon le type de vin et le cépage. Les vins sans millésime restent inchangés. Conseil : exportez d'abord une sauvegarde JSON. Continuer ?",
@@ -7473,6 +7504,9 @@ pl: {
   store_filter: "Ułóż: {name} · {n} but. – dotknij wolne miejsce",
   store_filter_off: "Pokaż wszystko",
   store_back: "← Do piwnicy",
+  cur_huf: "Forint węgierski",
+  cur_czk: "Korona czeska",
+  cur_ron: "Lej rumuński",
   drinkrule_btn: "Przelicz okno spożycia",
   drinkrule_desc: "Pić od = rocznik + 1; pić do wg rodzaju wina i szczepu",
   drinkrule_confirm: "Dla {n} win „pić od” zostanie ustawione na rocznik + 1 (ręcznie wpisane wartości też zostaną nadpisane), a „pić do” w razie potrzeby dopasowane do rodzaju wina i szczepu. Wina bez rocznika pozostają bez zmian. Wskazówka: najpierw wyeksportuj kopię JSON. Kontynuować?",
@@ -7896,6 +7930,9 @@ hu: {
   store_filter: "Elhelyezés: {name} · {n} üveg – koppints egy szabad helyre",
   store_filter_off: "Összes mutatása",
   store_back: "← A pincéhez",
+  cur_huf: "Magyar forint",
+  cur_czk: "Cseh korona",
+  cur_ron: "Román lej",
   drinkrule_btn: "Ivási időablak újraszámítása",
   drinkrule_desc: "Inni kezdve = évjárat + 1; inni eddig a bor típusa és a szőlő szerint",
   drinkrule_confirm: "{n} bornál az „inni kezdve” érték évjárat + 1 lesz (a kézzel beírt értékeket is felülírja), az „inni eddig” pedig szükség esetén a bor típusa és a szőlő szerint módosul. Az évjárat nélküli borok változatlanok maradnak. Tipp: előbb exportálj JSON-mentést. Folytatod?",
@@ -8319,6 +8356,9 @@ cs: {
   store_filter: "Uložit: {name} · {n} lahví – klepni na volné místo",
   store_filter_off: "Zobrazit vše",
   store_back: "← Do sklepa",
+  cur_huf: "Maďarský forint",
+  cur_czk: "Česká koruna",
+  cur_ron: "Rumunský leu",
   drinkrule_btn: "Přepočítat okno pití",
   drinkrule_desc: "Pít od = ročník + 1; pít do podle druhu vína a odrůdy",
   drinkrule_confirm: "U {n} vín se „pít od“ nastaví na ročník + 1 (přepíšou se i ručně zadané hodnoty) a „pít do“ se podle potřeby upraví podle druhu vína a odrůdy. Vína bez ročníku zůstanou beze změny. Tip: nejdřív exportujte zálohu JSON. Pokračovat?",
@@ -8742,6 +8782,9 @@ sk: {
   store_filter: "Uložiť: {name} · {n} fliaš – ťukni na voľné miesto",
   store_filter_off: "Zobraziť všetko",
   store_back: "← Do pivnice",
+  cur_huf: "Maďarský forint",
+  cur_czk: "Česká koruna",
+  cur_ron: "Rumunský lei",
   drinkrule_btn: "Prepočítať okno pitia",
   drinkrule_desc: "Piť od = ročník + 1; piť do podľa druhu vína a odrody",
   drinkrule_confirm: "Pri {n} vínach sa „piť od“ nastaví na ročník + 1 (prepíšu sa aj ručne zadané hodnoty) a „piť do“ sa podľa potreby upraví podľa druhu vína a odrody. Vína bez ročníka zostanú bez zmeny. Tip: najprv exportujte zálohu JSON. Pokračovať?",
@@ -9165,6 +9208,9 @@ ro: {
   store_filter: "Așază: {name} · {n} stic. – atinge un loc liber",
   store_filter_off: "Arată tot",
   store_back: "← La pivniță",
+  cur_huf: "Forint maghiar",
+  cur_czk: "Coroana cehă",
+  cur_ron: "Leu românesc",
   drinkrule_btn: "Recalculează intervalul de consum",
   drinkrule_desc: "De băut din = anul recoltei + 1; de băut până în funcție de tipul de vin și soi",
   drinkrule_confirm: "Pentru {n} vinuri, „de băut din” va fi setat la anul recoltei + 1 (valorile introduse manual sunt și ele suprascrise), iar „de băut până” se ajustează, la nevoie, după tipul de vin și soi. Vinurile fără anul recoltei rămân neschimbate. Sfat: exportă mai întâi o copie JSON. Continui?",
@@ -9588,6 +9634,9 @@ hr: {
   store_filter: "Pohrani: {name} · {n} boc. – dodirni slobodno mjesto",
   store_filter_off: "Prikaži sve",
   store_back: "← U podrum",
+  cur_huf: "Mađarska forinta",
+  cur_czk: "Češka kruna",
+  cur_ron: "Rumunjski lej",
   drinkrule_btn: "Ponovno izračunaj razdoblje pijenja",
   drinkrule_desc: "Piti od = berba + 1; piti do prema vrsti vina i sorti",
   drinkrule_confirm: "Za {n} vina „piti od” postavlja se na berbu + 1 (prepisuju se i ručno unesene vrijednosti), a „piti do” prema potrebi prilagođava prema vrsti vina i sorti. Vina bez berbe ostaju nepromijenjena. Savjet: prvo izvezite JSON sigurnosnu kopiju. Nastaviti?",
@@ -10011,6 +10060,9 @@ pt: {
   store_filter: "Arrumar: {name} · {n} gar. – toca num lugar livre",
   store_filter_off: "Mostrar tudo",
   store_back: "← Para a adega",
+  cur_huf: "Forint húngaro",
+  cur_czk: "Coroa checa",
+  cur_ron: "Leu romeno",
   drinkrule_btn: "Recalcular janela de consumo",
   drinkrule_desc: "Beber a partir de = colheita + 1; beber até conforme o tipo de vinho e a uva",
   drinkrule_confirm: "Em {n} vinhos, «beber a partir de» será definido como colheita + 1 (os valores introduzidos à mão também são substituídos) e «beber até» será ajustado, se necessário, conforme o tipo de vinho e a uva. Os vinhos sem colheita ficam inalterados. Dica: exporte antes uma cópia JSON. Continuar?",
@@ -10434,6 +10486,9 @@ no: {
   store_filter: "Plasser: {name} · {n} fl. – trykk på en ledig plass",
   store_filter_off: "Vis alle",
   store_back: "← Til kjelleren",
+  cur_huf: "Ungarsk forint",
+  cur_czk: "Tsjekkisk krone",
+  cur_ron: "Rumensk leu",
   drinkrule_btn: "Beregn drikkevindu på nytt",
   drinkrule_desc: "Drikk fra = årgang + 1; drikk til etter vintype og drue",
   drinkrule_confirm: "For {n} viner settes «drikk fra» til årgang + 1 (også verdier du selv har skrevet inn overskrives), og «drikk til» justeres ved behov etter vintype og drue. Viner uten årgang forblir uendret. Tips: eksporter en JSON-sikkerhetskopi først. Fortsette?",
@@ -10857,6 +10912,9 @@ nl: {
   store_filter: "Opbergen: {name} · {n} fl. – tik op een vrij vak",
   store_filter_off: "Toon alles",
   store_back: "← Naar de kelder",
+  cur_huf: "Hongaarse forint",
+  cur_czk: "Tsjechische kroon",
+  cur_ron: "Roemeense leu",
   drinkrule_btn: "Drinkvenster opnieuw berekenen",
   drinkrule_desc: "Drinken vanaf = jaargang + 1; drinken tot naar wijnsoort en druif",
   drinkrule_confirm: "Bij {n} wijnen wordt „drinken vanaf” op jaargang + 1 gezet (ook met de hand ingevoerde waarden worden overschreven) en „drinken tot” zo nodig aangepast naar wijnsoort en druif. Wijnen zonder jaargang blijven ongewijzigd. Tip: exporteer eerst een JSON-back-up. Doorgaan?",
@@ -11280,6 +11338,9 @@ el: {
   store_filter: "Τοποθέτηση: {name} · {n} φιάλ. – πατήστε μια ελεύθερη θέση",
   store_filter_off: "Εμφάνιση όλων",
   store_back: "← Στο κελάρι",
+  cur_huf: "Ουγγρικό φιορίνι",
+  cur_czk: "Τσεχική κορώνα",
+  cur_ron: "Ρουμανικό λέου",
   drinkrule_btn: "Επανυπολογισμός παραθύρου κατανάλωσης",
   drinkrule_desc: "Πίνετε από = έτος συγκομιδής + 1· πίνετε έως ανάλογα με τον τύπο κρασιού και την ποικιλία",
   drinkrule_confirm: "Για {n} κρασιά, το «πίνετε από» θα οριστεί σε έτος συγκομιδής + 1 (αντικαθίστανται και οι τιμές που έχετε εισαγάγει με το χέρι) και το «πίνετε έως» θα προσαρμοστεί όπου χρειάζεται ανάλογα με τον τύπο κρασιού και την ποικιλία. Τα κρασιά χωρίς έτος συγκομιδής μένουν αμετάβλητα. Συμβουλή: εξαγάγετε πρώτα αντίγραφο JSON. Συνέχεια;",
@@ -11703,6 +11764,9 @@ uk: {
   store_filter: "Розмістити: {name} · {n} пл. – торкніться вільного місця",
   store_filter_off: "Показати все",
   store_back: "← До погреба",
+  cur_huf: "Угорський форинт",
+  cur_czk: "Чеська крона",
+  cur_ron: "Румунський лей",
   drinkrule_btn: "Перерахувати вікно вживання",
   drinkrule_desc: "Пити з = рік урожаю + 1; пити до — за типом вина та сортом",
   drinkrule_confirm: "Для {n} вин «пити з» буде встановлено на рік урожаю + 1 (введені вручну значення теж перезаписуються), а «пити до» за потреби скоригується за типом вина та сортом. Вина без року урожаю не змінюються. Порада: спершу експортуйте резервну копію JSON. Продовжити?",
@@ -12126,6 +12190,9 @@ ja: {
   store_filter: "配置: {name} · {n}本 – 空いている場所をタップ",
   store_filter_off: "すべて表示",
   store_back: "← セラーへ戻る",
+  cur_huf: "ハンガリー・フォリント",
+  cur_czk: "チェコ・コルナ",
+  cur_ron: "ルーマニア・レウ",
   drinkrule_btn: "飲み頃を再計算",
   drinkrule_desc: "飲み頃の開始 = ヴィンテージ + 1、終了はワインの種類とぶどう品種で決定",
   drinkrule_confirm: "{n} 本のワインで「飲み頃の開始」をヴィンテージ + 1 に設定します（手入力した値も上書きされます）。「飲み頃の終了」は必要に応じてワインの種類とぶどう品種に合わせて調整します。ヴィンテージのないワインは変更されません。ヒント：先に JSON バックアップを書き出してください。続行しますか？",
@@ -12549,6 +12616,9 @@ ko: {
   store_filter: "보관: {name} · {n}병 – 빈 칸을 탭하세요",
   store_filter_off: "모두 보기",
   store_back: "← 셀러로",
+  cur_huf: "헝가리 포린트",
+  cur_czk: "체코 코루나",
+  cur_ron: "루마니아 레우",
   drinkrule_btn: "음용 시기 다시 계산",
   drinkrule_desc: "마시기 시작 = 빈티지 + 1, 마시는 기한은 와인 종류와 품종에 따라",
   drinkrule_confirm: "와인 {n}개의 ‘마시기 시작’을 빈티지 + 1로 설정합니다(직접 입력한 값도 덮어씁니다). ‘마시는 기한’은 필요하면 와인 종류와 품종에 맞게 조정합니다. 빈티지가 없는 와인은 그대로 둡니다. 팁: 먼저 JSON 백업을 내보내세요. 계속할까요?",
@@ -12972,6 +13042,9 @@ zh: {
   store_filter: "存放：{name} · {n} 瓶 – 请点按空位",
   store_filter_off: "显示全部",
   store_back: "← 返回酒窖",
+  cur_huf: "匈牙利福林",
+  cur_czk: "捷克克朗",
+  cur_ron: "罗马尼亚列伊",
   drinkrule_btn: "重新计算适饮期",
   drinkrule_desc: "适饮起点 = 年份 + 1；终点按酒的类型和葡萄品种确定",
   drinkrule_confirm: "将为 {n} 款酒把“适饮起点”设为年份 + 1（手动输入的值也会被覆盖），并在需要时按酒的类型和葡萄品种调整“适饮终点”。没有年份的酒保持不变。提示：请先导出 JSON 备份。继续吗？",
@@ -13395,6 +13468,9 @@ hi: {
   store_filter: "रखें: {name} · {n} बोतल – खाली स्थान पर टैप करें",
   store_filter_off: "सब दिखाएँ",
   store_back: "← सेलर पर",
+  cur_huf: "हंगेरियन फ़ोरिंट",
+  cur_czk: "चेक कोरुना",
+  cur_ron: "रोमानियाई ल्यू",
   drinkrule_btn: "पीने की अवधि दोबारा गणना करें",
   drinkrule_desc: "पीना शुरू = विंटेज + 1; पीने की अंतिम सीमा वाइन के प्रकार और अंगूर के अनुसार",
   drinkrule_confirm: "{n} वाइन के लिए “पीना शुरू” विंटेज + 1 पर सेट होगा (हाथ से दर्ज मान भी बदल जाएंगे) और “पीने की अंतिम सीमा” ज़रूरत पड़ने पर वाइन के प्रकार और अंगूर के अनुसार समायोजित होगी। बिना विंटेज वाली वाइन अपरिवर्तित रहेंगी। सुझाव: पहले JSON बैकअप निर्यात करें। जारी रखें?",
@@ -13554,6 +13630,12 @@ hi: {
   pdf_sub: "{n} वाइन · {d} तक"
 }
 };
+// Englisch (US): fehlende Schlüssel kommen automatisch aus Englisch (t() fällt auf I18N.en zurück); hier nur US-Schreibweisen
+I18N.us = {
+  barcode_miss_text: "This barcode is not in the database. The number is still saved with the wine so the bottle is recognized next time. Photograph the label now?",
+  photo_hint: "The photo stays on this device and is not synchronized."
+};
+const baseLang = () => (settings.lang === 'us' ? 'en' : (settings.lang || 'de'));   // Sprache für Tabellen, die es nur je Sprache (nicht je Region) gibt
 
 function t(key, vars) {
   let s = (I18N[settings.lang] && I18N[settings.lang][key]) ?? (I18N.en && I18N.en[key]) ?? I18N.de[key] ?? key;
@@ -13580,7 +13662,7 @@ function fitNavLabels() {
 window.addEventListener('resize', fitNavLabels);
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitNavLabels);
 function applyI18n() {
-  document.documentElement.lang = settings.lang;
+  document.documentElement.lang = settings.lang === 'us' ? 'en-US' : settings.lang;
   TYPE_LABELS = buildTypeLabels();
   buildWineData();
   document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
@@ -13665,8 +13747,8 @@ function ownerForTitles() {
   return (isNativeApp() || window.WK_NEUTRAL_TITLES) ? '' : DEFAULT_OWNER;
 }
 function composeTitles(o) {
-  if (!o) { const n = NEUTRAL_TITLES[settings.lang] || NEUTRAL_TITLES.de; return { cellar: n[0], stats: n[1], wish: n[2] }; }
-  const p = TITLE_PATTERNS[settings.lang] || TITLE_PATTERNS.de;
+  if (!o) { const n = NEUTRAL_TITLES[baseLang()] || NEUTRAL_TITLES.de; return { cellar: n[0], stats: n[1], wish: n[2] }; }
+  const p = TITLE_PATTERNS[baseLang()] || TITLE_PATTERNS.de;
   const f = s => s.split('{o}').join(o);
   return { cellar: f(p[0]), stats: f(p[1]), wish: f(p[2]) };
 }
@@ -13795,22 +13877,24 @@ function celebrate() {
 }
 
 function setCurrency(c) { settings.currency = c; saveSettings(); applyI18n(); touchData(); }
-// Zur Sprache passende Währungen (erste = Vorschlag). Beim Sprachwechsel wird die Währung nur dann umgestellt, wenn die gewählte nicht passt:
-// Deutsch/Französisch/Italienisch behalten auch CHF, Französisch auch C$. Englisch ist an kein Land gebunden (null = nie ändern), ebenso Ungarisch/Tschechisch/Rumänisch (deren Währung gibt es in der Liste nicht).
-const LANG_CURRENCY = { de: ['€', 'CHF'], en: null, es: ['€'], sv: ['SEK'], da: ['DKK'], fi: ['€'], ru: ['RUB'], it: ['€', 'CHF'], fr: ['€', 'CHF', 'C$'], pl: ['PLN'], hu: null, cs: null, sk: ['€'], ro: null, hr: ['€'], pt: ['€'], no: ['NOK'], nl: ['€'], el: ['€'], uk: ['UAH'], ja: ['JPY'], ko: ['KRW'], zh: ['CNY'], hi: ['INR'] };
-// Die App rechnet Preise NICHT um: eine andere Währung würde die vorhandenen Beträge nur umbenennen. Deshalb nur automatisch umstellen, solange keine Preise eingetragen sind.
-const hasPriceData = () => wines.some(w => w.price) || drunkWines.some(d => d.price);
+// Zur Sprache passende Währungen (erste = Vorschlag). Beim Sprachwechsel wird die Währung automatisch umgestellt, wenn die gewählte nicht zur Sprache passt:
+// Deutsch/Französisch/Italienisch behalten auch CHF, Französisch auch C$. Englisch (UK-Flagge) = £ (A$ und C$ bleiben erlaubt), Englisch (US) = $. Quelle der Zuordnung: Unicode CLDR (likelySubtags + currencyData). Danach bleibt die Währung von Hand änderbar (Setup).
+// Beträge werden dabei NICHT umgerechnet, nur die Währungsbezeichnung wechselt.
+const LANG_CURRENCY = { de: ['€', 'CHF'], en: ['£', 'A$', 'C$'], us: ['$'], es: ['€'], sv: ['SEK'], da: ['DKK'], fi: ['€'], ru: ['RUB'], it: ['€', 'CHF'], fr: ['€', 'CHF', 'C$'], pl: ['PLN'], hu: ['HUF'], cs: ['CZK'], sk: ['€'], ro: ['RON'], hr: ['€'], pt: ['€'], no: ['NOK'], nl: ['€'], el: ['€'], uk: ['UAH'], ja: ['JPY'], ko: ['KRW'], zh: ['CNY'], hi: ['INR'] };
 function setLanguage(l) {
+  const was = settings.lang;
   settings.lang = l;
   const fit = LANG_CURRENCY[l];
   let note = null;
-  if (fit && !fit.includes(settings.currency)) {
-    if (hasPriceData()) note = ['cur_auto_kept', settings.currency];
-    else { settings.currency = fit[0]; note = ['cur_auto_set', fit[0]]; }
-  }
+  if (fit && !fit.includes(settings.currency)) { settings.currency = fit[0]; note = fit[0]; }
+  // Englisch (US): Fahrenheit als Standard; beim Wechsel weg von US zurück auf Celsius
+  if (l === 'us' && was !== 'us') settings.tempUnit = 'F';
+  else if (was === 'us' && l !== 'us' && settings.tempUnit === 'F') settings.tempUnit = 'C';
   saveSettings(); applyI18n(); touchData();
   const sel = document.getElementById('setup-currency'); if (sel) sel.value = settings.currency;
-  if (note && CURRENCIES[note[1]]) showToast(t(note[0], { name: t(CURRENCIES[note[1]].key) }));
+  const tu = document.getElementById('setup-tempunit'); if (tu) tu.value = settings.tempUnit === 'F' ? 'F' : 'C';
+  applyTempLabels(); rerenderActive();
+  if (note && CURRENCIES[note]) showToast(t('cur_auto_set', { name: t(CURRENCIES[note].key) }));
 }
 function setOwner(v) { settings.owner = (v||'').trim(); saveSettings(); touchData(); applyI18n(); }
 
@@ -13932,7 +14016,7 @@ function wineRegionLinks(w) {
 // Wikipedia-Link zur Rebsorte (bzw. zum Wein) – in der eingestellten Sprache
 function wikiUrl(w) {
   const q = w.grape || w.name || '';
-  const lang = (settings.lang || 'de');
+  const lang = baseLang();
   return 'https://' + lang + '.wikipedia.org/wiki/Special:Search?search=' + encodeURIComponent(q) + '&go=Go';
 }
 
@@ -15776,7 +15860,7 @@ function sortRacksAlpha() {
   const racks = settings.racks;
   if (racks.length < 2) return;
   const k = rackIdxKeep();
-  const cmp = (a, b) => { try { return a.name.localeCompare(b.name, settings.lang || 'de', { numeric: true, sensitivity: 'base' }); } catch (e) { return a.name.localeCompare(b.name); } };
+  const cmp = (a, b) => { try { return a.name.localeCompare(b.name, settings.lang === 'us' ? 'en-US' : (settings.lang || 'de'), { numeric: true, sensitivity: 'base' }); } catch (e) { return a.name.localeCompare(b.name); } };
   racks.sort(cmp);
   rackIdxRestore(k);
   afterRackEdit();
