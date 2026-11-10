@@ -622,6 +622,7 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .setup-fold[open] > summary::before { transform: rotate(90deg); }
 .setup-fold[open] > summary { margin-bottom: 4px; }
 .setup-fold .fold-count { font-weight: 600; color: var(--text-muted); font-size: 12px; letter-spacing: 0; }
+.app-version { text-align: center; font-size: 12px; font-weight: 600; color: var(--text-dim); margin-top: 18px; }
 .rack-un-country { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; color: var(--text); font-family: inherit; font-size: 13px; }
 .rack-store-banner { display: flex; align-items: center; gap: 10px; justify-content: space-between; margin: 0 0 12px; padding: 10px 12px; border: 1px solid var(--gold); border-radius: 12px; background: var(--card); font-size: 13px; font-weight: 600; color: var(--gold-light, var(--gold)); }
 .rack-store-banner .wine-btn { flex: none; width: auto; padding: 6px 12px; }
@@ -1563,6 +1564,7 @@ input[type="file"] { display: none; }
           <div class="title" data-i18n="setup_support">Support &amp; Hilfe</div>
         </div>
       </a>
+      <div class="app-version" id="app-version"></div>
     </div>
   </div>
 </div>
@@ -1921,6 +1923,7 @@ input[type="file"] { display: none; }
 // ═══════════════════════════════════════
 // DATA
 // ═══════════════════════════════════════
+const APP_VERSION = '2.0';   // = MARKETING_VERSION im iOS-Projekt (ios/App/App.xcodeproj): bei jeder neuen App-Version beide ändern
 const SCAN_PROXY_URL = 'https://weinkeller-scan-proxy.ocho1511.workers.dev';
 const STORE_KEY = 'weinkeller_v2';
 const WISH_KEY  = 'weinkeller_v2_wish';
@@ -3703,6 +3706,7 @@ de: {
   store_filter: "Einlagern: {name} · {n} Fl. – freies Fach antippen",
   store_filter_off: "Alle anzeigen",
   store_back: "← Zum Keller",
+  setup_version: "Version",
   rack_delete_btn: "Regal löschen",
   setup_general: "Allgemein",
   s_over_warn: "{n} Flaschen sind überschritten – bald trinken",
@@ -4154,6 +4158,7 @@ en: {
   store_filter: "Store: {name} · {n} btl. – tap a free slot",
   store_filter_off: "Show all",
   store_back: "← To cellar",
+  setup_version: "Version",
   rack_delete_btn: "Delete rack",
   setup_general: "General",
   s_over_warn: "{n} bottles are past their window – drink soon",
@@ -4605,6 +4610,7 @@ es: {
   store_filter: "Colocar: {name} · {n} bot. – toca un hueco libre",
   store_filter_off: "Mostrar todo",
   store_back: "← A la bodega",
+  setup_version: "Versión",
   rack_delete_btn: "Eliminar estante",
   setup_general: "General",
   s_over_warn: "{n} botellas han pasado su momento – a beber pronto",
@@ -5056,6 +5062,7 @@ sv: {
   store_filter: "Placera: {name} · {n} fl. – tryck på en ledig plats",
   store_filter_off: "Visa alla",
   store_back: "← Till källaren",
+  setup_version: "Version",
   rack_delete_btn: "Ta bort hylla",
   setup_general: "Allmänt",
   s_over_warn: "{n} flaskor har passerat sitt fönster – drick snart",
@@ -5507,6 +5514,7 @@ da: {
   store_filter: "Placér: {name} · {n} fl. – tryk på en ledig plads",
   store_filter_off: "Vis alle",
   store_back: "← Til kælderen",
+  setup_version: "Version",
   rack_delete_btn: "Slet reol",
   setup_general: "Generelt",
   s_over_warn: "{n} flasker er over deres vindue – drik snart",
@@ -5958,6 +5966,7 @@ fi: {
   store_filter: "Sijoita: {name} · {n} pul. – napauta vapaata paikkaa",
   store_filter_off: "Näytä kaikki",
   store_back: "← Kellariin",
+  setup_version: "Versio",
   rack_delete_btn: "Poista hylly",
   setup_general: "Yleiset",
   s_over_warn: "{n} pulloa on ohittanut parhaan ajan – juo pian",
@@ -6409,6 +6418,7 @@ ru: {
   store_filter: "Разместить: {name} · {n} бут. – коснитесь свободной ячейки",
   store_filter_off: "Показать все",
   store_back: "← В погреб",
+  setup_version: "Версия",
   rack_delete_btn: "Удалить стеллаж",
   setup_general: "Общие",
   s_over_warn: "{n} бутылок прошли срок – пейте скорее",
@@ -6860,6 +6870,7 @@ it: {
   store_filter: "Riponi: {name} · {n} bott. – tocca uno scomparto libero",
   store_filter_off: "Mostra tutto",
   store_back: "← Alla cantina",
+  setup_version: "Versione",
   rack_delete_btn: "Elimina scaffale",
   setup_general: "Generali",
   s_over_warn: "{n} bottiglie hanno superato la finestra – da bere presto",
@@ -7311,6 +7322,7 @@ fr: {
   store_filter: "Ranger : {name} · {n} bout. – touchez un emplacement libre",
   store_filter_off: "Tout afficher",
   store_back: "← Vers la cave",
+  setup_version: "Version",
   rack_delete_btn: "Supprimer l’étagère",
   setup_general: "Général",
   s_over_warn: "{n} bouteilles ont dépassé leur apogée – à boire bientôt",
@@ -7762,6 +7774,7 @@ pl: {
   store_filter: "Ułóż: {name} · {n} but. – dotknij wolne miejsce",
   store_filter_off: "Pokaż wszystko",
   store_back: "← Do piwnicy",
+  setup_version: "Wersja",
   rack_delete_btn: "Usuń regał",
   setup_general: "Ogólne",
   s_over_warn: "{n} butelek przekroczyło okres – pij wkrótce",
@@ -8213,6 +8226,7 @@ hu: {
   store_filter: "Elhelyezés: {name} · {n} üveg – koppints egy szabad helyre",
   store_filter_off: "Összes mutatása",
   store_back: "← A pincéhez",
+  setup_version: "Verzió",
   rack_delete_btn: "Állvány törlése",
   setup_general: "Általános",
   s_over_warn: "{n} palack túllépte az ivási időszakot – igyál hamarosan",
@@ -8664,6 +8678,7 @@ cs: {
   store_filter: "Uložit: {name} · {n} lahví – klepni na volné místo",
   store_filter_off: "Zobrazit vše",
   store_back: "← Do sklepa",
+  setup_version: "Verze",
   rack_delete_btn: "Smazat regál",
   setup_general: "Obecné",
   s_over_warn: "{n} lahví překročilo své okno – pijte brzy",
@@ -9115,6 +9130,7 @@ sk: {
   store_filter: "Uložiť: {name} · {n} fliaš – ťukni na voľné miesto",
   store_filter_off: "Zobraziť všetko",
   store_back: "← Do pivnice",
+  setup_version: "Verzia",
   rack_delete_btn: "Zmazať regál",
   setup_general: "Všeobecné",
   s_over_warn: "{n} fliaš prekročilo svoje okno – pite čoskoro",
@@ -9566,6 +9582,7 @@ ro: {
   store_filter: "Așază: {name} · {n} stic. – atinge un loc liber",
   store_filter_off: "Arată tot",
   store_back: "← La pivniță",
+  setup_version: "Versiune",
   rack_delete_btn: "Șterge raftul",
   setup_general: "General",
   s_over_warn: "{n} sticle au depășit intervalul – de băut curând",
@@ -10017,6 +10034,7 @@ hr: {
   store_filter: "Pohrani: {name} · {n} boc. – dodirni slobodno mjesto",
   store_filter_off: "Prikaži sve",
   store_back: "← U podrum",
+  setup_version: "Verzija",
   rack_delete_btn: "Izbriši regal",
   setup_general: "Općenito",
   s_over_warn: "{n} boca je prošlo svoje razdoblje – pijte uskoro",
@@ -10468,6 +10486,7 @@ pt: {
   store_filter: "Arrumar: {name} · {n} gar. – toca num lugar livre",
   store_filter_off: "Mostrar tudo",
   store_back: "← Para a adega",
+  setup_version: "Versão",
   rack_delete_btn: "Eliminar prateleira",
   setup_general: "Geral",
   s_over_warn: "{n} garrafas passaram do prazo – beber em breve",
@@ -10919,6 +10938,7 @@ no: {
   store_filter: "Plasser: {name} · {n} fl. – trykk på en ledig plass",
   store_filter_off: "Vis alle",
   store_back: "← Til kjelleren",
+  setup_version: "Versjon",
   rack_delete_btn: "Slett hylle",
   setup_general: "Generelt",
   s_over_warn: "{n} flasker er over tiden – drikk snart",
@@ -11370,6 +11390,7 @@ nl: {
   store_filter: "Opbergen: {name} · {n} fl. – tik op een vrij vak",
   store_filter_off: "Toon alles",
   store_back: "← Naar de kelder",
+  setup_version: "Versie",
   rack_delete_btn: "Rek verwijderen",
   setup_general: "Algemeen",
   s_over_warn: "{n} flessen zijn over hun hoogtepunt – binnenkort drinken",
@@ -11821,6 +11842,7 @@ el: {
   store_filter: "Τοποθέτηση: {name} · {n} φιάλ. – πατήστε μια ελεύθερη θέση",
   store_filter_off: "Εμφάνιση όλων",
   store_back: "← Στο κελάρι",
+  setup_version: "Έκδοση",
   rack_delete_btn: "Διαγραφή ραφιού",
   setup_general: "Γενικά",
   s_over_warn: "{n} φιάλες έχουν περάσει το όριο – πιείτε σύντομα",
@@ -12272,6 +12294,7 @@ uk: {
   store_filter: "Розмістити: {name} · {n} пл. – торкніться вільного місця",
   store_filter_off: "Показати все",
   store_back: "← До погреба",
+  setup_version: "Версія",
   rack_delete_btn: "Видалити стелаж",
   setup_general: "Загальні",
   s_over_warn: "{n} пляшок минули свій термін – пийте скоро",
@@ -12723,6 +12746,7 @@ ja: {
   store_filter: "配置: {name} · {n}本 – 空いている場所をタップ",
   store_filter_off: "すべて表示",
   store_back: "← セラーへ戻る",
+  setup_version: "バージョン",
   rack_delete_btn: "ラックを削除",
   setup_general: "一般",
   s_over_warn: "{n} 本が飲み頃を過ぎています – 早めにお飲みください",
@@ -13174,6 +13198,7 @@ ko: {
   store_filter: "보관: {name} · {n}병 – 빈 칸을 탭하세요",
   store_filter_off: "모두 보기",
   store_back: "← 셀러로",
+  setup_version: "버전",
   rack_delete_btn: "랙 삭제",
   setup_general: "일반",
   s_over_warn: "{n}병이 음용 시기를 지났습니다 – 곧 드세요",
@@ -13625,6 +13650,7 @@ zh: {
   store_filter: "存放：{name} · {n} 瓶 – 请点按空位",
   store_filter_off: "显示全部",
   store_back: "← 返回酒窖",
+  setup_version: "版本",
   rack_delete_btn: "删除酒架",
   setup_general: "通用",
   s_over_warn: "{n} 瓶已过适饮期 – 请尽快饮用",
@@ -14076,6 +14102,7 @@ hi: {
   store_filter: "रखें: {name} · {n} बोतल – खाली स्थान पर टैप करें",
   store_filter_off: "सब दिखाएँ",
   store_back: "← सेलर पर",
+  setup_version: "संस्करण",
   rack_delete_btn: "रैक हटाएँ",
   setup_general: "सामान्य",
   s_over_warn: "{n} बोतलें अपनी अवधि पार कर चुकी हैं – जल्दी पिएँ",
@@ -14298,6 +14325,10 @@ window.addEventListener('resize', fitNavLabels);
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitNavLabels);
 // Text eines Beschriftungsschlüssels ohne führendes Symbol (z. B. "✏️ Bearbeiten" -> "Bearbeiten")
 function plainLabel(k) { return t(k).replace(/^\p{Extended_Pictographic}\uFE0F?\s*/u, ''); }
+function applyVersion() {
+  const el = document.getElementById('app-version');
+  if (el) el.textContent = t('setup_version') + ' ' + APP_VERSION;
+}
 function applyAria() {
   const fab = document.getElementById('fab');
   if (fab) { const l = t('m_add_title'); fab.setAttribute('aria-label', l); fab.title = l; }
@@ -14316,6 +14347,7 @@ function applyI18n() {
   updateCreditsUI();
   applyFont();
   applyAria();
+  applyVersion();
   applyOwnerTitles();
   fitNavLabels();
   const active = document.querySelector('.tab.active');
