@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ユーザーガイド – Weinkeller</title>
+<style>
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Sans CJK SC","Noto Sans JP","Noto Sans KR","Noto Sans Devanagari",sans-serif;max-width:760px;margin:0 auto;padding:24px 18px 70px;line-height:1.6;color:#222;background:#fff}
+  h1{font-size:28px;margin:6px 0 4px} h2{font-size:20px;margin-top:34px;padding-top:6px;border-top:1px solid #e3e3e3} h3{font-size:16px;margin:20px 0 4px}
+  small{color:#666} a{color:#0a58ca} p{margin:8px 0} ul,ol{margin:6px 0 10px;padding-left:22px} li{margin:3px 0}
+  code,kbd{background:#f2f2f2;border-radius:4px;padding:1px 5px;font-size:.92em}
+  .tip,.note{border-left:4px solid #b88a2a;background:#fbf6ea;padding:8px 12px;border-radius:0 8px 8px 0;margin:12px 0}
+  .note{border-color:#0a58ca;background:#eef4fd}
+  .toc{background:#f7f7f7;border-radius:10px;padding:10px 16px;margin:16px 0} .toc ol{margin:4px 0}
+  .lang{position:sticky;top:0;background:#fff;padding:8px 0;margin:0 0 6px;border-bottom:1px solid #eee;z-index:5}
+  .lang select{font:inherit;font-size:15px;padding:5px 10px;border:1px solid #bbb;border-radius:16px;background:#fff;max-width:100%}
+  table{border-collapse:collapse;width:100%;margin:8px 0} td,th{border:1px solid #ddd;padding:6px 9px;text-align:left;vertical-align:top;font-size:15px} th{background:#f4f4f4}
+  .back{margin:0 0 6px}
+  @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
+</style></head><body>
+<p class="back"><a href="support.html">← サポートに戻る</a></p>
+<div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html">Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html" selected>日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
+
+<h1>ユーザーガイド – Weinkeller</h1>
+<p><small>更新日：2026年11月10日 · アプリバージョン 2.0</small></p>
+
+<div class="toc">
+
+<strong>目次</strong><ol>
+<li><a href="#start">概要と最初のステップ</a></li>
+<li><a href="#add">ワインを追加する</a></li>
+<li><a href="#cellar">セラー</a></li>
+<li><a href="#drink">ワインを飲む</a></li>
+<li><a href="#ripe">飲み頃</a></li>
+<li><a href="#racks">ラックと保管</a></li>
+<li><a href="#history">履歴</a></li>
+<li><a href="#wish">ウィッシュリスト</a></li>
+<li><a href="#stats">統計</a></li>
+<li><a href="#export">書き出し、読み込み、バックアップ</a></li>
+<li><a href="#setup">設定</a></li>
+<li><a href="#sync">2台のデバイスを同期する</a></li>
+<li><a href="#privacy">AI、プライバシー、料金</a></li>
+<li><a href="#faq">ヒントとよくある質問</a></li></ol>
+</div>
+
+<!-- ───────────────── 1 ───────────────── -->
+<h2 id="start">1. 概要と最初のステップ</h2>
+
+<p>Weinkellerは、ポケットに入るあなた専用のワインセラーです。在庫、保管場所、飲み頃、ウィッシュリスト、統計を管理できます。すべてはお使いのデバイス上で動作し、同期コードを使えば複数のデバイスを連携できます。</p>
+<p>画面の下部（PCとiPadの横向きでは左側）に、8つのエリアを備えたバーがあります。</p>
+<table>
+<tbody><tr><th>エリア</th><th>用途</th></tr>
+<tr><td><strong>セラー</strong></td><td>すべてのワイン、検索、フィルター、並べ替え、ワインの追加、飲む</td></tr>
+<tr><td><strong>統計</strong></td><td>在庫、価格、飲み頃、保管、飲んだ履歴の集計</td></tr>
+<tr><td><strong>飲み頃</strong></td><td>今飲むべきワイン、もうすぐ飲むべきワイン、飲み頃を過ぎたワイン（「飲み頃」）</td></tr>
+<tr><td><strong>履歴</strong></td><td>これまでに飲んだワイン</td></tr>
+<tr><td><strong>ラック</strong></td><td>セラーの配置図：ワインの保管と移動、QRラベル</td></tr>
+<tr><td><strong>ほしい</strong></td><td>これから買いたいワイン</td></tr>
+<tr><td><strong>入出力</strong></td><td>データのバックアップ、表やバックアップの読み込み</td></tr>
+<tr><td><strong>設定</strong></td><td>名前、通貨、言語、クラウド、ラックの定義</td></tr>
+</tbody></table>
+<h3>最初の5ステップ</h3>
+<ol>
+<li><strong>言語と通貨を選ぶ</strong>：設定 → 一般。通貨は言語に自動で連動します。</li>
+<li><strong>ラックを定義する</strong>（任意）：設定 → ラック（<a href="#racks">6章</a>を参照）。</li>
+<li><strong>最初のワインを追加する</strong>：セラーで<kbd>+</kbd>をタップします（<a href="#add">2章</a>）。</li>
+<li><strong>保管する</strong>：ワインにラックの場所を割り当てます。</li>
+<li><strong>バックアップする</strong>：入出力 → JSONバックアップ、またはクラウド同期を設定します（<a href="#sync">12章</a>）。</li>
+</ol>
+<div class="tip">「<em>設定</em>」のセクションは折りたたみ式です。初回起動時は「一般」が開いており、ほかは閉じています。最後に開いた状態・閉じた状態はアプリが記憶します。</div>
+
+<!-- ───────────────── 2 ───────────────── -->
+<h2 id="add">2. ワインを追加する</h2>
+
+<p>セラーで<kbd>+</kbd>をタップします。ワインを追加する方法はいくつかあり、組み合わせて使うこともできます。</p>
+<h3>a) 手入力</h3>
+<p>項目を入力します：<strong>名前 / ワイナリー、ヴィンテージ、ボトル数、ワインのタイプ、地域、国、ぶどう品種、保管場所、飲み頃の開始／終了、飲用温度、価格、評価、メモ</strong>。必須なのは名前だけです。<em>保存</em>を押すとワインが作成されます。</p>
+<ul>
+<li><strong>飲み頃：</strong> ヴィンテージを入力するとすぐ、「飲み頃の開始」が<strong>ヴィンテージ + 1</strong>に設定されます。「飲み頃の終了」はワインのタイプとぶどう品種によって決まります（赤はロゼより長持ちします）。どちらもいつでも変更できます。</li>
+<li><strong>在庫、最小、最大：</strong> 最小を入力すると、在庫がそれを下回ったときにアプリが警告し、ワインをウィッシュリストに追加するか尋ねます（<a href="#cellar">3章</a>）。</li>
+<li><strong>自分の写真：</strong> 「写真を撮る / 選ぶ」でワインに写真を添付できます。写真はこのデバイスに残り、JSONバックアップには含まれますが、クラウドには同期されません。</li>
+</ul>
+<h3>b) ラベルをスキャン（AI）</h3>
+<p>追加画面で<em>ラベルをスキャン（AI）</em>をタップし、ボトルのラベルを撮影します。AIが名前、ヴィンテージ、タイプ、地域、国、ぶどう品種を読み取り、飲み頃と飲用温度を推定します。値を確認して保存してください。初めて使うときは、アプリが同意を求めます（<a href="#privacy">13章</a>）。</p>
+<h3>c) バーコードをスキャン</h3>
+<p>追加画面で<em>バーコードをスキャン</em>をタップし、ボトルのバーコードを枠内に合わせます。アプリは番号を無料の商品データベース（費用もAIクレジットも不要）で検索し、見つかれば<strong>名前、生産者、ワインのタイプ</strong>を入力します。ヴィンテージは名前から補完するか、入力を求めます。</p>
+<ul>
+<li>そのボトルがすでにセラーにある場合、アプリは「もう1本追加しますか？」と尋ねます。買い足したときに数を増やす簡単な方法です。</li>
+<li>バーコードがデータベースに<strong>ない</strong>場合（小規模なワイナリーによくあります）は、ボタン<em>ラベルをスキャン（AI）</em>が付いたヒントが表示されます。番号はワインと一緒に保存されるので、次回からはすぐにボトルが認識されます。</li>
+</ul>
+<h3>d) ワインを検索（AI）</h3>
+<p><em>ワインを検索（AI）</em>は、AIがウェブで地域、国、ぶどう品種、飲み頃、飲用温度、現在の平均価格、そしてウェブ版ではボトルの画像を検索する機能です。すでに入力した項目は上書きされません。名前とヴィンテージが入力されていて価格がまだない場合は、自動的にも実行されます。</p>
+<div class="note">iPhoneアプリは、インターネットからボトルの画像を読み込みません（App Storeの規則）。代わりに、自分で撮影した写真を使えます。</div>
+
+<!-- ───────────────── 3 ───────────────── -->
+<h2 id="cellar">3. セラー</h2>
+
+<h3>検索、フィルター、並べ替え</h3>
+<ul>
+<li><strong>検索</strong>：上部の検索欄で、名前、地域、国、ぶどう品種からワインを探せます。</li>
+<li><strong>フィルター：</strong> すべて、赤、白、ロゼ、泡、その他。タイプをタップすると検索が自動的にクリアされます。</li>
+<li><strong>並べ替え：</strong> 新しい順、名前順、ヴィンテージ、ぶどう品種、地域、国、飲み頃（急ぐ順）。</li>
+<li><strong>リスト / カード：</strong> 上部の<em>リスト</em>ボタンで、コンパクトな一覧と詳細カードを切り替えます。</li>
+</ul>
+<h3>ワインのカード</h3>
+<p>カードには、名前、ヴィンテージ、ぶどう品種、評価（星）、地域と国（タップすると地図またはその国のワイン産地が開きます）、ボトル数、<strong>飲用温度</strong>（🌡）、<strong>保管場所</strong>（タップするとラックに移動します）、そして「若い」「適熟」「ピーク」「飲み頃過ぎ」の色で表示される<strong>飲み頃バー</strong>が表示されます。ぶどう品種のアイコンをタップすると、そのぶどう品種のWikipediaが開きます。</p>
+<p>カードの下部：<em>編集</em>、<em>飲む</em>、🗑（ワインを削除）。</p>
+<h3>在庫、最小/最大、買い物リスト</h3>
+<p>ワインに最小（必要に応じて最大も）を設定すると、カードに「在庫 · 最小 · 最大」が表示され、下回ると⚠で警告されます。<em>買い足し</em>ボタンで<strong>買い物リスト</strong>が開きます：最小を下回っているすべてのワインが一覧になります（目標は最大、なければ最小です）。リストの共有やコピー、ワインのウィッシュリストへの追加もできます。</p>
+
+<!-- ───────────────── 4 ───────────────── -->
+<h2 id="drink">4. ワインを飲む</h2>
+
+<p>ワインのカード上の<em>飲む</em>（または飲み頃の「飲む · n本」）をタップします。<em>ワインを飲む</em>ダイアログが開きます：</p>
+<ul>
+<li><strong>どの場所から取り出しましたか？</strong> – ボトルを取り出したラックの場所を選ぶか、「場所に置かれていないボトル」を選びます。その場所は空きになります。</li>
+<li><strong>誰と飲みましたか？</strong> – 一緒に飲んだ人の名前（任意）。</li>
+<li><strong>シーン</strong> – 春、夏、秋、冬、誕生日、パーティー、または「何となく」（複数選択可）。</li>
+</ul>
+<p><em>飲む</em>を押すと、ボトルが1本減り、<a href="#history">履歴</a>にエントリが作成されます。紙吹雪とサウンドでお祝いします（設定でオフにできます）。<strong>最後の1本</strong>の場合はアプリがお知らせします：そのワインはセラーから消えます（履歴には残ります）。</p>
+<div class="tip"><strong>スキャンですばやく：</strong> セラーにある丸い🥂ボタンを押すと、ラベルを撮影してセラー内のワインを認識し、すぐに飲むダイアログが開きます。</div>
+
+<!-- ───────────────── 5 ───────────────── -->
+<h2 id="ripe">5. 飲み頃</h2>
+
+<p>ここには飲み頃のあるすべてのワインが、<strong>急ぐ順</strong>に表示されます。各カードには、名前、ヴィンテージ、タイプ、<strong>飲み頃の開始／終了</strong>、飲用温度、保管場所、今年の位置を示すマーカー付きバーが表示されます。</p>
+<table>
+<tbody><tr><th>ステータス</th><th>意味</th></tr>
+<tr><td><strong>若い</strong></td><td>まだ早い – 「飲み頃の開始」より前</td></tr>
+<tr><td><strong>適熟</strong></td><td>飲める状態で、飲み頃の前半</td></tr>
+<tr><td><strong>ピーク</strong></td><td>最も良い時期 – 早めに飲みましょう</td></tr>
+<tr><td><strong>飲み頃過ぎ</strong></td><td>「飲み頃の終了」を過ぎた状態 – できるだけ早く飲みましょう</td></tr>
+</tbody></table>
+<p><strong>フィルター：</strong> ワインのタイプ、ステータス、<strong>国</strong>（国ごとの数を表示するドロップダウン。該当のない国はグレー表示）で絞り込めます。フィルターは組み合わせられます。カードをタップすると、セラーでそのワインが開きます。</p>
+<p><strong>飲み頃のルール：</strong> 「飲み頃の開始」＝ヴィンテージ + 1。「飲み頃の終了」はワインのタイプとぶどう品種によって決まります。ほかの値が入っている古いワインがある場合は、設定（<a href="#setup">11章</a>、「飲み頃を再計算」）ですべてまとめて再計算できます。</p>
+
+<!-- ───────────────── 6 ───────────────── -->
+<h2 id="racks">6. ラックと保管</h2>
+
+<h3>ラックの定義と編集</h3>
+<p><strong>設定 → ラック</strong>（見出しをタップして開きます）：名前、段数、1段あたりの場所数、1か所あたりのボトル数を入力し、＋をタップします。「ボトル数/場所」は、ワインラックでは1、床やケースではそれより大きな値にします。リストでは、各ラックに次のものがあります：</p>
+<ul>
+<li>並べ替えには<strong>ハンドル ⠿</strong>をドラッグし、リストの下にある<em>A–Zで並べ替え</em>ボタンも使えます。</li>
+<li>▦ は<strong>QRラベル</strong>、✏️ は編集、🧹 は空にする、🗑 は削除です。</li>
+</ul>
+<p>ラックの<strong>編集</strong>（✏️）では、ラックの名前変更、1段あたりの場所数の変更、上または下への段の追加、段の削除、各段への個別の名前とボトル数の設定ができます。これによって場所を失ったボトルは、以後「未割り当て」として扱われますが、ワイン自体はセラーに残ります。こうした変更の前には、アプリが確認します。</p>
+<h3>ラックのエリア</h3>
+<p>上部で、<strong>タイル</strong>（名前と「使用中 / 場所数」）からラックを選びます。ここでも順序を変更できます：PCではタイルをドラッグし、タッチ画面ではタイルを約0.5秒長押ししてからドラッグします。下には<strong>セラーの配置図</strong>があり、各段とその場所が表示されます。使用中の場所には、ワインのタイプの色で横になったボトルが表示されます。</p>
+<h3>保管する</h3>
+<ol>
+<li>「未割り当て」のワインをタップします（リストはタイプと国で絞り込めます）。または、セラーに表示される「未割り当て」のヒントをタップします。</li>
+<li>次に<strong>空き場所</strong>をタップします。床やケースの場合、アプリは入る分だけボトルを保管します。</li>
+</ol>
+<p><strong>ワインをスキャンして保管</strong>：ラベルを撮影してワインを見つけ、保管までを案内します。</p>
+<h3>使用中の場所、移動、取り外し</h3>
+<p>使用中の場所をタップすると、ワインが表示され、<em>開く</em>、<em>場所から外す</em>、<em>移動</em>（その後、空き場所をタップ）から選べます。<em>ラックを空にする</em>は、（確認後に）ラックからすべてのボトルを取り出します。</p>
+<h3>点滅</h3>
+<p>「<em>点滅</em>」スイッチを入れると、<strong>先に飲む</strong>べきボトル（飲み頃を過ぎたもの、または遅くとも来年に飲み頃が終わるもの）、飲み頃を過ぎたボトル、ピークのボトル、適熟のボトルが点滅するので、ラックの中でひと目で見つかります。</p>
+<h3>QRラベルと「段をスキャン」</h3>
+<p>ラックに1枚、各段に1枚のラベルは、<strong>QRラベル</strong>（設定 → ラック → ▦）で作成します。PDFで共有するか印刷（ラベルシート 63.5 × 38.1 mm、1ページ21枚）して貼ります。その後：ラックの画面で<strong>段をスキャン</strong>すると、その段にあるものが表示され、<em>ここに保管</em>、<em>取り出す</em>、飲む、ボトルの移動、<em>段ごと移動</em>ができます。「ワインを追加」フォームで段のラベルをスキャンすると、保管場所も入力されます。</p>
+
+<!-- ───────────────── 7 ───────────────── -->
+<h2 id="history">7. 履歴</h2>
+
+<p>履歴には、これまでに飲んだすべてのワインが、日付、ワイン、金額、一緒に飲んだ人、シーンとともに表示されます。ワインのタイプやシーンで絞り込めるほか、エントリ（一緒に飲んだ人、シーン）を編集できます。履歴は、統計の「月別/年別の飲んだ量」、支出、頻度の集計に使われます。</p>
+
+<!-- ───────────────── 8 ───────────────── -->
+<h2 id="wish">8. ウィッシュリスト</h2>
+
+<ul>
+<li><strong>+ ウィッシュを追加</strong>：手入力またはラベルのスキャンで追加でき、メモ（「どこで買う？」）も任意で付けられます。</li>
+<li><strong>価格を検索</strong>（💶）：アプリがウェブでそのワインの価格を検索し、最安値を表示して数量を掛けます。これは目安であり保証はありません。送料や在庫は店舗でご確認ください。</li>
+<li><strong>チェック</strong>：左側のチェックで、購入済み/完了にします（行が薄くなります）。</li>
+<li><strong>→ セラーへ</strong>：ウィッシュをセラーに移します（数量と、あれば最安値も反映）。ラックがある場合は、そのまま保管の操作に進みます。</li>
+<li>ワインが最小を下回ると、アプリは不足している数量でウィッシュリストに追加するよう提案します（「買い足し」）。</li>
+</ul>
+
+<!-- ───────────────── 9 ───────────────── -->
+<h2 id="stats">9. 統計</h2>
+
+<p>上から順に：</p>
+<ul>
+<li><strong>主な数値：</strong> ボトル、ワイン、合計評価額、平均評価。</li>
+<li><strong>飲み頃：</strong> ステータス（若い、適熟、ピーク、飲み頃過ぎ）ごとのボトル数。飲み頃を過ぎたボトルには警告が出ます。タップすると、該当のフィルターで飲み頃が開きます。</li>
+<li><strong>タイプ別</strong>と<strong>トップワイン</strong>（評価または頻度順、星で絞り込み可）。</li>
+<li><strong>国別・地域別・品種別：</strong> 棒グラフ（最大8件、残りは「+n件」）。タップするとセラーを検索します。<strong>ヴィンテージ別：</strong> 縦棒グラフ（横にスクロールできます）。</li>
+<li><strong>価格：</strong> ボトルあたりの平均、最安、最高、価格帯（お使いの通貨に合わせて表示）、国別の評価額。</li>
+<li><strong>保管：</strong> 使用率（パーセント）、空き場所、未割り当てのボトル、ラックごとのバー（タップするとラックに移動します）。</li>
+<li><strong>飲んだ量：</strong> 月別（直近12か月）と年別、および飲んだボトルの支出。</li>
+<li><strong>評価の高い国とぶどう品種</strong>：平均評価順（セラーと履歴の合計）。</li>
+<li><strong>買い足し：</strong> 最小在庫を下回っているワイン（買い物リストが開きます）、未対応のウィッシュとその評価額。</li>
+</ul>
+<p>データのないセクション（たとえば価格がない場合）は表示されません。</p>
+
+<!-- ───────────────── 10 ───────────────── -->
+<h2 id="export">10. 書き出し、読み込み、バックアップ</h2>
+
+<table>
+<tbody><tr><th>機能</th><th>用途</th></tr>
+<tr><td>CSVを書き出し</td><td>ExcelやNumbers用の表</td></tr>
+<tr><td>Excelを書き出し</td><td>.xlsxファイルとして</td></tr>
+<tr><td>PDFを書き出し</td><td>印刷用の一覧</td></tr>
+<tr><td><strong>JSONバックアップ</strong></td><td><strong>データの完全なバックアップ</strong>（ワイン、ウィッシュリスト、履歴、ラック、表示名、自分の写真）</td></tr>
+<tr><td>クリップボードへ</td><td>テキストのリストをコピー</td></tr>
+<tr><td>JSON / CSV / Excelを読み込み</td><td>バックアップの復元、または表の読み込み</td></tr>
+</tbody></table>
+<div class="tip"><strong>JSONバックアップを定期的に作成してください。</strong> JSONの読み込みを行うと、セラーの内容がバックアップに置き換わります（事前にアプリが確認します）。新しいデバイスでは、これですべてが復元されます。クラウド同期を使う方法もあります（<a href="#sync">12章</a>）。</div>
+
+<!-- ───────────────── 11 ───────────────── -->
+<h2 id="setup">11. 設定</h2>
+
+<h3>一般</h3>
+<ul>
+<li><strong>表示名（タイトル）：</strong> 「Peter」と入力すると「Peterの Weinkeller」のようになります。空欄にすると標準のタイトルになります。</li>
+<li><strong>通貨：</strong> €、$、£、CHF、A$、C$、SEK、NOK、DKK、PLN、HUF、CZK、RON、RUB、UAH、JPY、CNY、KRW、INR。</li>
+<li><strong>言語：</strong> ドイツ語、英語、英語（米国）など、25の言語バリアントから選べます。<strong>通貨は自動的に切り替わります</strong>（スウェーデン語 → クローナ、英語（米国） → 米ドル、英語（英国） → £）。例：スウェーデン語に切り替えると、アプリはSEKに変更し、<strong>今日の欧州中央銀行のレートですべての価格を換算</strong>するか（「OK」）、表示だけ変更するか（「キャンセル」）を尋ねます。RUBとUAHにはレートがありません。通貨はいつでも手動で変更できます。</li>
+<li><strong>飲むときの紙吹雪＆サウンド：</strong> 両方、紙吹雪のみ、またはオフ。</li>
+<li><strong>フォント：</strong> 10種類から選べます。</li>
+<li><strong>温度の単位：</strong> °Cまたは°F（英語（米国）では自動的に°Fになります）。</li>
+</ul>
+<h3>保存先</h3>
+<p><em>このデバイスのみ</em>または<em>クラウド</em>（同期コード、<a href="#sync">12章</a>）。</p>
+<h3>AIクレジット（iPhoneアプリのみ）</h3>
+<p>残りのAIスキャン数、デバイスID、そして必要に応じて<em>クレジットを追加</em>やロック解除コードが表示されます。詳しくは<a href="#privacy">13章</a>を参照してください。</p>
+<h3>ワインデータベース</h3>
+<ul>
+<li><strong>すべてのワインを更新（AI）：</strong> すべてのワインについて、未入力の地域、国、ぶどう品種、飲み頃、飲用温度、価格を補完します（ウェブ版ではボトルの画像も）。すでにある値は変わりません。飲用温度がすでに入力されている場合は、AIの値でも置き換えるかどうか、最初に確認します。</li>
+<li><strong>飲み頃を再計算：</strong> ヴィンテージのあるすべてのワインで「飲み頃の開始」をヴィンテージ + 1に設定し（手入力した値も上書きされます）、必要に応じて「飲み頃の終了」を調整します。アプリは最初にワインの数を表示し、確認を求めます。<em>ヒント：先にJSONバックアップを書き出しておきましょう。</em></li>
+</ul>
+<h3>ラック</h3>
+<p>詳しくは<a href="#racks">6章</a>を参照してください。見出しにはラックの数が表示されます。</p>
+<h3>プライバシー、サポート、バージョン</h3>
+<p>リンクは、プライバシーポリシーとこのサポートページにつながっています。一番下に、アプリの<strong>バージョン</strong>が表示されます。お問い合わせの際はお知らせください。</p>
+
+<!-- ───────────────── 12 ───────────────── -->
+<h2 id="sync">12. 2台のデバイスを同期する</h2>
+
+<ol>
+<li><strong>1台目のデバイス：</strong> 設定 → 保存先 → <em>クラウド</em> → <em>新しい同期コードを作成</em>。画面にコードが表示されます。<em>コードをメールで保存</em>を使うと、自分宛に送れます。</li>
+<li><strong>2台目のデバイス：</strong> 設定 → 保存先 → <em>クラウド</em> → コードを入力（小文字、スペースなし）→ 接続。デバイスにすでにワインがある場合は、クラウドのデータと統合するかどうかをアプリが尋ねます。</li>
+<li>その後は、2台のデバイスが自動的に同期されます（たとえばアプリを開いたとき）。<em>今すぐ同期</em>で手動でも実行できます。ルールは次のとおりです：<strong>最後の変更が優先されます</strong>。</li>
+</ol>
+<p>ワイン、ウィッシュリスト、履歴、ラック、言語や通貨などの設定が同期されます。自分の写真やデバイス固有のデータは<strong>同期されません</strong>。コードを知っている人は誰でもあなたのワインを見られるので、信頼できる人にだけ教えてください。JSONバックアップも合わせて保管しておきましょう。</p>
+
+<!-- ───────────────── 13 ───────────────── -->
+<h2 id="privacy">13. AI、プライバシー、料金</h2>
+
+<ul>
+<li><strong>AIは何に使われますか？</strong> ラベルのスキャン、ワインの検索、価格の検索、「すべてのワインを更新」です。写真またはワイン名は、当社のサーバー経由でAIサービス（Anthropic、米国）に送られて解析されます。氏名やアカウント情報は含まれません。初めて使う前に、アプリが同意を求めます。</li>
+<li><strong>バーコードのスキャン</strong>では、番号だけが無料の商品データベースに送られ、AIクレジットは消費されません。</li>
+<li><strong>料金（iPhoneアプリ）：</strong> インストールごとにAIの呼び出し50回分が購入価格に含まれています。追加分は任意の買い切りで購入できます（サブスクリプションなし、クレジットに有効期限なし）。アプリのそのほかの機能に追加料金はかかりません。クレジットを使い切っても、AI機能以外はすべて引き続き使えます。</li>
+<li><strong>データ：</strong> クラウドを有効にしない限り、すべてはお使いのデバイス上に保存されます。広告なし、トラッキングなし、ユーザーアカウントなし。詳細は<a href="datenschutz.html">プライバシーポリシー</a>（ドイツ語）をご覧ください。</li>
+</ul>
+
+<!-- ───────────────── 14 ───────────────── -->
+<h2 id="faq">14. ヒントとよくある質問</h2>
+
+<ul>
+<li><strong>iPadやPCでは</strong>レイアウトが画面に合わせて変わります：列幅が広がり、複数のカードが横に並び、PC（とiPadの横向き）ではナビゲーションが左側に表示されます。スマートフォンでも横向きで使えます。PCでは<kbd>Esc</kbd>で最前面のウィンドウが閉じます。スマートフォンではウィンドウを下にスワイプして閉じます。</li>
+<li><strong>ワインが消えた：</strong> 「<a href="support.html">サポート</a>」を参照してください。同期コードまたはJSONバックアップで復元できます。</li>
+<li><strong>ワインのバーコードが見つからない：</strong> 小規模なワイナリーでは普通のことです。ラベルのスキャンを使ってください。</li>
+<li><strong>AIが読み間違えた：</strong> 項目を手動で修正して保存してください。AIの値はあくまで提案です。</li>
+<li><strong>飲み頃が早すぎる/遅すぎるように思える：</strong> これはワインのタイプとぶどう品種に基づく目安です。もっと詳しくご存じなら、ワインごとに「飲み頃の終了」を調整してください。</li>
+<li><strong>ページが古いバージョンのままになっている（ウェブ）：</strong> ページを再読み込みしてください（PCでは<kbd>Ctrl</kbd>+<kbd>F5</kbd>）。</li>
+</ul>
+<p>ほかにご質問があれば、<a href="mailto:t.knecht@web.de?subject=Weinkeller%20User%20guide">t.knecht@web.de</a>までお送りください。その際、アプリのバージョン（設定の一番下）をお知らせください。</p>
+
+<p style="margin-top:36px"><small>Weinkeller · Thomas Knecht · Scheidemannstr. 29 · 42781 Haan · ドイツ</small></p>
+
+</body></html>

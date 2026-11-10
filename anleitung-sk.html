@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="sk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Používateľská príručka – Weinkeller</title>
+<style>
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Sans CJK SC","Noto Sans JP","Noto Sans KR","Noto Sans Devanagari",sans-serif;max-width:760px;margin:0 auto;padding:24px 18px 70px;line-height:1.6;color:#222;background:#fff}
+  h1{font-size:28px;margin:6px 0 4px} h2{font-size:20px;margin-top:34px;padding-top:6px;border-top:1px solid #e3e3e3} h3{font-size:16px;margin:20px 0 4px}
+  small{color:#666} a{color:#0a58ca} p{margin:8px 0} ul,ol{margin:6px 0 10px;padding-left:22px} li{margin:3px 0}
+  code,kbd{background:#f2f2f2;border-radius:4px;padding:1px 5px;font-size:.92em}
+  .tip,.note{border-left:4px solid #b88a2a;background:#fbf6ea;padding:8px 12px;border-radius:0 8px 8px 0;margin:12px 0}
+  .note{border-color:#0a58ca;background:#eef4fd}
+  .toc{background:#f7f7f7;border-radius:10px;padding:10px 16px;margin:16px 0} .toc ol{margin:4px 0}
+  .lang{position:sticky;top:0;background:#fff;padding:8px 0;margin:0 0 6px;border-bottom:1px solid #eee;z-index:5}
+  .lang select{font:inherit;font-size:15px;padding:5px 10px;border:1px solid #bbb;border-radius:16px;background:#fff;max-width:100%}
+  table{border-collapse:collapse;width:100%;margin:8px 0} td,th{border:1px solid #ddd;padding:6px 9px;text-align:left;vertical-align:top;font-size:15px} th{background:#f4f4f4}
+  .back{margin:0 0 6px}
+  @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
+</style></head><body>
+<p class="back"><a href="support.html">← Späť na podporu</a></p>
+<div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html">Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html" selected>Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
+
+<h1>Používateľská príručka – Weinkeller</h1>
+<p><small>Aktualizované: 10. novembra 2026 · Verzia aplikácie 2.0</small></p>
+
+<div class="toc">
+
+<strong>Obsah</strong><ol>
+<li><a href="#start">Prehľad a prvé kroky</a></li>
+<li><a href="#add">Pridanie vína</a></li>
+<li><a href="#cellar">Pivnica</a></li>
+<li><a href="#drink">Vypitie vína</a></li>
+<li><a href="#ripe">Okno pitia (Zrelosť)</a></li>
+<li><a href="#racks">Regály a ukladanie</a></li>
+<li><a href="#history">História</a></li>
+<li><a href="#wish">Zoznam želaní</a></li>
+<li><a href="#stats">Štatistiky</a></li>
+<li><a href="#export">Export, import a záloha</a></li>
+<li><a href="#setup">Nastavenia</a></li>
+<li><a href="#sync">Synchronizácia dvoch zariadení</a></li>
+<li><a href="#privacy">AI, súkromie a náklady</a></li>
+<li><a href="#faq">Tipy a časté otázky</a></li></ol>
+</div>
+
+<!-- ───────────────── 1 ───────────────── -->
+<h2 id="start">1. Prehľad a prvé kroky</h2>
+
+<p>Weinkeller je vaša osobná vínna pivnica vo vrecku: spravujete zásoby, miesta uloženia, okná pitia, zoznam želaní a štatistiky. Všetko beží vo vašom zariadení; pomocou synchronizačného kódu môžete prepojiť viacero zariadení.</p>
+<p>Dole (na počítači a na iPade na šírku: vľavo) nájdete lištu s ôsmimi oblasťami:</p>
+<table>
+<tbody><tr><th>Oblasť</th><th>Účel</th></tr>
+<tr><td><strong>Pivnica</strong></td><td>Všetky vína, hľadanie, filtre, zoradenie, pridanie vína, vypitie</td></tr>
+<tr><td><strong>Štatistiky</strong></td><td>Prehľady zásob, cien, zrelosti, uloženia a histórie pitia</td></tr>
+<tr><td><strong>Zrelosť</strong></td><td>Ktoré vína vypiť teraz, čoskoro alebo už nie („okno pitia“)</td></tr>
+<tr><td><strong>História</strong></td><td>Vína, ktoré ste vypili</td></tr>
+<tr><td><strong>Regály</strong></td><td>Plán pivnice: ukladanie a presúvanie vín, QR štítky</td></tr>
+<tr><td><strong>Zoznam želaní</strong></td><td>Vína, ktoré si ešte chcete kúpiť</td></tr>
+<tr><td><strong>Export/Import</strong></td><td>Záloha dát, načítanie tabuliek a záloh</td></tr>
+<tr><td><strong>Nastavenia</strong></td><td>Meno, mena, jazyk, cloud, definícia regálov</td></tr>
+</tbody></table>
+<h3>Prvých päť krokov</h3>
+<ol>
+<li><strong>Zvoľte jazyk a menu</strong>: Nastavenia → Všeobecné. Mena automaticky nasleduje jazyk.</li>
+<li><strong>Definujte regály</strong> (voliteľné): Nastavenia → Regály (pozri <a href="#racks">kapitola 6</a>).</li>
+<li><strong>Pridajte svoje prvé víno</strong>: v pivnici ťuknite na <kbd>+</kbd> (<a href="#add">kapitola 2</a>).</li>
+<li><strong>Uložte ho</strong>: dajte vínu miesto v regáli.</li>
+<li><strong>Zálohujte</strong>: Export/Import → Záloha JSON, alebo nastavte synchronizáciu cez cloud (<a href="#sync">kapitola 12</a>).</li>
+</ol>
+<div class="tip">Sekcie v <em>Nastaveniach</em> sa dajú zbaliť a rozbaliť. „Všeobecné“ je pri prvom spustení otvorené, ostatné sú zatvorené. Aplikácia si pamätá, čo ste naposledy otvorili alebo zatvorili.</div>
+
+<!-- ───────────────── 2 ───────────────── -->
+<h2 id="add">2. Pridanie vína</h2>
+
+<p>V pivnici ťuknite na <kbd>+</kbd>. Víno možno pridať viacerými spôsobmi – dajú sa kombinovať.</p>
+<h3>a) Ručne</h3>
+<p>Vyplňte polia: <strong>Názov / Vinárstvo, Ročník, Fľaše, Typ vína, Región, Krajina, Odroda, Miesto uloženia, Piť od/do, Teplota podávania, Cena, Hodnotenie, Poznámka</strong>. Povinný je len názov. <em>Uložiť</em> víno vytvorí.</p>
+<ul>
+<li><strong>Okno pitia:</strong> Hneď ako zadáte ročník, aplikácia nastaví „Piť od“ na <strong>ročník + 1</strong>. „Piť do“ závisí od typu vína a odrody (červené vydrží dlhšie ako rosé). Oboje môžete kedykoľvek zmeniť.</li>
+<li><strong>Zásoba, Min a Max:</strong> Ak zadáte minimum, aplikácia vás upozorní, keď zásoba klesne pod neho, a ponúkne, že víno zapíše na zoznam želaní (<a href="#cellar">kapitola 3</a>).</li>
+<li><strong>Vlastná fotka:</strong> „Odfotiť / vybrať foto“ pripojí k vínu fotografiu. Zostane v tomto zariadení a je súčasťou zálohy JSON, ale do cloudu sa nesynchronizuje.</li>
+</ul>
+<h3>b) Naskenovať etiketu (AI)</h3>
+<p>Ťuknite na <em>Naskenovať etiketu (AI)</em> a odfoťte etiketu fľaše. AI prečíta názov, ročník, typ, región, krajinu a odrodu a odhadne okno pitia a teplotu podávania. Hodnoty skontrolujte a uložte. Pred prvým použitím vás aplikácia požiada o súhlas (<a href="#privacy">kapitola 13</a>).</p>
+<h3>c) Naskenovať čiarový kód</h3>
+<p>Ťuknite na <em>Naskenovať čiarový kód</em> a umiestnite čiarový kód fľaše do rámika. Aplikácia číslo vyhľadá v bezplatnej databáze produktov (zadarmo, bez AI kreditu) a ak ho nájde, doplní <strong>názov, výrobcu a typ vína</strong>. Ročník doplní z názvu, alebo sa naň opýta.</p>
+<ul>
+<li>Ak je fľaša už v pivnici, aplikácia sa opýta „Pridať ďalšiu fľašu?“ – rýchly spôsob, ako zvýšiť počet, keď dokúpite ďalšie.</li>
+<li>Ak čiarový kód v databáze <strong>nie je</strong> (pri menších vinárstvach bežné), zobrazí sa nápoveda s tlačidlom <em>Naskenovať etiketu (AI)</em>. Číslo sa k vínu napriek tomu uloží, takže fľašu nabudúce hneď spoznáte.</li>
+</ul>
+<h3>d) Vyhľadať víno (AI)</h3>
+<p><em>Vyhľadať víno (AI)</em>: AI na webe vyhľadá región, krajinu, odrodu, okno pitia, teplotu podávania, aktuálnu priemernú cenu a – vo webovej verzii – obrázok fľaše. Polia, ktoré ste už vyplnili, sa neprepisujú. Stane sa to aj automaticky, hneď ako je zadaný názov a ročník a ešte nie je cena.</p>
+<div class="note">Aplikácia pre iPhone nenačítava obrázky fliaš z internetu (pravidlo App Store). Namiesto toho môžete urobiť vlastné fotografie.</div>
+
+<!-- ───────────────── 3 ───────────────── -->
+<h2 id="cellar">3. Pivnica</h2>
+
+<h3>Hľadanie, filtrovanie, zoradenie</h3>
+<ul>
+<li><strong>Hľadanie</strong> hore: nájde vína podľa názvu, regiónu, krajiny a odrody.</li>
+<li><strong>Filtre:</strong> Všetko, Červené, Biele, Rosé, Šumivé, Ostatné. Ťuknutie na typ automaticky vymaže hľadanie.</li>
+<li><strong>Zoradenie:</strong> Najnovšie prvé, Názov, Ročník, Odroda, Región, Krajina alebo Zrelosť (najnaliehavejšie prvé).</li>
+<li><strong>Zoznam / karty:</strong> Tlačidlo <em>Zoznam</em> prepína medzi kompaktným zoznamom a podrobnými kartami.</li>
+</ul>
+<h3>Karta vína</h3>
+<p>Karta zobrazuje názov, ročník, odrodu, hodnotenie (hviezdičky), región a krajinu (ťuknutím otvoríte mapu alebo vinárske oblasti danej krajiny), počet fliaš, <strong>teplotu podávania</strong> (🌡), <strong>miesta uloženia</strong> (ťuknutím preskočíte do regálu) a <strong>pruh zrelosti</strong> vo farbách Mladé, Optimálne, Vrchol, Prekročené. Symbol odrody otvorí stránku odrody na Wikipédii.</p>
+<p>Dole na karte: <em>Upraviť</em>, <em>Vypiť</em> a 🗑 (zmazať víno).</p>
+<h3>Zásoba, Min/Max a nákupný zoznam</h3>
+<p>Ak pri víne zadáte minimum (a voliteľne maximum), karta zobrazí „Zásoba · Min · Max“ a upozorní symbolom ⚠, keď ste pod ním. Tlačidlo <em>Dokúpiť</em> otvorí <strong>nákupný zoznam</strong>: vypíše všetky vína pod minimom (cieľom je maximum, inak minimum). Zoznam môžete zdieľať alebo skopírovať, prípadne vína zapísať na zoznam želaní.</p>
+
+<!-- ───────────────── 4 ───────────────── -->
+<h2 id="drink">4. Vypitie vína</h2>
+
+<p>Ťuknite na karte vína na <em>Vypiť</em> (alebo v Zrelosti na „Vypiť · n fľ.“). Otvorí sa dialóg <em>Vypiť víno</em>:</p>
+<ul>
+<li><strong>Z ktorého miesta bola vzatá?</strong> – vyberte miesto v regáli, odkiaľ fľaša pochádza, alebo „Fľaša bez miesta“. Miesto sa uvoľní.</li>
+<li><strong>S kým ste pili?</strong> – mená vašich hostí (voliteľné).</li>
+<li><strong>Príležitosť</strong> – Jar, Leto, Jeseň, Zima, Narodeniny, Oslava alebo „Len tak“ (možno vybrať viac).</li>
+</ul>
+<p><em>Vypiť</em>: odoberie jednu fľašu a vytvorí záznam v <a href="#history">Histórii</a>. Konfety a zvuk to oslávia (v Nastaveniach sa dá vypnúť). Ak ide o <strong>poslednú fľašu</strong>, aplikácia vás upozorní: víno potom z pivnice zmizne (ale zostane v Histórii).</p>
+<div class="tip"><strong>Rýchlo skenom:</strong> Okrúhle tlačidlo 🥂 v pivnici odfotí etiketu, rozpozná víno vo vašej pivnici a hneď otvorí dialóg Vypiť.</div>
+
+<!-- ───────────────── 5 ───────────────── -->
+<h2 id="ripe">5. Okno pitia (Zrelosť)</h2>
+
+<p>Tu vidíte všetky vína s oknom pitia, <strong>najnaliehavejšie prvé</strong>. Každá karta zobrazuje názov, ročník, typ, <strong>Piť od/do</strong>, teplotu podávania, miesto uloženia a pruh so značkou aktuálneho roka.</p>
+<table>
+<tbody><tr><th>Stav</th><th>Význam</th></tr>
+<tr><td><strong>Mladé</strong></td><td>Príliš skoro – pred „Piť od“</td></tr>
+<tr><td><strong>Optimálne</strong></td><td>Pitné, ešte v prvej časti okna</td></tr>
+<tr><td><strong>Vrchol</strong></td><td>Na vrchole – vypite čoskoro</td></tr>
+<tr><td><strong>Prekročené</strong></td><td>Po „Piť do“ – vypite čo najskôr</td></tr>
+</tbody></table>
+<p><strong>Filtre:</strong> podľa typu vína, podľa stavu a podľa <strong>krajiny</strong> (rozbaľovací zoznam s počtom pri každej krajine; krajiny bez zhody sú sivé). Filtre sa dajú kombinovať. Ťuknutím na kartu otvoríte víno v pivnici.</p>
+<p><strong>Pravidlo pre okno:</strong> „Piť od“ = ročník + 1. „Piť do“ závisí od typu vína a odrody. Ak máte staršie vína s inými hodnotami, môžete ich všetky naraz prepočítať v Nastaveniach (<a href="#setup">kapitola 11</a>, „Prepočítať okno pitia“).</p>
+
+<!-- ───────────────── 6 ───────────────── -->
+<h2 id="racks">6. Regály a ukladanie</h2>
+
+<h3>Definícia a úprava regálov</h3>
+<p><strong>Nastavenia → Regály</strong> (otvoríte ťuknutím na nadpis): zadajte názov, úrovne, miesta na úroveň a fľaše na miesto a ťuknite na ＋. „Fliaš/miesto“ je 1 pri vínnom regáli a viac pri podlahe alebo prepravke. V zozname má každý regál:</p>
+<ul>
+<li>na zmenu poradia slúži <strong>úchyt ⠿</strong> a pod zoznamom tlačidlo <em>Zoradiť A–Z</em>,</li>
+<li>▦ pre <strong>QR štítky</strong>, ✏️ na úpravu, 🧹 na vyprázdnenie a 🗑 na zmazanie.</li>
+</ul>
+<p>Pomocou <strong>úpravy</strong> (✏️) môžete regál premenovať, zmeniť počet miest na úroveň, pridať úrovne hore alebo dole, úrovne odobrať a každej úrovni dať vlastný názov a počet fliaš. Fľaše, ktoré tak prídu o svoje miesto, sa potom počítajú ako „nezaradené“; samotné vína v pivnici zostávajú. Aplikácia sa pred takýmito zmenami opýta.</p>
+<h3>Oblasť Regály</h3>
+<p>Hore si regál vyberiete pomocou <strong>dlaždíc</strong> (názov a „obsadené / miest“). Poradie sa dá zmeniť aj tu: na počítači dlaždicu presuňte, na dotykových displejoch dlaždicu stlačte a asi pol sekundy podržte, potom ju presuňte. Pod tým je <strong>plán pivnice</strong>: každá úroveň so svojimi miestami. Na obsadených miestach je vidieť ležiacu fľašu vo farbe typu vína.</p>
+<h3>Ukladanie</h3>
+<ol>
+<li>Ťuknite na víno pod „Nezaradené“ (zoznam sa dá filtrovať podľa typu a krajiny) – alebo ťuknite na nápovedu „nezaradené“ v pivnici.</li>
+<li>Ťuknite na <strong>voľné miesto</strong>. Pri podlahe a prepravkách aplikácia uloží toľko fliaš, koľko sa zmestí.</li>
+</ol>
+<p><strong>Skenovať víno a uložiť</strong>: odfotí etiketu, nájde víno a prevedie vás ukladaním.</p>
+<h3>Obsadené miesta, presúvanie, odoberanie</h3>
+<p>Ťuknite na obsadené miesto: uvidíte víno a môžete ho <em>otvoriť</em>, <em>odobrať z miesta</em> alebo <em>presunúť</em> (potom ťuknite na voľné miesto). <em>Vyprázdniť regál</em> vyberie z regálu všetky fľaše (po potvrdení).</p>
+<h3>Blikanie</h3>
+<p>Prepínače <em>Blikanie</em> rozblikajú fľaše, ktoré by sa mali <strong>vypiť ako prvé</strong> (prekročené alebo s koncom okna najneskôr budúci rok), ktoré sú prekročené, na vrchole alebo optimálne – takže ich v regáli nájdete na prvý pohľad.</p>
+<h3>QR štítky a „Skenovať úroveň“</h3>
+<p>Pomocou <strong>QR štítkov</strong> (Nastavenia → Regály → ▦) vytvoríte jeden štítok pre regál a jeden pre každú úroveň. Zdieľajte ich ako PDF alebo vytlačte (hárok štítkov 63,5 × 38,1 mm, 21 na stranu) a nalepte. Potom: <strong>Skenovať úroveň</strong> v oblasti Regály – uvidíte, čo na danej úrovni leží, a môžete <em>uložiť sem</em>, <em>vybrať</em>, vypiť, presunúť fľašu alebo <em>presunúť celú úroveň</em>. Vo formulári „Pridať víno“ naskenovanie štítka úrovne vyplní aj miesto uloženia.</p>
+
+<!-- ───────────────── 7 ───────────────── -->
+<h2 id="history">7. História</h2>
+
+<p>História uvádza všetky vína, ktoré ste vypili, s dátumom, vínom, hodnotou, hosťami a príležitosťou. Môžete filtrovať podľa typu vína a príležitosti a upraviť záznam (hostí, príležitosť). História dodáva dáta pre prehľady „Vypité za mesiac/rok“, výdavky a početnosť v Štatistikách.</p>
+
+<!-- ───────────────── 8 ───────────────── -->
+<h2 id="wish">8. Zoznam želaní</h2>
+
+<ul>
+<li><strong>+ Pridať želanie</strong>: ručne alebo skenom etikety, s voliteľnou poznámkou („Kde kúpiť?“).</li>
+<li><strong>Hľadať ceny</strong> (💶): Aplikácia na webe hľadá ceny vína, zobrazí najlacnejší nález a vynásobí ho množstvom. Ide o orientačné hodnoty bez záruky – overte si u obchodu poštovné a dostupnosť.</li>
+<li><strong>Zaškrtnutie</strong> vľavo: označí ako kúpené/hotové (riadok zoslabne).</li>
+<li><strong>→ Pivnica</strong>: presunie želanie do pivnice (s množstvom a, ak je k dispozícii, najnižšou cenou) a ak máte regály, rovno vás zavedie k ukladaniu.</li>
+<li>Ak víno klesne pod svoje minimum, aplikácia ponúkne, že ho zapíše na zoznam želaní s chýbajúcim množstvom („dokúpenie“).</li>
+</ul>
+
+<!-- ───────────────── 9 ───────────────── -->
+<h2 id="stats">9. Štatistiky</h2>
+
+<p>Zhora nadol:</p>
+<ul>
+<li><strong>Kľúčové údaje:</strong> fľaše, vína, celková hodnota, priemerné hodnotenie.</li>
+<li><strong>Okno pitia:</strong> fľaše podľa stavu (Mladé, Optimálne, Vrchol, Prekročené) s varovaním pred prekročenými fľašami; ťuknutím otvoríte Zrelosť s príslušným filtrom.</li>
+<li><strong>Podľa typu</strong> a <strong>Najlepšie vína</strong> (podľa hodnotenia alebo početnosti, s možnosťou filtrovať podľa hviezdičiek).</li>
+<li><strong>Podľa krajiny, regiónu, odrody:</strong> pruhy (najviac 8, zvyšok ako „+n ďalších“); ťuknutím sa hľadá v pivnici. <strong>Podľa ročníka:</strong> stĺpce, posúvateľné do strán.</li>
+<li><strong>Ceny:</strong> priemer za fľašu, najlacnejšie, najdrahšie, cenové pásma (prispôsobené vašej mene) a hodnota podľa krajiny.</li>
+<li><strong>Sklad:</strong> obsadenosť v percentách, voľné miesta, nezaradené fľaše a pruh pre každý regál (ťuknutím preskočíte do regálu).</li>
+<li><strong>Vypité:</strong> za mesiac (posledných 12) a za rok, plus výdavky za vypité fľaše.</li>
+<li><strong>Najlepšie krajiny a odrody</strong> podľa priemerného hodnotenia (pivnica a História dokopy).</li>
+<li><strong>Dokúpiť:</strong> vína pod minimálnou zásobou (otvorí nákupný zoznam), otvorené želania a ich hodnota.</li>
+</ul>
+<p>Sekcie bez dát (napr. bez cien) sú skryté.</p>
+
+<!-- ───────────────── 10 ───────────────── -->
+<h2 id="export">10. Export, import a záloha</h2>
+
+<table>
+<tbody><tr><th>Funkcia</th><th>Účel</th></tr>
+<tr><td>Exportovať CSV</td><td>Tabuľka pre Excel alebo Numbers</td></tr>
+<tr><td>Exportovať Excel</td><td>Ako súbor .xlsx</td></tr>
+<tr><td>Exportovať PDF</td><td>Prehľad na vytlačenie</td></tr>
+<tr><td><strong>Záloha JSON</strong></td><td><strong>Úplná záloha dát</strong> (vína, zoznam želaní, história, regály, zobrazované meno, vlastné fotografie)</td></tr>
+<tr><td>Do schránky</td><td>Skopírovať textový zoznam</td></tr>
+<tr><td>Importovať JSON / CSV / Excel</td><td>Obnoviť zálohu alebo načítať tabuľku</td></tr>
+</tbody></table>
+<div class="tip"><strong>Zálohu JSON robte pravidelne.</strong> Import JSON nahradí pivnicu zálohou (aplikácia sa predtým opýta). Na novom zariadení tým obnovíte všetko. Prípadne použite synchronizáciu cez cloud (<a href="#sync">kapitola 12</a>).</div>
+
+<!-- ───────────────── 11 ───────────────── -->
+<h2 id="setup">11. Nastavenia</h2>
+
+<h3>Všeobecné</h3>
+<ul>
+<li><strong>Zobrazované meno (názov):</strong> z „Peter“ sa stane „Peterov Weinkeller“ a pod. Pre predvolený názov nechajte prázdne.</li>
+<li><strong>Mena:</strong> €, $, £, CHF, A$, C$, SEK, NOK, DKK, PLN, HUF, CZK, RON, RUB, UAH, JPY, CNY, KRW, INR.</li>
+<li><strong>Jazyk:</strong> 25 jazykových variantov, okrem iného nemčina, angličtina, angličtina (US) a mnoho ďalších. <strong>Mena sa zmení automaticky</strong> (švédčina → koruna, angličtina (US) → US $, angličtina (UK) → £). Príklad: keď prepnete na švédčinu, aplikácia prejde na SEK a opýta sa, či <strong>previesť všetky ceny dnešným kurzom Európskej centrálnej banky</strong> („OK“), alebo len zmeniť označenie („Zrušiť“). Pre RUB a UAH kurzy nie sú. Menu môžete kedykoľvek zmeniť ručne.</li>
+<li><strong>Konfety a zvuk pri pití:</strong> oboje, len konfety, alebo vypnuté.</li>
+<li><strong>Písmo:</strong> na výber je desať písiem.</li>
+<li><strong>Jednotka teploty:</strong> °C alebo °F (angličtina (US) nastaví °F automaticky).</li>
+</ul>
+<h3>Úložisko</h3>
+<p><em>Len toto zariadenie</em> alebo <em>Cloud</em> (synchronizačný kód, <a href="#sync">kapitola 12</a>).</p>
+<h3>AI kredity (len aplikácia pre iPhone)</h3>
+<p>Zobrazuje zostávajúce AI skeny, ID zariadenia a – ak treba – <em>Dobiť kredity</em> alebo odomykací kód. Pozri <a href="#privacy">kapitola 13</a>.</p>
+<h3>Databáza vín</h3>
+<ul>
+<li><strong>Aktualizovať všetky vína (AI):</strong> doplní chýbajúci región, krajinu, odrodu, okno pitia, teplotu podávania a cenu pri všetkých vínach (vo webovej verzii aj obrázky fliaš). Existujúce hodnoty zostanú. Ak už teploty podávania existujú, aplikácia sa najprv opýta, či ich tiež nahradiť hodnotami z AI.</li>
+<li><strong>Prepočítať okno pitia:</strong> nastaví „Piť od“ na ročník + 1 pri všetkých vínach s ročníkom (ručne zadané hodnoty sa tiež prepíšu) a podľa potreby upraví „Piť do“. Aplikácia najprv uvedie počet vín a požiada o potvrdenie. <em>Tip: najprv exportujte zálohu JSON.</em></li>
+</ul>
+<h3>Regály</h3>
+<p>Pozri <a href="#racks">kapitola 6</a>. Nadpis zobrazuje počet regálov.</p>
+<h3>Súkromie, podpora, verzia</h3>
+<p>Odkazy vedú na zásady ochrany osobných údajov a na túto stránku podpory. Úplne dole nájdete <strong>verziu</strong> aplikácie – uveďte ju, keď nás budete kontaktovať.</p>
+
+<!-- ───────────────── 12 ───────────────── -->
+<h2 id="sync">12. Synchronizácia dvoch zariadení</h2>
+
+<ol>
+<li><strong>Prvé zariadenie:</strong> Nastavenia → Úložisko → <em>Cloud</em> → <em>Vytvoriť nový synchronizačný kód</em>. Kód sa zobrazí na obrazovke; pomocou <em>Uložiť kód e-mailom</em> si ho pošlete.</li>
+<li><strong>Druhé zariadenie:</strong> Nastavenia → Úložisko → <em>Cloud</em> → zadajte kód (malými písmenami, bez medzier) → Pripojiť. Ak zariadenie už obsahuje vína, aplikácia sa opýta, či ich zlúčiť s dátami v cloude.</li>
+<li>Potom sa obe zariadenia synchronizujú automaticky (napr. pri otvorení aplikácie); <em>Synchronizovať teraz</em> to spustí ručne. Pravidlo znie: <strong>vyhráva najnovšia zmena</strong>.</li>
+</ol>
+<p>Synchronizujú sa vína, zoznam želaní, história, regály a nastavenia, napríklad jazyk a mena. <strong>Nesynchronizujú sa</strong> vlastné fotografie a údaje špecifické pre zariadenie. Kto pozná váš kód, uvidí vaše vína – zdieľajte ho len s ľuďmi, ktorým dôverujete. Uchovávajte aj zálohu JSON.</p>
+
+<!-- ───────────────── 13 ───────────────── -->
+<h2 id="privacy">13. AI, súkromie a náklady</h2>
+
+<ul>
+<li><strong>Na čo sa AI používa?</strong> Skenovanie etikety, vyhľadanie vína, hľadanie cien a „Aktualizovať všetky vína“. Fotografia alebo názov vína sa cez náš server odošle na spracovanie službe AI (Anthropic, USA) – bez mien a bez účtov. Pred prvým použitím vás aplikácia požiada o súhlas.</li>
+<li><strong>Skenovanie čiarového kódu</strong> odosiela len číslo do bezplatnej databázy produktov a nestojí žiadny AI kredit.</li>
+<li><strong>Náklady (aplikácia pre iPhone):</strong> 50 volaní AI na inštaláciu je zahrnutých v cene nákupu; ďalšie sa dajú dokúpiť ako voliteľný jednorazový nákup (žiadne predplatné, kredity nevypršia). Všetko ostatné v aplikácii je bez príplatku. Keď sa kredity vyčerpajú, všetko okrem funkcií AI funguje ďalej.</li>
+<li><strong>Dáta:</strong> Všetko zostáva vo vašom zariadení, kým nezapnete cloud. Žiadne reklamy, žiadne sledovanie, žiadny používateľský účet. Podrobnosti v <a href="datenschutz.html">zásadách ochrany osobných údajov</a> (po nemecky).</li>
+</ul>
+
+<!-- ───────────────── 14 ───────────────── -->
+<h2 id="faq">14. Tipy a časté otázky</h2>
+
+<ul>
+<li><strong>Na iPade alebo počítači</strong> sa rozloženie prispôsobí: širší stĺpec, niekoľko kariet vedľa seba a na počítači (a na iPade na šírku) navigácia vľavo. Telefón funguje aj na šírku. Na počítači <kbd>Esc</kbd> zatvorí horné okno; na telefóne okno zatvoríte potiahnutím nadol.</li>
+<li><strong>Moje vína zmizli:</strong> Pozri <a href="support.html">Podpora</a> – obnovte ich pomocou synchronizačného kódu alebo zálohy JSON.</li>
+<li><strong>K vínu sa nenašiel čiarový kód:</strong> Pri malých vinárstvach normálne. Použite skenovanie etikety.</li>
+<li><strong>AI niečo zle prečítala:</strong> Opravte pole ručne a uložte; hodnoty z AI sú návrhy.</li>
+<li><strong>Okno pitia sa zdá príliš skoro/neskoro:</strong> Ide o orientačné pravidlá podľa typu vína a odrody. Ak to viete lepšie, upravte „Piť do“ pri konkrétnom víne.</li>
+<li><strong>Stránka stále zobrazuje starú verziu (web):</strong> Stránku znova načítajte (na počítači <kbd>Ctrl</kbd>+<kbd>F5</kbd>).</li>
+</ul>
+<p>Ďalšie otázky? Napíšte na <a href="mailto:t.knecht@web.de?subject=Weinkeller%20Pou%C5%BE%C3%ADvate%C4%BEsk%C3%A1%20pr%C3%ADru%C4%8Dka">t.knecht@web.de</a> a uveďte verziu aplikácie (Nastavenia, úplne dole).</p>
+
+<p style="margin-top:36px"><small>Weinkeller · Thomas Knecht · Scheidemannstr. 29 · 42781 Haan · Deutschland</small></p>
+
+</body></html>

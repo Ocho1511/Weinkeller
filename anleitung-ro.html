@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="ro"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ghid de utilizare – Weinkeller</title>
+<style>
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Sans CJK SC","Noto Sans JP","Noto Sans KR","Noto Sans Devanagari",sans-serif;max-width:760px;margin:0 auto;padding:24px 18px 70px;line-height:1.6;color:#222;background:#fff}
+  h1{font-size:28px;margin:6px 0 4px} h2{font-size:20px;margin-top:34px;padding-top:6px;border-top:1px solid #e3e3e3} h3{font-size:16px;margin:20px 0 4px}
+  small{color:#666} a{color:#0a58ca} p{margin:8px 0} ul,ol{margin:6px 0 10px;padding-left:22px} li{margin:3px 0}
+  code,kbd{background:#f2f2f2;border-radius:4px;padding:1px 5px;font-size:.92em}
+  .tip,.note{border-left:4px solid #b88a2a;background:#fbf6ea;padding:8px 12px;border-radius:0 8px 8px 0;margin:12px 0}
+  .note{border-color:#0a58ca;background:#eef4fd}
+  .toc{background:#f7f7f7;border-radius:10px;padding:10px 16px;margin:16px 0} .toc ol{margin:4px 0}
+  .lang{position:sticky;top:0;background:#fff;padding:8px 0;margin:0 0 6px;border-bottom:1px solid #eee;z-index:5}
+  .lang select{font:inherit;font-size:15px;padding:5px 10px;border:1px solid #bbb;border-radius:16px;background:#fff;max-width:100%}
+  table{border-collapse:collapse;width:100%;margin:8px 0} td,th{border:1px solid #ddd;padding:6px 9px;text-align:left;vertical-align:top;font-size:15px} th{background:#f4f4f4}
+  .back{margin:0 0 6px}
+  @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
+</style></head><body>
+<p class="back"><a href="support.html">← Înapoi la asistență</a></p>
+<div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html">Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html" selected>Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
+
+<h1>Ghid de utilizare – Weinkeller</h1>
+<p><small>Actualizat: 10 noiembrie 2026 · Versiunea aplicației 2.0</small></p>
+
+<div class="toc">
+
+<strong>Cuprins</strong><ol>
+<li><a href="#start">Prezentare generală și primii pași</a></li>
+<li><a href="#add">Adăugarea unui vin</a></li>
+<li><a href="#cellar">Pivnița</a></li>
+<li><a href="#drink">Consumarea unui vin</a></li>
+<li><a href="#ripe">Intervalul de consum (Maturitate)</a></li>
+<li><a href="#racks">Rafturi și depozitare</a></li>
+<li><a href="#history">Istoric</a></li>
+<li><a href="#wish">Listă de dorințe</a></li>
+<li><a href="#stats">Statistici</a></li>
+<li><a href="#export">Export, import și backup</a></li>
+<li><a href="#setup">Setări (configurare)</a></li>
+<li><a href="#sync">Sincronizarea a două dispozitive</a></li>
+<li><a href="#privacy">IA, confidențialitate și costuri</a></li>
+<li><a href="#faq">Sfaturi și întrebări frecvente</a></li></ol>
+</div>
+
+<!-- ───────────────── 1 ───────────────── -->
+<h2 id="start">1. Prezentare generală și primii pași</h2>
+
+<p>Weinkeller este pivnița ta personală de vinuri, la tine în buzunar: gestionezi stocul, locurile de depozitare, intervalele de consum, o listă de dorințe și statisticile. Totul rulează pe dispozitivul tău; cu un cod de sincronizare poți conecta mai multe dispozitive.</p>
+<p>În partea de jos (pe PC și pe iPad în poziție orizontală: în stânga) găsești bara cu opt zone:</p>
+<table>
+<tbody><tr><th>Zonă</th><th>Scop</th></tr>
+<tr><td><strong>Pivniță</strong></td><td>Toate vinurile, căutare, filtre, sortare, adăugarea unui vin, consumare</td></tr>
+<tr><td><strong>Statistici</strong></td><td>Evaluări privind stocul, prețurile, maturitatea, depozitarea și istoricul consumului</td></tr>
+<tr><td><strong>Maturitate</strong></td><td>Ce vinuri trebuie băute acum, în curând sau nu mai trebuie băute („interval de consum”)</td></tr>
+<tr><td><strong>Istoric</strong></td><td>Vinurile pe care le-ai băut</td></tr>
+<tr><td><strong>Rafturi</strong></td><td>Planul pivniței: depozitezi și muți vinuri, etichete QR</td></tr>
+<tr><td><strong>Listă de dorințe</strong></td><td>Vinuri pe care vrei încă să le cumperi</td></tr>
+<tr><td><strong>Export/Import</strong></td><td>Salvează-ți datele, importă tabele și backup-uri</td></tr>
+<tr><td><strong>Setări</strong></td><td>Nume, monedă, limbă, cloud, definirea rafturilor</td></tr>
+</tbody></table>
+<h3>Primii cinci pași</h3>
+<ol>
+<li><strong>Alege limba și moneda</strong>: Setări → General. Moneda urmează automat limba.</li>
+<li><strong>Definește rafturile</strong> (opțional): Setări → Rafturi (vezi <a href="#racks">secțiunea 6</a>).</li>
+<li><strong>Adaugă primul tău vin</strong>: apasă <kbd>+</kbd> în pivniță (<a href="#add">secțiunea 2</a>).</li>
+<li><strong>Depozitează-l</strong>: dă vinului un loc într-un raft.</li>
+<li><strong>Fă un backup</strong>: Export/Import → Backup JSON sau configurează sincronizarea în cloud (<a href="#sync">secțiunea 12</a>).</li>
+</ol>
+<div class="tip">Secțiunile din <em>Setări</em> se pot restrânge. „General” este deschisă la prima pornire, celelalte sunt închise. Aplicația ține minte ce ai deschis sau închis ultima dată.</div>
+
+<!-- ───────────────── 2 ───────────────── -->
+<h2 id="add">2. Adăugarea unui vin</h2>
+
+<p>Apasă <kbd>+</kbd> în pivniță. Există mai multe moduri de a adăuga un vin – care pot fi combinate.</p>
+<h3>a) Manual</h3>
+<p>Completează câmpurile: <strong>Nume / Cramă, An, Sticle, Tip de vin, Regiune, Țară, Soi, Loc de depozitare, Bea de la/până, Temperatura de servire, Preț, Evaluare, Notă</strong>. Doar numele este obligatoriu. Cu <em>Salvează</em> se creează vinul.</p>
+<ul>
+<li><strong>Interval de consum:</strong> De îndată ce introduci anul, aplicația setează „Bea de la” la <strong>anul + 1</strong>. „Bea până” depinde de tipul de vin și de soi (un roșu se păstrează mai mult decât un rosé). Poți modifica oricând ambele valori.</li>
+<li><strong>Stoc, Min și Max:</strong> Dacă introduci un minim, aplicația te avertizează când stocul scade sub el și îți propune să pui vinul pe lista de dorințe (<a href="#cellar">secțiunea 3</a>).</li>
+<li><strong>Fotografie proprie:</strong> „Fă / alege o fotografie” atașează o fotografie la vin. Rămâne pe acest dispozitiv și este inclusă în backup-ul JSON, dar nu se sincronizează în cloud.</li>
+</ul>
+<h3>b) Scanează eticheta (IA)</h3>
+<p>Apasă <em>Scanează eticheta (IA)</em> și fotografiază eticheta sticlei. IA citește numele, anul, tipul, regiunea, țara și soiul și estimează intervalul de consum și temperatura de servire. Verifică valorile și salvează. Înainte de prima utilizare, aplicația îți cere acordul (<a href="#privacy">secțiunea 13</a>).</p>
+<h3>c) Scanează codul de bare</h3>
+<p>Apasă <em>Scanează codul de bare</em> și ține codul de bare al sticlei în cadru. Aplicația caută numărul într-o bază de date gratuită de produse (fără costuri, fără credit IA) și, dacă îl găsește, completează <strong>numele, producătorul și tipul de vin</strong>. Anul îl completează din nume sau îl cere de la tine.</p>
+<ul>
+<li>Dacă sticla se află deja în pivniță, aplicația întreabă „Adaugi încă o sticlă?” – o modalitate rapidă de a crește numărul când mai cumperi.</li>
+<li>Dacă codul de bare <strong>nu</strong> se află în baza de date (frecvent la cramele mai mici), apare un indiciu cu butonul <em>Scanează eticheta (IA)</em>. Numărul este totuși salvat împreună cu vinul, astfel încât sticla să fie recunoscută imediat data viitoare.</li>
+</ul>
+<h3>d) Caută vinul (IA)</h3>
+<p><em>Caută vinul (IA)</em> lasă IA să caute pe web regiunea, țara, soiul, intervalul de consum, temperatura de servire, prețul mediu actual și – în versiunea web – o imagine a sticlei. Câmpurile pe care le-ai completat deja nu sunt suprascrise. Acest lucru se întâmplă și automat de îndată ce sunt introduse numele și anul și nu există încă un preț.</p>
+<div class="note">Aplicația pentru iPhone nu încarcă imagini ale sticlelor de pe internet (regulă App Store). În schimb, poți face propriile fotografii.</div>
+
+<!-- ───────────────── 3 ───────────────── -->
+<h2 id="cellar">3. Pivnița</h2>
+
+<h3>Căutare, filtre, sortare</h3>
+<ul>
+<li><strong>Căutarea</strong> din partea de sus: găsește vinuri după nume, regiune, țară și soi.</li>
+<li><strong>Filtre:</strong> Toate, Roșu, Alb, Rosé, Spumant, Altele. Un clic pe un tip șterge automat căutarea.</li>
+<li><strong>Sortare:</strong> Cele mai noi întâi, Nume, An, Soi, Regiune, Țară sau Maturitate (cele mai urgente întâi).</li>
+<li><strong>Listă / carduri:</strong> Butonul <em>Listă</em> comută între o listă compactă și carduri detaliate.</li>
+</ul>
+<h3>Cardul vinului</h3>
+<p>Cardul afișează numele, anul, soiul, evaluarea (stele), regiunea și țara (atinge pentru a deschide o hartă sau regiunile viticole ale țării), numărul de sticle, <strong>temperatura de servire</strong> (🌡), <strong>locurile de depozitare</strong> (atinge pentru a sări la raft) și o <strong>bară de maturitate</strong> în culorile Tânăr, Optim, Apogeu, Depășit. Simbolul soiului deschide Wikipedia pentru soiul respectiv.</p>
+<p>În partea de jos a cardului: <em>Editează</em>, <em>Bea</em> și 🗑 (șterge vinul).</p>
+<h3>Stoc, Min/Max și lista de cumpărături</h3>
+<p>Dacă introduci un minim (și, opțional, un maxim) pentru un vin, cardul afișează „Stoc · Min · Max” și te avertizează cu ⚠ când ești sub el. Butonul <em>De recumpărat</em> deschide <strong>lista de cumpărături</strong>: aceasta cuprinde toate vinurile aflate sub minim (ținta este maximul, altfel minimul). Poți distribui sau copia lista ori pune vinurile pe lista de dorințe.</p>
+
+<!-- ───────────────── 4 ───────────────── -->
+<h2 id="drink">4. Consumarea unui vin</h2>
+
+<p>Apasă <em>Bea</em> pe cardul vinului (sau „Bea · n st.” în Maturitate). Se deschide dialogul <em>Bea vin</em>:</p>
+<ul>
+<li><strong>Din ce loc a fost luată?</strong> – alege locul din raft de unde a fost luată sticla sau „Sticlă fără loc”. Locul devine liber.</li>
+<li><strong>Cu cine ai băut?</strong> – numele invitaților tăi (opțional).</li>
+<li><strong>Ocazie</strong> – Primăvară, Vară, Toamnă, Iarnă, Zi de naștere, Petrecere sau „Pur și simplu” (se pot alege mai multe).</li>
+</ul>
+<p><em>Bea</em> scoate o sticlă și creează o înregistrare în <a href="#history">Istoric</a>. Confetti și sunet sărbătoresc momentul (se pot dezactiva în Setări). Dacă este <strong>ultima sticlă</strong>, aplicația te anunță: vinul dispare apoi din pivniță (dar rămâne în Istoric).</p>
+<div class="tip"><strong>Rapid prin scanare:</strong> Butonul rotund 🥂 din pivniță fotografiază o etichetă, recunoaște vinul din pivnița ta și deschide imediat dialogul de consum.</div>
+
+<!-- ───────────────── 5 ───────────────── -->
+<h2 id="ripe">5. Intervalul de consum (Maturitate)</h2>
+
+<p>Aici vezi toate vinurile cu un interval de consum, <strong>cele mai urgente întâi</strong>. Fiecare card afișează numele, anul, tipul, <strong>Bea de la/până</strong>, temperatura de servire, locul de depozitare și o bară cu un marcaj pentru anul curent.</p>
+<table>
+<tbody><tr><th>Stare</th><th>Semnificație</th></tr>
+<tr><td><strong>Tânăr</strong></td><td>Prea devreme – înainte de „Bea de la”</td></tr>
+<tr><td><strong>Optim</strong></td><td>Se poate bea, încă în prima parte a intervalului</td></tr>
+<tr><td><strong>Apogeu</strong></td><td>La apogeu – bea-l în curând</td></tr>
+<tr><td><strong>Depășit</strong></td><td>După „Bea până” – bea-l cât mai repede</td></tr>
+</tbody></table>
+<p><strong>Filtre:</strong> după tipul de vin, după stare și după <strong>țară</strong> (listă derulantă cu numărul pentru fiecare țară; țările fără rezultate sunt estompate). Filtrele pot fi combinate. Atinge un card pentru a deschide vinul în pivniță.</p>
+<p><strong>Regula intervalului:</strong> „Bea de la” = anul + 1. „Bea până” depinde de tipul de vin și de soi. Dacă ai vinuri mai vechi cu alte valori, le poți recalcula pe toate odată în Setări (<a href="#setup">secțiunea 11</a>, „Recalculează intervalul de consum”).</p>
+
+<!-- ───────────────── 6 ───────────────── -->
+<h2 id="racks">6. Rafturi și depozitare</h2>
+
+<h3>Definirea și editarea rafturilor</h3>
+<p><strong>Setări → Rafturi</strong> (atinge titlul pentru a deschide): introdu numele, nivelurile, locurile pe nivel și sticlele pe loc, apoi apasă ＋. „Sticle/loc” este 1 pentru un raft de vinuri și mai mare pentru o podea sau o ladă. În listă, fiecare raft are:</p>
+<ul>
+<li>un <strong>mâner ⠿</strong> pentru a schimba ordinea și butonul <em>Sortează A–Z</em> de sub listă,</li>
+<li>▦ pentru <strong>etichete QR</strong>, ✏️ pentru editare, 🧹 pentru golire și 🗑 pentru ștergere.</li>
+</ul>
+<p>Cu <strong>editarea</strong> (✏️) poți redenumi raftul, schimba numărul de locuri pe nivel, adăuga niveluri sus sau jos, elimina niveluri și da fiecărui nivel propriul nume și număr de sticle. Sticlele care își pierd astfel locul sunt considerate ulterior „fără loc”; vinurile în sine rămân în pivniță. Aplicația întreabă înainte de asemenea modificări.</p>
+<h3>Zona Rafturi</h3>
+<p>În partea de sus alegi un raft cu ajutorul <strong>plăcilor</strong> (nume și „ocupate / locuri”). Ordinea poate fi schimbată și aici: pe PC trage o placă, pe ecranele tactile ține apăsat pe o placă aproximativ o jumătate de secundă, apoi trage. Dedesubt se află <strong>planul pivniței</strong>: fiecare nivel cu locurile lui. Locurile ocupate arată o sticlă culcată, în culoarea tipului de vin.</p>
+<h3>Depozitarea</h3>
+<ol>
+<li>Atinge un vin de sub „Neatribuite” (lista poate fi filtrată după tip și țară) – sau atinge un indiciu „fără loc” din pivniță.</li>
+<li>Atinge un <strong>loc liber</strong>. Pentru podele și lăzi, aplicația depozitează câte sticle încap.</li>
+</ol>
+<p><strong>Scanare vin &amp; depozitare</strong> fotografiază eticheta, găsește vinul și te ghidează prin depozitare.</p>
+<h3>Locuri ocupate, mutare, eliminare</h3>
+<p>Atinge un loc ocupat: vezi vinul și poți <em>deschide</em>, <em>elimina din loc</em> sau <em>muta</em> vinul (apoi atinge un loc liber). <em>Golește raftul</em> scoate toate sticlele din raft (după confirmare).</p>
+<h3>Clipire</h3>
+<p>Comutatoarele <em>Clipire</em> fac să clipească sticlele care trebuie <strong>băute întâi</strong> (depășite sau la sfârșitul intervalului lor cel târziu anul viitor), cele depășite, cele la apogeu sau optime – astfel le găsești dintr-o privire în raft.</p>
+<h3>Etichete QR și „Scanează nivelul”</h3>
+<p>Cu <strong>Etichete QR</strong> (Setări → Rafturi → ▦) creezi o etichetă pentru raft și câte una pentru fiecare nivel. Distribuie ca PDF sau tipărește (coală de etichete 63,5 × 38,1 mm, 21 pe pagină) și lipește-le. Apoi: <strong>Scanează nivelul</strong> în zona Rafturi – vezi ce se află pe nivelul respectiv și poți <em>depozita aici</em>, <em>scoate</em>, bea, muta o sticlă sau <em>muta tot nivelul</em>. În formularul „Adaugă vin”, scanarea unei etichete de nivel completează și locul de depozitare.</p>
+
+<!-- ───────────────── 7 ───────────────── -->
+<h2 id="history">7. Istoric</h2>
+
+<p>Istoricul listează toate vinurile pe care le-ai băut, cu data, vinul, valoarea, invitații și ocazia. Poți filtra după tipul de vin și ocazie și poți edita o înregistrare (invitați, ocazie). Istoricul alimentează evaluările „Băut pe lună/an”, cheltuielile și frecvența din Statistici.</p>
+
+<!-- ───────────────── 8 ───────────────── -->
+<h2 id="wish">8. Listă de dorințe</h2>
+
+<ul>
+<li><strong>+ Adaugă dorință</strong>: manual sau prin scanarea etichetei, cu o notă opțională („Unde se cumpără?”).</li>
+<li><strong>Caută prețuri</strong> (💶): Aplicația caută pe web prețurile vinului, afișează cel mai mic preț găsit și îl înmulțește cu cantitatea. Sunt valori orientative, fără garanție – verifică la magazin costurile de livrare și disponibilitatea.</li>
+<li><strong>Bifa</strong> din stânga: marchează ca achiziționat/gata (rândul se estompează).</li>
+<li><strong>→ Pivniță</strong>: mută dorința în pivniță (cu cantitatea și, dacă există, cel mai mic preț) și, dacă ai rafturi, te duce direct la depozitare.</li>
+<li>Dacă un vin scade sub minim, aplicația se oferă să îl pună pe lista de dorințe cu cantitatea lipsă („recumpărare”).</li>
+</ul>
+
+<!-- ───────────────── 9 ───────────────── -->
+<h2 id="stats">9. Statistici</h2>
+
+<p>De sus în jos:</p>
+<ul>
+<li><strong>Cifre cheie:</strong> sticle, vinuri, valoare totală, evaluare medie.</li>
+<li><strong>Interval de consum:</strong> sticle pe stare (Tânăr, Optim, Apogeu, Depășit) cu un avertisment pentru sticlele depășite; o atingere deschide Maturitate cu filtrul corespunzător.</li>
+<li><strong>După tip</strong> și <strong>Cele mai bune vinuri</strong> (după evaluare sau frecvență, filtrabile după stele).</li>
+<li><strong>După țară, regiune, soi:</strong> bare (până la 8, restul ca „+n în plus”); o atingere caută în pivniță. <strong>După recoltă:</strong> coloane, derulabile lateral.</li>
+<li><strong>Prețuri:</strong> medie pe sticlă, cel mai mic, cel mai mare, intervale de preț (adaptate monedei tale) și valoarea pe țară.</li>
+<li><strong>Depozit:</strong> ocupare în procente, locuri libere, sticle fără loc și o bară pentru fiecare raft (o atingere sare la raft).</li>
+<li><strong>Băut:</strong> pe lună (ultimele 12) și pe an, plus cheltuielile pentru sticlele băute.</li>
+<li><strong>Cele mai bune țări și soiuri</strong> după evaluarea medie (pivnița și Istoricul împreună).</li>
+<li><strong>De recumpărat:</strong> vinuri sub stocul minim (deschide lista de cumpărături), dorințe deschise și valoarea lor.</li>
+</ul>
+<p>Secțiunile fără date (de exemplu fără prețuri) sunt ascunse.</p>
+
+<!-- ───────────────── 10 ───────────────── -->
+<h2 id="export">10. Export, import și backup</h2>
+
+<table>
+<tbody><tr><th>Funcție</th><th>Scop</th></tr>
+<tr><td>Exportă CSV</td><td>Tabel pentru Excel sau Numbers</td></tr>
+<tr><td>Exportă Excel</td><td>Ca fișier .xlsx</td></tr>
+<tr><td>Exportă PDF</td><td>Prezentare generală de tipărit</td></tr>
+<tr><td><strong>Backup JSON</strong></td><td><strong>Backup complet al datelor</strong> (vinuri, listă de dorințe, istoric, rafturi, nume afișat, fotografii proprii)</td></tr>
+<tr><td>În clipboard</td><td>Copiază o listă text</td></tr>
+<tr><td>Importă JSON / CSV / Excel</td><td>Restaurează un backup sau importă un tabel</td></tr>
+</tbody></table>
+<div class="tip"><strong>Fă regulat un backup JSON.</strong> Importul JSON înlocuiește pivnița cu backup-ul (aplicația întreabă mai întâi). Pe un dispozitiv nou, acesta restaurează totul. Alternativ, folosește sincronizarea în cloud (<a href="#sync">secțiunea 12</a>).</div>
+
+<!-- ───────────────── 11 ───────────────── -->
+<h2 id="setup">11. Setări (configurare)</h2>
+
+<h3>General</h3>
+<ul>
+<li><strong>Nume afișat (titlu):</strong> „Peter” devine „Weinkeller de Peter” etc. Lasă gol pentru titlul implicit.</li>
+<li><strong>Monedă:</strong> €, $, £, CHF, A$, C$, SEK, NOK, DKK, PLN, HUF, CZK, RON, RUB, UAH, JPY, CNY, KRW, INR.</li>
+<li><strong>Limbă:</strong> 25 de variante lingvistice, printre care germană, engleză, engleză (SUA) și multe altele. <strong>Moneda se schimbă automat</strong> (suedeză → coroană, engleză (SUA) → USD, engleză (Marea Britanie) → £). Exemplu: când treci la suedeză, aplicația trece la SEK și întreabă dacă să <strong>convertească toate prețurile la cursul de azi al Băncii Centrale Europene</strong> („OK”) sau să schimbe doar eticheta („Anulează”). Nu există cursuri pentru RUB și UAH. Poți schimba oricând moneda manual.</li>
+<li><strong>Confetti și sunet la băut:</strong> ambele, doar confetti sau dezactivat.</li>
+<li><strong>Font:</strong> zece fonturi la alegere.</li>
+<li><strong>Unitate de temperatură:</strong> °C sau °F (engleza (SUA) setează automat °F).</li>
+</ul>
+<h3>Stocare</h3>
+<p><em>Doar acest dispozitiv</em> sau <em>Cloud</em> (cod de sincronizare, <a href="#sync">secțiunea 12</a>).</p>
+<h3>Credite IA (doar în aplicația pentru iPhone)</h3>
+<p>Afișează scanările IA rămase, ID-ul dispozitivului și – la nevoie – <em>Reîncarcă credite</em> sau un cod de deblocare. Vezi <a href="#privacy">secțiunea 13</a>.</p>
+<h3>Bază de date vinuri</h3>
+<ul>
+<li><strong>Actualizează toate vinurile (IA):</strong> completează regiunea, țara, soiul, intervalul de consum, temperatura de servire și prețul lipsă pentru toate vinurile (în versiunea web și imaginile sticlelor). Valorile existente rămân. Dacă există deja temperaturi de servire, aplicația întreabă mai întâi dacă acestea trebuie înlocuite și ele cu valori IA.</li>
+<li><strong>Recalculează intervalul de consum:</strong> setează „Bea de la” la anul + 1 pentru toate vinurile cu un an (valorile introduse manual sunt suprascrise și ele) și ajustează „Bea până” unde este nevoie. Aplicația indică mai întâi numărul de vinuri și cere confirmare. <em>Sfat: exportă mai întâi un backup JSON.</em></li>
+</ul>
+<h3>Rafturi</h3>
+<p>Vezi <a href="#racks">secțiunea 6</a>. Titlul afișează numărul de rafturi.</p>
+<h3>Confidențialitate, asistență, versiune</h3>
+<p>Linkurile duc la politica de confidențialitate și la această pagină de asistență. Chiar în partea de jos găsești <strong>versiunea</strong> aplicației – te rugăm să o menționezi când ne contactezi.</p>
+
+<!-- ───────────────── 12 ───────────────── -->
+<h2 id="sync">12. Sincronizarea a două dispozitive</h2>
+
+<ol>
+<li><strong>Primul dispozitiv:</strong> Setări → Stocare → <em>Cloud</em> → <em>Creează un cod de sincronizare nou</em>. Codul apare pe ecran; cu <em>Salvează codul prin e-mail</em> ți-l trimiți ție însuți.</li>
+<li><strong>Al doilea dispozitiv:</strong> Setări → Stocare → <em>Cloud</em> → introdu codul (litere mici, fără spații) → Conectează. Dacă dispozitivul conține deja vinuri, aplicația întreabă dacă să le îmbine cu datele din cloud.</li>
+<li>După aceea, ambele dispozitive se sincronizează automat (de exemplu la deschiderea aplicației); <em>Sincronizează acum</em> declanșează sincronizarea manual. Regula este: <strong>ultima modificare câștigă</strong>.</li>
+</ol>
+<p>Se sincronizează vinurile, lista de dorințe, istoricul, rafturile și setările precum limba și moneda. <strong>Nu se sincronizează</strong> fotografiile proprii și datele specifice dispozitivului. Oricine îți cunoaște codul îți poate vedea vinurile – dă-l doar persoanelor în care ai încredere. Păstrează și un backup JSON.</p>
+
+<!-- ───────────────── 13 ───────────────── -->
+<h2 id="privacy">13. IA, confidențialitate și costuri</h2>
+
+<ul>
+<li><strong>Pentru ce se folosește IA?</strong> Scanarea etichetei, căutarea vinului, căutarea prețurilor și „Actualizează toate vinurile”. Fotografia sau numele vinului sunt trimise prin serverul nostru către un serviciu IA (Anthropic, SUA) pentru evaluare – fără nume sau conturi. Aplicația îți cere acordul înainte de prima utilizare.</li>
+<li><strong>Scanarea codului de bare</strong> trimite doar numărul către o bază de date gratuită de produse și nu costă niciun credit IA.</li>
+<li><strong>Costuri (aplicația pentru iPhone):</strong> 50 de apeluri IA pe instalare sunt incluse în prețul de achiziție; mai multe se pot cumpăra printr-o achiziție unică opțională (fără abonament, creditele nu expiră). Orice altceva din aplicație nu costă nimic în plus. Când creditele s-au epuizat, totul funcționează în continuare, cu excepția funcțiilor IA.</li>
+<li><strong>Date:</strong> Totul rămâne pe dispozitivul tău atât timp cât nu activezi cloud-ul. Fără reclame, fără urmărire, fără cont de utilizator. Detalii în <a href="datenschutz.html">politica de confidențialitate</a> (în germană).</li>
+</ul>
+
+<!-- ───────────────── 14 ───────────────── -->
+<h2 id="faq">14. Sfaturi și întrebări frecvente</h2>
+
+<ul>
+<li><strong>Pe un iPad sau PC</strong> aspectul se adaptează: coloană mai lată, mai multe carduri alăturate, iar pe PC (și pe iPad în poziție orizontală) navigarea în stânga. Telefonul funcționează și în poziție orizontală. Pe PC, <kbd>Esc</kbd> închide fereastra de sus; pe telefon, trage o fereastră în jos pentru a o închide.</li>
+<li><strong>Vinurile mele au dispărut:</strong> Vezi <a href="support.html">Asistență</a> – restaurează cu codul de sincronizare sau cu un backup JSON.</li>
+<li><strong>Niciun rezultat pentru codul de bare al unui vin:</strong> E normal pentru cramele mici. Folosește scanarea etichetei.</li>
+<li><strong>IA a citit ceva greșit:</strong> Corectează manual câmpul și salvează; valorile IA sunt sugestii.</li>
+<li><strong>Intervalul de consum pare prea devreme/târziu:</strong> Sunt reguli empirice după tipul de vin și soi. Ajustează „Bea până” pentru fiecare vin dacă știi mai bine.</li>
+<li><strong>Pagina încă afișează versiunea veche (web):</strong> Reîncarcă pagina (pe PC <kbd>Ctrl</kbd>+<kbd>F5</kbd>).</li>
+</ul>
+<p>Mai ai întrebări? Scrie la <a href="mailto:t.knecht@web.de?subject=Weinkeller%20Ghid%20de%20utilizare">t.knecht@web.de</a> și menționează versiunea aplicației (Setări, chiar în partea de jos).</p>
+
+<p style="margin-top:36px"><small>Weinkeller · Thomas Knecht · Scheidemannstr. 29 · 42781 Haan · Germania</small></p>
+
+</body></html>

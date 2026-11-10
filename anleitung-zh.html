@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>用户指南 – Weinkeller</title>
+<style>
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Sans CJK SC","Noto Sans JP","Noto Sans KR","Noto Sans Devanagari",sans-serif;max-width:760px;margin:0 auto;padding:24px 18px 70px;line-height:1.6;color:#222;background:#fff}
+  h1{font-size:28px;margin:6px 0 4px} h2{font-size:20px;margin-top:34px;padding-top:6px;border-top:1px solid #e3e3e3} h3{font-size:16px;margin:20px 0 4px}
+  small{color:#666} a{color:#0a58ca} p{margin:8px 0} ul,ol{margin:6px 0 10px;padding-left:22px} li{margin:3px 0}
+  code,kbd{background:#f2f2f2;border-radius:4px;padding:1px 5px;font-size:.92em}
+  .tip,.note{border-left:4px solid #b88a2a;background:#fbf6ea;padding:8px 12px;border-radius:0 8px 8px 0;margin:12px 0}
+  .note{border-color:#0a58ca;background:#eef4fd}
+  .toc{background:#f7f7f7;border-radius:10px;padding:10px 16px;margin:16px 0} .toc ol{margin:4px 0}
+  .lang{position:sticky;top:0;background:#fff;padding:8px 0;margin:0 0 6px;border-bottom:1px solid #eee;z-index:5}
+  .lang select{font:inherit;font-size:15px;padding:5px 10px;border:1px solid #bbb;border-radius:16px;background:#fff;max-width:100%}
+  table{border-collapse:collapse;width:100%;margin:8px 0} td,th{border:1px solid #ddd;padding:6px 9px;text-align:left;vertical-align:top;font-size:15px} th{background:#f4f4f4}
+  .back{margin:0 0 6px}
+  @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
+</style></head><body>
+<p class="back"><a href="support.html">← 返回支持页面</a></p>
+<div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html">Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html" selected>简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
+
+<h1>用户指南 – Weinkeller</h1>
+<p><small>更新日期：2026年11月10日 · 应用版本 2.0</small></p>
+
+<div class="toc">
+
+<strong>目录</strong><ol>
+<li><a href="#start">概览与入门</a></li>
+<li><a href="#add">添加葡萄酒</a></li>
+<li><a href="#cellar">酒窖</a></li>
+<li><a href="#drink">饮用葡萄酒</a></li>
+<li><a href="#ripe">适饮期（适饮）</a></li>
+<li><a href="#racks">酒架与存放</a></li>
+<li><a href="#history">历史</a></li>
+<li><a href="#wish">心愿单</a></li>
+<li><a href="#stats">统计</a></li>
+<li><a href="#export">导出、导入与备份</a></li>
+<li><a href="#setup">设置</a></li>
+<li><a href="#sync">在两台设备间同步</a></li>
+<li><a href="#privacy">AI、隐私与费用</a></li>
+<li><a href="#faq">小贴士与常见问题</a></li></ol>
+</div>
+
+<!-- ───────────────── 1 ───────────────── -->
+<h2 id="start">1. 概览与入门</h2>
+
+<p>Weinkeller 是您装在口袋里的私人酒窖：您可以管理库存、存放位置、适饮期、心愿单和统计数据。一切都在您的设备上运行；通过同步码还可以连接多台设备。</p>
+<p>底部（在电脑和横屏 iPad 上则在左侧）是包含八个板块的导航栏：</p>
+<table>
+<tbody><tr><th>板块</th><th>用途</th></tr>
+<tr><td><strong>酒窖</strong></td><td>所有葡萄酒、搜索、筛选、排序、添加葡萄酒、饮用</td></tr>
+<tr><td><strong>统计</strong></td><td>对库存、价格、适饮状态、存放情况和饮用历史的分析</td></tr>
+<tr><td><strong>适饮</strong></td><td>哪些酒现在、很快或已不宜饮用（“适饮期”）</td></tr>
+<tr><td><strong>历史</strong></td><td>您已经喝过的葡萄酒</td></tr>
+<tr><td><strong>酒架</strong></td><td>酒窖平面图：存放和移动葡萄酒、二维码标签</td></tr>
+<tr><td><strong>心愿单</strong></td><td>您还想购买的葡萄酒</td></tr>
+<tr><td><strong>导入导出</strong></td><td>备份数据，导入表格和备份文件</td></tr>
+<tr><td><strong>设置</strong></td><td>名称、货币、语言、云端、定义酒架</td></tr>
+</tbody></table>
+<h3>最初的五个步骤</h3>
+<ol>
+<li><strong>选择语言和货币</strong>：设置 → 通用。货币会自动跟随语言。</li>
+<li><strong>定义酒架</strong>（可选）：设置 → 酒架（参见<a href="#racks">第 6 节</a>）。</li>
+<li><strong>添加第一款葡萄酒</strong>：在酒窖中点按 <kbd>+</kbd>（<a href="#add">第 2 节</a>）。</li>
+<li><strong>存放</strong>：为这款酒在酒架上指定一个位置。</li>
+<li><strong>备份</strong>：导入导出 → JSON 备份，或设置云端同步（<a href="#sync">第 12 节</a>）。</li>
+</ol>
+<div class="tip">在<em>设置</em>中，各个部分都可以折叠。首次启动时“通用”处于展开状态，其他部分处于收起状态。应用会记住您上次展开或收起的内容。</div>
+
+<!-- ───────────────── 2 ───────────────── -->
+<h2 id="add">2. 添加葡萄酒</h2>
+
+<p>在酒窖中点按 <kbd>+</kbd>。添加葡萄酒有多种方式，它们可以组合使用。</p>
+<h3>a) 手动输入</h3>
+<p>填写以下字段：<strong>名称 / 酒庄、年份、瓶数、葡萄酒类型、产区、国家、葡萄品种、存放位置、适饮起/适饮至、适饮温度、价格、评分、备注</strong>。只有名称是必填项。点按<em>保存</em>即可创建这款葡萄酒。</p>
+<ul>
+<li><strong>适饮期：</strong>一旦输入年份，应用就会把“适饮起”设为<strong>年份 + 1</strong>。“适饮至”则取决于葡萄酒类型和葡萄品种（红葡萄酒比桃红保存得更久）。这两项您随时都可以修改。</li>
+<li><strong>库存、最低和最高：</strong>如果您设置了最低库存，当库存低于该值时应用会提醒您，并提供将这款酒加入心愿单的选项（<a href="#cellar">第 3 节</a>）。</li>
+<li><strong>自己的照片：</strong>“拍照 / 选择照片”可为葡萄酒附上一张照片。照片只保存在这台设备上，并包含在 JSON 备份中，但不会同步到云端。</li>
+</ul>
+<h3>b) 扫描酒标（AI）</h3>
+<p>点按<em>扫描酒标（AI）</em>并拍下酒瓶的酒标。AI 会识别名称、年份、类型、产区、国家和葡萄品种，并估算适饮期和适饮温度。请核对各项数值后保存。首次使用前，应用会征求您的同意（<a href="#privacy">第 13 节</a>）。</p>
+<h3>c) 扫描条形码</h3>
+<p>点按<em>扫描条形码</em>，将酒瓶的条形码对准取景框。应用会在免费的商品数据库中查询该号码（不收费，也不消耗 AI 额度），如果找到，就会自动填入<strong>名称、生产商和葡萄酒类型</strong>。年份会从名称中补全，或者向您询问。</p>
+<ul>
+<li>如果这瓶酒已经在酒窖里，应用会询问“再添加一瓶？”——买了更多时，这是快速累加数量的办法。</li>
+<li>如果条形码<strong>不在</strong>数据库中（小型酒庄很常见），会出现一条带有<em>扫描酒标（AI）</em>按钮的提示。这个号码仍会随这款酒一起保存，这样下次就能立刻识别这瓶酒。</li>
+</ul>
+<h3>d) 查询葡萄酒（AI）</h3>
+<p><em>查询葡萄酒（AI）</em>会让 AI 在网上搜索产区、国家、葡萄品种、适饮期、适饮温度、当前平均价格，以及（在网页版中）酒瓶图片。您已经填写的字段不会被覆盖。当名称和年份已输入而价格尚未填写时，这一步也会自动执行。</p>
+<div class="note">iPhone 应用不会从互联网加载酒瓶图片（App Store 规定）。您可以改用自己拍摄的照片。</div>
+
+<!-- ───────────────── 3 ───────────────── -->
+<h2 id="cellar">3. 酒窖</h2>
+
+<h3>搜索、筛选、排序</h3>
+<ul>
+<li><strong>搜索</strong>（位于顶部）：可按名称、产区、国家和葡萄品种查找葡萄酒。</li>
+<li><strong>筛选：</strong>全部、红葡萄酒、白葡萄酒、桃红、起泡酒、其他。点按某个类型时会自动清除搜索内容。</li>
+<li><strong>排序：</strong>最新添加、名称、年份、葡萄品种、产区、国家，或适饮状态（最紧迫优先）。</li>
+<li><strong>列表 / 卡片：</strong>点按<em>列表</em>按钮可在紧凑列表和详细卡片之间切换。</li>
+</ul>
+<h3>葡萄酒卡片</h3>
+<p>卡片会显示名称、年份、葡萄品种、评分（星级）、产区和国家（点按可打开地图或该国的葡萄酒产区）、瓶数、<strong>适饮温度</strong>（🌡）、<strong>存放位置</strong>（点按可跳转到酒架），以及一条<strong>适饮进度条</strong>，其颜色对应尚年轻、最佳、巅峰、已过期。点按葡萄图标会打开该葡萄品种的维基百科（Wikipedia）页面。</p>
+<p>卡片底部有：<em>编辑</em>、<em>饮用</em>和 🗑（删除葡萄酒）。</p>
+<h3>库存、最低/最高与购物清单</h3>
+<p>如果您为某款葡萄酒设置了最低库存（也可以再设置最高库存），卡片会显示“库存 · 最低 · 最高”，库存低于最低值时会用 ⚠ 提醒。<em>补货</em>按钮会打开<strong>购物清单</strong>：其中列出所有低于最低库存的葡萄酒（目标数量为最高库存，没有设置时则为最低库存）。您可以分享或复制这份清单，也可以把这些酒加入心愿单。</p>
+
+<!-- ───────────────── 4 ───────────────── -->
+<h2 id="drink">4. 饮用葡萄酒</h2>
+
+<p>在葡萄酒卡片上点按<em>饮用</em>（或在适饮页面点按“饮用 · n 瓶”）。随后会打开<em>饮用葡萄酒</em>对话框：</p>
+<ul>
+<li><strong>从哪个位置取出？</strong>——选择这瓶酒取自的酒架位置，或选择“酒瓶不在任何位置”。该位置随之变为空闲。</li>
+<li><strong>和谁一起喝的？</strong>——您的客人姓名（可选）。</li>
+<li><strong>场合</strong>——春天、夏天、秋天、冬天、生日、派对或“随心小酌”（可多选）。</li>
+</ul>
+<p><em>饮用</em>会减少一瓶，并在<a href="#history">历史</a>中新增一条记录。彩带和音效会为此庆祝（可在设置中关闭）。如果这是<strong>最后一瓶</strong>，应用会提示您：这款酒随后会从酒窖中消失（但仍保留在历史中）。</p>
+<div class="tip"><strong>扫描快速饮用：</strong>酒窖中圆形的 🥂 按钮会拍下酒标，在您的酒窖中识别出这款酒，并立即打开饮用对话框。</div>
+
+<!-- ───────────────── 5 ───────────────── -->
+<h2 id="ripe">5. 适饮期（适饮）</h2>
+
+<p>在这里，您可以看到所有设有适饮期的葡萄酒，<strong>最紧迫的排在最前</strong>。每张卡片会显示名称、年份、类型、<strong>适饮起/适饮至</strong>、适饮温度、存放位置，以及一条标有当前年份的进度条。</p>
+<table>
+<tbody><tr><th>状态</th><th>含义</th></tr>
+<tr><td><strong>尚年轻</strong></td><td>太早——还没到“适饮起”</td></tr>
+<tr><td><strong>最佳</strong></td><td>可以饮用，仍处于适饮期的前段</td></tr>
+<tr><td><strong>巅峰</strong></td><td>正值巅峰——请尽快饮用</td></tr>
+<tr><td><strong>已过期</strong></td><td>已过“适饮至”——请尽快饮用</td></tr>
+</tbody></table>
+<p><strong>筛选：</strong>按葡萄酒类型、按状态和按<strong>国家</strong>（下拉菜单中显示每个国家的数量；没有匹配结果的国家会显示为灰色）。这些筛选条件可以组合使用。点按卡片即可在酒窖中打开这款葡萄酒。</p>
+<p><strong>适饮期的规则：</strong>“适饮起”= 年份 + 1。“适饮至”取决于葡萄酒类型和葡萄品种。如果您有一些旧酒设置了其他数值，可以在设置中一次性重新计算全部（<a href="#setup">第 11 节</a>，“重新计算适饮期”）。</p>
+
+<!-- ───────────────── 6 ───────────────── -->
+<h2 id="racks">6. 酒架与存放</h2>
+
+<h3>定义和编辑酒架</h3>
+<p><strong>设置 → 酒架</strong>（点按标题展开）：输入名称、层数、每层的位数和每位的瓶数，然后点按 ＋。“瓶/位”对于酒架是 1，对于地面堆放或酒箱则更大。在列表中，每个酒架都有：</p>
+<ul>
+<li>用于调整顺序的<strong>拖动手柄 ⠿</strong>，以及列表下方的<em>按 A–Z 排序</em>按钮，</li>
+<li>▦ 用于<strong>二维码标签</strong>，✏️ 用于编辑，🧹 用于清空，🗑 用于删除。</li>
+</ul>
+<p>通过<strong>编辑</strong>（✏️），您可以重命名酒架、更改每层的位数、在上方或下方添加层、删除层，并为每一层设置独立的名称和瓶数。因此而失去位置的酒瓶之后会算作“未存放”；这些葡萄酒本身仍留在酒窖中。进行此类更改前，应用会先询问您。</p>
+<h3>酒架板块</h3>
+<p>在顶部，您可以通过<strong>图块</strong>选择酒架（显示名称和“已占用 / 位数”）。顺序也可以在这里调整：在电脑上拖动图块；在触摸屏上长按图块约半秒，然后拖动。下方是<strong>酒窖平面图</strong>：每一层及其各个位置。已占用的位置会显示一瓶平放的酒，颜色对应葡萄酒类型。</p>
+<h3>存放</h3>
+<ol>
+<li>点按“未分配”下的一款葡萄酒（该列表可按类型和国家筛选）——或者点按酒窖中的“未存放”提示。</li>
+<li>点按一个<strong>空闲位置</strong>。对于地面堆放和酒箱，应用会存入尽可能多的酒瓶。</li>
+</ol>
+<p><strong>扫描葡萄酒并存放</strong>会拍下酒标，找到对应的葡萄酒，并引导您完成存放。</p>
+<h3>已占用的位置、移动、移除</h3>
+<p>点按一个已占用的位置：您会看到这款葡萄酒，并可以<em>打开</em>它、<em>从位置移除</em>，或<em>移动</em>它（然后点按一个空闲位置）。<em>清空酒架</em>会取出酒架上的所有酒瓶（需先确认）。</p>
+<h3>闪烁</h3>
+<p>通过<em>闪烁</em>开关，您可以让以下酒瓶闪烁：应<strong>优先饮用</strong>的（已过期，或最迟明年就到适饮期末尾的）、已过期的、处于巅峰的或处于最佳状态的——这样您在酒架上一眼就能找到它们。</p>
+<h3>二维码标签与“扫描层”</h3>
+<p>使用<strong>二维码标签</strong>（设置 → 酒架 → ▦），可以为酒架制作一张标签，并为每一层各制作一张。可分享为 PDF 或直接打印（标签纸 63.5 × 38.1 mm，每页 21 张），然后贴上。之后：在酒架板块中使用<strong>扫描层</strong>——您会看到该层存放了什么，并可以<em>存放到这里</em>、<em>取出</em>、饮用、移动某一瓶，或<em>整层移动</em>。在“添加葡萄酒”表单中，扫描层标签同样会自动填入存放位置。</p>
+
+<!-- ───────────────── 7 ───────────────── -->
+<h2 id="history">7. 历史</h2>
+
+<p>历史会列出您喝过的所有葡萄酒，包括日期、葡萄酒、价值、客人和场合。您可以按葡萄酒类型和场合筛选，并编辑某条记录（客人、场合）。历史为统计中的“每月/每年饮用量”、支出和饮用频率提供数据。</p>
+
+<!-- ───────────────── 8 ───────────────── -->
+<h2 id="wish">8. 心愿单</h2>
+
+<ul>
+<li><strong>+ 添加心愿</strong>：手动输入或扫描酒标，还可附上备注（“在哪里买？”）。</li>
+<li><strong>搜索价格</strong>（💶）：应用会在网上搜索这款葡萄酒的价格，显示最低的结果，并乘以数量。这些只是参考值，不作任何保证——请向商家确认运费和供货情况。</li>
+<li><strong>勾选框</strong>（位于左侧）：标记为已购买/已完成（该行会变淡）。</li>
+<li><strong>→ 酒窖</strong>：把这个心愿移入酒窖（带上数量，如有的话还有最低价格）；如果您已设置酒架，会直接带您去存放。</li>
+<li>如果某款葡萄酒低于其最低库存，应用会提议按缺少的数量把它加入心愿单（“补货”）。</li>
+</ul>
+
+<!-- ───────────────── 9 ───────────────── -->
+<h2 id="stats">9. 统计</h2>
+
+<p>从上到下依次为：</p>
+<ul>
+<li><strong>关键数据：</strong>瓶数、款数、总价值、均分。</li>
+<li><strong>适饮期：</strong>每种状态（尚年轻、最佳、巅峰、已过期）的瓶数，已过期的酒瓶会有警告；点按会打开适饮页面并应用对应的筛选。</li>
+<li><strong>按类型</strong>和<strong>最佳葡萄酒</strong>（按评分或频率，可按星级筛选）。</li>
+<li><strong>按国家、产区、品种：</strong>条形图（最多 8 项，其余显示为“另有 +n 项”）；点按会在酒窖中搜索。<strong>按年份：</strong>柱状图，可左右滚动。</li>
+<li><strong>价格：</strong>每瓶平均价、最低价、最高价、价格区间（已匹配您的货币）以及按国家统计的价值。</li>
+<li><strong>储存：</strong>占用率（百分比）、空闲位置、未存放的酒瓶，以及每个酒架一条的进度条（点按可跳转到该酒架）。</li>
+<li><strong>已饮用：</strong>按月（最近 12 个月）和按年统计，以及已饮用酒瓶的花费。</li>
+<li><strong>最佳国家和葡萄品种</strong>：按平均评分排列（酒窖与历史合并计算）。</li>
+<li><strong>补货：</strong>低于最低库存的葡萄酒（会打开购物清单）、未完成的心愿及其价值。</li>
+</ul>
+<p>没有数据的部分（例如没有价格时）会被隐藏。</p>
+
+<!-- ───────────────── 10 ───────────────── -->
+<h2 id="export">10. 导出、导入与备份</h2>
+
+<table>
+<tbody><tr><th>功能</th><th>用途</th></tr>
+<tr><td>导出 CSV</td><td>可用于 Excel 或 Numbers 的表格</td></tr>
+<tr><td>导出 Excel</td><td>.xlsx 文件</td></tr>
+<tr><td>导出 PDF</td><td>可打印的概览</td></tr>
+<tr><td><strong>JSON 备份</strong></td><td><strong>完整的数据备份</strong>（葡萄酒、心愿单、历史、酒架、显示名称、自己的照片）</td></tr>
+<tr><td>复制到剪贴板</td><td>复制文本清单</td></tr>
+<tr><td>导入 JSON / CSV / Excel</td><td>恢复备份或导入表格</td></tr>
+</tbody></table>
+<div class="tip"><strong>请定期进行 JSON 备份。</strong>导入 JSON 会用备份内容替换酒窖（应用会先询问）。在新设备上，这样可以恢复全部内容。您也可以改用云端同步（<a href="#sync">第 12 节</a>）。</div>
+
+<!-- ───────────────── 11 ───────────────── -->
+<h2 id="setup">11. 设置</h2>
+
+<h3>通用</h3>
+<ul>
+<li><strong>显示名称（标题）：</strong>输入“Peter”，标题就会变成“Peter 的 Weinkeller”，依此类推。留空则使用默认标题。</li>
+<li><strong>货币：</strong>€、$、£、CHF、A$、C$、SEK、NOK、DKK、PLN、HUF、CZK、RON、RUB、UAH、JPY、CNY、KRW、INR。</li>
+<li><strong>语言：</strong>25 种语言版本，包括德语、英语、英语（美国）等众多语言。<strong>货币会自动随之变化</strong>（瑞典语 → 克朗，英语（美国）→ 美元，英语（英国）→ £）。例如：当您切换到瑞典语时，应用会改为 SEK，并询问是<strong>按今天的欧洲中央银行汇率换算所有价格</strong>（“确定”），还是只更改标签（“取消”）。RUB 和 UAH 没有汇率。您随时可以手动更改货币。</li>
+<li><strong>饮用时的彩带与音效：</strong>两者都开、仅彩带，或关闭。</li>
+<li><strong>字体：</strong>可从十种字体中选择。</li>
+<li><strong>温度单位：</strong>°C 或 °F（英语（美国）会自动设为 °F）。</li>
+</ul>
+<h3>存储</h3>
+<p><em>仅限此设备</em>或<em>云端</em>（同步码，<a href="#sync">第 12 节</a>）。</p>
+<h3>AI 额度（仅限 iPhone 应用）</h3>
+<p>显示剩余的 AI 扫描次数、设备 ID，并在需要时显示<em>充值额度</em>或解锁码。参见<a href="#privacy">第 13 节</a>。</p>
+<h3>葡萄酒数据库</h3>
+<ul>
+<li><strong>更新所有葡萄酒（AI）：</strong>为所有葡萄酒补全缺失的产区、国家、葡萄品种、适饮期、适饮温度和价格（网页版还会补全酒瓶图片）。已有的数值保持不变。如果已经存在适饮温度，应用会先询问是否也要用 AI 的数值替换它们。</li>
+<li><strong>重新计算适饮期：</strong>为所有有年份的葡萄酒把“适饮起”设为年份 + 1（手动输入的数值也会被覆盖），并在需要时调整“适饮至”。应用会先告知涉及的葡萄酒数量，并请您确认。<em>小贴士：请先导出一份 JSON 备份。</em></li>
+</ul>
+<h3>酒架</h3>
+<p>参见<a href="#racks">第 6 节</a>。标题处会显示酒架的数量。</p>
+<h3>隐私政策、支持与帮助、版本</h3>
+<p>这些链接会通向隐私政策和本支持页面。在最底部您可以看到应用的<strong>版本</strong>——联系我们时请告知该版本号。</p>
+
+<!-- ───────────────── 12 ───────────────── -->
+<h2 id="sync">12. 在两台设备间同步</h2>
+
+<ol>
+<li><strong>第一台设备：</strong>设置 → 存储 → <em>云端</em> → <em>创建新的同步码</em>。同步码会显示在屏幕上；使用<em>通过邮件保存同步码</em>可以把它发给自己。</li>
+<li><strong>第二台设备：</strong>设置 → 存储 → <em>云端</em> → 输入同步码（小写，不含空格）→ 连接。如果该设备上已有葡萄酒，应用会询问是否与云端数据合并。</li>
+<li>此后两台设备会自动同步（例如在打开应用时）；<em>立即同步</em>可手动触发。规则是：<strong>以最新的更改为准</strong>。</li>
+</ol>
+<p>葡萄酒、心愿单、历史、酒架以及语言和货币等设置都会同步。<strong>不会同步</strong>的是自己的照片和设备专属数据。任何知道您同步码的人都能看到您的葡萄酒——请只与您信任的人分享。同时也请保留一份 JSON 备份。</p>
+
+<!-- ───────────────── 13 ───────────────── -->
+<h2 id="privacy">13. AI、隐私与费用</h2>
+
+<ul>
+<li><strong>AI 用于什么？</strong>扫描酒标、查询葡萄酒、搜索价格和“更新所有葡萄酒”。照片或葡萄酒名称会通过我们的服务器发送给 AI 服务（Anthropic，美国）进行分析——不含姓名或账号。首次使用前，应用会征求您的同意。</li>
+<li><strong>条形码扫描</strong>只会把号码发送到免费的商品数据库，不消耗 AI 额度。</li>
+<li><strong>费用（iPhone 应用）：</strong>每次安装包含在购买价格内的 AI 调用次数为 50 次；更多次数可作为可选的一次性购买项目购买（无需订阅，额度不会过期）。应用中的其他一切都不额外收费。额度用完后，除 AI 功能外的所有功能仍可继续使用。</li>
+<li><strong>数据：</strong>只要您不启用云端，所有内容都保存在您的设备上。没有广告，没有跟踪，没有用户账号。详情见<a href="datenschutz.html">隐私政策</a>（德语）。</li>
+</ul>
+
+<!-- ───────────────── 14 ───────────────── -->
+<h2 id="faq">14. 小贴士与常见问题</h2>
+
+<ul>
+<li><strong>在 iPad 或电脑上</strong>，界面布局会自动适配：栏位更宽、多张卡片并排显示，在电脑（以及横屏的 iPad）上导航栏位于左侧。手机也可以横屏使用。在电脑上按 <kbd>Esc</kbd> 可关闭最上层的窗口；在手机上向下滑动窗口即可关闭。</li>
+<li><strong>我的葡萄酒不见了：</strong>请参见<a href="support.html">支持</a>——可通过同步码或 JSON 备份恢复。</li>
+<li><strong>某款葡萄酒查不到条形码：</strong>小型酒庄很常见。请改用酒标扫描。</li>
+<li><strong>AI 识别错了：</strong>请手动修正该字段并保存；AI 给出的数值只是建议。</li>
+<li><strong>适饮期似乎偏早/偏晚：</strong>这些是按葡萄酒类型和葡萄品种得出的经验规则。如果您更了解情况，可以为每款葡萄酒单独调整“适饮至”。</li>
+<li><strong>页面仍显示旧版本（网页版）：</strong>请重新加载页面（在电脑上按 <kbd>Ctrl</kbd>+<kbd>F5</kbd>）。</li>
+</ul>
+<p>还有其他问题？请写信至 <a href="mailto:t.knecht@web.de?subject=Weinkeller%20User%20guide">t.knecht@web.de</a>，并注明应用版本（设置，位于最底部）。</p>
+
+<p style="margin-top:36px"><small>Weinkeller · Thomas Knecht · Scheidemannstr. 29 · 42781 Haan · Deutschland</small></p>
+
+</body></html>

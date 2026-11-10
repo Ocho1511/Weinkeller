@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>User guide – Weinkeller</title>
+<style>
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Sans CJK SC","Noto Sans JP","Noto Sans KR","Noto Sans Devanagari",sans-serif;max-width:760px;margin:0 auto;padding:24px 18px 70px;line-height:1.6;color:#222;background:#fff}
+  h1{font-size:28px;margin:6px 0 4px} h2{font-size:20px;margin-top:34px;padding-top:6px;border-top:1px solid #e3e3e3} h3{font-size:16px;margin:20px 0 4px}
+  small{color:#666} a{color:#0a58ca} p{margin:8px 0} ul,ol{margin:6px 0 10px;padding-left:22px} li{margin:3px 0}
+  code,kbd{background:#f2f2f2;border-radius:4px;padding:1px 5px;font-size:.92em}
+  .tip,.note{border-left:4px solid #b88a2a;background:#fbf6ea;padding:8px 12px;border-radius:0 8px 8px 0;margin:12px 0}
+  .note{border-color:#0a58ca;background:#eef4fd}
+  .toc{background:#f7f7f7;border-radius:10px;padding:10px 16px;margin:16px 0} .toc ol{margin:4px 0}
+  .lang{position:sticky;top:0;background:#fff;padding:8px 0;margin:0 0 6px;border-bottom:1px solid #eee;z-index:5}
+  .lang select{font:inherit;font-size:15px;padding:5px 10px;border:1px solid #bbb;border-radius:16px;background:#fff;max-width:100%}
+  table{border-collapse:collapse;width:100%;margin:8px 0} td,th{border:1px solid #ddd;padding:6px 9px;text-align:left;vertical-align:top;font-size:15px} th{background:#f4f4f4}
+  .back{margin:0 0 6px}
+  @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
+</style></head><body>
+<p class="back"><a href="support.html">← Back to support</a></p>
+<div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html">Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html" selected>English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
+
+<h1>User guide – Weinkeller</h1>
+<p><small>Updated: 10 November 2026 · App version 2.0</small></p>
+
+<div class="toc">
+
+<strong>Contents</strong><ol>
+<li><a href="#start">Overview and first steps</a></li>
+<li><a href="#add">Adding a wine</a></li>
+<li><a href="#cellar">The cellar</a></li>
+<li><a href="#drink">Drinking a wine</a></li>
+<li><a href="#ripe">Drinking window (Readiness)</a></li>
+<li><a href="#racks">Racks and storing</a></li>
+<li><a href="#history">History</a></li>
+<li><a href="#wish">Wishlist</a></li>
+<li><a href="#stats">Statistics</a></li>
+<li><a href="#export">Export, import and backup</a></li>
+<li><a href="#setup">Setup (settings)</a></li>
+<li><a href="#sync">Syncing two devices</a></li>
+<li><a href="#privacy">AI, privacy and costs</a></li>
+<li><a href="#faq">Tips and FAQ</a></li></ol>
+</div>
+
+<!-- ───────────────── 1 ───────────────── -->
+<h2 id="start">1. Overview and first steps</h2>
+
+<p>Weinkeller is your personal wine cellar in your pocket: you manage stock, storage slots, drinking windows, a wishlist and statistics. Everything runs on your device; a sync code lets you connect several devices.</p>
+<p>At the bottom (on PC and iPad landscape: on the left) you find the bar with eight areas:</p>
+<table>
+<tbody><tr><th>Area</th><th>Purpose</th></tr>
+<tr><td><strong>Cellar</strong></td><td>All wines, search, filters, sorting, add a wine, drink</td></tr>
+<tr><td><strong>Statistics</strong></td><td>Evaluations of stock, prices, readiness, storage, drinking history</td></tr>
+<tr><td><strong>Readiness</strong></td><td>Which wines to drink now, soon, or no longer (“Drinking Window”)</td></tr>
+<tr><td><strong>History</strong></td><td>The wines you have drunk</td></tr>
+<tr><td><strong>Racks</strong></td><td>Cellar plan: store and move wines, QR labels</td></tr>
+<tr><td><strong>Wishlist</strong></td><td>Wines you still want to buy</td></tr>
+<tr><td><strong>Export/Import</strong></td><td>Back up your data, read in tables and backups</td></tr>
+<tr><td><strong>Setup</strong></td><td>Name, currency, language, cloud, define racks</td></tr>
+</tbody></table>
+<h3>The first five steps</h3>
+<ol>
+<li><strong>Choose language and currency</strong>: Setup → General. The currency follows the language automatically.</li>
+<li><strong>Define racks</strong> (optional): Setup → Racks (see <a href="#racks">section 6</a>).</li>
+<li><strong>Add your first wine</strong>: tap <kbd>+</kbd> in the cellar (<a href="#add">section 2</a>).</li>
+<li><strong>Store it</strong>: give the wine a slot in a rack.</li>
+<li><strong>Back up</strong>: Export/Import → JSON backup, or set up cloud sync (<a href="#sync">section 12</a>).</li>
+</ol>
+<div class="tip">The <em>Setup</em> sections are collapsible. “General” is open on first start, the others are closed. The app remembers what you opened or closed last.</div>
+
+<!-- ───────────────── 2 ───────────────── -->
+<h2 id="add">2. Adding a wine</h2>
+
+<p>Tap <kbd>+</kbd> in the cellar. There are several ways to add a wine – they can be combined.</p>
+<h3>a) By hand</h3>
+<p>Fill in the fields: <strong>Name / Winery, Vintage, Bottles, Wine type, Region, Country, Grape, Storage slot, Drink from/until, Serving temperature, Price, Rating, Note</strong>. Only the name is required. <em>Save</em> creates the wine.</p>
+<ul>
+<li><strong>Drinking window:</strong> As soon as you enter the vintage, the app sets “Drink from” to <strong>vintage + 1</strong>. “Drink until” depends on wine type and grape (a red keeps longer than a rosé). You can change both at any time.</li>
+<li><strong>Stock, Min and Max:</strong> If you enter a minimum, the app warns you when the stock falls below it and offers to put the wine on the wishlist (<a href="#cellar">section 3</a>).</li>
+<li><strong>Own photo:</strong> “Take / choose photo” attaches a photo to the wine. It stays on this device and is included in the JSON backup, but is not synchronised to the cloud.</li>
+</ul>
+<h3>b) Scan label (AI)</h3>
+<p>Tap <em>Scan label (AI)</em> and photograph the bottle label. The AI reads name, vintage, type, region, country and grape and estimates drinking window and serving temperature. Check the values and save. Before the first use the app asks for your consent (<a href="#privacy">section 13</a>).</p>
+<h3>c) Scan barcode</h3>
+<p>Tap <em>Scan barcode</em> and hold the bottle's barcode in the frame. The app looks the number up in a free product database (no cost, no AI credit) and, if found, fills in <strong>name, producer and wine type</strong>. It completes the vintage from the name or asks for it.</p>
+<ul>
+<li>If the bottle is already in the cellar, the app asks “Add another bottle?” – a quick way to count up when you buy more.</li>
+<li>If the barcode is <strong>not</strong> in the database (common for smaller wineries), a hint with the button <em>Scan label (AI)</em> appears. The number is still saved with the wine so the bottle is recognised immediately next time.</li>
+</ul>
+<h3>d) Look up wine (AI)</h3>
+<p><em>Look up wine (AI)</em> lets the AI search the web for region, country, grape, drinking window, serving temperature, current average price and – in the web version – a bottle image. Fields you already filled in are not overwritten. This also happens automatically once name and vintage are entered and there is no price yet.</p>
+<div class="note">The iPhone app does not load bottle images from the internet (App Store rule). You can take your own photos instead.</div>
+
+<!-- ───────────────── 3 ───────────────── -->
+<h2 id="cellar">3. The cellar</h2>
+
+<h3>Search, filter, sort</h3>
+<ul>
+<li><strong>Search</strong> at the top: finds wines by name, region, country and grape.</li>
+<li><strong>Filters:</strong> All, Red, White, Rosé, Sparkling, Other. Clicking a type clears the search automatically.</li>
+<li><strong>Sorting:</strong> Newest first, Name, Vintage, Grape, Region, Country or Readiness (most urgent first).</li>
+<li><strong>List / cards:</strong> The <em>List</em> button switches between a compact list and detailed cards.</li>
+</ul>
+<h3>The wine card</h3>
+<p>The card shows name, vintage, grape, rating (stars), region and country (tap to open a map or the country's wine regions), the number of bottles, the <strong>serving temperature</strong> (🌡), the <strong>storage slots</strong> (tap to jump to the rack) and a <strong>readiness bar</strong> in the colours Young, Optimal, Peak, Overdue. The grape symbol opens Wikipedia for the grape.</p>
+<p>At the bottom of the card: <em>Edit</em>, <em>Drink</em> and 🗑 (delete wine).</p>
+<h3>Stock, Min/Max and the shopping list</h3>
+<p>If you enter a minimum (and optionally a maximum) for a wine, the card shows “Stock · Min · Max” and warns with ⚠ when you are below it. The <em>Reorder</em> button opens the <strong>shopping list</strong>: it lists all wines under their minimum (the target is the maximum, otherwise the minimum). You can share or copy the list, or put the wines on the wishlist.</p>
+
+<!-- ───────────────── 4 ───────────────── -->
+<h2 id="drink">4. Drinking a wine</h2>
+
+<p>Tap <em>Drink</em> on the wine card (or “Drink · n btl.” in Readiness). The <em>Drink wine</em> dialog opens:</p>
+<ul>
+<li><strong>Taken from which slot?</strong> – choose the rack slot the bottle came from, or “Bottle not stored”. The slot becomes free.</li>
+<li><strong>Drunk with whom?</strong> – names of your guests (optional).</li>
+<li><strong>Occasion</strong> – Spring, Summer, Autumn, Winter, Birthday, Party or “Just because” (several allowed).</li>
+</ul>
+<p><em>Drink</em> removes one bottle and creates an entry in the <a href="#history">History</a>. Confetti and sound celebrate it (can be switched off in Setup). If it is the <strong>last bottle</strong>, the app tells you: the wine then disappears from the cellar (but stays in the History).</p>
+<div class="tip"><strong>Quick by scan:</strong> The round 🥂 button in the cellar photographs a label, recognises the wine in your cellar and opens the Drink dialog right away.</div>
+
+<!-- ───────────────── 5 ───────────────── -->
+<h2 id="ripe">5. Drinking window (Readiness)</h2>
+
+<p>Here you see all wines with a drinking window, <strong>the most urgent first</strong>. Each card shows name, vintage, type, <strong>Drink from/until</strong>, serving temperature, storage slot and a bar with a marker for the current year.</p>
+<table>
+<tbody><tr><th>Status</th><th>Meaning</th></tr>
+<tr><td><strong>Young</strong></td><td>Too early – before “Drink from”</td></tr>
+<tr><td><strong>Optimal</strong></td><td>Drinkable, still in the first part of the window</td></tr>
+<tr><td><strong>Peak</strong></td><td>At its peak – drink soon</td></tr>
+<tr><td><strong>Overdue</strong></td><td>After “Drink until” – drink as soon as possible</td></tr>
+</tbody></table>
+<p><strong>Filters:</strong> by wine type, by status and by <strong>country</strong> (drop-down with the number per country; countries without matches are greyed out). The filters can be combined. Tap a card to open the wine in the cellar.</p>
+<p><strong>The rule for the window:</strong> “Drink from” = vintage + 1. “Drink until” depends on wine type and grape. If you have older wines with other values, you can recalculate all of them at once in Setup (<a href="#setup">section 11</a>, “Recalculate drinking windows”).</p>
+
+<!-- ───────────────── 6 ───────────────── -->
+<h2 id="racks">6. Racks and storing</h2>
+
+<h3>Defining and editing racks</h3>
+<p><strong>Setup → Racks</strong> (tap the heading to open): enter name, levels, slots per level and bottles per slot, then tap ＋. “Bottles/slot” is 1 for a wine rack and larger for a floor or crate. In the list each rack has:</p>
+<ul>
+<li>the <strong>handle ⠿</strong> to change the order, and the <em>Sort A–Z</em> button below the list,</li>
+<li>▦ for <strong>QR labels</strong>, ✏️ to edit, 🧹 to empty and 🗑 to delete.</li>
+</ul>
+<p>With <strong>edit</strong> (✏️) you can rename the rack, change the slots per level, add levels on top or at the bottom, remove levels, and give each level its own name and bottle count. Bottles that lose their slot this way count as “not stored” afterwards; the wines themselves stay in the cellar. The app asks before such changes.</p>
+<h3>The Racks area</h3>
+<p>At the top you choose a rack with the <strong>tiles</strong> (name and “occupied / slots”). The order can also be changed here: on a PC drag a tile, on touch screens press and hold a tile for about half a second, then drag. Below is the <strong>cellar plan</strong>: each level with its slots. Occupied slots show a bottle lying down in the colour of the wine type.</p>
+<h3>Storing</h3>
+<ol>
+<li>Tap a wine under “Unassigned” (the list can be filtered by type and country) – or tap a “not stored” hint in the cellar.</li>
+<li>Tap a <strong>free slot</strong>. For floors and crates the app stores as many bottles as fit.</li>
+</ol>
+<p><strong>Scan wine &amp; store</strong> photographs the label, finds the wine and guides you through storing.</p>
+<h3>Occupied slots, moving, removing</h3>
+<p>Tap an occupied slot: you see the wine and can <em>open</em> it, <em>remove it from the slot</em> or <em>move</em> it (then tap a free slot). <em>Empty rack</em> takes all bottles out of the rack (after confirmation).</p>
+<h3>Blink</h3>
+<p>The <em>Blink</em> switches make bottles blink that should be <strong>drunk first</strong> (overdue or at the end of their window by next year at the latest), that are overdue, at their peak or optimal – so you find them in the rack at a glance.</p>
+<h3>QR labels and “Scan level”</h3>
+<p>With <strong>QR labels</strong> (Setup → Racks → ▦) you create one label for the rack and one for each level. Share as PDF or print (label sheet 63.5 × 38.1 mm, 21 per page) and stick them on. Then: <strong>Scan level</strong> in the Racks area – you see what lies on that level and can <em>store here</em>, <em>take out</em>, drink, move a bottle or <em>move the whole level</em>. In the “Add wine” form, scanning a level label also fills in the storage slot.</p>
+
+<!-- ───────────────── 7 ───────────────── -->
+<h2 id="history">7. History</h2>
+
+<p>The History lists all wines you have drunk with date, wine, value, guests and occasion. You can filter by wine type and occasion and edit an entry (guests, occasion). The History feeds the evaluations “Drunk per month/year”, the spending and the frequency in the Statistics.</p>
+
+<!-- ───────────────── 8 ───────────────── -->
+<h2 id="wish">8. Wishlist</h2>
+
+<ul>
+<li><strong>+ Add wish</strong>: by hand or by label scan, with an optional note (“Where to buy?”).</li>
+<li><strong>Find prices</strong> (💶): The app searches the web for prices of the wine, shows the cheapest hit and multiplies by the quantity. These are indicative values without guarantee – please check shipping costs and availability with the shop.</li>
+<li><strong>Tick</strong> on the left: mark as bought/done (the row fades).</li>
+<li><strong>→ Cellar</strong>: moves the wish into the cellar (with quantity and, if available, the cheapest price) and, if you have racks, takes you straight to storing.</li>
+<li>If a wine falls below its minimum, the app offers to put it on the wishlist with the missing quantity (“reorder”).</li>
+</ul>
+
+<!-- ───────────────── 9 ───────────────── -->
+<h2 id="stats">9. Statistics</h2>
+
+<p>From top to bottom:</p>
+<ul>
+<li><strong>Key figures:</strong> bottles, wines, total value, avg rating.</li>
+<li><strong>Drinking window:</strong> bottles per status (Young, Optimal, Peak, Overdue) with a warning for overdue bottles; a tap opens Readiness with the matching filter.</li>
+<li><strong>By type</strong> and <strong>Top wines</strong> (by rating or frequency, filterable by stars).</li>
+<li><strong>By country, region, grape:</strong> bars (up to 8, the rest as “+n more”); a tap searches the cellar. <strong>By vintage:</strong> columns, scrollable sideways.</li>
+<li><strong>Prices:</strong> avg per bottle, cheapest, most expensive, price ranges (matched to your currency) and value by country.</li>
+<li><strong>Storage:</strong> occupancy in percent, free slots, bottles not stored and a bar per rack (a tap jumps to the rack).</li>
+<li><strong>Drunk:</strong> per month (last 12) and per year, plus the spending on bottles drunk.</li>
+<li><strong>Best countries and grapes</strong> by average rating (cellar and History together).</li>
+<li><strong>Reorder:</strong> wines below minimum stock (opens the shopping list), open wishes and their value.</li>
+</ul>
+<p>Sections without data (e.g. without prices) are hidden.</p>
+
+<!-- ───────────────── 10 ───────────────── -->
+<h2 id="export">10. Export, import and backup</h2>
+
+<table>
+<tbody><tr><th>Function</th><th>Purpose</th></tr>
+<tr><td>Export CSV</td><td>Table for Excel or Numbers</td></tr>
+<tr><td>Export Excel</td><td>As .xlsx file</td></tr>
+<tr><td>Export PDF</td><td>Printable overview</td></tr>
+<tr><td><strong>JSON backup</strong></td><td><strong>Complete data backup</strong> (wines, wishlist, history, racks, display name, own photos)</td></tr>
+<tr><td>To clipboard</td><td>Copy a text list</td></tr>
+<tr><td>Import JSON / CSV / Excel</td><td>Restore a backup or read in a table</td></tr>
+</tbody></table>
+<div class="tip"><strong>Make a JSON backup regularly.</strong> The JSON import replaces the cellar with the backup (the app asks first). On a new device this restores everything. Alternatively use cloud sync (<a href="#sync">section 12</a>).</div>
+
+<!-- ───────────────── 11 ───────────────── -->
+<h2 id="setup">11. Setup (settings)</h2>
+
+<h3>General</h3>
+<ul>
+<li><strong>Display name (title):</strong> “Peter” becomes “Peter's Weinkeller” etc. Leave empty for the default title.</li>
+<li><strong>Currency:</strong> €, $, £, CHF, A$, C$, SEK, NOK, DKK, PLN, HUF, CZK, RON, RUB, UAH, JPY, CNY, KRW, INR.</li>
+<li><strong>Language:</strong> 25 language variants, including German, English, English (US) and many more. <strong>The currency changes automatically</strong> (Swedish → krona, English (US) → US $, English (UK) → £). Example: when you switch to Swedish the app changes to SEK and asks whether to <strong>convert all prices at today's European Central Bank rate</strong> (“OK”) or only change the label (“Cancel”). There are no rates for RUB and UAH. You can change the currency by hand at any time.</li>
+<li><strong>Confetti &amp; sound when drinking:</strong> both, confetti only, or off.</li>
+<li><strong>Font:</strong> ten fonts to choose from.</li>
+<li><strong>Temperature unit:</strong> °C or °F (English (US) sets °F automatically).</li>
+</ul>
+<h3>Storage</h3>
+<p><em>This device only</em> or <em>Cloud</em> (sync code, <a href="#sync">section 12</a>).</p>
+<h3>AI credits (iPhone app only)</h3>
+<p>Shows the remaining AI scans, the device ID and – when needed – <em>Add credits</em> or an unlock code. See <a href="#privacy">section 13</a>.</p>
+<h3>Wine database</h3>
+<ul>
+<li><strong>Update all wines (AI):</strong> fills in missing region, country, grape, drinking window, serving temperature and price for all wines (in the web version also bottle images). Existing values stay. If serving temperatures already exist, the app first asks whether they should also be replaced by AI values.</li>
+<li><strong>Recalculate drinking windows:</strong> sets “Drink from” to vintage + 1 for all wines with a vintage (hand-entered values are overwritten too) and adjusts “Drink until” where needed. The app states the number of wines first and asks for confirmation. <em>Tip: export a JSON backup first.</em></li>
+</ul>
+<h3>Racks</h3>
+<p>See <a href="#racks">section 6</a>. The heading shows the number of racks.</p>
+<h3>Privacy, support, version</h3>
+<p>The links lead to the privacy policy and to this support page. At the very bottom you find the app <strong>version</strong> – please state it when you contact us.</p>
+
+<!-- ───────────────── 12 ───────────────── -->
+<h2 id="sync">12. Syncing two devices</h2>
+
+<ol>
+<li><strong>First device:</strong> Setup → Storage → <em>Cloud</em> → <em>Create new sync code</em>. The code appears on screen; with <em>Save code via email</em> you send it to yourself.</li>
+<li><strong>Second device:</strong> Setup → Storage → <em>Cloud</em> → enter the code (lowercase, no spaces) → Connect. If the device already contains wines, the app asks whether to merge them with the cloud data.</li>
+<li>After that both devices sync automatically (e.g. when the app is opened); <em>Sync now</em> triggers it by hand. The rule is: <strong>the latest change wins</strong>.</li>
+</ol>
+<p>Wines, wishlist, history, racks and settings such as language and currency are synchronised. <strong>Not synchronised</strong> are own photos and device-specific data. Anyone who knows your code can see your wines – only share it with people you trust. Also keep a JSON backup.</p>
+
+<!-- ───────────────── 13 ───────────────── -->
+<h2 id="privacy">13. AI, privacy and costs</h2>
+
+<ul>
+<li><strong>What is AI used for?</strong> Scan label, look up wine, find prices and “Update all wines”. The photo or the wine name is sent via our server to an AI service (Anthropic, USA) for evaluation – without names or accounts. The app asks for your consent before the first use.</li>
+<li><strong>Barcode scan</strong> only sends the number to a free product database and costs no AI credit.</li>
+<li><strong>Costs (iPhone app):</strong> 50 AI calls per installation are included in the purchase price; more can be bought as an optional one-time purchase (no subscription, credits do not expire). Everything else in the app costs nothing extra. When the credits are used up, everything except the AI functions keeps working.</li>
+<li><strong>Data:</strong> Everything stays on your device as long as you do not enable the cloud. No ads, no tracking, no user account. Details in the <a href="datenschutz.html">privacy policy</a> (German).</li>
+</ul>
+
+<!-- ───────────────── 14 ───────────────── -->
+<h2 id="faq">14. Tips and FAQ</h2>
+
+<ul>
+<li><strong>On an iPad or PC</strong> the layout adapts: wider column, several cards side by side, and on PC (and iPad landscape) the navigation on the left. The phone also works in landscape. On a PC <kbd>Esc</kbd> closes the top window; on a phone swipe a window down to close it.</li>
+<li><strong>My wines are gone:</strong> See <a href="support.html">Support</a> – restore with the sync code or a JSON backup.</li>
+<li><strong>No barcode hit for a wine:</strong> Normal for small wineries. Use the label scan.</li>
+<li><strong>The AI misread something:</strong> Correct the field by hand and save; the AI values are suggestions.</li>
+<li><strong>The drinking window seems too early/late:</strong> These are rules of thumb by wine type and grape. Adjust “Drink until” per wine if you know better.</li>
+<li><strong>The page still shows the old version (web):</strong> Reload the page (on PC <kbd>Ctrl</kbd>+<kbd>F5</kbd>).</li>
+</ul>
+<p>More questions? Write to <a href="mailto:t.knecht@web.de?subject=Weinkeller%20User%20guide">t.knecht@web.de</a> and state the app version (Setup, at the very bottom).</p>
+
+<p style="margin-top:36px"><small>Weinkeller · Thomas Knecht · Scheidemannstr. 29 · 42781 Haan · Deutschland</small></p>
+</body></html>

@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gebruikershandleiding – Weinkeller</title>
+<style>
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Sans CJK SC","Noto Sans JP","Noto Sans KR","Noto Sans Devanagari",sans-serif;max-width:760px;margin:0 auto;padding:24px 18px 70px;line-height:1.6;color:#222;background:#fff}
+  h1{font-size:28px;margin:6px 0 4px} h2{font-size:20px;margin-top:34px;padding-top:6px;border-top:1px solid #e3e3e3} h3{font-size:16px;margin:20px 0 4px}
+  small{color:#666} a{color:#0a58ca} p{margin:8px 0} ul,ol{margin:6px 0 10px;padding-left:22px} li{margin:3px 0}
+  code,kbd{background:#f2f2f2;border-radius:4px;padding:1px 5px;font-size:.92em}
+  .tip,.note{border-left:4px solid #b88a2a;background:#fbf6ea;padding:8px 12px;border-radius:0 8px 8px 0;margin:12px 0}
+  .note{border-color:#0a58ca;background:#eef4fd}
+  .toc{background:#f7f7f7;border-radius:10px;padding:10px 16px;margin:16px 0} .toc ol{margin:4px 0}
+  .lang{position:sticky;top:0;background:#fff;padding:8px 0;margin:0 0 6px;border-bottom:1px solid #eee;z-index:5}
+  .lang select{font:inherit;font-size:15px;padding:5px 10px;border:1px solid #bbb;border-radius:16px;background:#fff;max-width:100%}
+  table{border-collapse:collapse;width:100%;margin:8px 0} td,th{border:1px solid #ddd;padding:6px 9px;text-align:left;vertical-align:top;font-size:15px} th{background:#f4f4f4}
+  .back{margin:0 0 6px}
+  @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
+</style></head><body>
+<p class="back"><a href="support.html">← Terug naar support</a></p>
+<div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html">Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html" selected>Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
+
+<h1>Gebruikershandleiding – Weinkeller</h1>
+<p><small>Bijgewerkt: 10 november 2026 · App-versie 2.0</small></p>
+
+<div class="toc">
+
+<strong>Inhoud</strong><ol>
+<li><a href="#start">Overzicht en eerste stappen</a></li>
+<li><a href="#add">Een wijn toevoegen</a></li>
+<li><a href="#cellar">De kelder</a></li>
+<li><a href="#drink">Een wijn drinken</a></li>
+<li><a href="#ripe">Drinkvenster (Rijpheid)</a></li>
+<li><a href="#racks">Rekken en opbergen</a></li>
+<li><a href="#history">Historie</a></li>
+<li><a href="#wish">Verlanglijst</a></li>
+<li><a href="#stats">Cijfers</a></li>
+<li><a href="#export">Export, import en back-up</a></li>
+<li><a href="#setup">Opties (instellingen)</a></li>
+<li><a href="#sync">Twee apparaten synchroniseren</a></li>
+<li><a href="#privacy">AI, privacy en kosten</a></li>
+<li><a href="#faq">Tips en veelgestelde vragen</a></li></ol>
+</div>
+
+<!-- ───────────────── 1 ───────────────── -->
+<h2 id="start">1. Overzicht en eerste stappen</h2>
+
+<p>Weinkeller is je persoonlijke wijnkelder in je zak: je beheert voorraad, opslagplekken, drinkvensters, een verlanglijst en cijfers. Alles draait op je eigen apparaat; met een synccode koppel je meerdere apparaten.</p>
+<p>Onderaan (op pc en iPad in liggende stand: links) vind je de balk met acht onderdelen:</p>
+<table>
+<tbody><tr><th>Onderdeel</th><th>Doel</th></tr>
+<tr><td><strong>Kelder</strong></td><td>Alle wijnen, zoeken, filters, sorteren, een wijn toevoegen, drinken</td></tr>
+<tr><td><strong>Cijfers</strong></td><td>Overzichten van voorraad, prijzen, rijpheid, opslag en drinkgeschiedenis</td></tr>
+<tr><td><strong>Rijpheid</strong></td><td>Welke wijnen je nu, binnenkort of niet meer moet drinken (“Drinkvenster”)</td></tr>
+<tr><td><strong>Historie</strong></td><td>De wijnen die je hebt gedronken</td></tr>
+<tr><td><strong>Rekken</strong></td><td>Kelderplan: wijnen opbergen en verplaatsen, QR-labels</td></tr>
+<tr><td><strong>Verlanglijst</strong></td><td>Wijnen die je nog wilt kopen</td></tr>
+<tr><td><strong>Export/Import</strong></td><td>Maak een back-up van je gegevens, lees tabellen en back-ups in</td></tr>
+<tr><td><strong>Opties</strong></td><td>Naam, valuta, taal, cloud, rekken definiëren</td></tr>
+</tbody></table>
+<h3>De eerste vijf stappen</h3>
+<ol>
+<li><strong>Kies taal en valuta</strong>: Opties → Algemeen. De valuta volgt automatisch de taal.</li>
+<li><strong>Definieer rekken</strong> (optioneel): Opties → Rekken (zie <a href="#racks">hoofdstuk 6</a>).</li>
+<li><strong>Voeg je eerste wijn toe</strong>: tik in de kelder op <kbd>+</kbd> (<a href="#add">hoofdstuk 2</a>).</li>
+<li><strong>Berg hem op</strong>: geef de wijn een plek in een rek.</li>
+<li><strong>Maak een back-up</strong>: Export/Import → JSON-back-up, of stel cloudsynchronisatie in (<a href="#sync">hoofdstuk 12</a>).</li>
+</ol>
+<div class="tip">De onderdelen in <em>Opties</em> zijn inklapbaar. “Algemeen” staat bij de eerste start open, de andere zijn dicht. De app onthoudt wat je het laatst hebt geopend of gesloten.</div>
+
+<!-- ───────────────── 2 ───────────────── -->
+<h2 id="add">2. Een wijn toevoegen</h2>
+
+<p>Tik in de kelder op <kbd>+</kbd>. Er zijn meerdere manieren om een wijn toe te voegen – ze kunnen worden gecombineerd.</p>
+<h3>a) Met de hand</h3>
+<p>Vul de velden in: <strong>Naam / Wijnhuis, Jaargang, Flessen, Wijntype, Regio, Land, Druif, Opslagplaats, Drinken vanaf/tot, Serveertemperatuur, Prijs, Beoordeling, Notitie</strong>. Alleen de naam is verplicht. <em>Opslaan</em> maakt de wijn aan.</p>
+<ul>
+<li><strong>Drinkvenster:</strong> Zodra je de jaargang invult, zet de app “Drinken vanaf” op <strong>jaargang + 1</strong>. “Drinken tot” hangt af van wijntype en druif (een rode wijn houdt langer dan een rosé). Je kunt beide op elk moment aanpassen.</li>
+<li><strong>Voorraad, Min en Max:</strong> Als je een minimum invult, waarschuwt de app je zodra de voorraad daaronder zakt en biedt ze aan de wijn op de verlanglijst te zetten (<a href="#cellar">hoofdstuk 3</a>).</li>
+<li><strong>Eigen foto:</strong> “Foto maken / kiezen” voegt een foto aan de wijn toe. Die blijft op dit apparaat, zit in de JSON-back-up, maar wordt niet met de cloud gesynchroniseerd.</li>
+</ul>
+<h3>b) Etiket scannen (AI)</h3>
+<p>Tik op <em>Etiket scannen (AI)</em> en fotografeer het flesetiket. De AI leest naam, jaargang, type, regio, land en druif uit en schat het drinkvenster en de serveertemperatuur in. Controleer de waarden en sla op. Vóór het eerste gebruik vraagt de app om je toestemming (<a href="#privacy">hoofdstuk 13</a>).</p>
+<h3>c) Barcode scannen</h3>
+<p>Tik op <em>Barcode scannen</em> en houd de barcode van de fles binnen het kader. De app zoekt het nummer op in een gratis productdatabase (gratis, geen AI-tegoed) en vult, als ze iets vindt, <strong>naam, producent en wijntype</strong> in. De jaargang haalt ze uit de naam of vraagt ze je.</p>
+<ul>
+<li>Staat de fles al in de kelder, dan vraagt de app “Nog een fles toevoegen?” – een snelle manier om bij te tellen als je meer koopt.</li>
+<li>Staat de barcode <strong>niet</strong> in de database (gebruikelijk bij kleinere wijnhuizen), dan verschijnt een tip met de knop <em>Etiket scannen (AI)</em>. Het nummer wordt toch bij de wijn bewaard, zodat de fles de volgende keer meteen wordt herkend.</li>
+</ul>
+<h3>d) Wijn opzoeken (AI)</h3>
+<p><em>Wijn opzoeken (AI)</em> laat de AI op internet zoeken naar regio, land, druif, drinkvenster, serveertemperatuur, actuele gemiddelde prijs en – in de webversie – een flesafbeelding. Velden die je al hebt ingevuld, worden niet overschreven. Dit gebeurt ook automatisch zodra naam en jaargang zijn ingevuld en er nog geen prijs is.</p>
+<div class="note">De iPhone-app laadt geen flesafbeeldingen van internet (regel van de App Store). Je kunt in plaats daarvan eigen foto’s maken.</div>
+
+<!-- ───────────────── 3 ───────────────── -->
+<h2 id="cellar">3. De kelder</h2>
+
+<h3>Zoeken, filteren, sorteren</h3>
+<ul>
+<li><strong>Zoeken</strong> bovenaan: vindt wijnen op naam, regio, land en druif.</li>
+<li><strong>Filters:</strong> Alle, Rood, Wit, Rosé, Mousserend, Overig. Een klik op een type wist automatisch de zoekopdracht.</li>
+<li><strong>Sorteren:</strong> Nieuwste eerst, Naam, Jaargang, Druif, Regio, Land of Drinkrijpheid (meest dringend eerst).</li>
+<li><strong>Lijst / kaarten:</strong> De knop <em>Lijst</em> schakelt tussen een compacte lijst en uitgebreide kaarten.</li>
+</ul>
+<h3>De wijnkaart</h3>
+<p>De kaart toont naam, jaargang, druif, beoordeling (sterren), regio en land (tik om een kaart of de wijnregio’s van het land te openen), het aantal flessen, de <strong>serveertemperatuur</strong> (🌡), de <strong>opslagplekken</strong> (tik om naar het rek te springen) en een <strong>rijpheidsbalk</strong> in de kleuren Jong, Optimaal, Piek, Overschreden. Het druivensymbool opent Wikipedia voor de druif.</p>
+<p>Onderaan de kaart: <em>Bewerken</em>, <em>Drinken</em> en 🗑 (wijn verwijderen).</p>
+<h3>Voorraad, Min/Max en de boodschappenlijst</h3>
+<p>Als je voor een wijn een minimum (en eventueel een maximum) invult, toont de kaart “Voorraad · Min · Max” en waarschuwt met ⚠ als je eronder zit. De knop <em>Bijbestellen</em> opent de <strong>boodschappenlijst</strong>: die toont alle wijnen onder hun minimum (het streefaantal is het maximum, anders het minimum). Je kunt de lijst delen of kopiëren, of de wijnen op de verlanglijst zetten.</p>
+
+<!-- ───────────────── 4 ───────────────── -->
+<h2 id="drink">4. Een wijn drinken</h2>
+
+<p>Tik op de wijnkaart op <em>Drinken</em> (of op “Drinken · n fl.” bij Rijpheid). Het venster <em>Wijn drinken</em> opent:</p>
+<ul>
+<li><strong>Uit welke plek genomen?</strong> – kies de rekplek waaruit de fles kwam, of “Fles zonder plek”. De plek komt vrij.</li>
+<li><strong>Met wie heb je gedronken?</strong> – de namen van je gasten (optioneel).</li>
+<li><strong>Gelegenheid</strong> – Lente, Zomer, Herfst, Winter, Verjaardag, Feest of “Zomaar” (meerdere mogelijk).</li>
+</ul>
+<p><em>Drinken</em> haalt één fles weg en maakt een vermelding in de <a href="#history">Historie</a>. Confetti en geluid vieren het (uit te zetten in Opties). Is het de <strong>laatste fles</strong>, dan meldt de app dat: de wijn verdwijnt dan uit de kelder (maar blijft in de Historie staan).</p>
+<div class="tip"><strong>Snel met scannen:</strong> De ronde 🥂-knop in de kelder fotografeert een etiket, herkent de wijn in je kelder en opent meteen het venster Drinken.</div>
+
+<!-- ───────────────── 5 ───────────────── -->
+<h2 id="ripe">5. Drinkvenster (Rijpheid)</h2>
+
+<p>Hier zie je alle wijnen met een drinkvenster, <strong>de meest dringende eerst</strong>. Elke kaart toont naam, jaargang, type, <strong>Drinken vanaf/tot</strong>, serveertemperatuur, opslagplek en een balk met een markering voor het huidige jaar.</p>
+<table>
+<tbody><tr><th>Status</th><th>Betekenis</th></tr>
+<tr><td><strong>Jong</strong></td><td>Te vroeg – vóór “Drinken vanaf”</td></tr>
+<tr><td><strong>Optimaal</strong></td><td>Drinkbaar, nog in het eerste deel van het venster</td></tr>
+<tr><td><strong>Piek</strong></td><td>Op zijn hoogtepunt – drink binnenkort</td></tr>
+<tr><td><strong>Overschreden</strong></td><td>Na “Drinken tot” – zo snel mogelijk drinken</td></tr>
+</tbody></table>
+<p><strong>Filters:</strong> op wijntype, op status en op <strong>land</strong> (keuzelijst met het aantal per land; landen zonder resultaten zijn grijs). De filters kunnen worden gecombineerd. Tik op een kaart om de wijn in de kelder te openen.</p>
+<p><strong>De regel voor het venster:</strong> “Drinken vanaf” = jaargang + 1. “Drinken tot” hangt af van wijntype en druif. Heb je oudere wijnen met andere waarden, dan kun je ze allemaal in één keer opnieuw berekenen in Opties (<a href="#setup">hoofdstuk 11</a>, “Drinkvenster opnieuw berekenen”).</p>
+
+<!-- ───────────────── 6 ───────────────── -->
+<h2 id="racks">6. Rekken en opbergen</h2>
+
+<h3>Rekken definiëren en bewerken</h3>
+<p><strong>Opties → Rekken</strong> (tik op de kop om te openen): vul naam, niveaus, plekken per niveau en flessen per plek in en tik dan op ＋. “Flessen/plek” is 1 voor een wijnrek en groter voor een vloer of krat. In de lijst heeft elk rek:</p>
+<ul>
+<li>de <strong>greep ⠿</strong> om de volgorde te wijzigen, en de knop <em>Sorteer A–Z</em> onder de lijst,</li>
+<li>▦ voor <strong>QR-labels</strong>, ✏️ om te bewerken, 🧹 om te legen en 🗑 om te verwijderen.</li>
+</ul>
+<p>Met <strong>bewerken</strong> (✏️) kun je het rek hernoemen, de plekken per niveau wijzigen, niveaus bovenaan of onderaan toevoegen, niveaus verwijderen en elk niveau een eigen naam en een eigen aantal flessen geven. Flessen die zo hun plek verliezen, tellen daarna als “niet toegewezen”; de wijnen zelf blijven in de kelder. De app vraagt om bevestiging vóór dergelijke wijzigingen.</p>
+<h3>Het onderdeel Rekken</h3>
+<p>Bovenaan kies je een rek met de <strong>tegels</strong> (naam en “bezet / plekken”). De volgorde kun je ook hier wijzigen: op een pc sleep je een tegel, op touchscreens houd je een tegel ongeveer een halve seconde ingedrukt en sleep je daarna. Daaronder staat het <strong>kelderplan</strong>: elk niveau met zijn plekken. Bezette plekken tonen een liggende fles in de kleur van het wijntype.</p>
+<h3>Opbergen</h3>
+<ol>
+<li>Tik op een wijn onder “Niet toegewezen” (de lijst kan worden gefilterd op type en land) – of tik in de kelder op een hint “niet opgeborgen”.</li>
+<li>Tik op een <strong>vrije plek</strong>. Bij vloeren en kratten bergt de app zoveel flessen op als er passen.</li>
+</ol>
+<p><strong>Wijn scannen &amp; opbergen</strong> fotografeert het etiket, vindt de wijn en leidt je door het opbergen.</p>
+<h3>Bezette plekken, verplaatsen, verwijderen</h3>
+<p>Tik op een bezette plek: je ziet de wijn en kunt hem <em>openen</em>, <em>uit het vak verwijderen</em> of <em>verplaatsen</em> (tik daarna op een vrije plek). <em>Rek legen</em> haalt alle flessen uit het rek (na bevestiging).</p>
+<h3>Knipperen</h3>
+<p>De schakelaars <em>Knipperen</em> laten flessen knipperen die <strong>als eerste gedronken</strong> moeten worden (overschreden of uiterlijk volgend jaar aan het einde van hun venster), die overschreden zijn, op hun piek zijn of optimaal – zo vind je ze in het rek in één oogopslag.</p>
+<h3>QR-labels en “Niveau scannen”</h3>
+<p>Met <strong>QR-labels</strong> (Opties → Rekken → ▦) maak je één label voor het rek en één voor elk niveau. Deel ze als PDF of print ze (labelvel 63,5 × 38,1 mm, 21 per pagina) en plak ze op. Daarna: <strong>Niveau scannen</strong> in het onderdeel Rekken – je ziet wat er op dat niveau ligt en kunt <em>hier opslaan</em>, <em>uitnemen</em>, drinken, een fles verplaatsen of <em>heel niveau verplaatsen</em>. In het formulier “Wijn toevoegen” vult het scannen van een niveaulabel ook de opslagplaats in.</p>
+
+<!-- ───────────────── 7 ───────────────── -->
+<h2 id="history">7. Historie</h2>
+
+<p>De Historie toont alle wijnen die je hebt gedronken met datum, wijn, waarde, gasten en gelegenheid. Je kunt filteren op wijntype en gelegenheid en een vermelding bewerken (gasten, gelegenheid). De Historie voedt de overzichten “Gedronken per maand/jaar”, de uitgaven en de frequentie in Cijfers.</p>
+
+<!-- ───────────────── 8 ───────────────── -->
+<h2 id="wish">8. Verlanglijst</h2>
+
+<ul>
+<li><strong>+ Wens toevoegen</strong>: met de hand of via een etiketscan, met een optionele notitie (“Waar te koop?”).</li>
+<li><strong>Prijzen zoeken</strong> (💶): De app zoekt op internet naar prijzen van de wijn, toont de goedkoopste treffer en vermenigvuldigt met het aantal. Dit zijn richtwaarden zonder garantie – controleer verzendkosten en beschikbaarheid bij de winkel.</li>
+<li><strong>Vinkje</strong> links: markeer als gekocht/klaar (de rij wordt vager).</li>
+<li><strong>→ Kelder</strong>: verplaatst de wens naar de kelder (met aantal en, indien beschikbaar, de goedkoopste prijs) en brengt je, als je rekken hebt, meteen naar het opbergen.</li>
+<li>Als een wijn onder zijn minimum zakt, biedt de app aan hem met de ontbrekende hoeveelheid op de verlanglijst te zetten (“bijbestellen”).</li>
+</ul>
+
+<!-- ───────────────── 9 ───────────────── -->
+<h2 id="stats">9. Cijfers</h2>
+
+<p>Van boven naar beneden:</p>
+<ul>
+<li><strong>Kerncijfers:</strong> flessen, wijnen, totale waarde, ⌀ beoordeling.</li>
+<li><strong>Drinkvenster:</strong> flessen per status (Jong, Optimaal, Piek, Overschreden) met een waarschuwing voor overschreden flessen; een tik opent Rijpheid met het bijbehorende filter.</li>
+<li><strong>Per type</strong> en <strong>Topwijnen</strong> (op beoordeling of frequentie, te filteren op sterren).</li>
+<li><strong>Per land, regio, druif:</strong> balken (tot 8, de rest als “+n meer”); een tik zoekt in de kelder. <strong>Per jaargang:</strong> kolommen, zijwaarts te scrollen.</li>
+<li><strong>Prijzen:</strong> ⌀ per fles, goedkoopste, duurste, prijsklassen (afgestemd op je valuta) en waarde per land.</li>
+<li><strong>Opslag:</strong> bezetting in procenten, vrije plekken, niet opgeborgen flessen en een balk per rek (een tik springt naar het rek).</li>
+<li><strong>Gedronken:</strong> per maand (laatste 12) en per jaar, plus de uitgaven aan gedronken flessen.</li>
+<li><strong>Beste landen en druiven</strong> naar gemiddelde beoordeling (kelder en Historie samen).</li>
+<li><strong>Bijkopen:</strong> wijnen onder de minimumvoorraad (opent de boodschappenlijst), openstaande wensen en hun waarde.</li>
+</ul>
+<p>Onderdelen zonder gegevens (bijvoorbeeld zonder prijzen) worden verborgen.</p>
+
+<!-- ───────────────── 10 ───────────────── -->
+<h2 id="export">10. Export, import en back-up</h2>
+
+<table>
+<tbody><tr><th>Functie</th><th>Doel</th></tr>
+<tr><td>CSV exporteren</td><td>Tabel voor Excel of Numbers</td></tr>
+<tr><td>Excel exporteren</td><td>Als .xlsx-bestand</td></tr>
+<tr><td>PDF exporteren</td><td>Afdrukbaar overzicht</td></tr>
+<tr><td><strong>JSON-back-up</strong></td><td><strong>Volledige back-up van de gegevens</strong> (wijnen, verlanglijst, historie, rekken, weergavenaam, eigen foto’s)</td></tr>
+<tr><td>Naar klembord</td><td>Een tekstlijst kopiëren</td></tr>
+<tr><td>JSON / CSV / Excel importeren</td><td>Een back-up herstellen of een tabel inlezen</td></tr>
+</tbody></table>
+<div class="tip"><strong>Maak regelmatig een JSON-back-up.</strong> De JSON-import vervangt de kelder door de back-up (de app vraagt eerst om bevestiging). Op een nieuw apparaat herstelt dit alles. Of gebruik cloudsynchronisatie (<a href="#sync">hoofdstuk 12</a>).</div>
+
+<!-- ───────────────── 11 ───────────────── -->
+<h2 id="setup">11. Opties (instellingen)</h2>
+
+<h3>Algemeen</h3>
+<ul>
+<li><strong>Weergavenaam (titel):</strong> “Peter” wordt “Peters Weinkeller” enzovoort. Laat het leeg voor de standaardtitel.</li>
+<li><strong>Valuta:</strong> €, $, £, CHF, A$, C$, SEK, NOK, DKK, PLN, HUF, CZK, RON, RUB, UAH, JPY, CNY, KRW, INR.</li>
+<li><strong>Taal:</strong> 25 taalvarianten, waaronder Duits, Engels, Engels (VS) en nog veel meer. <strong>De valuta verandert automatisch mee</strong> (Zweeds → kroon, Engels (VS) → US $, Engels (VK) → £). Voorbeeld: als je overschakelt naar Zweeds, wisselt de app naar SEK en vraagt of je <strong>alle prijzen wilt omrekenen tegen de huidige koers van de Europese Centrale Bank</strong> (“OK”) of alleen het label wilt wijzigen (“Annuleren”). Voor RUB en UAH zijn er geen koersen. Je kunt de valuta op elk moment met de hand wijzigen.</li>
+<li><strong>Confetti &amp; geluid bij het drinken:</strong> beide, alleen confetti of uit.</li>
+<li><strong>Lettertype:</strong> tien lettertypen om uit te kiezen.</li>
+<li><strong>Temperatuureenheid:</strong> °C of °F (Engels (VS) zet automatisch °F).</li>
+</ul>
+<h3>Opslaglocatie</h3>
+<p><em>Alleen dit apparaat</em> of <em>Cloud</em> (synccode, <a href="#sync">hoofdstuk 12</a>).</p>
+<h3>AI-tegoed (alleen iPhone-app)</h3>
+<p>Toont de resterende AI-scans, de apparaat-ID en – indien nodig – <em>Tegoed opwaarderen</em> of een ontgrendelcode. Zie <a href="#privacy">hoofdstuk 13</a>.</p>
+<h3>Wijndatabase</h3>
+<ul>
+<li><strong>Alle wijnen bijwerken (AI):</strong> vult ontbrekende regio, land, druif, drinkvenster, serveertemperatuur en prijs in voor alle wijnen (in de webversie ook flesafbeeldingen). Bestaande waarden blijven staan. Als er al serveertemperaturen zijn, vraagt de app eerst of die ook door AI-waarden moeten worden vervangen.</li>
+<li><strong>Drinkvenster opnieuw berekenen:</strong> zet “Drinken vanaf” op jaargang + 1 voor alle wijnen met een jaargang (met de hand ingevoerde waarden worden ook overschreven) en past “Drinken tot” aan waar nodig. De app noemt eerst het aantal wijnen en vraagt om bevestiging. <em>Tip: exporteer eerst een JSON-back-up.</em></li>
+</ul>
+<h3>Rekken</h3>
+<p>Zie <a href="#racks">hoofdstuk 6</a>. De kop toont het aantal rekken.</p>
+<h3>Privacybeleid, support, versie</h3>
+<p>De links leiden naar het privacybeleid en naar deze supportpagina. Helemaal onderaan vind je de <strong>versie</strong> van de app – vermeld die als je contact met ons opneemt.</p>
+
+<!-- ───────────────── 12 ───────────────── -->
+<h2 id="sync">12. Twee apparaten synchroniseren</h2>
+
+<ol>
+<li><strong>Eerste apparaat:</strong> Opties → Opslaglocatie → <em>Cloud</em> → <em>Nieuwe synccode aanmaken</em>. De code verschijnt op het scherm; met <em>Code opslaan via e-mail</em> stuur je hem naar jezelf.</li>
+<li><strong>Tweede apparaat:</strong> Opties → Opslaglocatie → <em>Cloud</em> → voer de code in (kleine letters, zonder spaties) → Verbinden. Bevat het apparaat al wijnen, dan vraagt de app of ze met de cloudgegevens moeten worden samengevoegd.</li>
+<li>Daarna synchroniseren beide apparaten automatisch (bijvoorbeeld wanneer de app wordt geopend); <em>Nu synchroniseren</em> start het met de hand. De regel is: <strong>de laatste wijziging wint</strong>.</li>
+</ol>
+<p>Wijnen, verlanglijst, historie, rekken en instellingen zoals taal en valuta worden gesynchroniseerd. <strong>Niet gesynchroniseerd</strong> worden eigen foto’s en apparaatspecifieke gegevens. Iedereen die je code kent, kan je wijnen zien – deel hem alleen met mensen die je vertrouwt. Bewaar ook een JSON-back-up.</p>
+
+<!-- ───────────────── 13 ───────────────── -->
+<h2 id="privacy">13. AI, privacy en kosten</h2>
+
+<ul>
+<li><strong>Waarvoor wordt AI gebruikt?</strong> Etiket scannen, wijn opzoeken, prijzen zoeken en “Alle wijnen bijwerken”. De foto of de naam van de wijn wordt via onze server naar een AI-dienst (Anthropic, VS) gestuurd voor analyse – zonder namen of accounts. De app vraagt vóór het eerste gebruik om je toestemming.</li>
+<li><strong>Barcodes scannen</strong> stuurt alleen het nummer naar een gratis productdatabase en kost geen AI-tegoed.</li>
+<li><strong>Kosten (iPhone-app):</strong> 50 AI-aanroepen per installatie zijn bij de aanschafprijs inbegrepen; meer kun je kopen als optionele eenmalige aankoop (geen abonnement, het tegoed verloopt niet). Al het andere in de app kost niets extra. Als het tegoed op is, blijft alles behalve de AI-functies gewoon werken.</li>
+<li><strong>Gegevens:</strong> Alles blijft op je apparaat zolang je de cloud niet inschakelt. Geen advertenties, geen tracking, geen gebruikersaccount. Details in het <a href="datenschutz.html">privacybeleid</a> (in het Duits).</li>
+</ul>
+
+<!-- ───────────────── 14 ───────────────── -->
+<h2 id="faq">14. Tips en veelgestelde vragen</h2>
+
+<ul>
+<li><strong>Op een iPad of pc</strong> past de indeling zich aan: bredere kolom, meerdere kaarten naast elkaar, en op pc (en iPad in liggende stand) staat de navigatie links. De telefoon werkt ook in liggende stand. Op een pc sluit <kbd>Esc</kbd> het bovenste venster; op een telefoon veeg je een venster omlaag om het te sluiten.</li>
+<li><strong>Mijn wijnen zijn weg:</strong> Zie <a href="support.html">Support</a> – herstel met de synccode of een JSON-back-up.</li>
+<li><strong>Geen barcodetreffer voor een wijn:</strong> Normaal bij kleine wijnhuizen. Gebruik de etiketscan.</li>
+<li><strong>De AI heeft iets verkeerd gelezen:</strong> Corrigeer het veld met de hand en sla op; de AI-waarden zijn suggesties.</li>
+<li><strong>Het drinkvenster lijkt te vroeg/laat:</strong> Het zijn vuistregels naar wijntype en druif. Pas “Drinken tot” per wijn aan als je het beter weet.</li>
+<li><strong>De pagina toont nog de oude versie (web):</strong> Laad de pagina opnieuw (op pc <kbd>Ctrl</kbd>+<kbd>F5</kbd>).</li>
+</ul>
+<p>Nog vragen? Schrijf naar <a href="mailto:t.knecht@web.de?subject=Weinkeller%20Gebruikershandleiding">t.knecht@web.de</a> en vermeld de app-versie (Opties, helemaal onderaan).</p>
+
+<p style="margin-top:36px"><small>Weinkeller · Thomas Knecht · Scheidemannstr. 29 · 42781 Haan · Deutschland</small></p>
+
+</body></html>

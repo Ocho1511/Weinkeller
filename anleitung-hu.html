@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="hu"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Felhasználói útmutató – Weinkeller</title>
+<style>
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Sans CJK SC","Noto Sans JP","Noto Sans KR","Noto Sans Devanagari",sans-serif;max-width:760px;margin:0 auto;padding:24px 18px 70px;line-height:1.6;color:#222;background:#fff}
+  h1{font-size:28px;margin:6px 0 4px} h2{font-size:20px;margin-top:34px;padding-top:6px;border-top:1px solid #e3e3e3} h3{font-size:16px;margin:20px 0 4px}
+  small{color:#666} a{color:#0a58ca} p{margin:8px 0} ul,ol{margin:6px 0 10px;padding-left:22px} li{margin:3px 0}
+  code,kbd{background:#f2f2f2;border-radius:4px;padding:1px 5px;font-size:.92em}
+  .tip,.note{border-left:4px solid #b88a2a;background:#fbf6ea;padding:8px 12px;border-radius:0 8px 8px 0;margin:12px 0}
+  .note{border-color:#0a58ca;background:#eef4fd}
+  .toc{background:#f7f7f7;border-radius:10px;padding:10px 16px;margin:16px 0} .toc ol{margin:4px 0}
+  .lang{position:sticky;top:0;background:#fff;padding:8px 0;margin:0 0 6px;border-bottom:1px solid #eee;z-index:5}
+  .lang select{font:inherit;font-size:15px;padding:5px 10px;border:1px solid #bbb;border-radius:16px;background:#fff;max-width:100%}
+  table{border-collapse:collapse;width:100%;margin:8px 0} td,th{border:1px solid #ddd;padding:6px 9px;text-align:left;vertical-align:top;font-size:15px} th{background:#f4f4f4}
+  .back{margin:0 0 6px}
+  @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
+</style></head><body>
+<p class="back"><a href="support.html">← Vissza a támogatáshoz</a></p>
+<div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html">Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html" selected>Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
+
+<h1>Felhasználói útmutató – Weinkeller</h1>
+<p><small>Frissítve: 2026. november 10. · Az alkalmazás verziója: 2.0</small></p>
+
+<div class="toc">
+
+<strong>Tartalom</strong><ol>
+<li><a href="#start">Áttekintés és első lépések</a></li>
+<li><a href="#add">Bor hozzáadása</a></li>
+<li><a href="#cellar">A pince</a></li>
+<li><a href="#drink">Bor elfogyasztása</a></li>
+<li><a href="#ripe">Ivási időablak (Érettség)</a></li>
+<li><a href="#racks">Polcok és elhelyezés</a></li>
+<li><a href="#history">Napló</a></li>
+<li><a href="#wish">Kívánságlista</a></li>
+<li><a href="#stats">Statisztika</a></li>
+<li><a href="#export">Export, import és biztonsági mentés</a></li>
+<li><a href="#setup">Beállítások</a></li>
+<li><a href="#sync">Két eszköz szinkronizálása</a></li>
+<li><a href="#privacy">MI, adatvédelem és költségek</a></li>
+<li><a href="#faq">Tippek és GYIK</a></li></ol>
+</div>
+
+<!-- ───────────────── 1 ───────────────── -->
+<h2 id="start">1. Áttekintés és első lépések</h2>
+
+<p>A Weinkeller a személyes borospincéd a zsebedben: kezeled vele a készletet, a tárolóhelyeket, az ivási időablakokat, a kívánságlistát és a statisztikákat. Minden az eszközödön fut; egy szinkronkóddal több eszközt is összekapcsolhatsz.</p>
+<p>Alul (számítógépen és fekvő iPaden: a bal oldalon) találod a sávot nyolc területtel:</p>
+<table>
+<tbody><tr><th>Terület</th><th>Rendeltetés</th></tr>
+<tr><td><strong>Pince</strong></td><td>Az összes bor, keresés, szűrők, rendezés, bor hozzáadása, ivás</td></tr>
+<tr><td><strong>Statisztika</strong></td><td>Kimutatások a készletről, az árakról, az érettségről, a tárolásról és az ivási naplóról</td></tr>
+<tr><td><strong>Érettség</strong></td><td>Mely borokat idd meg most, hamarosan vagy már nem („ivási időablak”)</td></tr>
+<tr><td><strong>Napló</strong></td><td>Az általad megivott borok</td></tr>
+<tr><td><strong>Polcok</strong></td><td>A pince alaprajza: borok elhelyezése és áthelyezése, QR-címkék</td></tr>
+<tr><td><strong>Kívánság</strong></td><td>Borok, amelyeket még meg szeretnél venni</td></tr>
+<tr><td><strong>Export/Import</strong></td><td>Adataid mentése, táblázatok és biztonsági mentések beolvasása</td></tr>
+<tr><td><strong>Beállítások</strong></td><td>Név, pénznem, nyelv, felhő, polcok meghatározása</td></tr>
+</tbody></table>
+<h3>Az első öt lépés</h3>
+<ol>
+<li><strong>Válassz nyelvet és pénznemet</strong>: Beállítások → Általános. A pénznem automatikusan követi a nyelvet.</li>
+<li><strong>Határozd meg a polcokat</strong> (nem kötelező): Beállítások → Polcok (lásd a <a href="#racks">6. fejezetet</a>).</li>
+<li><strong>Add hozzá az első borodat</strong>: koppints a pincében a <kbd>+</kbd> gombra (<a href="#add">2. fejezet</a>).</li>
+<li><strong>Helyezd el</strong>: adj a bornak helyet egy polcon.</li>
+<li><strong>Készíts biztonsági mentést</strong>: Export/Import → JSON biztonsági mentés, vagy állítsd be a felhőszinkront (<a href="#sync">12. fejezet</a>).</li>
+</ol>
+<div class="tip">A <em>Beállítások</em> szakaszai összecsukhatók. Az „Általános” az első indításkor nyitva van, a többi zárva. Az alkalmazás megjegyzi, mit nyitottál ki vagy csuktál össze utoljára.</div>
+
+<!-- ───────────────── 2 ───────────────── -->
+<h2 id="add">2. Bor hozzáadása</h2>
+
+<p>Koppints a pincében a <kbd>+</kbd> gombra. Többféleképpen vehetsz fel bort – ezek kombinálhatók.</p>
+<h3>a) Kézzel</h3>
+<p>Töltsd ki a mezőket: <strong>Név / Borászat, Évjárat, Palackok, Bortípus, Régió, Ország, Szőlő, Tárolóhely, Iható ettől/eddig, Felszolgálási hőmérséklet, Ár, Értékelés, Megjegyzés</strong>. Csak a név kötelező. A <em>Mentés</em> létrehozza a bort.</p>
+<ul>
+<li><strong>Ivási időablak:</strong> Amint megadod az évjáratot, az alkalmazás az „Iható ettől” mezőt <strong>évjárat + 1</strong> értékre állítja. Az „Iható eddig” a bortípustól és a szőlőtől függ (a vörös tovább eláll, mint a rosé). Mindkettőt bármikor módosíthatod.</li>
+<li><strong>Készlet, Min és Max:</strong> Ha megadsz egy minimumot, az alkalmazás figyelmeztet, ha a készlet ez alá csökken, és felajánlja, hogy a bort felveszi a kívánságlistára (<a href="#cellar">3. fejezet</a>).</li>
+<li><strong>Saját fotó:</strong> A „Fotó készítése / kiválasztása” fotót csatol a borhoz. A fotó ezen az eszközön marad, része a JSON biztonsági mentésnek, de a felhővel nem szinkronizálódik.</li>
+</ul>
+<h3>b) Címke beolvasása (MI)</h3>
+<p>Koppints a <em>Címke beolvasása (MI)</em> gombra, és fényképezd le a palack címkéjét. Az MI kiolvassa a nevet, az évjáratot, a típust, a régiót, az országot és a szőlőt, és megbecsüli az ivási időablakot és a felszolgálási hőmérsékletet. Ellenőrizd az értékeket, majd mentsd el. Az első használat előtt az alkalmazás megkérdezi a hozzájárulásodat (<a href="#privacy">13. fejezet</a>).</p>
+<h3>c) Vonalkód beolvasása</h3>
+<p>Koppints a <em>Vonalkód beolvasása</em> gombra, és tartsd a palack vonalkódját a keretbe. Az alkalmazás egy ingyenes termékadatbázisban megkeresi a számot (ingyenes, MI-kredit nélkül), és ha megtalálja, kitölti a <strong>nevet, a termelőt és a bortípust</strong>. Az évjáratot a névből egészíti ki, vagy rákérdez.</p>
+<ul>
+<li>Ha a palack már a pincében van, az alkalmazás megkérdezi: „Még egy palackot hozzáadsz?” – gyors módja a darabszám növelésének, ha többet vásárolsz.</li>
+<li>Ha a vonalkód <strong>nincs</strong> az adatbázisban (kisebb borászatoknál gyakori), megjelenik egy tipp a <em>Címke beolvasása (MI)</em> gombbal. A szám ettől még elmentődik a borral, így a palackot legközelebb azonnal felismeri.</li>
+</ul>
+<h3>d) Bor keresése (MI)</h3>
+<p><em>Bor keresése (MI)</em>: az MI megkeresi a weben a régiót, az országot, a szőlőt, az ivási időablakot, a felszolgálási hőmérsékletet, az aktuális átlagárat és – a webes változatban – egy palackképet. A már kitöltött mezőket nem írja felül. Ez automatikusan is megtörténik, ha a név és az évjárat meg van adva, és még nincs ár.</p>
+<div class="note">Az iPhone-alkalmazás nem tölt le palackképeket az internetről (App Store-szabály). Helyette saját fotókat készíthetsz.</div>
+
+<!-- ───────────────── 3 ───────────────── -->
+<h2 id="cellar">3. A pince</h2>
+
+<h3>Keresés, szűrés, rendezés</h3>
+<ul>
+<li><strong>Keresés</strong> felül: név, régió, ország és szőlő alapján talál borokat.</li>
+<li><strong>Szűrők:</strong> Mind, Vörös, Fehér, Rosé, Pezsgő, Egyéb. A típusra kattintás automatikusan törli a keresést.</li>
+<li><strong>Rendezés:</strong> Legújabb elöl, Név, Évjárat, Szőlő, Régió, Ország vagy Érettség (legsürgősebb elöl).</li>
+<li><strong>Lista / kártyák:</strong> A <em>Lista</em> gomb vált a tömör lista és a részletes kártyák között.</li>
+</ul>
+<h3>A borkártya</h3>
+<p>A kártya megmutatja a nevet, az évjáratot, a szőlőt, az értékelést (csillagok), a régiót és az országot (koppintásra megnyílik egy térkép vagy az ország borvidékei), a palackok számát, a <strong>felszolgálási hőmérsékletet</strong> (🌡), a <strong>tárolóhelyeket</strong> (koppintásra a polcra ugrik) és egy <strong>érettségi sávot</strong> a Fiatal, Optimális, Csúcs, Túlhaladt színeivel. A szőlő szimbóluma megnyitja a szőlő Wikipedia-oldalát.</p>
+<p>A kártya alján: <em>Szerkesztés</em>, <em>Iszom</em> és 🗑 (bor törlése).</p>
+<h3>Készlet, Min/Max és a bevásárlólista</h3>
+<p>Ha megadsz egy bornak minimumot (és opcionálisan maximumot), a kártya a „Készlet · Min · Max” értékeket mutatja, és ⚠ jellel figyelmeztet, ha alatta vagy. Az <em>Utánrendelés</em> gomb megnyitja a <strong>bevásárlólistát</strong>: ez felsorolja az összes minimum alatti bort (a cél a maximum, ennek hiányában a minimum). A listát megoszthatod, kimásolhatod, vagy felveheted a borokat a kívánságlistára.</p>
+
+<!-- ───────────────── 4 ───────────────── -->
+<h2 id="drink">4. Bor elfogyasztása</h2>
+
+<p>Koppints a borkártyán az <em>Iszom</em> gombra (vagy az Érettségben az „Iszom · n pal.” gombra). Megnyílik a <em>Bor elfogyasztása</em> ablak:</p>
+<ul>
+<li><strong>Melyik helyről vették ki?</strong> – válaszd ki azt a polchelyet, ahonnan a palack származott, vagy az „Elhelyezetlen üveg” lehetőséget. A hely felszabadul.</li>
+<li><strong>Kivel ittad?</strong> – a vendégeid nevei (nem kötelező).</li>
+<li><strong>Alkalom</strong> – Tavasz, Nyár, Ősz, Tél, Születésnap, Buli vagy „Csak úgy” (többet is választhatsz).</li>
+</ul>
+<p><em>Iszom</em>: levon egy palackot, és létrehoz egy bejegyzést a <a href="#history">Naplóban</a>. Konfetti és hang ünnepli meg (a Beállításokban kikapcsolható). Ha ez az <strong>utolsó palack</strong>, az alkalmazás szól: a bor ekkor eltűnik a pincéből (de a Naplóban megmarad).</p>
+<div class="tip"><strong>Gyorsan beolvasással:</strong> A pincében lévő kerek 🥂 gomb lefényképez egy címkét, felismeri a bort a pincédben, és rögtön megnyitja az ivás ablakát.</div>
+
+<!-- ───────────────── 5 ───────────────── -->
+<h2 id="ripe">5. Ivási időablak (Érettség)</h2>
+
+<p>Itt látod az összes olyan bort, amelynek van ivási időablaka, <strong>a legsürgősebbel kezdve</strong>. Minden kártya megmutatja a nevet, az évjáratot, a típust, az <strong>Iható ettől/eddig</strong> értéket, a felszolgálási hőmérsékletet, a tárolóhelyet és egy sávot az aktuális évet jelölő jelzéssel.</p>
+<table>
+<tbody><tr><th>Állapot</th><th>Jelentés</th></tr>
+<tr><td><strong>Fiatal</strong></td><td>Túl korai – az „Iható ettől” előtt</td></tr>
+<tr><td><strong>Optimális</strong></td><td>Iható, még az időablak első szakaszában</td></tr>
+<tr><td><strong>Csúcs</strong></td><td>Csúcsponton – idd meg hamarosan</td></tr>
+<tr><td><strong>Túlhaladt</strong></td><td>Az „Iható eddig” után – idd meg minél előbb</td></tr>
+</tbody></table>
+<p><strong>Szűrők:</strong> bortípus, állapot és <strong>ország</strong> szerint (legördülő menü az országonkénti darabszámmal; a találat nélküli országok szürkék). A szűrők kombinálhatók. Koppints egy kártyára, hogy a bor megnyíljon a pincében.</p>
+<p><strong>Az időablak szabálya:</strong> „Iható ettől” = évjárat + 1. Az „Iható eddig” a bortípustól és a szőlőtől függ. Ha régebbi boraid más értékekkel vannak, mindet egyszerre újraszámíthatod a Beállításokban (<a href="#setup">11. fejezet</a>, „Ivási időablak újraszámítása”).</p>
+
+<!-- ───────────────── 6 ───────────────── -->
+<h2 id="racks">6. Polcok és elhelyezés</h2>
+
+<h3>Polcok meghatározása és szerkesztése</h3>
+<p><strong>Beállítások → Polcok</strong> (a megnyitáshoz koppints a címsorra): add meg a nevet, a szinteket, a szintenkénti helyeket és a helyenkénti palackokat, majd koppints a ＋ gombra. Az „Üveg/hely” értéke borospolcnál 1, padlónál vagy ládánál ennél nagyobb. A listában minden polcnál van:</p>
+<ul>
+<li>a sorrend módosításához egy <strong>fogantyú ⠿</strong>, valamint a lista alatt a <em>Rendezés A–Z</em> gomb,</li>
+<li>▦ a <strong>QR-címkékhez</strong>, ✏️ a szerkesztéshez, 🧹 a kiürítéshez és 🗑 a törléshez.</li>
+</ul>
+<p>A <strong>szerkesztéssel</strong> (✏️) átnevezheted a polcot, módosíthatod a szintenkénti helyek számát, felül vagy alul szinteket adhatsz hozzá, szinteket távolíthatsz el, és minden szintnek saját nevet és palackszámot adhatsz. Azok a palackok, amelyek így elveszítik a helyüket, utána „elhelyezetlennek” számítanak; maguk a borok a pincében maradnak. Az alkalmazás az ilyen módosítások előtt rákérdez.</p>
+<h3>A Polcok terület</h3>
+<p>Felül a <strong>csempékkel</strong> választasz polcot (név és „foglalt / helyek”). A sorrendet itt is módosíthatod: számítógépen húzz el egy csempét, érintőképernyőn nyomd meg és tartsd nyomva a csempét körülbelül fél másodpercig, majd húzd el. Alatta van a <strong>pince alaprajza</strong>: minden szint a helyeivel. A foglalt helyeken egy fekvő palack látszik a bortípus színében.</p>
+<h3>Elhelyezés</h3>
+<ol>
+<li>Koppints egy borra a „Nincs elhelyezve” alatt (a lista típus és ország szerint szűrhető) – vagy koppints a pincében egy „elhelyezetlen” jelzésre.</li>
+<li>Koppints egy <strong>szabad helyre</strong>. Padlónál és ládánál az alkalmazás annyi palackot helyez el, amennyi elfér.</li>
+</ol>
+<p><strong>Bor beolvasása és elhelyezése</strong>: lefényképezi a címkét, megkeresi a bort, és végigvezet az elhelyezésen.</p>
+<h3>Foglalt helyek, áthelyezés, eltávolítás</h3>
+<p>Koppints egy foglalt helyre: látod a bort, és <em>megnyithatod</em>, <em>eltávolíthatod a helyről</em> vagy <em>áthelyezheted</em> (majd koppints egy szabad helyre). Az <em>Állvány kiürítése</em> az összes palackot kiveszi a polcról (megerősítés után).</p>
+<h3>Villogás</h3>
+<p>A <em>Villogás</em> kapcsolók villogtatják azokat a palackokat, amelyeket <strong>először kell meginni</strong> (túlhaladott, vagy legkésőbb jövőre lejár az időablakuk), a túlhaladottakat, a csúcson lévőket vagy az optimálisakat – így egy pillantással megtalálod őket a polcon.</p>
+<h3>QR-címkék és „Szint beolvasása”</h3>
+<p>A <strong>QR-címkékkel</strong> (Beállítások → Polcok → ▦) egy címkét készíthetsz a polcnak és egyet minden szintnek. Oszd meg PDF-ként vagy nyomtasd ki (címkelap 63,5 × 38,1 mm, oldalanként 21), és ragaszd fel őket. Ezután: <strong>Szint beolvasása</strong> a Polcok területen – látod, mi van azon a szinten, és <em>berakhatsz ide</em>, <em>kivehetsz</em>, ihatsz, áthelyezhetsz egy palackot vagy <em>áthelyezheted az egész szintet</em>. A „Bor hozzáadása” űrlapon egy szintcímke beolvasása a tárolóhelyet is kitölti.</p>
+
+<!-- ───────────────── 7 ───────────────── -->
+<h2 id="history">7. Napló</h2>
+
+<p>A Napló felsorolja az összes megivott bort dátummal, borral, értékkel, vendégekkel és alkalommal. Szűrhetsz bortípus és alkalom szerint, és szerkeszthetsz egy bejegyzést (vendégek, alkalom). A Napló táplálja a Statisztika „Megivott havonta/évente” kimutatásait, a költést és a gyakoriságot.</p>
+
+<!-- ───────────────── 8 ───────────────── -->
+<h2 id="wish">8. Kívánságlista</h2>
+
+<ul>
+<li><strong>+ Kívánság hozzáadása</strong>: kézzel vagy címkebeolvasással, egy opcionális megjegyzéssel („Hol kapható?”).</li>
+<li><strong>Árak keresése</strong> (💶): Az alkalmazás a weben keresi a bor árait, megmutatja a legolcsóbb találatot, és megszorozza a mennyiséggel. Ezek tájékoztató értékek garancia nélkül – kérdezd meg a boltban a szállítási költséget és a készletet.</li>
+<li><strong>Pipa</strong> a bal oldalon: megvettnek/késznek jelölés (a sor elhalványul).</li>
+<li><strong>→ Pince</strong>: áthelyezi a kívánságot a pincébe (a mennyiséggel és, ha van, a legolcsóbb árral), és ha vannak polcaid, rögtön az elhelyezéshez visz.</li>
+<li>Ha egy bor a minimum alá csökken, az alkalmazás felajánlja, hogy a hiányzó mennyiséggel felveszi a kívánságlistára („utánrendelés”).</li>
+</ul>
+
+<!-- ───────────────── 9 ───────────────── -->
+<h2 id="stats">9. Statisztika</h2>
+
+<p>Fentről lefelé:</p>
+<ul>
+<li><strong>Főbb számok:</strong> palackok, borok, teljes érték, átlagos értékelés.</li>
+<li><strong>Ivási időablak:</strong> palackok állapotonként (Fiatal, Optimális, Csúcs, Túlhaladt), figyelmeztetéssel a túlhaladott palackokra; koppintásra megnyílik az Érettség a megfelelő szűrővel.</li>
+<li><strong>Típus szerint</strong> és <strong>Legjobb borok</strong> (értékelés vagy gyakoriság szerint, csillagokra szűrhető).</li>
+<li><strong>Ország, régió, szőlőfajta szerint:</strong> sávok (legfeljebb 8, a többi „+n további”); koppintásra a pincében keres. <strong>Évjárat szerint:</strong> oszlopok, oldalirányban görgethetők.</li>
+<li><strong>Árak:</strong> átlag palackonként, legolcsóbb, legdrágább, árkategóriák (a pénznemedhez igazítva) és érték országonként.</li>
+<li><strong>Raktár:</strong> kihasználtság százalékban, szabad helyek, elhelyezetlen palackok és egy sáv polconként (koppintásra a polcra ugrik).</li>
+<li><strong>Megivott:</strong> havonta (az utolsó 12) és évente, valamint a megivott palackokra költött összeg.</li>
+<li><strong>Legjobb országok és szőlőfajták</strong> átlagos értékelés szerint (a pince és a Napló együtt).</li>
+<li><strong>Újravásárlás:</strong> a minimális készlet alatti borok (megnyitja a bevásárlólistát), nyitott kívánságok és az értékük.</li>
+</ul>
+<p>Az adat nélküli szakaszok (pl. ár nélkül) rejtve maradnak.</p>
+
+<!-- ───────────────── 10 ───────────────── -->
+<h2 id="export">10. Export, import és biztonsági mentés</h2>
+
+<table>
+<tbody><tr><th>Funkció</th><th>Rendeltetés</th></tr>
+<tr><td>CSV exportálása</td><td>Táblázat Excelhez vagy Numbershez</td></tr>
+<tr><td>Excel exportálása</td><td>.xlsx fájlként</td></tr>
+<tr><td>PDF exportálása</td><td>Nyomtatható áttekintés</td></tr>
+<tr><td><strong>JSON biztonsági mentés</strong></td><td><strong>Teljes adatmentés</strong> (borok, kívánságlista, napló, polcok, megjelenített név, saját fotók)</td></tr>
+<tr><td>Vágólapra</td><td>Szöveges lista másolása</td></tr>
+<tr><td>JSON / CSV / Excel importálása</td><td>Biztonsági mentés visszaállítása vagy táblázat beolvasása</td></tr>
+</tbody></table>
+<div class="tip"><strong>Rendszeresen készíts JSON biztonsági mentést.</strong> A JSON importálása a pincét a mentéssel váltja fel (az alkalmazás előbb rákérdez). Új eszközön ez mindent visszaállít. Használhatod helyette a felhőszinkront is (<a href="#sync">12. fejezet</a>).</div>
+
+<!-- ───────────────── 11 ───────────────── -->
+<h2 id="setup">11. Beállítások</h2>
+
+<h3>Általános</h3>
+<ul>
+<li><strong>Megjelenített név (cím):</strong> a „Peter” így lesz: „Peter Weinkellere” stb. Hagyd üresen az alapértelmezett címhez.</li>
+<li><strong>Pénznem:</strong> €, $, £, CHF, A$, C$, SEK, NOK, DKK, PLN, HUF, CZK, RON, RUB, UAH, JPY, CNY, KRW, INR.</li>
+<li><strong>Nyelv:</strong> 25 nyelvi változat, köztük német, angol, angol (US) és sok más. <strong>A pénznem automatikusan változik</strong> (svéd → korona, angol (US) → US $, angol (UK) → £). Példa: ha svédre váltasz, az alkalmazás SEK-re vált, és megkérdezi, hogy <strong>átváltsa-e az összes árat az Európai Központi Bank mai árfolyamán</strong> („OK”), vagy csak a jelölést módosítsa („Mégse”). RUB-hoz és UAH-hoz nincsenek árfolyamok. A pénznemet bármikor kézzel is módosíthatod.</li>
+<li><strong>Konfetti és hang ivásnál:</strong> mindkettő, csak konfetti, vagy ki.</li>
+<li><strong>Betűtípus:</strong> tíz betűtípus közül választhatsz.</li>
+<li><strong>Hőmérséklet-mértékegység:</strong> °C vagy °F (az angol (US) automatikusan °F-ot állít be).</li>
+</ul>
+<h3>Tárolás helye</h3>
+<p><em>Csak ezen az eszközön</em> vagy <em>Felhő</em> (szinkronkód, <a href="#sync">12. fejezet</a>).</p>
+<h3>MI-kreditek (csak az iPhone-alkalmazásban)</h3>
+<p>Megmutatja a hátralévő MI-beolvasásokat, az eszközazonosítót és – szükség esetén – a <em>Kredit feltöltése</em> gombot vagy egy feloldó kódot. Lásd a <a href="#privacy">13. fejezetet</a>.</p>
+<h3>Boradatbázis</h3>
+<ul>
+<li><strong>Összes bor frissítése (MI):</strong> kitölti a hiányzó régiót, országot, szőlőt, ivási időablakot, felszolgálási hőmérsékletet és árat az összes bornál (a webes változatban a palackképeket is). A meglévő értékek megmaradnak. Ha már vannak felszolgálási hőmérsékletek, az alkalmazás előbb megkérdezi, hogy azokat is MI-értékekre cserélje-e.</li>
+<li><strong>Ivási időablak újraszámítása:</strong> az „Iható ettől” értékét évjárat + 1 értékre állítja az összes évjáratos bornál (a kézzel megadott értékeket is felülírja), és szükség esetén igazítja az „Iható eddig” értéket. Az alkalmazás előbb kiírja a borok számát, és megerősítést kér. <em>Tipp: előbb exportálj JSON biztonsági mentést.</em></li>
+</ul>
+<h3>Polcok</h3>
+<p>Lásd a <a href="#racks">6. fejezetet</a>. A címsor a polcok számát mutatja.</p>
+<h3>Adatvédelem, támogatás, verzió</h3>
+<p>A hivatkozások az adatvédelmi nyilatkozatra és erre a támogatási oldalra vezetnek. Legalul találod az alkalmazás <strong>verzióját</strong> – kérjük, add meg, ha kapcsolatba lépsz velünk.</p>
+
+<!-- ───────────────── 12 ───────────────── -->
+<h2 id="sync">12. Két eszköz szinkronizálása</h2>
+
+<ol>
+<li><strong>Első eszköz:</strong> Beállítások → Tárolás helye → <em>Felhő</em> → <em>Új szinkronkód létrehozása</em>. A kód megjelenik a képernyőn; a <em>Kód mentése e-mailben</em> gombbal elküldheted magadnak.</li>
+<li><strong>Második eszköz:</strong> Beállítások → Tárolás helye → <em>Felhő</em> → add meg a kódot (kisbetűkkel, szóközök nélkül) → Csatlakozás. Ha az eszközön már vannak borok, az alkalmazás megkérdezi, egyesítse-e őket a felhőadatokkal.</li>
+<li>Ezután mindkét eszköz automatikusan szinkronizál (pl. az alkalmazás megnyitásakor); a <em>Szinkronizálás most</em> kézzel indítja el. A szabály: <strong>a legutóbbi módosítás nyer</strong>.</li>
+</ol>
+<p>A borok, a kívánságlista, a napló, a polcok és a beállítások, például a nyelv és a pénznem szinkronizálódnak. <strong>Nem szinkronizálódnak</strong> a saját fotók és az eszközspecifikus adatok. Aki ismeri a kódodat, látja a boraidat – csak megbízható emberekkel oszd meg. Készíts JSON biztonsági mentést is.</p>
+
+<!-- ───────────────── 13 ───────────────── -->
+<h2 id="privacy">13. MI, adatvédelem és költségek</h2>
+
+<ul>
+<li><strong>Mire használjuk az MI-t?</strong> Címke beolvasása, bor keresése, árak keresése és az „Összes bor frissítése”. A fotót vagy a bor nevét a szerverünkön keresztül elküldjük egy MI-szolgáltatásnak (Anthropic, USA) kiértékelésre – nevek és fiókok nélkül. Az alkalmazás az első használat előtt megkérdezi a hozzájárulásodat.</li>
+<li><strong>Vonalkód-beolvasás:</strong> csak a számot küldi el egy ingyenes termékadatbázisnak, és nem kerül MI-kreditbe.</li>
+<li><strong>Költségek (iPhone-alkalmazás):</strong> telepítésenként 50 MI-hívás benne van a vételárban; továbbiak opcionális, egyszeri vásárlással szerezhetők (nincs előfizetés, a kreditek nem járnak le). Az alkalmazásban minden más ingyenes. Ha a kreditek elfogytak, az MI-funkciókon kívül minden tovább működik.</li>
+<li><strong>Adatok:</strong> Minden az eszközödön marad, amíg nem kapcsolod be a felhőt. Nincs hirdetés, nincs követés, nincs felhasználói fiók. A részletek az <a href="datenschutz.html">adatvédelmi nyilatkozatban</a> (németül) találhatók.</li>
+</ul>
+
+<!-- ───────────────── 14 ───────────────── -->
+<h2 id="faq">14. Tippek és GYIK</h2>
+
+<ul>
+<li><strong>iPaden vagy számítógépen</strong> az elrendezés alkalmazkodik: szélesebb oszlop, több kártya egymás mellett, számítógépen (és fekvő iPaden) a navigáció a bal oldalon. A telefon is működik fekvő módban. Számítógépen az <kbd>Esc</kbd> bezárja a legfelső ablakot; telefonon húzd lefelé az ablakot a bezáráshoz.</li>
+<li><strong>Eltűntek a boraim:</strong> Lásd a <a href="support.html">Támogatást</a> – állítsd vissza a szinkronkóddal vagy egy JSON biztonsági mentéssel.</li>
+<li><strong>Nincs vonalkód-találat egy borhoz:</strong> Kis borászatoknál ez normális. Használd a címkebeolvasást.</li>
+<li><strong>Az MI félreolvasott valamit:</strong> Javítsd ki a mezőt kézzel, és mentsd el; az MI értékei javaslatok.</li>
+<li><strong>Az ivási időablak túl korainak/későinek tűnik:</strong> Ezek bortípus és szőlő szerinti hüvelykujjszabályok. Állítsd át az „Iható eddig” értéket boronként, ha jobban tudod.</li>
+<li><strong>Az oldal még a régi verziót mutatja (web):</strong> Töltsd újra az oldalt (számítógépen <kbd>Ctrl</kbd>+<kbd>F5</kbd>).</li>
+</ul>
+<p>További kérdésed van? Írj a <a href="mailto:t.knecht@web.de?subject=Weinkeller%20Felhaszn%C3%A1l%C3%B3i%20%C3%BAtmutat%C3%B3">t.knecht@web.de</a> címre, és add meg az alkalmazás verzióját (Beállítások, legalul).</p>
+
+<p style="margin-top:36px"><small>Weinkeller · Thomas Knecht · Scheidemannstr. 29 · 42781 Haan · Deutschland</small></p>
+
+</body></html>

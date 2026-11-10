@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide d'utilisation – Weinkeller</title>
+<style>
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Sans CJK SC","Noto Sans JP","Noto Sans KR","Noto Sans Devanagari",sans-serif;max-width:760px;margin:0 auto;padding:24px 18px 70px;line-height:1.6;color:#222;background:#fff}
+  h1{font-size:28px;margin:6px 0 4px} h2{font-size:20px;margin-top:34px;padding-top:6px;border-top:1px solid #e3e3e3} h3{font-size:16px;margin:20px 0 4px}
+  small{color:#666} a{color:#0a58ca} p{margin:8px 0} ul,ol{margin:6px 0 10px;padding-left:22px} li{margin:3px 0}
+  code,kbd{background:#f2f2f2;border-radius:4px;padding:1px 5px;font-size:.92em}
+  .tip,.note{border-left:4px solid #b88a2a;background:#fbf6ea;padding:8px 12px;border-radius:0 8px 8px 0;margin:12px 0}
+  .note{border-color:#0a58ca;background:#eef4fd}
+  .toc{background:#f7f7f7;border-radius:10px;padding:10px 16px;margin:16px 0} .toc ol{margin:4px 0}
+  .lang{position:sticky;top:0;background:#fff;padding:8px 0;margin:0 0 6px;border-bottom:1px solid #eee;z-index:5}
+  .lang select{font:inherit;font-size:15px;padding:5px 10px;border:1px solid #bbb;border-radius:16px;background:#fff;max-width:100%}
+  table{border-collapse:collapse;width:100%;margin:8px 0} td,th{border:1px solid #ddd;padding:6px 9px;text-align:left;vertical-align:top;font-size:15px} th{background:#f4f4f4}
+  .back{margin:0 0 6px}
+  @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
+</style></head><body>
+<p class="back"><a href="support.html">← Retour à l'assistance</a></p>
+<div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html">Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html" selected>Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
+
+<h1>Guide d'utilisation – Weinkeller</h1>
+<p><small>Mis à jour : 10 novembre 2026 · Version de l'app 2.0</small></p>
+
+<div class="toc">
+
+<strong>Sommaire</strong><ol>
+<li><a href="#start">Aperçu et premiers pas</a></li>
+<li><a href="#add">Ajouter un vin</a></li>
+<li><a href="#cellar">La cave</a></li>
+<li><a href="#drink">Boire un vin</a></li>
+<li><a href="#ripe">Fenêtre de dégustation (Maturité)</a></li>
+<li><a href="#racks">Casiers et rangement</a></li>
+<li><a href="#history">Historique</a></li>
+<li><a href="#wish">Liste de souhaits</a></li>
+<li><a href="#stats">Statistiques</a></li>
+<li><a href="#export">Export, import et sauvegarde</a></li>
+<li><a href="#setup">Réglages</a></li>
+<li><a href="#sync">Synchroniser deux appareils</a></li>
+<li><a href="#privacy">IA, confidentialité et coûts</a></li>
+<li><a href="#faq">Astuces et FAQ</a></li></ol>
+</div>
+
+<!-- ───────────────── 1 ───────────────── -->
+<h2 id="start">1. Aperçu et premiers pas</h2>
+
+<p>Weinkeller est votre cave à vin personnelle dans la poche : vous gérez le stock, les emplacements de rangement, les fenêtres de dégustation, une liste de souhaits et des statistiques. Tout fonctionne sur votre appareil ; un code de synchronisation permet de relier plusieurs appareils.</p>
+<p>En bas (sur PC et iPad en paysage : à gauche), vous trouvez la barre avec huit zones :</p>
+<table>
+<tbody><tr><th>Zone</th><th>Utilité</th></tr>
+<tr><td><strong>Cave</strong></td><td>Tous les vins, recherche, filtres, tri, ajouter un vin, boire</td></tr>
+<tr><td><strong>Stats</strong></td><td>Analyses du stock, des prix, de la maturité, du rangement et de l'historique de dégustation</td></tr>
+<tr><td><strong>Maturité</strong></td><td>Quels vins boire maintenant, bientôt ou plus du tout (“Maturité”)</td></tr>
+<tr><td><strong>Historique</strong></td><td>Les vins que vous avez bus</td></tr>
+<tr><td><strong>Casiers</strong></td><td>Plan de la cave : ranger et déplacer les vins, étiquettes QR</td></tr>
+<tr><td><strong>Liste de souhaits</strong></td><td>Les vins que vous voulez encore acheter</td></tr>
+<tr><td><strong>Export/Import</strong></td><td>Sauvegarder vos données, importer des tableaux et des sauvegardes</td></tr>
+<tr><td><strong>Réglages</strong></td><td>Nom, devise, langue, cloud, définir les casiers</td></tr>
+</tbody></table>
+<h3>Les cinq premières étapes</h3>
+<ol>
+<li><strong>Choisissez la langue et la devise</strong> : Réglages → Général. La devise suit automatiquement la langue.</li>
+<li><strong>Définissez des casiers</strong> (facultatif) : Réglages → Casiers (voir la <a href="#racks">section 6</a>).</li>
+<li><strong>Ajoutez votre premier vin</strong> : touchez <kbd>+</kbd> dans la cave (<a href="#add">section 2</a>).</li>
+<li><strong>Rangez-le</strong> : attribuez au vin un emplacement dans un casier.</li>
+<li><strong>Sauvegardez</strong> : Export/Import → Sauvegarde JSON, ou configurez la synchronisation cloud (<a href="#sync">section 12</a>).</li>
+</ol>
+<div class="tip">Les sections des <em>Réglages</em> sont repliables. « Général » est ouverte au premier lancement, les autres sont fermées. L'app se souvient de ce que vous avez ouvert ou fermé en dernier.</div>
+
+<!-- ───────────────── 2 ───────────────── -->
+<h2 id="add">2. Ajouter un vin</h2>
+
+<p>Touchez <kbd>+</kbd> dans la cave. Il y a plusieurs façons d'ajouter un vin, et elles peuvent se combiner.</p>
+<h3>a) À la main</h3>
+<p>Remplissez les champs : <strong>Nom / Domaine, Millésime, Bouteilles, Type de vin, Région, Pays, Cépage, Emplacement, Boire dès/jusqu'à, Température de service, Prix, Note, Remarque</strong>. Seul le nom est obligatoire. <em>Enregistrer</em> crée le vin.</p>
+<ul>
+<li><strong>Fenêtre de dégustation :</strong> Dès que vous saisissez le millésime, l'app règle « Boire dès » sur <strong>millésime + 1</strong>. « Boire jusqu'à » dépend du type de vin et du cépage (un rouge se garde plus longtemps qu'un rosé). Vous pouvez modifier les deux à tout moment.</li>
+<li><strong>Stock, Min et Max :</strong> Si vous indiquez un minimum, l'app vous avertit quand le stock passe en dessous et propose de mettre le vin sur la liste de souhaits (<a href="#cellar">section 3</a>).</li>
+<li><strong>Photo personnelle :</strong> « Prendre / choisir une photo » joint une photo au vin. Elle reste sur cet appareil et est incluse dans la sauvegarde JSON, mais n'est pas synchronisée avec le cloud.</li>
+</ul>
+<h3>b) Scanner l'étiquette (IA)</h3>
+<p>Touchez <em>Scanner l'étiquette (IA)</em> et photographiez l'étiquette de la bouteille. L'IA lit le nom, le millésime, le type, la région, le pays et le cépage, et estime la fenêtre de dégustation et la température de service. Vérifiez les valeurs et enregistrez. Avant la première utilisation, l'app demande votre consentement (<a href="#privacy">section 13</a>).</p>
+<h3>c) Scanner le code-barres</h3>
+<p>Touchez <em>Scanner le code-barres</em> et placez le code-barres de la bouteille dans le cadre. L'app recherche le numéro dans une base de données de produits gratuite (sans frais, sans crédit IA) et, s'il est trouvé, remplit le <strong>nom, le producteur et le type de vin</strong>. Elle complète le millésime à partir du nom ou vous le demande.</p>
+<ul>
+<li>Si la bouteille est déjà dans la cave, l'app demande « Ajouter une autre bouteille ? » – un moyen rapide d'incrémenter quand vous en rachetez.</li>
+<li>Si le code-barres n'est <strong>pas</strong> dans la base (fréquent pour les petits domaines), une indication avec le bouton <em>Scanner l'étiquette (IA)</em> apparaît. Le numéro est tout de même enregistré avec le vin, de sorte que la bouteille soit reconnue immédiatement la prochaine fois.</li>
+</ul>
+<h3>d) Rechercher le vin (IA)</h3>
+<p><em>Rechercher le vin (IA)</em> laisse l'IA chercher sur le web la région, le pays, le cépage, la fenêtre de dégustation, la température de service, le prix moyen actuel et – dans la version web – une image de la bouteille. Les champs que vous avez déjà remplis ne sont pas écrasés. Cela se fait aussi automatiquement dès que le nom et le millésime sont saisis et qu'il n'y a pas encore de prix.</p>
+<div class="note">L'app pour iPhone ne charge pas d'images de bouteilles depuis internet (règle de l'App Store). Vous pouvez prendre vos propres photos à la place.</div>
+
+<!-- ───────────────── 3 ───────────────── -->
+<h2 id="cellar">3. La cave</h2>
+
+<h3>Rechercher, filtrer, trier</h3>
+<ul>
+<li><strong>Recherche</strong> en haut : trouve les vins par nom, région, pays et cépage.</li>
+<li><strong>Filtres :</strong> Tous, Rouge, Blanc, Rosé, Mousseux, Autre. Un clic sur un type efface automatiquement la recherche.</li>
+<li><strong>Tri :</strong> Plus récents d'abord, Nom, Millésime, Cépage, Région, Pays ou Maturité (les plus urgents d'abord).</li>
+<li><strong>Liste / cartes :</strong> Le bouton <em>Liste</em> bascule entre une liste compacte et des cartes détaillées.</li>
+</ul>
+<h3>La carte du vin</h3>
+<p>La carte affiche le nom, le millésime, le cépage, la note (étoiles), la région et le pays (touchez pour ouvrir une carte ou les régions viticoles du pays), le nombre de bouteilles, la <strong>température de service</strong> (🌡), les <strong>emplacements</strong> (touchez pour aller au casier) et une <strong>barre de maturité</strong> aux couleurs Jeune, Optimal, Apogée, Dépassé. Le symbole du cépage ouvre Wikipedia pour ce cépage.</p>
+<p>En bas de la carte : <em>Modifier</em>, <em>Boire</em> et 🗑 (supprimer le vin).</p>
+<h3>Stock, Min/Max et la liste de courses</h3>
+<p>Si vous indiquez un minimum (et éventuellement un maximum) pour un vin, la carte affiche « Stock · Min · Max » et vous avertit par ⚠ quand vous êtes en dessous. Le bouton <em>À racheter</em> ouvre la <strong>liste de courses</strong> : elle recense tous les vins sous leur minimum (la cible est le maximum, sinon le minimum). Vous pouvez partager ou copier la liste, ou mettre les vins sur la liste de souhaits.</p>
+
+<!-- ───────────────── 4 ───────────────── -->
+<h2 id="drink">4. Boire un vin</h2>
+
+<p>Touchez <em>Boire</em> sur la carte du vin (ou « Boire · n bt. » dans Maturité). La boîte de dialogue <em>Boire un vin</em> s'ouvre :</p>
+<ul>
+<li><strong>Prise de quel emplacement ?</strong> – choisissez l'emplacement du casier d'où vient la bouteille, ou « Bouteille non rangée ». L'emplacement se libère.</li>
+<li><strong>Avec qui l'avez-vous bu ?</strong> – noms de vos invités (facultatif).</li>
+<li><strong>Occasion</strong> – Printemps, Été, Automne, Hiver, Anniversaire, Fête ou « Sans raison » (plusieurs choix possibles).</li>
+</ul>
+<p><em>Boire</em> retire une bouteille et crée une entrée dans l'<a href="#history">Historique</a>. Confettis et son marquent le moment (désactivables dans les Réglages). S'il s'agit de la <strong>dernière bouteille</strong>, l'app vous le signale : le vin disparaît alors de la cave (mais reste dans l'Historique).</p>
+<div class="tip"><strong>Rapide par scan :</strong> Le bouton rond 🥂 dans la cave photographie une étiquette, reconnaît le vin dans votre cave et ouvre aussitôt la boîte de dialogue Boire.</div>
+
+<!-- ───────────────── 5 ───────────────── -->
+<h2 id="ripe">5. Fenêtre de dégustation (Maturité)</h2>
+
+<p>Vous voyez ici tous les vins ayant une fenêtre de dégustation, <strong>les plus urgents d'abord</strong>. Chaque carte affiche le nom, le millésime, le type, <strong>Boire dès/jusqu'à</strong>, la température de service, l'emplacement et une barre avec un repère pour l'année en cours.</p>
+<table>
+<tbody><tr><th>État</th><th>Signification</th></tr>
+<tr><td><strong>Jeune</strong></td><td>Trop tôt – avant « Boire dès »</td></tr>
+<tr><td><strong>Optimal</strong></td><td>Buvable, encore dans la première partie de la fenêtre</td></tr>
+<tr><td><strong>Apogée</strong></td><td>À son sommet – à boire bientôt</td></tr>
+<tr><td><strong>Dépassé</strong></td><td>Après « Boire jusqu'à » – à boire dès que possible</td></tr>
+</tbody></table>
+<p><strong>Filtres :</strong> par type de vin, par état et par <strong>pays</strong> (liste déroulante avec le nombre par pays ; les pays sans résultat sont grisés). Les filtres peuvent être combinés. Touchez une carte pour ouvrir le vin dans la cave.</p>
+<p><strong>La règle de la fenêtre :</strong> « Boire dès » = millésime + 1. « Boire jusqu'à » dépend du type de vin et du cépage. Si vous avez des vins plus anciens avec d'autres valeurs, vous pouvez tous les recalculer d'un coup dans les Réglages (<a href="#setup">section 11</a>, « Recalculer la fenêtre de dégustation »).</p>
+
+<!-- ───────────────── 6 ───────────────── -->
+<h2 id="racks">6. Casiers et rangement</h2>
+
+<h3>Définir et modifier des casiers</h3>
+<p><strong>Réglages → Casiers</strong> (touchez le titre pour ouvrir) : saisissez le nom, les niveaux, les emplacements par niveau et les bouteilles par emplacement, puis touchez ＋. « Bouteilles/empl. » vaut 1 pour un casier à bouteilles et plus pour un sol ou une caisse. Dans la liste, chaque casier propose :</p>
+<ul>
+<li>la <strong>poignée ⠿</strong> pour changer l'ordre, et le bouton <em>Trier de A à Z</em> sous la liste,</li>
+<li>▦ pour les <strong>étiquettes QR</strong>, ✏️ pour modifier, 🧹 pour vider et 🗑 pour supprimer.</li>
+</ul>
+<p>Avec <strong>modifier</strong> (✏️), vous pouvez renommer le casier, changer les emplacements par niveau, ajouter des niveaux en haut ou en bas, supprimer des niveaux et donner à chaque niveau son propre nom et son nombre de bouteilles. Les bouteilles qui perdent ainsi leur emplacement comptent ensuite comme « non rangées » ; les vins eux-mêmes restent dans la cave. L'app demande confirmation avant de tels changements.</p>
+<h3>La zone Casiers</h3>
+<p>En haut, vous choisissez un casier avec les <strong>pastilles</strong> (nom et « occupés / emplacements »). L'ordre peut aussi être modifié ici : sur PC, faites glisser une pastille ; sur écran tactile, maintenez une pastille appuyée environ une demi-seconde, puis faites-la glisser. En dessous se trouve le <strong>plan de la cave</strong> : chaque niveau avec ses emplacements. Les emplacements occupés montrent une bouteille couchée à la couleur du type de vin.</p>
+<h3>Ranger</h3>
+<ol>
+<li>Touchez un vin sous « Non placés » (la liste peut être filtrée par type et pays) – ou touchez une indication « non rangé » dans la cave.</li>
+<li>Touchez un <strong>emplacement libre</strong>. Pour les sols et les caisses, l'app range autant de bouteilles que possible.</li>
+</ol>
+<p><strong>Scanner le vin et le ranger</strong> photographie l'étiquette, trouve le vin et vous guide pour le rangement.</p>
+<h3>Emplacements occupés, déplacer, retirer</h3>
+<p>Touchez un emplacement occupé : vous voyez le vin et pouvez l'<em>ouvrir</em>, le <em>retirer de l'emplacement</em> ou le <em>déplacer</em> (touchez ensuite un emplacement libre). <em>Vider l’étagère</em> retire toutes les bouteilles du casier (après confirmation).</p>
+<h3>Clignotement</h3>
+<p>Les interrupteurs <em>Clignoter</em> font clignoter les bouteilles qui doivent être <strong>bues en premier</strong> (dépassées ou en fin de fenêtre l'an prochain au plus tard), celles qui sont dépassées, à leur apogée ou optimales – pour les repérer d'un coup d'œil dans le casier.</p>
+<h3>Étiquettes QR et « Scanner un niveau »</h3>
+<p>Avec les <strong>étiquettes QR</strong> (Réglages → Casiers → ▦), vous créez une étiquette pour le casier et une pour chaque niveau. Partagez-les en PDF ou imprimez-les (planche d'étiquettes de 63,5 × 38,1 mm, 21 par page) et collez-les. Ensuite : <strong>Scanner un niveau</strong> dans la zone Casiers – vous voyez ce qui se trouve sur ce niveau et pouvez <em>ranger ici</em>, <em>retirer</em>, boire, déplacer une bouteille ou <em>déplacer tout le niveau</em>. Dans le formulaire « Ajouter un vin », scanner une étiquette de niveau renseigne aussi l'emplacement.</p>
+
+<!-- ───────────────── 7 ───────────────── -->
+<h2 id="history">7. Historique</h2>
+
+<p>L'Historique liste tous les vins que vous avez bus avec la date, le vin, la valeur, les invités et l'occasion. Vous pouvez filtrer par type de vin et occasion et modifier une entrée (invités, occasion). L'Historique alimente les analyses « Bu par mois/année », les dépenses et la fréquence dans les Stats.</p>
+
+<!-- ───────────────── 8 ───────────────── -->
+<h2 id="wish">8. Liste de souhaits</h2>
+
+<ul>
+<li><strong>+ Ajouter un souhait</strong> : à la main ou par scan d'étiquette, avec une remarque facultative (« Où acheter ? »).</li>
+<li><strong>Chercher les prix</strong> (💶) : L'app cherche sur le web les prix du vin, affiche le résultat le moins cher et le multiplie par la quantité. Ce sont des valeurs indicatives, sans garantie – vérifiez les frais de port et la disponibilité auprès du magasin.</li>
+<li><strong>Case</strong> à gauche : marquer comme acheté/terminé (la ligne s'estompe).</li>
+<li><strong>→ Cave</strong> : déplace le souhait dans la cave (avec la quantité et, s'il existe, le prix le plus bas) et, si vous avez des casiers, vous mène directement au rangement.</li>
+<li>Si un vin passe sous son minimum, l'app propose de le mettre sur la liste de souhaits avec la quantité manquante (« à racheter »).</li>
+</ul>
+
+<!-- ───────────────── 9 ───────────────── -->
+<h2 id="stats">9. Statistiques</h2>
+
+<p>De haut en bas :</p>
+<ul>
+<li><strong>Chiffres clés :</strong> bouteilles, vins, valeur totale, note moyenne.</li>
+<li><strong>Fenêtre de dégustation :</strong> bouteilles par état (Jeune, Optimal, Apogée, Dépassé) avec un avertissement pour les bouteilles dépassées ; un appui ouvre Maturité avec le filtre correspondant.</li>
+<li><strong>Par type</strong> et <strong>Meilleurs vins</strong> (par note ou fréquence, filtrables par étoiles).</li>
+<li><strong>Par pays, région, cépage :</strong> barres (jusqu'à 8, le reste en « +n de plus ») ; un appui lance la recherche dans la cave. <strong>Par millésime :</strong> colonnes, défilables latéralement.</li>
+<li><strong>Prix :</strong> moyenne par bouteille, la moins chère, la plus chère, tranches de prix (adaptées à votre devise) et valeur par pays.</li>
+<li><strong>Stockage :</strong> taux d'occupation en pourcentage, emplacements libres, bouteilles non rangées et une barre par casier (un appui mène au casier).</li>
+<li><strong>Bu :</strong> par mois (12 derniers) et par année, plus les dépenses pour les bouteilles bues.</li>
+<li><strong>Meilleurs pays et cépages</strong> selon la note moyenne (cave et Historique réunis).</li>
+<li><strong>À racheter :</strong> vins sous le stock minimum (ouvre la liste de courses), souhaits en cours et leur valeur.</li>
+</ul>
+<p>Les sections sans données (par exemple sans prix) sont masquées.</p>
+
+<!-- ───────────────── 10 ───────────────── -->
+<h2 id="export">10. Export, import et sauvegarde</h2>
+
+<table>
+<tbody><tr><th>Fonction</th><th>Utilité</th></tr>
+<tr><td>Exporter CSV</td><td>Tableau pour Excel ou Numbers</td></tr>
+<tr><td>Exporter Excel</td><td>Sous forme de fichier .xlsx</td></tr>
+<tr><td>Exporter PDF</td><td>Aperçu imprimable</td></tr>
+<tr><td><strong>Sauvegarde JSON</strong></td><td><strong>Sauvegarde complète des données</strong> (vins, liste de souhaits, historique, casiers, nom affiché, photos personnelles)</td></tr>
+<tr><td>Dans le presse-papiers</td><td>Copier une liste en texte</td></tr>
+<tr><td>Importer JSON / CSV / Excel</td><td>Restaurer une sauvegarde ou importer un tableau</td></tr>
+</tbody></table>
+<div class="tip"><strong>Faites régulièrement une sauvegarde JSON.</strong> L'import JSON remplace la cave par la sauvegarde (l'app demande d'abord). Sur un nouvel appareil, cela restaure tout. Vous pouvez aussi utiliser la synchronisation cloud (<a href="#sync">section 12</a>).</div>
+
+<!-- ───────────────── 11 ───────────────── -->
+<h2 id="setup">11. Réglages</h2>
+
+<h3>Général</h3>
+<ul>
+<li><strong>Nom affiché (titre) :</strong> « Peter » devient « Weinkeller de Peter », etc. Laissez vide pour le titre par défaut.</li>
+<li><strong>Devise :</strong> €, $, £, CHF, A$, C$, SEK, NOK, DKK, PLN, HUF, CZK, RON, RUB, UAH, JPY, CNY, KRW, INR.</li>
+<li><strong>Langue :</strong> 25 variantes linguistiques, dont l'allemand, l'anglais, l'anglais (États-Unis) et bien d'autres. <strong>La devise change automatiquement</strong> (suédois → couronne, anglais (États-Unis) → US $, anglais (Royaume-Uni) → £). Exemple : quand vous passez au suédois, l'app bascule sur SEK et demande si elle doit <strong>convertir tous les prix au taux du jour de la Banque centrale européenne</strong> (« OK ») ou seulement changer l'intitulé (« Annuler »). Il n'y a pas de taux pour RUB et UAH. Vous pouvez changer la devise à la main à tout moment.</li>
+<li><strong>Confettis et son en buvant :</strong> les deux, confettis seuls ou désactivé.</li>
+<li><strong>Police :</strong> dix polices au choix.</li>
+<li><strong>Unité de température :</strong> °C ou °F (l'anglais (États-Unis) règle automatiquement sur °F).</li>
+</ul>
+<h3>Stockage</h3>
+<p><em>Cet appareil uniquement</em> ou <em>Cloud</em> (code de sync, <a href="#sync">section 12</a>).</p>
+<h3>Crédits IA (app iPhone uniquement)</h3>
+<p>Affiche les scans IA restants, l'ID de l'appareil et – si nécessaire – <em>Recharger des crédits</em> ou un code de déverrouillage. Voir la <a href="#privacy">section 13</a>.</p>
+<h3>Base de vins</h3>
+<ul>
+<li><strong>Mettre à jour tous les vins (IA) :</strong> renseigne la région, le pays, le cépage, la fenêtre de dégustation, la température de service et le prix manquants pour tous les vins (dans la version web aussi les images de bouteilles). Les valeurs existantes sont conservées. Si des températures de service existent déjà, l'app demande d'abord si elles doivent aussi être remplacées par des valeurs de l'IA.</li>
+<li><strong>Recalculer la fenêtre de dégustation :</strong> règle « Boire dès » sur millésime + 1 pour tous les vins ayant un millésime (les valeurs saisies à la main sont aussi écrasées) et ajuste « Boire jusqu'à » si nécessaire. L'app indique d'abord le nombre de vins et demande confirmation. <em>Astuce : exportez d'abord une sauvegarde JSON.</em></li>
+</ul>
+<h3>Casiers</h3>
+<p>Voir la <a href="#racks">section 6</a>. Le titre indique le nombre de casiers.</p>
+<h3>Confidentialité, assistance, version</h3>
+<p>Les liens mènent à la politique de confidentialité et à cette page d'assistance. Tout en bas, vous trouvez la <strong>version</strong> de l'app – merci de l'indiquer quand vous nous contactez.</p>
+
+<!-- ───────────────── 12 ───────────────── -->
+<h2 id="sync">12. Synchroniser deux appareils</h2>
+
+<ol>
+<li><strong>Premier appareil :</strong> Réglages → Stockage → <em>Cloud</em> → <em>Créer un nouveau code de sync</em>. Le code s'affiche à l'écran ; avec <em>Sauvegarder le code par e-mail</em>, vous vous l'envoyez à vous-même.</li>
+<li><strong>Deuxième appareil :</strong> Réglages → Stockage → <em>Cloud</em> → saisissez le code (en minuscules, sans espaces) → Connecter. Si l'appareil contient déjà des vins, l'app demande s'il faut les fusionner avec les données du cloud.</li>
+<li>Ensuite, les deux appareils se synchronisent automatiquement (par exemple à l'ouverture de l'app) ; <em>Synchroniser maintenant</em> le déclenche à la main. La règle est : <strong>la dernière modification l'emporte</strong>.</li>
+</ol>
+<p>Les vins, la liste de souhaits, l'historique, les casiers et les réglages comme la langue et la devise sont synchronisés. Les photos personnelles et les données propres à l'appareil <strong>ne sont pas synchronisées</strong>. Toute personne qui connaît votre code peut voir vos vins – ne le partagez qu'avec des personnes de confiance. Conservez aussi une sauvegarde JSON.</p>
+
+<!-- ───────────────── 13 ───────────────── -->
+<h2 id="privacy">13. IA, confidentialité et coûts</h2>
+
+<ul>
+<li><strong>À quoi sert l'IA ?</strong> Scanner l'étiquette, rechercher le vin, chercher les prix et « Mettre à jour tous les vins ». La photo ou le nom du vin est envoyé via notre serveur à un service d'IA (Anthropic, États-Unis) pour analyse – sans noms ni comptes. L'app demande votre consentement avant la première utilisation.</li>
+<li><strong>Le scan de code-barres</strong> envoie seulement le numéro à une base de données de produits gratuite et ne coûte aucun crédit IA.</li>
+<li><strong>Coûts (app iPhone) :</strong> 50 appels d'IA par installation sont inclus dans le prix d'achat ; il est possible d'en acheter d'autres via un achat unique facultatif (sans abonnement, les crédits n'expirent pas). Tout le reste de l'app est gratuit. Quand les crédits sont épuisés, tout continue de fonctionner sauf les fonctions d'IA.</li>
+<li><strong>Données :</strong> Tout reste sur votre appareil tant que vous n'activez pas le cloud. Pas de publicité, pas de suivi, pas de compte utilisateur. Détails dans la <a href="datenschutz.html">politique de confidentialité</a> (en allemand).</li>
+</ul>
+
+<!-- ───────────────── 14 ───────────────── -->
+<h2 id="faq">14. Astuces et FAQ</h2>
+
+<ul>
+<li><strong>Sur iPad ou PC</strong>, la mise en page s'adapte : colonne plus large, plusieurs cartes côte à côte et, sur PC (et iPad en paysage), la navigation à gauche. Le téléphone fonctionne aussi en paysage. Sur PC, <kbd>Esc</kbd> ferme la fenêtre du dessus ; sur téléphone, faites glisser une fenêtre vers le bas pour la fermer.</li>
+<li><strong>Mes vins ont disparu :</strong> Voir l'<a href="support.html">Assistance</a> – restaurez avec le code de synchronisation ou une sauvegarde JSON.</li>
+<li><strong>Aucun résultat de code-barres pour un vin :</strong> C'est normal pour les petits domaines. Utilisez le scan d'étiquette.</li>
+<li><strong>L'IA a mal lu quelque chose :</strong> Corrigez le champ à la main et enregistrez ; les valeurs de l'IA ne sont que des suggestions.</li>
+<li><strong>La fenêtre de dégustation semble trop précoce/tardive :</strong> Ce sont des règles empiriques selon le type de vin et le cépage. Ajustez « Boire jusqu'à » pour chaque vin si vous en savez plus.</li>
+<li><strong>La page affiche encore l'ancienne version (web) :</strong> Rechargez la page (sur PC <kbd>Ctrl</kbd>+<kbd>F5</kbd>).</li>
+</ul>
+<p>D'autres questions ? Écrivez à <a href="mailto:t.knecht@web.de?subject=Weinkeller%20Guide%20d%27utilisation">t.knecht@web.de</a> en indiquant la version de l'app (Réglages, tout en bas).</p>
+
+<p style="margin-top:36px"><small>Weinkeller · Thomas Knecht · Scheidemannstr. 29 · 42781 Haan · Allemagne</small></p>
+
+</body></html>

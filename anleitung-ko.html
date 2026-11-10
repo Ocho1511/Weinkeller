@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>사용 설명서 – Weinkeller</title>
+<style>
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Sans CJK SC","Noto Sans JP","Noto Sans KR","Noto Sans Devanagari",sans-serif;max-width:760px;margin:0 auto;padding:24px 18px 70px;line-height:1.6;color:#222;background:#fff}
+  h1{font-size:28px;margin:6px 0 4px} h2{font-size:20px;margin-top:34px;padding-top:6px;border-top:1px solid #e3e3e3} h3{font-size:16px;margin:20px 0 4px}
+  small{color:#666} a{color:#0a58ca} p{margin:8px 0} ul,ol{margin:6px 0 10px;padding-left:22px} li{margin:3px 0}
+  code,kbd{background:#f2f2f2;border-radius:4px;padding:1px 5px;font-size:.92em}
+  .tip,.note{border-left:4px solid #b88a2a;background:#fbf6ea;padding:8px 12px;border-radius:0 8px 8px 0;margin:12px 0}
+  .note{border-color:#0a58ca;background:#eef4fd}
+  .toc{background:#f7f7f7;border-radius:10px;padding:10px 16px;margin:16px 0} .toc ol{margin:4px 0}
+  .lang{position:sticky;top:0;background:#fff;padding:8px 0;margin:0 0 6px;border-bottom:1px solid #eee;z-index:5}
+  .lang select{font:inherit;font-size:15px;padding:5px 10px;border:1px solid #bbb;border-radius:16px;background:#fff;max-width:100%}
+  table{border-collapse:collapse;width:100%;margin:8px 0} td,th{border:1px solid #ddd;padding:6px 9px;text-align:left;vertical-align:top;font-size:15px} th{background:#f4f4f4}
+  .back{margin:0 0 6px}
+  @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
+</style></head><body>
+<p class="back"><a href="support.html">← 지원으로 돌아가기</a></p>
+<div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html">Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html" selected>한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
+
+<h1>사용 설명서 – Weinkeller</h1>
+<p><small>업데이트: 2026년 11월 10일 · 앱 버전 2.0</small></p>
+
+<div class="toc">
+
+<strong>목차</strong><ol>
+<li><a href="#start">개요와 첫 단계</a></li>
+<li><a href="#add">와인 추가하기</a></li>
+<li><a href="#cellar">셀러</a></li>
+<li><a href="#drink">와인 마시기</a></li>
+<li><a href="#ripe">음용 적기</a></li>
+<li><a href="#racks">랙과 보관</a></li>
+<li><a href="#history">기록</a></li>
+<li><a href="#wish">위시리스트</a></li>
+<li><a href="#stats">통계</a></li>
+<li><a href="#export">내보내기, 가져오기, 백업</a></li>
+<li><a href="#setup">설정</a></li>
+<li><a href="#sync">두 기기 동기화하기</a></li>
+<li><a href="#privacy">AI, 개인정보, 비용</a></li>
+<li><a href="#faq">팁과 자주 묻는 질문</a></li></ol>
+</div>
+
+<!-- ───────────────── 1 ───────────────── -->
+<h2 id="start">1. 개요와 첫 단계</h2>
+
+<p>Weinkeller는 주머니 속에 들어 있는 나만의 와인 셀러입니다. 재고, 보관 위치, 음용 적기, 위시리스트, 통계를 관리할 수 있습니다. 모든 것이 내 기기에서 작동하며, 동기화 코드를 사용하면 여러 기기를 연결할 수 있습니다.</p>
+<p>화면 하단(PC와 가로 방향 iPad에서는 왼쪽)에 여덟 개의 영역이 있는 바가 있습니다.</p>
+<table>
+<tbody><tr><th>영역</th><th>용도</th></tr>
+<tr><td><strong>셀러</strong></td><td>모든 와인, 검색, 필터, 정렬, 와인 추가, 마시기</td></tr>
+<tr><td><strong>통계</strong></td><td>재고, 가격, 적기, 보관, 마신 기록에 대한 분석</td></tr>
+<tr><td><strong>적기</strong></td><td>지금 마실 와인, 곧 마실 와인, 이미 늦은 와인(“음용 적기”)</td></tr>
+<tr><td><strong>기록</strong></td><td>마신 와인</td></tr>
+<tr><td><strong>랙</strong></td><td>셀러 배치도: 와인 보관과 이동, QR 라벨</td></tr>
+<tr><td><strong>위시</strong></td><td>앞으로 사고 싶은 와인</td></tr>
+<tr><td><strong>백업</strong></td><td>데이터 백업, 표와 백업 파일 가져오기</td></tr>
+<tr><td><strong>설정</strong></td><td>이름, 통화, 언어, 클라우드, 랙 정의</td></tr>
+</tbody></table>
+<h3>처음 다섯 단계</h3>
+<ol>
+<li><strong>언어와 통화 선택</strong>: 설정 → 일반. 통화는 언어에 따라 자동으로 바뀝니다.</li>
+<li><strong>랙 정의</strong>(선택 사항): 설정 → 랙(<a href="#racks">6장</a> 참조).</li>
+<li><strong>첫 와인 추가</strong>: 셀러에서 <kbd>+</kbd>를 탭합니다(<a href="#add">2장</a>).</li>
+<li><strong>보관하기</strong>: 와인에 랙의 칸을 지정합니다.</li>
+<li><strong>백업</strong>: 백업 → JSON 백업을 하거나 클라우드 동기화를 설정합니다(<a href="#sync">12장</a>).</li>
+</ol>
+<div class="tip">“<em>설정</em>” 섹션은 접었다 펼 수 있습니다. 처음 시작할 때는 “일반”이 열려 있고 나머지는 닫혀 있습니다. 앱은 마지막으로 열거나 닫은 상태를 기억합니다.</div>
+
+<!-- ───────────────── 2 ───────────────── -->
+<h2 id="add">2. 와인 추가하기</h2>
+
+<p>셀러에서 <kbd>+</kbd>를 탭합니다. 와인을 추가하는 방법은 여러 가지이며, 함께 사용할 수도 있습니다.</p>
+<h3>a) 직접 입력</h3>
+<p>항목을 입력합니다: <strong>이름 / 와이너리, 빈티지, 병 수, 와인 종류, 지역, 국가, 품종, 보관 위치, 마시기 시작/종료, 음용 온도, 가격, 평점, 메모</strong>. 필수 항목은 이름뿐입니다. <em>저장</em>을 누르면 와인이 만들어집니다.</p>
+<ul>
+<li><strong>음용 적기:</strong> 빈티지를 입력하면 곧바로 앱이 “마시기 시작”을 <strong>빈티지 + 1</strong>로 설정합니다. “마시기 종료”는 와인 종류와 품종에 따라 달라집니다(레드는 로제보다 오래 보관됩니다). 두 값 모두 언제든지 바꿀 수 있습니다.</li>
+<li><strong>재고, 최소, 최대:</strong> 최소 수량을 입력하면 재고가 그 아래로 떨어질 때 앱이 경고하고, 와인을 위시리스트에 올릴지 물어봅니다(<a href="#cellar">3장</a>).</li>
+<li><strong>내 사진:</strong> “사진 촬영 / 선택”으로 와인에 사진을 첨부합니다. 사진은 이 기기에 남고 JSON 백업에는 포함되지만, 클라우드에는 동기화되지 않습니다.</li>
+</ul>
+<h3>b) 라벨 스캔 (AI)</h3>
+<p>추가 화면에서 <em>라벨 스캔 (AI)</em>을 탭하고 병의 라벨을 촬영합니다. AI가 이름, 빈티지, 종류, 지역, 국가, 품종을 읽고 음용 적기와 음용 온도를 추정합니다. 값을 확인한 뒤 저장하세요. 처음 사용하기 전에 앱이 동의를 요청합니다(<a href="#privacy">13장</a>).</p>
+<h3>c) 바코드 스캔</h3>
+<p>추가 화면에서 <em>바코드 스캔</em>을 탭하고 병의 바코드를 프레임 안에 맞춥니다. 앱이 무료 제품 데이터베이스에서 번호를 조회하고(비용 없음, AI 크레딧 소모 없음), 찾으면 <strong>이름, 생산자, 와인 종류</strong>를 채워 줍니다. 빈티지는 이름에서 보완하거나 직접 입력하도록 요청합니다.</p>
+<ul>
+<li>이미 셀러에 있는 병이면 앱이 “병을 하나 더 추가할까요?”라고 묻습니다. 더 구입했을 때 수량을 빠르게 늘리는 방법입니다.</li>
+<li>바코드가 데이터베이스에 <strong>없는</strong> 경우(규모가 작은 와이너리에서 흔함), <em>라벨 스캔 (AI)</em> 버튼이 있는 안내가 나타납니다. 번호는 와인과 함께 저장되므로 다음번에는 병을 바로 알아봅니다.</li>
+</ul>
+<h3>d) 와인 검색 (AI)</h3>
+<p><em>와인 검색 (AI)</em>는 AI가 웹에서 지역, 국가, 품종, 음용 적기, 음용 온도, 현재 평균 가격, 그리고 웹 버전에서는 병 이미지까지 검색하는 기능입니다. 이미 입력한 항목은 덮어쓰지 않습니다. 이름과 빈티지를 입력했고 아직 가격이 없으면 자동으로도 실행됩니다.</p>
+<div class="note">iPhone 앱은 인터넷에서 병 이미지를 불러오지 않습니다(App Store 규정). 대신 직접 사진을 찍어 사용할 수 있습니다.</div>
+
+<!-- ───────────────── 3 ───────────────── -->
+<h2 id="cellar">3. 셀러</h2>
+
+<h3>검색, 필터, 정렬</h3>
+<ul>
+<li><strong>검색</strong>: 상단의 검색창에서 이름, 지역, 국가, 품종으로 와인을 찾습니다.</li>
+<li><strong>필터:</strong> 전체, 레드, 화이트, 로제, 스파클링, 기타. 종류를 탭하면 검색이 자동으로 지워집니다.</li>
+<li><strong>정렬:</strong> 최신순, 이름, 빈티지, 품종, 지역, 국가, 숙성도(급한 순).</li>
+<li><strong>목록 / 카드:</strong> 상단의 <em>목록</em> 버튼으로 간단한 목록과 상세 카드를 전환합니다.</li>
+</ul>
+<h3>와인 카드</h3>
+<p>카드에는 이름, 빈티지, 품종, 평점(별), 지역과 국가(탭하면 지도 또는 해당 국가의 와인 산지가 열림), 병 수, <strong>음용 온도</strong>(🌡), <strong>보관 위치</strong>(탭하면 해당 랙으로 이동), 그리고 “숙성 전”, “적기”, “절정”, “기한 초과” 색상으로 표시되는 <strong>적기 바</strong>가 나타납니다. 품종 아이콘을 탭하면 해당 품종의 Wikipedia가 열립니다.</p>
+<p>카드 하단: <em>수정</em>, <em>마시기</em>, 🗑(와인 삭제).</p>
+<h3>재고, 최소/최대, 장보기 목록</h3>
+<p>와인에 최소 수량(선택적으로 최대 수량도)을 입력하면 카드에 “재고 · 최소 · 최대”가 표시되고, 그 아래로 내려가면 ⚠로 경고합니다. <em>재주문</em> 버튼을 누르면 <strong>장보기 목록</strong>이 열립니다: 최소 수량 미만인 모든 와인이 나열됩니다(목표는 최대 수량이며, 없으면 최소 수량). 목록을 공유하거나 복사하거나, 와인을 위시리스트에 올릴 수 있습니다.</p>
+
+<!-- ───────────────── 4 ───────────────── -->
+<h2 id="drink">4. 와인 마시기</h2>
+
+<p>와인 카드의 <em>마시기</em>(또는 적기의 “마시기 · n병”)를 탭합니다. <em>와인 마시기</em> 대화상자가 열립니다:</p>
+<ul>
+<li><strong>어느 칸에서 꺼냈나요?</strong> – 병을 꺼낸 랙의 칸을 선택하거나 “칸에 없는 병”을 선택합니다. 그 칸은 비워집니다.</li>
+<li><strong>누구와 마셨나요?</strong> – 함께한 사람들의 이름(선택 사항).</li>
+<li><strong>계기</strong> – 봄, 여름, 가을, 겨울, 생일, 파티 또는 “그냥”(여러 개 선택 가능).</li>
+</ul>
+<p><em>마시기</em>를 누르면 병이 하나 줄고 <a href="#history">기록</a>에 항목이 만들어집니다. 색종이와 소리로 축하합니다(설정에서 끌 수 있음). <strong>마지막 병</strong>이면 앱이 알려 줍니다: 그 와인은 셀러에서 사라집니다(기록에는 남습니다).</p>
+<div class="tip"><strong>스캔으로 빠르게:</strong> 셀러의 둥근 🥂 버튼을 누르면 라벨을 촬영해 셀러 안의 와인을 인식하고 곧바로 마시기 대화상자를 엽니다.</div>
+
+<!-- ───────────────── 5 ───────────────── -->
+<h2 id="ripe">5. 음용 적기</h2>
+
+<p>여기에서는 음용 적기가 있는 모든 와인을 <strong>급한 순</strong>으로 볼 수 있습니다. 각 카드에는 이름, 빈티지, 종류, <strong>마시기 시작/종료</strong>, 음용 온도, 보관 위치, 그리고 올해 위치를 표시한 바가 나타납니다.</p>
+<table>
+<tbody><tr><th>상태</th><th>의미</th></tr>
+<tr><td><strong>숙성 전</strong></td><td>너무 이름 – “마시기 시작” 이전</td></tr>
+<tr><td><strong>적기</strong></td><td>마실 수 있음, 아직 적기의 앞부분</td></tr>
+<tr><td><strong>절정</strong></td><td>가장 좋은 시기 – 곧 마시세요</td></tr>
+<tr><td><strong>기한 초과</strong></td><td>“마시기 종료” 이후 – 가능한 한 빨리 마시세요</td></tr>
+</tbody></table>
+<p><strong>필터:</strong> 와인 종류, 상태, <strong>국가</strong>(국가별 개수가 표시되는 드롭다운, 해당 와인이 없는 국가는 회색으로 표시)로 거를 수 있습니다. 필터는 함께 사용할 수 있습니다. 카드를 탭하면 셀러에서 그 와인이 열립니다.</p>
+<p><strong>적기 계산 규칙:</strong> “마시기 시작” = 빈티지 + 1. “마시기 종료”는 와인 종류와 품종에 따라 달라집니다. 다른 값이 들어 있는 오래된 와인이 있으면 설정(<a href="#setup">11장</a>, “음용 시기 다시 계산”)에서 한 번에 모두 다시 계산할 수 있습니다.</p>
+
+<!-- ───────────────── 6 ───────────────── -->
+<h2 id="racks">6. 랙과 보관</h2>
+
+<h3>랙 정의와 수정</h3>
+<p><strong>설정 → 랙</strong>(제목을 탭하면 열림): 이름, 단 수, 단당 칸 수, 칸당 병 수를 입력한 다음 ＋를 탭합니다. “칸당 병 수”는 와인 랙에서는 1이고, 바닥이나 상자에서는 더 큰 값입니다. 목록에서 각 랙에는 다음이 있습니다:</p>
+<ul>
+<li>순서를 바꾸려면 <strong>핸들 ⠿</strong>을 드래그하고, 목록 아래의 <em>A–Z 정렬</em> 버튼도 사용할 수 있습니다,</li>
+<li>▦는 <strong>QR 라벨</strong>, ✏️는 수정, 🧹는 비우기, 🗑는 삭제입니다.</li>
+</ul>
+<p>랙의 <strong>수정</strong>(✏️)에서는 랙 이름 변경, 단당 칸 수 변경, 위나 아래에 단 추가, 단 삭제, 각 단에 고유한 이름과 병 수 지정을 할 수 있습니다. 이 과정에서 칸을 잃은 병은 이후 “미배정”으로 처리되며, 와인 자체는 셀러에 그대로 남습니다. 이런 변경 전에는 앱이 확인을 요청합니다.</p>
+<h3>랙 영역</h3>
+<p>상단에서 <strong>타일</strong>(이름과 “사용 중 / 칸 수”)로 랙을 선택합니다. 순서는 여기에서도 바꿀 수 있습니다: PC에서는 타일을 드래그하고, 터치 화면에서는 타일을 약 0.5초 동안 길게 누른 뒤 드래그합니다. 아래에는 <strong>셀러 배치도</strong>가 있고, 각 단과 칸이 표시됩니다. 사용 중인 칸에는 와인 종류의 색으로 누워 있는 병이 표시됩니다.</p>
+<h3>보관하기</h3>
+<ol>
+<li>“미배정”에 있는 와인을 탭합니다(목록은 종류와 국가로 거를 수 있습니다). 또는 셀러에 표시된 “미배정” 안내를 탭합니다.</li>
+<li>그런 다음 <strong>빈 칸</strong>을 탭합니다. 바닥이나 상자의 경우 앱이 들어갈 만큼의 병을 보관합니다.</li>
+</ol>
+<p><strong>와인 스캔 후 보관</strong>: 라벨을 촬영해 와인을 찾고 보관까지 안내합니다.</p>
+<h3>사용 중인 칸, 이동, 제거</h3>
+<p>사용 중인 칸을 탭하면 와인이 표시되며 <em>열기</em>, <em>칸에서 제거</em>, <em>이동</em>(이후 빈 칸을 탭) 중에서 선택할 수 있습니다. <em>랙 비우기</em>는 (확인 후) 랙에서 모든 병을 꺼냅니다.</p>
+<h3>깜박임</h3>
+<p>“<em>깜박임</em>” 스위치를 켜면 <strong>먼저 마시기</strong> 대상인 병(기한이 지났거나 늦어도 내년에 적기가 끝나는 병), 기한이 지난 병, 절정인 병, 적기인 병이 깜박이므로 랙에서 한눈에 찾을 수 있습니다.</p>
+<h3>QR 라벨과 “단 스캔”</h3>
+<p>랙용 라벨 한 장과 각 단용 라벨 한 장은 <strong>QR 라벨</strong>(설정 → 랙 → ▦)로 만듭니다. PDF로 공유하거나 인쇄(라벨 시트 63.5 × 38.1 mm, 페이지당 21개)하여 붙입니다. 그다음: 랙 영역에서 <strong>단 스캔</strong>을 하면 해당 단에 있는 것이 표시되고, <em>여기에 보관</em>, <em>꺼내기</em>, 마시기, 병 이동, <em>단 전체 이동</em>을 할 수 있습니다. “와인 추가” 양식에서 단 라벨을 스캔하면 보관 위치도 함께 채워집니다.</p>
+
+<!-- ───────────────── 7 ───────────────── -->
+<h2 id="history">7. 기록</h2>
+
+<p>기록에는 마신 모든 와인이 날짜, 와인, 금액, 함께한 사람, 계기와 함께 나열됩니다. 와인 종류와 계기로 거를 수 있고, 항목(함께한 사람, 계기)을 수정할 수 있습니다. 기록은 통계의 “월별/연도별 마신 양”, 지출, 빈도 분석에 사용됩니다.</p>
+
+<!-- ───────────────── 8 ───────────────── -->
+<h2 id="wish">8. 위시리스트</h2>
+
+<ul>
+<li><strong>+ 위시 추가</strong>: 직접 입력하거나 라벨 스캔으로 추가하며, 메모(“어디서 살까?”)를 선택적으로 남길 수 있습니다.</li>
+<li><strong>가격 검색</strong>(💶): 앱이 웹에서 해당 와인의 가격을 검색해 가장 싼 결과를 보여 주고 수량을 곱합니다. 참고용 값이며 보증되지 않으므로, 배송비와 재고는 판매처에 확인하세요.</li>
+<li><strong>체크</strong>: 왼쪽의 체크로 구입/완료 표시를 합니다(행이 흐려집니다).</li>
+<li><strong>→ 셀러</strong>: 위시를 셀러로 옮기고(수량과, 있으면 가장 싼 가격 포함), 랙이 있으면 바로 보관 단계로 이동합니다.</li>
+<li>와인이 최소 수량 미만으로 떨어지면 부족한 수량으로 위시리스트에 올릴지 앱이 제안합니다(“재주문”).</li>
+</ul>
+
+<!-- ───────────────── 9 ───────────────── -->
+<h2 id="stats">9. 통계</h2>
+
+<p>위에서 아래로:</p>
+<ul>
+<li><strong>주요 수치:</strong> 병, 와인, 총 가치, 평균 평점.</li>
+<li><strong>음용 적기:</strong> 상태(숙성 전, 적기, 절정, 기한 초과)별 병 수와 기한이 지난 병에 대한 경고. 탭하면 해당 필터가 적용된 적기 화면이 열립니다.</li>
+<li><strong>종류별</strong> 및 <strong>인기 와인</strong>(평점 또는 빈도 기준, 별로 필터링 가능).</li>
+<li><strong>국가별, 지역별, 품종별:</strong> 막대(최대 8개, 나머지는 “+n개 더”), 탭하면 셀러를 검색합니다. <strong>빈티지별:</strong> 세로 막대(좌우로 스크롤 가능).</li>
+<li><strong>가격:</strong> 병당 평균, 최저가, 최고가, 가격대(사용 중인 통화에 맞춤), 국가별 가치.</li>
+<li><strong>보관:</strong> 사용률(퍼센트), 빈 칸, 미배정 병, 랙별 바(탭하면 해당 랙으로 이동).</li>
+<li><strong>마신 양:</strong> 월별(최근 12개월)과 연도별, 그리고 마신 병에 쓴 지출.</li>
+<li><strong>평점이 높은 국가와 품종</strong>: 평균 평점 기준(셀러와 기록 합산).</li>
+<li><strong>재구매:</strong> 최소 재고 미만인 와인(장보기 목록이 열림), 처리되지 않은 위시와 그 가치.</li>
+</ul>
+<p>데이터가 없는 섹션(예: 가격이 없는 경우)은 숨겨집니다.</p>
+
+<!-- ───────────────── 10 ───────────────── -->
+<h2 id="export">10. 내보내기, 가져오기, 백업</h2>
+
+<table>
+<tbody><tr><th>기능</th><th>용도</th></tr>
+<tr><td>CSV 내보내기</td><td>Excel 또는 Numbers용 표</td></tr>
+<tr><td>Excel 내보내기</td><td>.xlsx 파일로</td></tr>
+<tr><td>PDF 내보내기</td><td>인쇄 가능한 개요</td></tr>
+<tr><td><strong>JSON 백업</strong></td><td><strong>전체 데이터 백업</strong>(와인, 위시리스트, 기록, 랙, 표시 이름, 내 사진)</td></tr>
+<tr><td>클립보드로</td><td>텍스트 목록 복사</td></tr>
+<tr><td>JSON / CSV / Excel 가져오기</td><td>백업 복원 또는 표 불러오기</td></tr>
+</tbody></table>
+<div class="tip"><strong>JSON 백업을 정기적으로 만드세요.</strong> JSON 가져오기를 하면 셀러가 백업 내용으로 교체됩니다(앱이 먼저 확인을 요청합니다). 새 기기에서는 이렇게 하면 모든 것이 복원됩니다. 클라우드 동기화를 사용하는 방법도 있습니다(<a href="#sync">12장</a>).</div>
+
+<!-- ───────────────── 11 ───────────────── -->
+<h2 id="setup">11. 설정</h2>
+
+<h3>일반</h3>
+<ul>
+<li><strong>표시 이름 (제목):</strong> “Peter”를 입력하면 “Peter의 Weinkeller”처럼 표시됩니다. 비워 두면 기본 제목이 사용됩니다.</li>
+<li><strong>통화:</strong> €, $, £, CHF, A$, C$, SEK, NOK, DKK, PLN, HUF, CZK, RON, RUB, UAH, JPY, CNY, KRW, INR.</li>
+<li><strong>언어:</strong> 독일어, 영어, 영어(미국) 등 25개 언어 변형을 지원합니다. <strong>통화가 자동으로 바뀝니다</strong>(스웨덴어 → 크로나, 영어(미국) → 미국 달러, 영어(영국) → £). 예: 스웨덴어로 전환하면 앱이 SEK로 바꾸고 <strong>모든 가격을 오늘의 유럽 중앙은행 환율로 환산할지</strong>(“확인”) 아니면 표시만 바꿀지(“취소”) 묻습니다. RUB와 UAH는 환율이 없습니다. 통화는 언제든지 직접 바꿀 수 있습니다.</li>
+<li><strong>마실 때 색종이 &amp; 소리:</strong> 둘 다, 색종이만, 또는 끔.</li>
+<li><strong>글꼴:</strong> 열 가지 글꼴 중에서 선택할 수 있습니다.</li>
+<li><strong>온도 단위:</strong> °C 또는 °F(영어(미국)에서는 °F가 자동으로 설정됩니다).</li>
+</ul>
+<h3>저장 방식</h3>
+<p><em>이 기기에만</em> 또는 <em>클라우드</em>(동기화 코드, <a href="#sync">12장</a>).</p>
+<h3>AI 크레딧(iPhone 앱 전용)</h3>
+<p>남은 AI 스캔 횟수, 기기 ID, 그리고 필요한 경우 <em>크레딧 추가</em> 또는 잠금 해제 코드가 표시됩니다. 자세한 내용은 <a href="#privacy">13장</a>을 참조하세요.</p>
+<h3>와인 데이터베이스</h3>
+<ul>
+<li><strong>모든 와인 업데이트 (AI):</strong> 모든 와인에서 비어 있는 지역, 국가, 품종, 음용 적기, 음용 온도, 가격을 채웁니다(웹 버전에서는 병 이미지도). 이미 있는 값은 유지됩니다. 음용 온도가 이미 있으면 AI 값으로도 바꿀지 앱이 먼저 묻습니다.</li>
+<li><strong>음용 시기 다시 계산:</strong> 빈티지가 있는 모든 와인의 “마시기 시작”을 빈티지 + 1로 설정하고(직접 입력한 값도 덮어씁니다) 필요하면 “마시기 종료”를 조정합니다. 앱이 먼저 와인 수를 알려 주고 확인을 요청합니다. <em>팁: 먼저 JSON 백업을 내보내 두세요.</em></li>
+</ul>
+<h3>랙</h3>
+<p>자세한 내용은 <a href="#racks">6장</a>을 참조하세요. 제목에 랙 수가 표시됩니다.</p>
+<h3>개인정보, 지원, 버전</h3>
+<p>링크는 개인정보 처리방침과 이 지원 페이지로 연결됩니다. 맨 아래에서 앱 <strong>버전</strong>을 확인할 수 있습니다. 문의하실 때 알려 주세요.</p>
+
+<!-- ───────────────── 12 ───────────────── -->
+<h2 id="sync">12. 두 기기 동기화하기</h2>
+
+<ol>
+<li><strong>첫 번째 기기:</strong> 설정 → 저장 방식 → <em>클라우드</em> → <em>새 동기화 코드 만들기</em>. 화면에 코드가 나타납니다. <em>이메일로 코드 저장</em>을 사용하면 코드를 나에게 보낼 수 있습니다.</li>
+<li><strong>두 번째 기기:</strong> 설정 → 저장 방식 → <em>클라우드</em> → 코드를 입력합니다(소문자, 공백 없이) → 연결. 기기에 이미 와인이 있으면 클라우드 데이터와 병합할지 앱이 묻습니다.</li>
+<li>그 후에는 두 기기가 자동으로 동기화됩니다(예: 앱을 열 때). <em>지금 동기화</em>로 직접 실행할 수도 있습니다. 규칙은 다음과 같습니다: <strong>가장 최근 변경이 우선합니다</strong>.</li>
+</ol>
+<p>와인, 위시리스트, 기록, 랙, 그리고 언어와 통화 같은 설정이 동기화됩니다. 내 사진과 기기별 데이터는 <strong>동기화되지 않습니다</strong>. 코드를 아는 사람은 누구나 내 와인을 볼 수 있으므로, 신뢰하는 사람에게만 공유하세요. JSON 백업도 함께 보관해 두세요.</p>
+
+<!-- ───────────────── 13 ───────────────── -->
+<h2 id="privacy">13. AI, 개인정보, 비용</h2>
+
+<ul>
+<li><strong>AI는 어디에 사용되나요?</strong> 라벨 스캔, 와인 검색, 가격 검색, “모든 와인 업데이트”에 사용됩니다. 사진 또는 와인 이름이 당사 서버를 거쳐 AI 서비스(Anthropic, 미국)로 전송되어 분석됩니다. 이름이나 계정 정보는 포함되지 않습니다. 앱은 처음 사용하기 전에 동의를 요청합니다.</li>
+<li><strong>바코드 스캔</strong>은 번호만 무료 제품 데이터베이스로 전송하며 AI 크레딧을 소모하지 않습니다.</li>
+<li><strong>비용(iPhone 앱):</strong> 설치당 AI 호출 50회가 구입 가격에 포함되어 있으며, 추가분은 선택 사항인 일회성 구매로 살 수 있습니다(구독 없음, 크레딧 만료 없음). 앱의 나머지 기능에는 추가 비용이 없습니다. 크레딧을 모두 사용해도 AI 기능을 제외한 모든 기능은 계속 작동합니다.</li>
+<li><strong>데이터:</strong> 클라우드를 켜지 않는 한 모든 것이 내 기기에만 저장됩니다. 광고, 추적, 사용자 계정이 없습니다. 자세한 내용은 <a href="datenschutz.html">개인정보 처리방침</a>(독일어)을 참조하세요.</li>
+</ul>
+
+<!-- ───────────────── 14 ───────────────── -->
+<h2 id="faq">14. 팁과 자주 묻는 질문</h2>
+
+<ul>
+<li><strong>iPad나 PC에서는</strong> 화면에 맞게 레이아웃이 바뀝니다: 열이 넓어지고, 여러 카드가 나란히 표시되며, PC(와 가로 방향 iPad)에서는 내비게이션이 왼쪽에 나타납니다. 스마트폰에서도 가로 방향으로 사용할 수 있습니다. PC에서는 <kbd>Esc</kbd>로 맨 위 창을 닫고, 스마트폰에서는 창을 아래로 스와이프해 닫습니다.</li>
+<li><strong>와인이 사라졌어요:</strong> “<a href="support.html">지원</a>”을 참조하세요. 동기화 코드 또는 JSON 백업으로 복원할 수 있습니다.</li>
+<li><strong>와인의 바코드가 검색되지 않아요:</strong> 규모가 작은 와이너리에서는 흔한 일입니다. 라벨 스캔을 사용하세요.</li>
+<li><strong>AI가 잘못 읽었어요:</strong> 항목을 직접 고친 뒤 저장하세요. AI 값은 제안일 뿐입니다.</li>
+<li><strong>음용 적기가 너무 이르거나 늦은 것 같아요:</strong> 와인 종류와 품종에 따른 경험칙입니다. 더 잘 알고 계시면 와인별로 “마시기 종료”를 조정하세요.</li>
+<li><strong>페이지에 아직 이전 버전이 표시돼요(웹):</strong> 페이지를 새로고침하세요(PC에서는 <kbd>Ctrl</kbd>+<kbd>F5</kbd>).</li>
+</ul>
+<p>더 궁금한 점이 있으면 <a href="mailto:t.knecht@web.de?subject=Weinkeller%20User%20guide">t.knecht@web.de</a>로 문의해 주세요. 이때 앱 버전(설정 맨 아래)을 함께 알려 주세요.</p>
+
+<p style="margin-top:36px"><small>Weinkeller · Thomas Knecht · Scheidemannstr. 29 · 42781 Haan · 독일</small></p>
+
+</body></html>

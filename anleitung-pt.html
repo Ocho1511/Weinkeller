@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guia do utilizador – Weinkeller</title>
+<style>
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Sans CJK SC","Noto Sans JP","Noto Sans KR","Noto Sans Devanagari",sans-serif;max-width:760px;margin:0 auto;padding:24px 18px 70px;line-height:1.6;color:#222;background:#fff}
+  h1{font-size:28px;margin:6px 0 4px} h2{font-size:20px;margin-top:34px;padding-top:6px;border-top:1px solid #e3e3e3} h3{font-size:16px;margin:20px 0 4px}
+  small{color:#666} a{color:#0a58ca} p{margin:8px 0} ul,ol{margin:6px 0 10px;padding-left:22px} li{margin:3px 0}
+  code,kbd{background:#f2f2f2;border-radius:4px;padding:1px 5px;font-size:.92em}
+  .tip,.note{border-left:4px solid #b88a2a;background:#fbf6ea;padding:8px 12px;border-radius:0 8px 8px 0;margin:12px 0}
+  .note{border-color:#0a58ca;background:#eef4fd}
+  .toc{background:#f7f7f7;border-radius:10px;padding:10px 16px;margin:16px 0} .toc ol{margin:4px 0}
+  .lang{position:sticky;top:0;background:#fff;padding:8px 0;margin:0 0 6px;border-bottom:1px solid #eee;z-index:5}
+  .lang select{font:inherit;font-size:15px;padding:5px 10px;border:1px solid #bbb;border-radius:16px;background:#fff;max-width:100%}
+  table{border-collapse:collapse;width:100%;margin:8px 0} td,th{border:1px solid #ddd;padding:6px 9px;text-align:left;vertical-align:top;font-size:15px} th{background:#f4f4f4}
+  .back{margin:0 0 6px}
+  @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
+</style></head><body>
+<p class="back"><a href="support.html">← Voltar ao suporte</a></p>
+<div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html">Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html" selected>Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
+
+<h1>Guia do utilizador – Weinkeller</h1>
+<p><small>Atualizado: 10 de novembro de 2026 · Versão da app 2.0</small></p>
+
+<div class="toc">
+
+<strong>Índice</strong><ol>
+<li><a href="#start">Visão geral e primeiros passos</a></li>
+<li><a href="#add">Adicionar um vinho</a></li>
+<li><a href="#cellar">A adega</a></li>
+<li><a href="#drink">Beber um vinho</a></li>
+<li><a href="#ripe">Janela de consumo (Maturação)</a></li>
+<li><a href="#racks">Prateleiras e arrumação</a></li>
+<li><a href="#history">Histórico</a></li>
+<li><a href="#wish">Lista de desejos</a></li>
+<li><a href="#stats">Dados (estatísticas)</a></li>
+<li><a href="#export">Exportação, importação e cópia de segurança</a></li>
+<li><a href="#setup">Definições</a></li>
+<li><a href="#sync">Sincronizar dois dispositivos</a></li>
+<li><a href="#privacy">IA, privacidade e custos</a></li>
+<li><a href="#faq">Dicas e perguntas frequentes</a></li></ol>
+</div>
+
+<!-- ───────────────── 1 ───────────────── -->
+<h2 id="start">1. Visão geral e primeiros passos</h2>
+
+<p>O Weinkeller é a sua adega pessoal no bolso: gere stock, lugares de armazenamento, janelas de consumo, uma lista de desejos e estatísticas. Tudo funciona no seu dispositivo; com um código de sincronização pode ligar vários dispositivos.</p>
+<p>Em baixo (no PC e no iPad na horizontal: à esquerda) encontra a barra com oito áreas:</p>
+<table>
+<tbody><tr><th>Área</th><th>Finalidade</th></tr>
+<tr><td><strong>Adega</strong></td><td>Todos os vinhos, pesquisa, filtros, ordenação, adicionar um vinho, beber</td></tr>
+<tr><td><strong>Dados</strong></td><td>Análises de stock, preços, maturação, armazenamento e histórico de consumo</td></tr>
+<tr><td><strong>Maturação</strong></td><td>Que vinhos beber agora, em breve ou já não (“Janela de consumo”)</td></tr>
+<tr><td><strong>Histórico</strong></td><td>Os vinhos que já bebeu</td></tr>
+<tr><td><strong>Prateleiras</strong></td><td>Planta da adega: arrumar e mover vinhos, etiquetas QR</td></tr>
+<tr><td><strong>Lista de desejos</strong></td><td>Vinhos que ainda quer comprar</td></tr>
+<tr><td><strong>Exportar/Importar</strong></td><td>Fazer cópia de segurança dos dados, ler tabelas e cópias</td></tr>
+<tr><td><strong>Definições</strong></td><td>Nome, moeda, idioma, nuvem, definir prateleiras</td></tr>
+</tbody></table>
+<h3>Os primeiros cinco passos</h3>
+<ol>
+<li><strong>Escolha o idioma e a moeda</strong>: Definições → Geral. A moeda acompanha automaticamente o idioma.</li>
+<li><strong>Defina prateleiras</strong> (opcional): Definições → Prateleiras (veja a <a href="#racks">secção 6</a>).</li>
+<li><strong>Adicione o seu primeiro vinho</strong>: toque em <kbd>+</kbd> na adega (<a href="#add">secção 2</a>).</li>
+<li><strong>Arrume-o</strong>: atribua ao vinho um lugar numa prateleira.</li>
+<li><strong>Faça uma cópia de segurança</strong>: Exportar/Importar → Cópia JSON, ou configure a sincronização na nuvem (<a href="#sync">secção 12</a>).</li>
+</ol>
+<div class="tip">As secções das <em>Definições</em> são expansíveis. “Geral” está aberta no primeiro arranque, as outras estão fechadas. A app lembra-se do que abriu ou fechou por último.</div>
+
+<!-- ───────────────── 2 ───────────────── -->
+<h2 id="add">2. Adicionar um vinho</h2>
+
+<p>Toque em <kbd>+</kbd> na adega. Há várias formas de adicionar um vinho, e podem ser combinadas.</p>
+<h3>a) À mão</h3>
+<p>Preencha os campos: <strong>Nome / Produtor, Ano, Garrafas, Tipo de vinho, Região, País, Casta, Local de armazenamento, Beber a partir de/até, Temperatura de serviço, Preço, Avaliação, Nota</strong>. Só o nome é obrigatório. <em>Guardar</em> cria o vinho.</p>
+<ul>
+<li><strong>Janela de consumo:</strong> Assim que introduz o ano, a app define “Beber a partir de” como <strong>ano + 1</strong>. “Beber até” depende do tipo de vinho e da casta (um tinto aguenta mais tempo do que um rosé). Pode alterar ambos a qualquer momento.</li>
+<li><strong>Stock, Mín e Máx:</strong> Se indicar um mínimo, a app avisa-o quando o stock desce abaixo dele e propõe colocar o vinho na lista de desejos (<a href="#cellar">secção 3</a>).</li>
+<li><strong>Foto própria:</strong> “Tirar / escolher foto” anexa uma foto ao vinho. Fica neste dispositivo e é incluída na cópia JSON, mas não é sincronizada com a nuvem.</li>
+</ul>
+<h3>b) Digitalizar rótulo (IA)</h3>
+<p>Toque em <em>Digitalizar rótulo (IA)</em> e fotografe o rótulo da garrafa. A IA lê o nome, o ano, o tipo, a região, o país e a casta, e estima a janela de consumo e a temperatura de serviço. Verifique os valores e guarde. Antes da primeira utilização, a app pede o seu consentimento (<a href="#privacy">secção 13</a>).</p>
+<h3>c) Ler código de barras</h3>
+<p>Toque em <em>Ler código de barras</em> e coloque o código de barras da garrafa na moldura. A app procura o número numa base de dados de produtos gratuita (sem custos e sem crédito de IA) e, se o encontrar, preenche <strong>nome, produtor e tipo de vinho</strong>. Completa o ano a partir do nome ou pergunta-lho.</p>
+<ul>
+<li>Se a garrafa já estiver na adega, a app pergunta “Adicionar outra garrafa?” – uma forma rápida de aumentar a contagem quando compra mais.</li>
+<li>Se o código de barras <strong>não</strong> estiver na base de dados (frequente em pequenos produtores), aparece uma sugestão com o botão <em>Digitalizar rótulo (IA)</em>. O número é guardado na mesma com o vinho, para que a garrafa seja reconhecida logo da próxima vez.</li>
+</ul>
+<h3>d) Pesquisar vinho (IA)</h3>
+<p><em>Pesquisar vinho (IA)</em> faz com que a IA procure na web a região, o país, a casta, a janela de consumo, a temperatura de serviço, o preço médio atual e – na versão web – uma imagem da garrafa. Os campos que já preencheu não são substituídos. Isto também acontece automaticamente assim que o nome e o ano estão introduzidos e ainda não há preço.</p>
+<div class="note">A app para iPhone não carrega imagens de garrafas da internet (regra da App Store). Em alternativa, pode tirar as suas próprias fotos.</div>
+
+<!-- ───────────────── 3 ───────────────── -->
+<h2 id="cellar">3. A adega</h2>
+
+<h3>Pesquisar, filtrar, ordenar</h3>
+<ul>
+<li><strong>Pesquisa</strong> no topo: encontra vinhos por nome, região, país e casta.</li>
+<li><strong>Filtros:</strong> Todos, Tinto, Branco, Rosé, Espumante, Outros. Ao tocar num tipo, a pesquisa é apagada automaticamente.</li>
+<li><strong>Ordenação:</strong> Mais recentes primeiro, Nome, Ano, Casta, Região, País ou Maturação (mais urgentes primeiro).</li>
+<li><strong>Lista / cartões:</strong> O botão <em>Lista</em> alterna entre uma lista compacta e cartões detalhados.</li>
+</ul>
+<h3>O cartão do vinho</h3>
+<p>O cartão mostra nome, ano, casta, avaliação (estrelas), região e país (toque para abrir um mapa ou as regiões vinícolas do país), o número de garrafas, a <strong>temperatura de serviço</strong> (🌡), os <strong>lugares</strong> (toque para ir à prateleira) e uma <strong>barra de maturação</strong> com as cores Jovem, Ótimo, Auge, Ultrapassado. O símbolo da casta abre a Wikipedia sobre essa casta.</p>
+<p>Na parte inferior do cartão: <em>Editar</em>, <em>Beber</em> e 🗑 (eliminar vinho).</p>
+<h3>Stock, Mín/Máx e a lista de compras</h3>
+<p>Se indicar um mínimo (e, opcionalmente, um máximo) para um vinho, o cartão mostra “Stock · Mín · Máx” e avisa com ⚠ quando está abaixo. O botão <em>Repor</em> abre a <strong>lista de compras</strong>: inclui todos os vinhos abaixo do mínimo (o objetivo é o máximo; se não existir, o mínimo). Pode partilhar ou copiar a lista, ou colocar os vinhos na lista de desejos.</p>
+
+<!-- ───────────────── 4 ───────────────── -->
+<h2 id="drink">4. Beber um vinho</h2>
+
+<p>Toque em <em>Beber</em> no cartão do vinho (ou em “Beber · n gf.” em Maturação). Abre-se a janela <em>Beber vinho</em>:</p>
+<ul>
+<li><strong>De que lugar foi retirada?</strong> – escolha o lugar da prateleira de onde saiu a garrafa, ou “Garrafa sem lugar”. O lugar fica livre.</li>
+<li><strong>Com quem bebeu?</strong> – nomes dos seus convidados (opcional).</li>
+<li><strong>Ocasião</strong> – Primavera, Verão, Outono, Inverno, Aniversário, Festa ou “Sem motivo” (pode escolher várias).</li>
+</ul>
+<p><em>Beber</em> retira uma garrafa e cria uma entrada no <a href="#history">Histórico</a>. Confetes e som assinalam o momento (podem ser desativados nas Definições). Se for a <strong>última garrafa</strong>, a app avisa: o vinho desaparece então da adega (mas fica no Histórico).</p>
+<div class="tip"><strong>Rápido com a digitalização:</strong> O botão redondo 🥂 na adega fotografa um rótulo, reconhece o vinho na sua adega e abre logo a janela Beber.</div>
+
+<!-- ───────────────── 5 ───────────────── -->
+<h2 id="ripe">5. Janela de consumo (Maturação)</h2>
+
+<p>Aqui vê todos os vinhos com janela de consumo, <strong>os mais urgentes primeiro</strong>. Cada cartão mostra nome, ano, tipo, <strong>Beber a partir de/até</strong>, temperatura de serviço, lugar e uma barra com um marcador para o ano atual.</p>
+<table>
+<tbody><tr><th>Estado</th><th>Significado</th></tr>
+<tr><td><strong>Jovem</strong></td><td>Cedo demais – antes de “Beber a partir de”</td></tr>
+<tr><td><strong>Ótimo</strong></td><td>Pronto a beber, ainda na primeira parte da janela</td></tr>
+<tr><td><strong>Auge</strong></td><td>No seu auge – beber em breve</td></tr>
+<tr><td><strong>Ultrapassado</strong></td><td>Depois de “Beber até” – beber o mais depressa possível</td></tr>
+</tbody></table>
+<p><strong>Filtros:</strong> por tipo de vinho, por estado e por <strong>país</strong> (lista pendente com o número por país; os países sem resultados aparecem a cinzento). Os filtros podem ser combinados. Toque num cartão para abrir o vinho na adega.</p>
+<p><strong>A regra da janela:</strong> “Beber a partir de” = ano + 1. “Beber até” depende do tipo de vinho e da casta. Se tiver vinhos mais antigos com outros valores, pode recalculá-los todos de uma só vez nas Definições (<a href="#setup">secção 11</a>, “Recalcular janela de consumo”).</p>
+
+<!-- ───────────────── 6 ───────────────── -->
+<h2 id="racks">6. Prateleiras e arrumação</h2>
+
+<h3>Definir e editar prateleiras</h3>
+<p><strong>Definições → Prateleiras</strong> (toque no título para abrir): introduza o nome, os níveis, os lugares por nível e as garrafas por lugar e toque em ＋. “Garrafas/lugar” é 1 num garrafeiro e maior num chão ou numa caixa. Na lista, cada prateleira tem:</p>
+<ul>
+<li>a <strong>pega ⠿</strong> para mudar a ordem, e o botão <em>Ordenar A–Z</em> por baixo da lista,</li>
+<li>▦ para <strong>etiquetas QR</strong>, ✏️ para editar, 🧹 para esvaziar e 🗑 para eliminar.</li>
+</ul>
+<p>Com <strong>editar</strong> (✏️) pode mudar o nome da prateleira, alterar os lugares por nível, acrescentar níveis em cima ou em baixo, remover níveis e dar a cada nível o seu próprio nome e número de garrafas. As garrafas que perdem assim o seu lugar passam a contar como “sem lugar”; os próprios vinhos ficam na adega. A app pede confirmação antes dessas alterações.</p>
+<h3>A área Prateleiras</h3>
+<p>No topo escolhe uma prateleira com os <strong>mosaicos</strong> (nome e “ocupados / lugares”). A ordem também pode ser alterada aqui: no PC arraste um mosaico; em ecrãs táteis mantenha um mosaico premido cerca de meio segundo e depois arraste. Por baixo está a <strong>planta da adega</strong>: cada nível com os seus lugares. Os lugares ocupados mostram uma garrafa deitada na cor do tipo de vinho.</p>
+<h3>Arrumar</h3>
+<ol>
+<li>Toque num vinho em “Não atribuídos” (a lista pode ser filtrada por tipo e país) – ou toque numa indicação de “sem lugar” na adega.</li>
+<li>Toque num <strong>lugar livre</strong>. Em chãos e caixas, a app arruma tantas garrafas quantas couberem.</li>
+</ol>
+<p><strong>Digitalizar vinho e arrumar</strong> fotografa o rótulo, encontra o vinho e guia-o durante a arrumação.</p>
+<h3>Lugares ocupados, mover, remover</h3>
+<p>Toque num lugar ocupado: vê o vinho e pode <em>abri-lo</em>, <em>removê-lo do lugar</em> ou <em>movê-lo</em> (depois toque num lugar livre). <em>Esvaziar estante</em> retira todas as garrafas da prateleira (após confirmação).</p>
+<h3>Piscar</h3>
+<p>Os interruptores <em>Piscar</em> fazem piscar as garrafas que devem ser <strong>bebidas primeiro</strong> (ultrapassadas ou que, o mais tardar no próximo ano, chegam ao fim da janela), as que estão ultrapassadas, no auge ou ótimas – para as encontrar na prateleira num relance.</p>
+<h3>Etiquetas QR e “Digitalizar nível”</h3>
+<p>Com as <strong>etiquetas QR</strong> (Definições → Prateleiras → ▦) cria uma etiqueta para a prateleira e uma para cada nível. Partilhe-as em PDF ou imprima-as (folha de etiquetas de 63,5 × 38,1 mm, 21 por página) e cole-as. Depois: <strong>Digitalizar nível</strong> na área Prateleiras – vê o que está nesse nível e pode <em>guardar aqui</em>, <em>retirar</em>, beber, mover uma garrafa ou <em>mover o nível todo</em>. No formulário “Adicionar vinho”, digitalizar a etiqueta de um nível também preenche o local de armazenamento.</p>
+
+<!-- ───────────────── 7 ───────────────── -->
+<h2 id="history">7. Histórico</h2>
+
+<p>O Histórico lista todos os vinhos que bebeu com data, vinho, valor, convidados e ocasião. Pode filtrar por tipo de vinho e ocasião e editar uma entrada (convidados, ocasião). O Histórico alimenta as análises “Bebido por mês/ano”, a despesa e a frequência em Dados.</p>
+
+<!-- ───────────────── 8 ───────────────── -->
+<h2 id="wish">8. Lista de desejos</h2>
+
+<ul>
+<li><strong>+ Adicionar desejo</strong>: à mão ou por digitalização de rótulo, com uma nota opcional (“Onde comprar?”).</li>
+<li><strong>Procurar preços</strong> (💶): A app procura na web preços do vinho, mostra o resultado mais barato e multiplica-o pela quantidade. São valores indicativos, sem garantia – verifique os custos de envio e a disponibilidade junto da loja.</li>
+<li><strong>Visto</strong> à esquerda: marcar como comprado/concluído (a linha fica esbatida).</li>
+<li><strong>→ Adega</strong>: passa o desejo para a adega (com a quantidade e, se existir, o preço mais baixo) e, se tiver prateleiras, leva-o diretamente à arrumação.</li>
+<li>Se um vinho descer abaixo do seu mínimo, a app propõe colocá-lo na lista de desejos com a quantidade em falta (“repor”).</li>
+</ul>
+
+<!-- ───────────────── 9 ───────────────── -->
+<h2 id="stats">9. Dados (estatísticas)</h2>
+
+<p>De cima para baixo:</p>
+<ul>
+<li><strong>Números-chave:</strong> garrafas, vinhos, valor total, avaliação média.</li>
+<li><strong>Janela de consumo:</strong> garrafas por estado (Jovem, Ótimo, Auge, Ultrapassado) com um aviso para as garrafas ultrapassadas; um toque abre Maturação com o filtro correspondente.</li>
+<li><strong>Por tipo</strong> e <strong>Melhores vinhos</strong> (por avaliação ou frequência, filtráveis por estrelas).</li>
+<li><strong>Por país, região, casta:</strong> barras (até 8, o resto como “+n mais”); um toque pesquisa na adega. <strong>Por colheita:</strong> colunas, deslizáveis para os lados.</li>
+<li><strong>Preços:</strong> média por garrafa, a mais barata, a mais cara, escalões de preço (adaptados à sua moeda) e valor por país.</li>
+<li><strong>Armazenamento:</strong> ocupação em percentagem, lugares livres, garrafas sem lugar e uma barra por prateleira (um toque salta para a prateleira).</li>
+<li><strong>Bebido:</strong> por mês (últimos 12) e por ano, mais a despesa com as garrafas bebidas.</li>
+<li><strong>Melhores países e castas</strong> por avaliação média (adega e Histórico em conjunto).</li>
+<li><strong>Repor:</strong> vinhos abaixo do stock mínimo (abre a lista de compras), desejos em aberto e o seu valor.</li>
+</ul>
+<p>As secções sem dados (por exemplo, sem preços) ficam ocultas.</p>
+
+<!-- ───────────────── 10 ───────────────── -->
+<h2 id="export">10. Exportação, importação e cópia de segurança</h2>
+
+<table>
+<tbody><tr><th>Função</th><th>Finalidade</th></tr>
+<tr><td>Exportar CSV</td><td>Tabela para Excel ou Numbers</td></tr>
+<tr><td>Exportar Excel</td><td>Como ficheiro .xlsx</td></tr>
+<tr><td>Exportar PDF</td><td>Resumo imprimível</td></tr>
+<tr><td><strong>Cópia JSON</strong></td><td><strong>Cópia de segurança completa dos dados</strong> (vinhos, lista de desejos, histórico, prateleiras, nome a apresentar, fotos próprias)</td></tr>
+<tr><td>Para a área de transferência</td><td>Copiar uma lista em texto</td></tr>
+<tr><td>Importar JSON / CSV / Excel</td><td>Restaurar uma cópia ou ler uma tabela</td></tr>
+</tbody></table>
+<div class="tip"><strong>Faça regularmente uma cópia JSON.</strong> A importação JSON substitui a adega pela cópia (a app pergunta antes). Num dispositivo novo, isto restaura tudo. Em alternativa, use a sincronização na nuvem (<a href="#sync">secção 12</a>).</div>
+
+<!-- ───────────────── 11 ───────────────── -->
+<h2 id="setup">11. Definições</h2>
+
+<h3>Geral</h3>
+<ul>
+<li><strong>Nome a apresentar (título):</strong> “Peter” passa a “Weinkeller do Peter” etc. Deixe vazio para o título predefinido.</li>
+<li><strong>Moeda:</strong> €, $, £, CHF, A$, C$, SEK, NOK, DKK, PLN, HUF, CZK, RON, RUB, UAH, JPY, CNY, KRW, INR.</li>
+<li><strong>Idioma:</strong> 25 variantes de idioma, entre elas alemão, inglês, inglês (EUA) e muitas outras. <strong>A moeda muda automaticamente</strong> (sueco → coroa, inglês (EUA) → US $, inglês (Reino Unido) → £). Exemplo: ao mudar para sueco, a app passa para SEK e pergunta se deve <strong>converter todos os preços à taxa de câmbio atual do Banco Central Europeu</strong> (“OK”) ou apenas alterar o símbolo (“Cancelar”). Não existem taxas para RUB e UAH. Pode alterar a moeda manualmente a qualquer momento.</li>
+<li><strong>Confetes e som ao beber:</strong> ambos, só confetes ou desativado.</li>
+<li><strong>Tipo de letra:</strong> dez tipos de letra à escolha.</li>
+<li><strong>Unidade de temperatura:</strong> °C ou °F (o inglês (EUA) define automaticamente °F).</li>
+</ul>
+<h3>Armazenamento</h3>
+<p><em>Apenas este dispositivo</em> ou <em>Nuvem</em> (código de sincronização, <a href="#sync">secção 12</a>).</p>
+<h3>Créditos de IA (apenas app para iPhone)</h3>
+<p>Mostra as digitalizações de IA restantes, o ID do dispositivo e – quando necessário – <em>Carregar créditos</em> ou um código de desbloqueio. Veja a <a href="#privacy">secção 13</a>.</p>
+<h3>Base de dados de vinhos</h3>
+<ul>
+<li><strong>Atualizar todos os vinhos (IA):</strong> preenche a região, o país, a casta, a janela de consumo, a temperatura de serviço e o preço em falta em todos os vinhos (na versão web, também imagens de garrafas). Os valores existentes mantêm-se. Se já existirem temperaturas de serviço, a app pergunta primeiro se também devem ser substituídas por valores da IA.</li>
+<li><strong>Recalcular janela de consumo:</strong> define “Beber a partir de” como ano + 1 em todos os vinhos com ano (os valores introduzidos à mão também são substituídos) e ajusta “Beber até” onde for necessário. A app indica primeiro o número de vinhos e pede confirmação. <em>Dica: exporte primeiro uma cópia JSON.</em></li>
+</ul>
+<h3>Prateleiras</h3>
+<p>Veja a <a href="#racks">secção 6</a>. O título mostra o número de prateleiras.</p>
+<h3>Privacidade, suporte, versão</h3>
+<p>As ligações levam à política de privacidade e a esta página de suporte. No fim de tudo encontra a <strong>versão</strong> da app – indique-a quando nos contactar.</p>
+
+<!-- ───────────────── 12 ───────────────── -->
+<h2 id="sync">12. Sincronizar dois dispositivos</h2>
+
+<ol>
+<li><strong>Primeiro dispositivo:</strong> Definições → Armazenamento → <em>Nuvem</em> → <em>Criar novo código de sincronização</em>. O código aparece no ecrã; com <em>Guardar código por e-mail</em> envia-o a si próprio.</li>
+<li><strong>Segundo dispositivo:</strong> Definições → Armazenamento → <em>Nuvem</em> → introduza o código (em minúsculas, sem espaços) → Ligar. Se o dispositivo já contiver vinhos, a app pergunta se os deve juntar aos dados da nuvem.</li>
+<li>Depois disso, os dois dispositivos sincronizam automaticamente (por exemplo, ao abrir a app); <em>Sincronizar agora</em> inicia-o manualmente. A regra é: <strong>prevalece a última alteração</strong>.</li>
+</ol>
+<p>São sincronizados os vinhos, a lista de desejos, o histórico, as prateleiras e definições como o idioma e a moeda. <strong>Não são sincronizados</strong> as fotos próprias e os dados específicos do dispositivo. Quem souber o seu código pode ver os seus vinhos – partilhe-o apenas com pessoas de confiança. Guarde também uma cópia JSON.</p>
+
+<!-- ───────────────── 13 ───────────────── -->
+<h2 id="privacy">13. IA, privacidade e custos</h2>
+
+<ul>
+<li><strong>Para que serve a IA?</strong> Digitalizar rótulo, pesquisar vinho, procurar preços e “Atualizar todos os vinhos”. A foto ou o nome do vinho é enviado através do nosso servidor para um serviço de IA (Anthropic, EUA) para avaliação – sem nomes nem contas. A app pede o seu consentimento antes da primeira utilização.</li>
+<li><strong>A leitura do código de barras</strong> envia apenas o número para uma base de dados de produtos gratuita e não gasta crédito de IA.</li>
+<li><strong>Custos (app para iPhone):</strong> 50 chamadas de IA por instalação estão incluídas no preço de compra; podem comprar-se mais através de uma compra única opcional (sem subscrição, os créditos não expiram). Tudo o resto na app não tem custos adicionais. Quando os créditos acabam, tudo continua a funcionar exceto as funções de IA.</li>
+<li><strong>Dados:</strong> Tudo fica no seu dispositivo enquanto não ativar a nuvem. Sem publicidade, sem rastreamento, sem conta de utilizador. Detalhes na <a href="datenschutz.html">política de privacidade</a> (em alemão).</li>
+</ul>
+
+<!-- ───────────────── 14 ───────────────── -->
+<h2 id="faq">14. Dicas e perguntas frequentes</h2>
+
+<ul>
+<li><strong>Num iPad ou PC</strong> a disposição adapta-se: coluna mais larga, vários cartões lado a lado e, no PC (e no iPad na horizontal), a navegação à esquerda. O telemóvel também funciona na horizontal. No PC, <kbd>Esc</kbd> fecha a janela de cima; no telemóvel, deslize uma janela para baixo para a fechar.</li>
+<li><strong>Os meus vinhos desapareceram:</strong> Veja o <a href="support.html">Suporte</a> – restaure com o código de sincronização ou com uma cópia JSON.</li>
+<li><strong>Sem resultado do código de barras para um vinho:</strong> É normal em pequenos produtores. Use a digitalização do rótulo.</li>
+<li><strong>A IA leu algo mal:</strong> Corrija o campo à mão e guarde; os valores da IA são sugestões.</li>
+<li><strong>A janela de consumo parece demasiado cedo/tarde:</strong> São regras empíricas conforme o tipo de vinho e a casta. Ajuste “Beber até” em cada vinho se souber melhor.</li>
+<li><strong>A página ainda mostra a versão antiga (web):</strong> Recarregue a página (no PC <kbd>Ctrl</kbd>+<kbd>F5</kbd>).</li>
+</ul>
+<p>Mais perguntas? Escreva para <a href="mailto:t.knecht@web.de?subject=Weinkeller%20Guia%20do%20utilizador">t.knecht@web.de</a> e indique a versão da app (Definições, no fim de tudo).</p>
+
+<p style="margin-top:36px"><small>Weinkeller · Thomas Knecht · Scheidemannstr. 29 · 42781 Haan · Alemanha</small></p>
+
+</body></html>

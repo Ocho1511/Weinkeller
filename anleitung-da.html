@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="da"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Brugervejledning – Weinkeller</title>
+<style>
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Sans CJK SC","Noto Sans JP","Noto Sans KR","Noto Sans Devanagari",sans-serif;max-width:760px;margin:0 auto;padding:24px 18px 70px;line-height:1.6;color:#222;background:#fff}
+  h1{font-size:28px;margin:6px 0 4px} h2{font-size:20px;margin-top:34px;padding-top:6px;border-top:1px solid #e3e3e3} h3{font-size:16px;margin:20px 0 4px}
+  small{color:#666} a{color:#0a58ca} p{margin:8px 0} ul,ol{margin:6px 0 10px;padding-left:22px} li{margin:3px 0}
+  code,kbd{background:#f2f2f2;border-radius:4px;padding:1px 5px;font-size:.92em}
+  .tip,.note{border-left:4px solid #b88a2a;background:#fbf6ea;padding:8px 12px;border-radius:0 8px 8px 0;margin:12px 0}
+  .note{border-color:#0a58ca;background:#eef4fd}
+  .toc{background:#f7f7f7;border-radius:10px;padding:10px 16px;margin:16px 0} .toc ol{margin:4px 0}
+  .lang{position:sticky;top:0;background:#fff;padding:8px 0;margin:0 0 6px;border-bottom:1px solid #eee;z-index:5}
+  .lang select{font:inherit;font-size:15px;padding:5px 10px;border:1px solid #bbb;border-radius:16px;background:#fff;max-width:100%}
+  table{border-collapse:collapse;width:100%;margin:8px 0} td,th{border:1px solid #ddd;padding:6px 9px;text-align:left;vertical-align:top;font-size:15px} th{background:#f4f4f4}
+  .back{margin:0 0 6px}
+  @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
+</style></head><body>
+<p class="back"><a href="support.html">← Tilbage til support</a></p>
+<div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html" selected>Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
+
+<h1>Brugervejledning – Weinkeller</h1>
+<p><small>Opdateret: 10. november 2026 · Appversion 2.0</small></p>
+
+<div class="toc">
+
+<strong>Indhold</strong><ol>
+<li><a href="#start">Overblik og første skridt</a></li>
+<li><a href="#add">Tilføj en vin</a></li>
+<li><a href="#cellar">Kælderen</a></li>
+<li><a href="#drink">Drik en vin</a></li>
+<li><a href="#ripe">Drikkevindue (Modenhed)</a></li>
+<li><a href="#racks">Reoler og placering</a></li>
+<li><a href="#history">Historik</a></li>
+<li><a href="#wish">Ønskeliste</a></li>
+<li><a href="#stats">Statistik</a></li>
+<li><a href="#export">Eksport, import og backup</a></li>
+<li><a href="#setup">Opsætning (indstillinger)</a></li>
+<li><a href="#sync">Synkronisér to enheder</a></li>
+<li><a href="#privacy">AI, privatliv og omkostninger</a></li>
+<li><a href="#faq">Tips og FAQ</a></li></ol>
+</div>
+
+<!-- ───────────────── 1 ───────────────── -->
+<h2 id="start">1. Overblik og første skridt</h2>
+
+<p>Weinkeller er din personlige vinkælder i lommen: du styrer beholdning, lagerpladser, drikkevinduer, en ønskeliste og statistik. Alt kører på din enhed; med en synk-kode kan du forbinde flere enheder.</p>
+<p>Nederst (på pc og iPad i liggende format: til venstre) finder du bjælken med otte områder:</p>
+<table>
+<tbody><tr><th>Område</th><th>Formål</th></tr>
+<tr><td><strong>Kælder</strong></td><td>Alle vine, søgning, filtre, sortering, tilføj en vin, drik</td></tr>
+<tr><td><strong>Statistik</strong></td><td>Opgørelser over beholdning, priser, modenhed, lagring og drikkehistorik</td></tr>
+<tr><td><strong>Modenhed</strong></td><td>Hvilke vine du skal drikke nu, snart eller ikke længere (”Drikkevindue”)</td></tr>
+<tr><td><strong>Historik</strong></td><td>De vine, du har drukket</td></tr>
+<tr><td><strong>Reoler</strong></td><td>Kælderplan: placér og flyt vine, QR-etiketter</td></tr>
+<tr><td><strong>Ønskeliste</strong></td><td>Vine, du stadig vil købe</td></tr>
+<tr><td><strong>Eksport/Import</strong></td><td>Tag backup af dine data, indlæs tabeller og backups</td></tr>
+<tr><td><strong>Opsætning</strong></td><td>Navn, valuta, sprog, sky, definér reoler</td></tr>
+</tbody></table>
+<h3>De første fem skridt</h3>
+<ol>
+<li><strong>Vælg sprog og valuta</strong>: Opsætning → Generelt. Valutaen følger automatisk sproget.</li>
+<li><strong>Definér reoler</strong> (valgfrit): Opsætning → Reoler (se <a href="#racks">afsnit 6</a>).</li>
+<li><strong>Tilføj din første vin</strong>: tryk på <kbd>+</kbd> i kælderen (<a href="#add">afsnit 2</a>).</li>
+<li><strong>Placér den</strong>: giv vinen en plads i en reol.</li>
+<li><strong>Tag backup</strong>: Eksport/Import → JSON-backup, eller opsæt skysynkronisering (<a href="#sync">afsnit 12</a>).</li>
+</ol>
+<div class="tip">Afsnittene i <em>Opsætning</em> kan foldes sammen. ”Generelt” er åbent ved første start, de andre er lukkede. Appen husker, hvad du sidst åbnede eller lukkede.</div>
+
+<!-- ───────────────── 2 ───────────────── -->
+<h2 id="add">2. Tilføj en vin</h2>
+
+<p>Tryk på <kbd>+</kbd> i kælderen. Der er flere måder at tilføje en vin på – de kan kombineres.</p>
+<h3>a) Manuelt</h3>
+<p>Udfyld felterne: <strong>Navn / Vingård, Årgang, Flasker, Vintype, Region, Land, Drue, Lagerplads, Drik fra/til, Serveringstemperatur, Pris, Bedømmelse, Note</strong>. Kun navnet er påkrævet. <em>Gem</em> opretter vinen.</p>
+<ul>
+<li><strong>Drikkevindue:</strong> Så snart du angiver årgangen, sætter appen ”Drik fra” til <strong>årgang + 1</strong>. ”Drik til” afhænger af vintype og drue (en rødvin holder længere end en rosé). Du kan til enhver tid ændre begge.</li>
+<li><strong>Beholdning, Min og Maks:</strong> Hvis du angiver et minimum, advarer appen, når beholdningen falder under det, og tilbyder at sætte vinen på ønskelisten (<a href="#cellar">afsnit 3</a>).</li>
+<li><strong>Eget foto:</strong> ”Tag / vælg foto” knytter et foto til vinen. Det bliver på denne enhed og er med i JSON-backuppen, men synkroniseres ikke til skyen.</li>
+</ul>
+<h3>b) Scan etiket (AI)</h3>
+<p>Tryk på <em>Scan etiket (AI)</em> og fotografér flaskens etiket. AI’en aflæser navn, årgang, type, region, land og drue og vurderer drikkevindue og serveringstemperatur. Kontrollér værdierne og gem. Før første brug beder appen om dit samtykke (<a href="#privacy">afsnit 13</a>).</p>
+<h3>c) Scan stregkode</h3>
+<p>Tryk på <em>Scan stregkode</em> og hold flaskens stregkode inden for rammen. Appen slår nummeret op i en gratis produktdatabase (uden omkostninger, ingen AI-kredit) og udfylder, hvis den finder det, <strong>navn, producent og vintype</strong>. Årgangen udleder den af navnet, ellers spørger den efter den.</p>
+<ul>
+<li>Hvis flasken allerede står i kælderen, spørger appen ”Tilføj en flaske mere?” – en hurtig måde at tælle op på, når du køber flere.</li>
+<li>Hvis stregkoden <strong>ikke</strong> findes i databasen (almindeligt for mindre vingårde), vises et tip med knappen <em>Scan etiket (AI)</em>. Nummeret bliver alligevel gemt sammen med vinen, så flasken genkendes med det samme næste gang.</li>
+</ul>
+<h3>d) Slå vin op (AI)</h3>
+<p>Med <em>Slå vin op (AI)</em> lader du AI’en søge på nettet efter region, land, drue, drikkevindue, serveringstemperatur, aktuel gennemsnitspris og – i webversionen – et flaskebillede. Felter, du allerede har udfyldt, bliver ikke overskrevet. Det sker også automatisk, så snart navn og årgang er indtastet, og der endnu ikke er en pris.</p>
+<div class="note">iPhone-appen henter ikke flaskebilleder fra internettet (App Store-regel). Du kan i stedet tage dine egne fotos.</div>
+
+<!-- ───────────────── 3 ───────────────── -->
+<h2 id="cellar">3. Kælderen</h2>
+
+<h3>Søg, filtrér, sortér</h3>
+<ul>
+<li><strong>Søgning</strong> øverst: finder vine på navn, region, land og drue.</li>
+<li><strong>Filtre:</strong> Alle, Rødvin, Hvidvin, Rosé, Mousserende, Andet. Et klik på en type rydder automatisk søgningen.</li>
+<li><strong>Sortering:</strong> Nyeste først, Navn, Årgang, Drue, Region, Land eller Drikkemodenhed (mest presserende først).</li>
+<li><strong>Liste / kort:</strong> Knappen <em>Liste</em> skifter mellem en kompakt liste og detaljerede kort.</li>
+</ul>
+<h3>Vinkortet</h3>
+<p>Kortet viser navn, årgang, drue, bedømmelse (stjerner), region og land (tryk for at åbne et kort eller landets vinregioner), antal flasker, <strong>serveringstemperaturen</strong> (🌡), <strong>lagerpladserne</strong> (tryk for at hoppe til reolen) og en <strong>modenhedsbjælke</strong> i farverne Ung, Optimal, Top, Overskredet. Drue-symbolet åbner Wikipedia for druen.</p>
+<p>Nederst på kortet: <em>Rediger</em>, <em>Drik</em> og 🗑 (slet vin).</p>
+<h3>Beholdning, Min/Maks og indkøbslisten</h3>
+<p>Hvis du angiver et minimum (og eventuelt et maksimum) for en vin, viser kortet ”Beholdning · Min · Maks” og advarer med ⚠, når du ligger under. Knappen <em>Genbestil</em> åbner <strong>indkøbslisten</strong>: den viser alle vine under deres minimum (målet er maksimum, ellers minimum). Du kan dele eller kopiere listen eller sætte vinene på ønskelisten.</p>
+
+<!-- ───────────────── 4 ───────────────── -->
+<h2 id="drink">4. Drik en vin</h2>
+
+<p>Tryk på <em>Drik</em> på vinkortet (eller ”Drik · n fl.” under Modenhed). Dialogen <em>Drik vin</em> åbnes:</p>
+<ul>
+<li><strong>Fra hvilken plads blev den taget?</strong> – vælg den reolplads, flasken kom fra, eller ”Flaske uden plads”. Pladsen bliver ledig.</li>
+<li><strong>Med hvem drak du?</strong> – navnene på dine gæster (valgfrit).</li>
+<li><strong>Anledning</strong> – Forår, Sommer, Efterår, Vinter, Fødselsdag, Fest eller ”Bare fordi” (flere kan vælges).</li>
+</ul>
+<p><em>Drik</em> fjerner én flaske og opretter en post i <a href="#history">Historik</a>. Konfetti og lyd fejrer det (kan slås fra i Opsætning). Hvis det er den <strong>sidste flaske</strong>, giver appen besked: vinen forsvinder så fra kælderen (men bliver i Historik).</p>
+<div class="tip"><strong>Hurtigt med scanning:</strong> Den runde 🥂-knap i kælderen fotograferer en etiket, genkender vinen i din kælder og åbner Drik-dialogen med det samme.</div>
+
+<!-- ───────────────── 5 ───────────────── -->
+<h2 id="ripe">5. Drikkevindue (Modenhed)</h2>
+
+<p>Her ser du alle vine med et drikkevindue, <strong>de mest presserende først</strong>. Hvert kort viser navn, årgang, type, <strong>Drik fra/til</strong>, serveringstemperatur, lagerplads og en bjælke med en markør for det aktuelle år.</p>
+<table>
+<tbody><tr><th>Status</th><th>Betydning</th></tr>
+<tr><td><strong>Ung</strong></td><td>For tidligt – før ”Drik fra”</td></tr>
+<tr><td><strong>Optimal</strong></td><td>Kan drikkes, stadig i den første del af vinduet</td></tr>
+<tr><td><strong>Top</strong></td><td>På sit højdepunkt – drik den snart</td></tr>
+<tr><td><strong>Overskredet</strong></td><td>Efter ”Drik til” – drik den hurtigst muligt</td></tr>
+</tbody></table>
+<p><strong>Filtre:</strong> efter vintype, efter status og efter <strong>land</strong> (rullemenu med antal pr. land; lande uden resultater er nedtonede). Filtrene kan kombineres. Tryk på et kort for at åbne vinen i kælderen.</p>
+<p><strong>Reglen for vinduet:</strong> ”Drik fra” = årgang + 1. ”Drik til” afhænger af vintype og drue. Hvis du har ældre vine med andre værdier, kan du genberegne dem alle på én gang i Opsætning (<a href="#setup">afsnit 11</a>, ”Genberegn drikkevindue”).</p>
+
+<!-- ───────────────── 6 ───────────────── -->
+<h2 id="racks">6. Reoler og placering</h2>
+
+<h3>Definér og rediger reoler</h3>
+<p><strong>Opsætning → Reoler</strong> (tryk på overskriften for at åbne): angiv navn, hylder, pladser pr. hylde og flasker pr. plads, og tryk derefter på ＋. ”Flasker/plads” er 1 for en vinreol og større for et gulv eller en kasse. På listen har hver reol:</p>
+<ul>
+<li><strong>grebet ⠿</strong> til at ændre rækkefølgen og knappen <em>Sortér A–Å</em> under listen,</li>
+<li>▦ til <strong>QR-etiketter</strong>, ✏️ til at redigere, 🧹 til at tømme og 🗑 til at slette.</li>
+</ul>
+<p>Med <strong>rediger</strong> (✏️) kan du omdøbe reolen, ændre pladserne pr. hylde, tilføje hylder øverst eller nederst, fjerne hylder og give hver hylde sit eget navn og sit eget antal flasker. Flasker, der mister deres plads på den måde, tæller bagefter som ”ikke placeret”; selve vinene bliver i kælderen. Appen spørger, før sådanne ændringer udføres.</p>
+<h3>Området Reoler</h3>
+<p>Øverst vælger du en reol med <strong>felterne</strong> (navn og ”optaget / pladser”). Rækkefølgen kan også ændres her: på en pc trækker du et felt, på touchskærme holder du et felt nede i omkring et halvt sekund og trækker derefter. Nedenfor ligger <strong>kælderplanen</strong>: hver hylde med sine pladser. Optagne pladser viser en liggende flaske i vintypens farve.</p>
+<h3>Placering</h3>
+<ol>
+<li>Tryk på en vin under ”Ikke placeret” (listen kan filtreres efter type og land) – eller tryk på et ”ikke placeret”-tip i kælderen.</li>
+<li>Tryk på en <strong>ledig plads</strong>. På gulve og kasser placerer appen så mange flasker, som der er plads til.</li>
+</ol>
+<p><strong>Scan vin &amp; placér</strong> fotograferer etiketten, finder vinen og guider dig gennem placeringen.</p>
+<h3>Optagne pladser, flytning, fjernelse</h3>
+<p>Tryk på en optaget plads: du ser vinen og kan <em>åbne</em> den, <em>fjerne den fra pladsen</em> eller <em>flytte</em> den (tryk derefter på en ledig plads). <em>Tøm reol</em> tager alle flasker ud af reolen (efter bekræftelse).</p>
+<h3>Blink</h3>
+<p>Kontakterne <em>Blink</em> får flasker til at blinke, som skal <strong>drikkes først</strong> (overskredne eller senest næste år ved slutningen af deres vindue), som er overskredne, på deres top eller optimale – så du finder dem i reolen med et enkelt blik.</p>
+<h3>QR-etiketter og ”Scan hylde”</h3>
+<p>Med <strong>QR-etiketter</strong> (Opsætning → Reoler → ▦) laver du én etiket til reolen og én til hver hylde. Del som PDF eller udskriv (etiketark 63,5 × 38,1 mm, 21 pr. side) og sæt dem på. Derefter: <strong>Scan hylde</strong> i området Reoler – du ser, hvad der ligger på den hylde, og kan <em>lægge ind her</em>, <em>tage ud</em>, drikke, flytte en flaske eller <em>flytte hele hylden</em>. I formularen ”Tilføj vin” udfylder en scannet hyldeetiket også lagerpladsen.</p>
+
+<!-- ───────────────── 7 ───────────────── -->
+<h2 id="history">7. Historik</h2>
+
+<p>Historikken viser alle vine, du har drukket, med dato, vin, værdi, gæster og anledning. Du kan filtrere efter vintype og anledning og redigere en post (gæster, anledning). Historikken danner grundlag for opgørelserne ”Drukket pr. måned/år”, forbruget og hyppigheden i Statistik.</p>
+
+<!-- ───────────────── 8 ───────────────── -->
+<h2 id="wish">8. Ønskeliste</h2>
+
+<ul>
+<li><strong>+ Tilføj ønske</strong>: manuelt eller med etiketscanning, med en valgfri note (”Hvor kan man købe den?”).</li>
+<li><strong>Søg priser</strong> (💶): Appen søger på nettet efter priser på vinen, viser det billigste hit og ganger med antallet. Det er vejledende værdier uden garanti – tjek forsendelsesomkostninger og tilgængelighed hos butikken.</li>
+<li><strong>Flueben</strong> til venstre: markér som købt/færdig (rækken bliver nedtonet).</li>
+<li><strong>→ Kælder</strong>: flytter ønsket ind i kælderen (med antal og, hvis den findes, den billigste pris) og fører dig, hvis du har reoler, direkte videre til placeringen.</li>
+<li>Hvis en vin falder under sit minimum, tilbyder appen at sætte den på ønskelisten med den manglende mængde (”genbestil”).</li>
+</ul>
+
+<!-- ───────────────── 9 ───────────────── -->
+<h2 id="stats">9. Statistik</h2>
+
+<p>Oppefra og ned:</p>
+<ul>
+<li><strong>Nøgletal:</strong> flasker, vine, samlet værdi, ⌀ bedømmelse.</li>
+<li><strong>Drikkevindue:</strong> flasker pr. status (Ung, Optimal, Top, Overskredet) med en advarsel om overskredne flasker; et tryk åbner Modenhed med det tilsvarende filter.</li>
+<li><strong>Efter type</strong> og <strong>Topvine</strong> (efter bedømmelse eller hyppighed, kan filtreres efter stjerner).</li>
+<li><strong>Efter land, region, drue:</strong> søjler (op til 8, resten som ”+n flere”); et tryk søger i kælderen. <strong>Efter årgang:</strong> kolonner, kan rulles sidelæns.</li>
+<li><strong>Priser:</strong> ⌀ pr. flaske, billigste, dyreste, prisintervaller (tilpasset din valuta) og værdi pr. land.</li>
+<li><strong>Lager:</strong> belægning i procent, ledige pladser, flasker uden placering og en bjælke pr. reol (et tryk hopper til reolen).</li>
+<li><strong>Drukket:</strong> pr. måned (de seneste 12) og pr. år samt forbruget på drukne flasker.</li>
+<li><strong>Bedste lande og druer</strong> efter gennemsnitlig bedømmelse (kælder og Historik samlet).</li>
+<li><strong>Køb igen:</strong> vine under minimumsbeholdning (åbner indkøbslisten), åbne ønsker og deres værdi.</li>
+</ul>
+<p>Afsnit uden data (f.eks. uden priser) skjules.</p>
+
+<!-- ───────────────── 10 ───────────────── -->
+<h2 id="export">10. Eksport, import og backup</h2>
+
+<table>
+<tbody><tr><th>Funktion</th><th>Formål</th></tr>
+<tr><td>Eksportér CSV</td><td>Tabel til Excel eller Numbers</td></tr>
+<tr><td>Eksportér Excel</td><td>Som .xlsx-fil</td></tr>
+<tr><td>Eksportér PDF</td><td>Printvenlig oversigt</td></tr>
+<tr><td><strong>JSON-backup</strong></td><td><strong>Komplet backup af data</strong> (vine, ønskeliste, historik, reoler, visningsnavn, egne fotos)</td></tr>
+<tr><td>Til udklipsholder</td><td>Kopiér en tekstliste</td></tr>
+<tr><td>Importér JSON / CSV / Excel</td><td>Gendan en backup eller indlæs en tabel</td></tr>
+</tbody></table>
+<div class="tip"><strong>Tag jævnligt en JSON-backup.</strong> JSON-importen erstatter kælderen med backuppen (appen spørger først). På en ny enhed gendanner det alt. Alternativt kan du bruge skysynkronisering (<a href="#sync">afsnit 12</a>).</div>
+
+<!-- ───────────────── 11 ───────────────── -->
+<h2 id="setup">11. Opsætning (indstillinger)</h2>
+
+<h3>Generelt</h3>
+<ul>
+<li><strong>Visningsnavn (titel):</strong> ”Peter” bliver til ”Peters Weinkeller” osv. Lad feltet stå tomt for standardtitlen.</li>
+<li><strong>Valuta:</strong> €, $, £, CHF, A$, C$, SEK, NOK, DKK, PLN, HUF, CZK, RON, RUB, UAH, JPY, CNY, KRW, INR.</li>
+<li><strong>Sprog:</strong> 25 sprogvarianter, blandt andet tysk, engelsk, engelsk (US) og mange flere. <strong>Valutaen skifter automatisk</strong> (svensk → krone, engelsk (US) → US $, engelsk (UK) → £). Eksempel: Når du skifter til svensk, skifter appen til SEK og spørger, om du vil <strong>omregne alle priser til dagens kurs fra Den Europæiske Centralbank</strong> (”OK”) eller kun ændre betegnelsen (”Annuller”). Der findes ingen kurser for RUB og UAH. Du kan til enhver tid ændre valutaen manuelt.</li>
+<li><strong>Konfetti &amp; lyd, når du drikker:</strong> begge dele, kun konfetti eller slået fra.</li>
+<li><strong>Skrifttype:</strong> ti skrifttyper at vælge imellem.</li>
+<li><strong>Temperaturenhed:</strong> °C eller °F (engelsk (US) sætter automatisk °F).</li>
+</ul>
+<h3>Lagringssted</h3>
+<p><em>Kun denne enhed</em> eller <em>Sky</em> (synk-kode, <a href="#sync">afsnit 12</a>).</p>
+<h3>AI-kreditter (kun iPhone-appen)</h3>
+<p>Viser de resterende AI-scanninger, enheds-ID’et og – når det er nødvendigt – <em>Tilføj kreditter</em> eller en oplåsningskode. Se <a href="#privacy">afsnit 13</a>.</p>
+<h3>Vindatabase</h3>
+<ul>
+<li><strong>Opdater alle vine (AI):</strong> udfylder manglende region, land, drue, drikkevindue, serveringstemperatur og pris for alle vine (i webversionen også flaskebilleder). Eksisterende værdier bliver bevaret. Hvis der allerede findes serveringstemperaturer, spørger appen først, om de også skal erstattes af AI-værdier.</li>
+<li><strong>Genberegn drikkevindue:</strong> sætter ”Drik fra” til årgang + 1 for alle vine med en årgang (håndindtastede værdier bliver også overskrevet) og justerer ”Drik til”, hvor det er nødvendigt. Appen oplyser først antallet af vine og beder om bekræftelse. <em>Tip: Eksportér først en JSON-backup.</em></li>
+</ul>
+<h3>Reoler</h3>
+<p>Se <a href="#racks">afsnit 6</a>. Overskriften viser antallet af reoler.</p>
+<h3>Privatlivspolitik, support, version</h3>
+<p>Linkene fører til privatlivspolitikken og til denne supportside. Allernederst finder du appens <strong>version</strong> – oplys den, når du kontakter os.</p>
+
+<!-- ───────────────── 12 ───────────────── -->
+<h2 id="sync">12. Synkronisér to enheder</h2>
+
+<ol>
+<li><strong>Første enhed:</strong> Opsætning → Lagringssted → <em>Sky</em> → <em>Opret ny synk-kode</em>. Koden vises på skærmen; med <em>Gem koden via e-mail</em> sender du den til dig selv.</li>
+<li><strong>Anden enhed:</strong> Opsætning → Lagringssted → <em>Sky</em> → indtast koden (små bogstaver, uden mellemrum) → Tilslut. Hvis enheden allerede indeholder vine, spørger appen, om de skal flettes med skydataene.</li>
+<li>Derefter synkroniserer begge enheder automatisk (f.eks. når appen åbnes); <em>Synkronisér nu</em> starter det manuelt. Reglen er: <strong>den seneste ændring vinder</strong>.</li>
+</ol>
+<p>Vine, ønskeliste, historik, reoler og indstillinger som sprog og valuta bliver synkroniseret. <strong>Ikke synkroniseret</strong> er egne fotos og enhedsspecifikke data. Alle, der kender din kode, kan se dine vine – del den kun med personer, du stoler på. Gem også en JSON-backup.</p>
+
+<!-- ───────────────── 13 ───────────────── -->
+<h2 id="privacy">13. AI, privatliv og omkostninger</h2>
+
+<ul>
+<li><strong>Hvad bruges AI til?</strong> Scan etiket, slå vin op, søg priser og ”Opdater alle vine”. Fotoet eller vinens navn sendes via vores server til en AI-tjeneste (Anthropic, USA) til analyse – uden navne eller konti. Appen beder om dit samtykke før første brug.</li>
+<li><strong>Stregkodescanning</strong> sender kun nummeret til en gratis produktdatabase og koster ingen AI-kredit.</li>
+<li><strong>Omkostninger (iPhone-appen):</strong> 50 AI-kald pr. installation er inkluderet i købsprisen; flere kan købes som et valgfrit engangskøb (intet abonnement, kreditterne udløber ikke). Alt andet i appen koster ikke ekstra. Når kreditterne er brugt op, virker alt undtagen AI-funktionerne stadig.</li>
+<li><strong>Data:</strong> Alt bliver på din enhed, så længe du ikke aktiverer skyen. Ingen reklamer, ingen tracking, ingen brugerkonto. Detaljer i <a href="datenschutz.html">privatlivspolitikken</a> (på tysk).</li>
+</ul>
+
+<!-- ───────────────── 14 ───────────────── -->
+<h2 id="faq">14. Tips og FAQ</h2>
+
+<ul>
+<li><strong>På en iPad eller pc</strong> tilpasser layoutet sig: bredere kolonne, flere kort side om side, og på pc (og iPad i liggende format) ligger navigationen til venstre. Telefonen virker også i liggende format. På en pc lukker <kbd>Esc</kbd> det øverste vindue; på en telefon stryger du et vindue nedad for at lukke det.</li>
+<li><strong>Mine vine er væk:</strong> Se <a href="support.html">Support</a> – gendan med synk-koden eller en JSON-backup.</li>
+<li><strong>Intet stregkodehit for en vin:</strong> Normalt for små vingårde. Brug etiketscanningen.</li>
+<li><strong>AI’en har aflæst noget forkert:</strong> Ret feltet manuelt og gem; AI-værdierne er forslag.</li>
+<li><strong>Drikkevinduet virker for tidligt/sent:</strong> Det er tommelfingerregler efter vintype og drue. Justér ”Drik til” pr. vin, hvis du ved bedre.</li>
+<li><strong>Siden viser stadig den gamle version (web):</strong> Genindlæs siden (på pc <kbd>Ctrl</kbd>+<kbd>F5</kbd>).</li>
+</ul>
+<p>Flere spørgsmål? Skriv til <a href="mailto:t.knecht@web.de?subject=Weinkeller%20Brugervejledning">t.knecht@web.de</a> og oplys appversionen (Opsætning, allernederst).</p>
+
+<p style="margin-top:36px"><small>Weinkeller · Thomas Knecht · Scheidemannstr. 29 · 42781 Haan · Deutschland</small></p>
+
+</body></html>

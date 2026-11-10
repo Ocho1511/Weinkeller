@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="fi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Käyttöohje – Weinkeller</title>
+<style>
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Sans CJK SC","Noto Sans JP","Noto Sans KR","Noto Sans Devanagari",sans-serif;max-width:760px;margin:0 auto;padding:24px 18px 70px;line-height:1.6;color:#222;background:#fff}
+  h1{font-size:28px;margin:6px 0 4px} h2{font-size:20px;margin-top:34px;padding-top:6px;border-top:1px solid #e3e3e3} h3{font-size:16px;margin:20px 0 4px}
+  small{color:#666} a{color:#0a58ca} p{margin:8px 0} ul,ol{margin:6px 0 10px;padding-left:22px} li{margin:3px 0}
+  code,kbd{background:#f2f2f2;border-radius:4px;padding:1px 5px;font-size:.92em}
+  .tip,.note{border-left:4px solid #b88a2a;background:#fbf6ea;padding:8px 12px;border-radius:0 8px 8px 0;margin:12px 0}
+  .note{border-color:#0a58ca;background:#eef4fd}
+  .toc{background:#f7f7f7;border-radius:10px;padding:10px 16px;margin:16px 0} .toc ol{margin:4px 0}
+  .lang{position:sticky;top:0;background:#fff;padding:8px 0;margin:0 0 6px;border-bottom:1px solid #eee;z-index:5}
+  .lang select{font:inherit;font-size:15px;padding:5px 10px;border:1px solid #bbb;border-radius:16px;background:#fff;max-width:100%}
+  table{border-collapse:collapse;width:100%;margin:8px 0} td,th{border:1px solid #ddd;padding:6px 9px;text-align:left;vertical-align:top;font-size:15px} th{background:#f4f4f4}
+  .back{margin:0 0 6px}
+  @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
+</style></head><body>
+<p class="back"><a href="support.html">← Takaisin tukeen</a></p>
+<div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html">Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html" selected>Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
+
+<h1>Käyttöohje – Weinkeller</h1>
+<p><small>Päivitetty: 10. marraskuuta 2026 · Sovelluksen versio 2.0</small></p>
+
+<div class="toc">
+
+<strong>Sisältö</strong><ol>
+<li><a href="#start">Yleiskatsaus ja ensimmäiset askeleet</a></li>
+<li><a href="#add">Viinin lisääminen</a></li>
+<li><a href="#cellar">Kellari</a></li>
+<li><a href="#drink">Viinin juominen</a></li>
+<li><a href="#ripe">Juomaikkuna (Kypsyys)</a></li>
+<li><a href="#racks">Hyllyt ja sijoittaminen</a></li>
+<li><a href="#history">Historia</a></li>
+<li><a href="#wish">Toivelista</a></li>
+<li><a href="#stats">Tilastot</a></li>
+<li><a href="#export">Vienti, tuonti ja varmuuskopio</a></li>
+<li><a href="#setup">Asetukset</a></li>
+<li><a href="#sync">Kahden laitteen synkronointi</a></li>
+<li><a href="#privacy">Tekoäly, tietosuoja ja kustannukset</a></li>
+<li><a href="#faq">Vinkit ja UKK</a></li></ol>
+</div>
+
+<!-- ───────────────── 1 ───────────────── -->
+<h2 id="start">1. Yleiskatsaus ja ensimmäiset askeleet</h2>
+
+<p>Weinkeller on henkilökohtainen viinikellarisi taskussa: hallitset varastoa, säilytyspaikkoja, juomaikkunoita, toivelistaa ja tilastoja. Kaikki toimii laitteellasi; synkronointikoodilla voit yhdistää useita laitteita.</p>
+<p>Alareunassa (tietokoneella ja iPadilla vaaka-asennossa: vasemmalla) on palkki, jossa on kahdeksan aluetta:</p>
+<table>
+<tbody><tr><th>Alue</th><th>Tarkoitus</th></tr>
+<tr><td><strong>Kellari</strong></td><td>Kaikki viinit, haku, suodattimet, lajittelu, viinin lisääminen, juominen</td></tr>
+<tr><td><strong>Tilastot</strong></td><td>Analyysit varastosta, hinnoista, kypsyydestä, säilytyksestä ja juomahistoriasta</td></tr>
+<tr><td><strong>Kypsyys</strong></td><td>Mitkä viinit juoda nyt, pian tai ei enää (”juomaikkuna”)</td></tr>
+<tr><td><strong>Historia</strong></td><td>Juomasi viinit</td></tr>
+<tr><td><strong>Hyllyt</strong></td><td>Kellarin pohjapiirros: viinien sijoittaminen ja siirtäminen, QR-tarrat</td></tr>
+<tr><td><strong>Toivelista</strong></td><td>Viinit, jotka haluat vielä ostaa</td></tr>
+<tr><td><strong>Vienti/Tuonti</strong></td><td>Tietojen varmuuskopiointi, taulukoiden ja varmuuskopioiden lukeminen sisään</td></tr>
+<tr><td><strong>Asetukset</strong></td><td>Nimi, valuutta, kieli, pilvi, hyllyjen määrittely</td></tr>
+</tbody></table>
+<h3>Viisi ensimmäistä askelta</h3>
+<ol>
+<li><strong>Valitse kieli ja valuutta</strong>: Asetukset → Yleiset. Valuutta seuraa kieltä automaattisesti.</li>
+<li><strong>Määrittele hyllyt</strong> (valinnainen): Asetukset → Hyllyt (katso <a href="#racks">luku 6</a>).</li>
+<li><strong>Lisää ensimmäinen viinisi</strong>: napauta kellarissa <kbd>+</kbd> (<a href="#add">luku 2</a>).</li>
+<li><strong>Sijoita se</strong>: anna viinille paikka hyllystä.</li>
+<li><strong>Varmuuskopioi</strong>: Vienti/Tuonti → JSON-varmuuskopio tai ota käyttöön pilvisynkronointi (<a href="#sync">luku 12</a>).</li>
+</ol>
+<div class="tip">Näkymän <em>Asetukset</em> osiot ovat laajennettavia. ”Yleiset” on auki ensimmäisellä käynnistyskerralla, muut ovat suljettuina. Sovellus muistaa, mitkä osat avasit tai suljit viimeksi.</div>
+
+<!-- ───────────────── 2 ───────────────── -->
+<h2 id="add">2. Viinin lisääminen</h2>
+
+<p>Napauta kellarissa <kbd>+</kbd>. Viinin voi lisätä usealla tavalla – niitä voi yhdistellä.</p>
+<h3>a) Käsin</h3>
+<p>Täytä kentät: <strong>Nimi / Viinitila, Vuosikerta, Pulloja, Viinityyppi, Alue, Maa, Rypäle, Säilytyspaikka, Juo alkaen/asti, Tarjoilulämpötila, Hinta, Arvosana, Muistiinpano</strong>. Vain nimi on pakollinen. <em>Tallenna</em> luo viinin.</p>
+<ul>
+<li><strong>Juomaikkuna:</strong> Heti kun syötät vuosikerran, sovellus asettaa ”Juo alkaen” -kenttään arvon <strong>vuosikerta + 1</strong>. ”Juo asti” riippuu viinityypistä ja rypäleestä (punaviini säilyy pidempään kuin rosé). Voit muuttaa molempia milloin tahansa.</li>
+<li><strong>Varasto, Min ja Maks:</strong> Jos syötät minimin, sovellus varoittaa, kun varasto laskee sen alle, ja tarjoutuu lisäämään viinin toivelistalle (<a href="#cellar">luku 3</a>).</li>
+<li><strong>Oma kuva:</strong> ”Ota / valitse kuva” liittää viiniin valokuvan. Se pysyy tällä laitteella ja sisältyy JSON-varmuuskopioon, mutta sitä ei synkronoida pilveen.</li>
+</ul>
+<h3>b) Skannaa etiketti (tekoäly)</h3>
+<p>Napauta <em>Skannaa etiketti (tekoäly)</em> ja ota kuva pullon etiketistä. Tekoäly lukee nimen, vuosikerran, tyypin, alueen, maan ja rypäleen sekä arvioi juomaikkunan ja tarjoilulämpötilan. Tarkista arvot ja tallenna. Ennen ensimmäistä käyttökertaa sovellus pyytää suostumuksesi (<a href="#privacy">luku 13</a>).</p>
+<h3>c) Skannaa viivakoodi</h3>
+<p>Napauta <em>Skannaa viivakoodi</em> ja pidä pullon viivakoodia kehyksen sisällä. Sovellus hakee numeron ilmaisesta tuotetietokannasta (ei kustannuksia, ei tekoälykrediittiä) ja täyttää löytyessään <strong>nimen, tuottajan ja viinityypin</strong>. Vuosikerran se täydentää nimestä tai kysyy sitä.</p>
+<ul>
+<li>Jos pullo on jo kellarissa, sovellus kysyy ”Lisätäänkö toinen pullo?” – nopea tapa kasvattaa määrää, kun ostat lisää.</li>
+<li>Jos viivakoodia <strong>ei</strong> löydy tietokannasta (yleistä pienillä viinitiloilla), näkyy vihje ja painike <em>Skannaa etiketti (tekoäly)</em>. Numero tallennetaan silti viinin mukana, jotta pullo tunnistetaan heti ensi kerralla.</li>
+</ul>
+<h3>d) Hae viinin tiedot (tekoäly)</h3>
+<p><em>Hae viinin tiedot (tekoäly)</em> antaa tekoälyn etsiä verkosta alueen, maan, rypäleen, juomaikkunan, tarjoilulämpötilan, nykyisen keskihinnan ja – verkkoversiossa – pullokuvan. Jo täyttämiäsi kenttiä ei korvata. Tämä tapahtuu myös automaattisesti, kun nimi ja vuosikerta on syötetty eikä hintaa vielä ole.</p>
+<div class="note">iPhone-sovellus ei lataa pullokuvia internetistä (App Storen sääntö). Voit ottaa omia kuvia sen sijaan.</div>
+
+<!-- ───────────────── 3 ───────────────── -->
+<h2 id="cellar">3. Kellari</h2>
+
+<h3>Haku, suodatus, lajittelu</h3>
+<ul>
+<li><strong>Haku</strong> ylhäällä: löytää viinit nimen, alueen, maan ja rypäleen perusteella.</li>
+<li><strong>Suodattimet:</strong> Kaikki, Punaviini, Valkoviini, Rosé, Kuohuviini, Muu. Tyypin valitseminen tyhjentää haun automaattisesti.</li>
+<li><strong>Lajittelu:</strong> Uusin ensin, Nimi, Vuosikerta, Rypäle, Alue, Maa tai Juomakypsyys (kiireellisin ensin).</li>
+<li><strong>Lista / kortit:</strong> Painike <em>Lista</em> vaihtaa tiiviin listan ja yksityiskohtaisten korttien välillä.</li>
+</ul>
+<h3>Viinikortti</h3>
+<p>Kortti näyttää nimen, vuosikerran, rypäleen, arvosanan (tähdet), alueen ja maan (napauta avataksesi kartan tai maan viinialueet), pullojen määrän, <strong>tarjoilulämpötilan</strong> (🌡), <strong>säilytyspaikat</strong> (napauta siirtyäksesi hyllyyn) sekä <strong>kypsyyspalkin</strong> väreillä Nuori, Optimaalinen, Huippu, Ylitetty. Rypälesymboli avaa rypäleen Wikipedia-sivun.</p>
+<p>Kortin alareunassa: <em>Muokkaa</em>, <em>Juo</em> ja 🗑 (poista viini).</p>
+<h3>Varasto, Min/Maks ja ostoslista</h3>
+<p>Jos syötät viinille minimin (ja halutessasi maksimin), kortti näyttää ”Varasto · Min · Maks” ja varoittaa merkillä ⚠, kun olet sen alapuolella. Painike <em>Täydennä</em> avaa <strong>ostoslistan</strong>: se luettelee kaikki viinit, jotka ovat minimin alla (tavoite on maksimi, muuten minimi). Voit jakaa tai kopioida listan tai lisätä viinit toivelistalle.</p>
+
+<!-- ───────────────── 4 ───────────────── -->
+<h2 id="drink">4. Viinin juominen</h2>
+
+<p>Napauta viinikortissa <em>Juo</em> (tai Kypsyys-näkymässä ”Juo · n pll.”). <em>Juo viini</em> -ikkuna aukeaa:</p>
+<ul>
+<li><strong>Miltä paikalta otettu?</strong> – valitse hyllypaikka, jolta pullo otettiin, tai ”Pullo ilman paikkaa”. Paikka vapautuu.</li>
+<li><strong>Kenen kanssa joit?</strong> – vieraidesi nimet (valinnainen).</li>
+<li><strong>Tilaisuus</strong> – Kevät, Kesä, Syksy, Talvi, Syntymäpäivä, Juhlat tai ”Ihan vain” (voit valita useita).</li>
+</ul>
+<p><em>Juo</em> poistaa yhden pullon ja luo merkinnän <a href="#history">Historiaan</a>. Konfetti ja ääni juhlistavat hetkeä (voi kytkeä pois Asetuksissa). Jos kyseessä on <strong>viimeinen pullo</strong>, sovellus kertoo siitä: viini katoaa silloin kellarista (mutta säilyy Historiassa).</p>
+<div class="tip"><strong>Nopeasti skannaamalla:</strong> Kellarin pyöreä 🥂-painike ottaa kuvan etiketistä, tunnistaa viinin kellaristasi ja avaa Juo-ikkunan heti.</div>
+
+<!-- ───────────────── 5 ───────────────── -->
+<h2 id="ripe">5. Juomaikkuna (Kypsyys)</h2>
+
+<p>Tässä näet kaikki viinit, joilla on juomaikkuna, <strong>kiireellisin ensin</strong>. Jokaisessa kortissa on nimi, vuosikerta, tyyppi, <strong>Juo alkaen/asti</strong>, tarjoilulämpötila, säilytyspaikka ja palkki, jossa on merkki kuluvalle vuodelle.</p>
+<table>
+<tbody><tr><th>Tila</th><th>Merkitys</th></tr>
+<tr><td><strong>Nuori</strong></td><td>Liian aikaisin – ennen kohtaa ”Juo alkaen”</td></tr>
+<tr><td><strong>Optimaalinen</strong></td><td>Juotavissa, vielä ikkunan alkuvaiheessa</td></tr>
+<tr><td><strong>Huippu</strong></td><td>Huipussaan – juo pian</td></tr>
+<tr><td><strong>Ylitetty</strong></td><td>Kohdan ”Juo asti” jälkeen – juo mahdollisimman pian</td></tr>
+</tbody></table>
+<p><strong>Suodattimet:</strong> viinityypin, tilan ja <strong>maan</strong> mukaan (pudotusvalikko, jossa on maakohtainen määrä; maat ilman osumia ovat harmaina). Suodattimia voi yhdistellä. Napauta korttia avataksesi viinin kellarissa.</p>
+<p><strong>Ikkunan sääntö:</strong> ”Juo alkaen” = vuosikerta + 1. ”Juo asti” riippuu viinityypistä ja rypäleestä. Jos sinulla on vanhempia viinejä muilla arvoilla, voit laskea ne kaikki uudelleen kerralla Asetuksissa (<a href="#setup">luku 11</a>, ”Laske juomaikkuna uudelleen”).</p>
+
+<!-- ───────────────── 6 ───────────────── -->
+<h2 id="racks">6. Hyllyt ja sijoittaminen</h2>
+
+<h3>Hyllyjen määrittely ja muokkaus</h3>
+<p><strong>Asetukset → Hyllyt</strong> (avaa napauttamalla otsikkoa): syötä nimi, tasot, paikat tasoa kohti ja pullot paikkaa kohti ja napauta sitten ＋. ”Pulloa/paikka” on 1 viinitelineelle ja suurempi lattialle tai laatikolle. Listassa jokaisella hyllyllä on:</p>
+<ul>
+<li>järjestyksen muuttamiseen on <strong>kahva ⠿</strong> sekä listan alla painike <em>Lajittele A–Ö</em>,</li>
+<li>▦ <strong>QR-tarroille</strong>, ✏️ muokkaamiseen, 🧹 tyhjentämiseen ja 🗑 poistamiseen.</li>
+</ul>
+<p>Toiminnolla <strong>muokkaa</strong> (✏️) voit nimetä hyllyn uudelleen, muuttaa paikkojen määrää tasoa kohti, lisätä tasoja ylös tai alas, poistaa tasoja ja antaa jokaiselle tasolle oman nimen ja pullomäärän. Pullot, jotka menettävät paikkansa näin, lasketaan sen jälkeen ”ei sijoitetuiksi”; viinit itse pysyvät kellarissa. Sovellus kysyy ennen tällaisia muutoksia.</p>
+<h3>Hyllyt-alue</h3>
+<p>Ylhäällä valitset hyllyn <strong>laatoista</strong> (nimi ja ”varattu / paikat”). Järjestystä voi muuttaa myös täällä: tietokoneella vedä laattaa, kosketusnäytöllä paina laattaa noin puoli sekuntia ja vedä sitten. Alla on <strong>kellarin pohjapiirros</strong>: jokainen taso paikkoineen. Varatuissa paikoissa näkyy makaava pullo viinityypin värisenä.</p>
+<h3>Sijoittaminen</h3>
+<ol>
+<li>Napauta viiniä kohdassa ”Ei sijoitettu” (listaa voi suodattaa tyypin ja maan mukaan) – tai napauta kellarissa ”ei sijoitettu” -vihjettä.</li>
+<li>Napauta <strong>vapaata paikkaa</strong>. Lattioille ja laatikoille sovellus sijoittaa niin monta pulloa kuin mahtuu.</li>
+</ol>
+<p><strong>Skannaa viini ja sijoita</strong> ottaa kuvan etiketistä, löytää viinin ja opastaa sijoittamisessa.</p>
+<h3>Varatut paikat, siirtäminen, poistaminen</h3>
+<p>Napauta varattua paikkaa: näet viinin ja voit <em>avata</em> sen, <em>poistaa sen paikalta</em> tai <em>siirtää</em> sen (napauta sitten vapaata paikkaa). <em>Tyhjennä hylly</em> ottaa kaikki pullot pois hyllystä (vahvistuksen jälkeen).</p>
+<h3>Vilkutus</h3>
+<p>Kytkimet <em>Vilku</em> saavat vilkkumaan pullot, jotka tulisi <strong>juoda ensin</strong> (ylitetty tai ikkunan lopussa viimeistään ensi vuonna), jotka ovat ylitettyjä, huipussaan tai optimaalisia – niin löydät ne hyllystä yhdellä silmäyksellä.</p>
+<h3>QR-tarrat ja ”Skannaa taso”</h3>
+<p>Toiminnolla <strong>QR-tarrat</strong> (Asetukset → Hyllyt → ▦) luot yhden tarran hyllylle ja yhden jokaiselle tasolle. Jaa PDF-tiedostona tai tulosta (tarra-arkki 63,5 × 38,1 mm, 21 per sivu) ja kiinnitä ne. Sen jälkeen: <strong>Skannaa taso</strong> Hyllyt-alueella – näet, mitä tasolla on, ja voit <em>varastoida tähän</em>, <em>ottaa pois</em>, juoda, siirtää pullon tai <em>siirtää koko tason</em>. Lisää viini -lomakkeessa tasotarran skannaus täyttää myös säilytyspaikan.</p>
+
+<!-- ───────────────── 7 ───────────────── -->
+<h2 id="history">7. Historia</h2>
+
+<p>Historia listaa kaikki juomasi viinit päivämäärän, viinin, arvon, vieraiden ja tilaisuuden kanssa. Voit suodattaa viinityypin ja tilaisuuden mukaan ja muokata merkintää (vieraat, tilaisuus). Historia syöttää Tilastojen analyysit ”Juodut kuukaudessa/vuodessa”, kulutuksen ja juomatiheyden.</p>
+
+<!-- ───────────────── 8 ───────────────── -->
+<h2 id="wish">8. Toivelista</h2>
+
+<ul>
+<li><strong>+ Lisää toive</strong>: käsin tai etikettiskannauksella, valinnaisella muistiinpanolla (”Mistä ostaa?”).</li>
+<li><strong>Hae hintoja</strong> (💶): Sovellus etsii verkosta viinin hintoja, näyttää halvimman osuman ja kertoo sen määrällä. Arvot ovat suuntaa antavia ilman takuuta – tarkista toimituskulut ja saatavuus kaupasta.</li>
+<li><strong>Rasti</strong> vasemmalla: merkitse ostetuksi/tehdyksi (rivi haalistuu).</li>
+<li><strong>→ Kellari</strong>: siirtää toiveen kellariin (määrän ja mahdollisen halvimman hinnan kanssa) ja vie sinut suoraan sijoittamaan, jos sinulla on hyllyjä.</li>
+<li>Jos viini laskee minimin alle, sovellus tarjoutuu lisäämään sen toivelistalle puuttuvalla määrällä (”täydennys”).</li>
+</ul>
+
+<!-- ───────────────── 9 ───────────────── -->
+<h2 id="stats">9. Tilastot</h2>
+
+<p>Ylhäältä alas:</p>
+<ul>
+<li><strong>Tunnusluvut:</strong> pullot, viinit, kokonaisarvo, arvosanojen keskiarvo.</li>
+<li><strong>Juomaikkuna:</strong> pullot tilan mukaan (Nuori, Optimaalinen, Huippu, Ylitetty) ja varoitus ylitetyistä pulloista; napautus avaa Kypsyys-näkymän vastaavalla suodattimella.</li>
+<li><strong>Tyypeittäin</strong> ja <strong>Parhaat viinit</strong> (arvosanan tai tiheyden mukaan, suodatettavissa tähdillä).</li>
+<li><strong>Maittain, alueittain, rypäleittäin:</strong> palkit (enintään 8, loput ”+n muuta”); napautus hakee kellarista. <strong>Vuosikerroittain:</strong> pylväät, vieritettävissä sivusuunnassa.</li>
+<li><strong>Hinnat:</strong> keskihinta pulloa kohti, halvin, kallein, hintaluokat (sovitettu valuuttaasi) ja arvo maittain.</li>
+<li><strong>Varasto:</strong> täyttöaste prosentteina, vapaat paikat, ei sijoitetut pullot ja palkki jokaiselle hyllylle (napautus vie hyllyyn).</li>
+<li><strong>Juodut:</strong> kuukausittain (viimeiset 12) ja vuosittain sekä juotuihin pulloihin käytetty raha.</li>
+<li><strong>Parhaat maat ja rypäleet</strong> arvosanojen keskiarvon mukaan (kellari ja Historia yhdessä).</li>
+<li><strong>Täydennettävät:</strong> viinit, joiden varasto on alle minimin (avaa ostoslistan), avoimet toiveet ja niiden arvo.</li>
+</ul>
+<p>Osiot ilman tietoja (esim. ilman hintoja) piilotetaan.</p>
+
+<!-- ───────────────── 10 ───────────────── -->
+<h2 id="export">10. Vienti, tuonti ja varmuuskopio</h2>
+
+<table>
+<tbody><tr><th>Toiminto</th><th>Tarkoitus</th></tr>
+<tr><td>Vie CSV</td><td>Taulukko Excelille tai Numbersille</td></tr>
+<tr><td>Vie Excel</td><td>.xlsx-tiedostona</td></tr>
+<tr><td>Vie PDF</td><td>Tulostettava yleiskatsaus</td></tr>
+<tr><td><strong>JSON-varmuuskopio</strong></td><td><strong>Täydellinen tietojen varmuuskopio</strong> (viinit, toivelista, historia, hyllyt, näyttönimi, omat kuvat)</td></tr>
+<tr><td>Leikepöydälle</td><td>Kopioi tekstilista</td></tr>
+<tr><td>Tuo JSON / CSV / Excel</td><td>Palauta varmuuskopio tai lue taulukko sisään</td></tr>
+</tbody></table>
+<div class="tip"><strong>Tee JSON-varmuuskopio säännöllisesti.</strong> JSON-tuonti korvaa kellarin varmuuskopiolla (sovellus kysyy ensin). Uudella laitteella tämä palauttaa kaiken. Vaihtoehtoisesti käytä pilvisynkronointia (<a href="#sync">luku 12</a>).</div>
+
+<!-- ───────────────── 11 ───────────────── -->
+<h2 id="setup">11. Asetukset</h2>
+
+<h3>Yleiset</h3>
+<ul>
+<li><strong>Näyttönimi (otsikko):</strong> ”Peter” muuttuu muotoon ”Peterin Weinkeller” jne. Jätä tyhjäksi, jos haluat oletusotsikon.</li>
+<li><strong>Valuutta:</strong> €, $, £, CHF, A$, C$, SEK, NOK, DKK, PLN, HUF, CZK, RON, RUB, UAH, JPY, CNY, KRW, INR.</li>
+<li><strong>Kieli:</strong> 25 kielivarianttia, mukaan lukien saksa, englanti, englanti (US) ja monia muita. <strong>Valuutta vaihtuu automaattisesti</strong> (ruotsi → kruunu, englanti (US) → US $, englanti (UK) → £). Esimerkki: kun vaihdat ruotsiin, sovellus vaihtaa valuutaksi SEK ja kysyy, haluatko <strong>muuntaa kaikki hinnat Euroopan keskuspankin tämänpäiväisellä kurssilla</strong> (”OK”) vai vaihtaa vain tunnuksen (”Peruuta”). RUB:lle ja UAH:lle ei ole kursseja. Voit vaihtaa valuutan käsin milloin tahansa.</li>
+<li><strong>Konfetti &amp; ääni juodessa:</strong> molemmat, vain konfetti tai pois.</li>
+<li><strong>Fontti:</strong> kymmenen fonttia valittavana.</li>
+<li><strong>Lämpötilayksikkö:</strong> °C tai °F (englanti (US) asettaa °F automaattisesti).</li>
+</ul>
+<h3>Tallennuspaikka</h3>
+<p><em>Vain tämä laite</em> tai <em>Pilvi</em> (synkronointikoodi, <a href="#sync">luku 12</a>).</p>
+<h3>Tekoälykrediitit (vain iPhone-sovellus)</h3>
+<p>Näyttää jäljellä olevat tekoälyskannaukset, laitetunnuksen ja tarvittaessa <em>Lisää krediittejä</em> -toiminnon tai avauskoodin. Katso <a href="#privacy">luku 13</a>.</p>
+<h3>Viinitietokanta</h3>
+<ul>
+<li><strong>Päivitä kaikki viinit (tekoäly):</strong> täyttää puuttuvan alueen, maan, rypäleen, juomaikkunan, tarjoilulämpötilan ja hinnan kaikille viineille (verkkoversiossa myös pullokuvat). Olemassa olevat arvot säilyvät. Jos tarjoilulämpötiloja on jo, sovellus kysyy ensin, korvataanko ne myös tekoälyn arvoilla.</li>
+<li><strong>Laske juomaikkuna uudelleen:</strong> asettaa ”Juo alkaen” -arvoksi vuosikerta + 1 kaikille viineille, joilla on vuosikerta (myös käsin syötetyt arvot ylikirjoitetaan), ja säätää ”Juo asti” -arvoa tarvittaessa. Sovellus ilmoittaa ensin viinien määrän ja pyytää vahvistuksen. <em>Vinkki: vie ensin JSON-varmuuskopio.</em></li>
+</ul>
+<h3>Hyllyt</h3>
+<p>Katso <a href="#racks">luku 6</a>. Otsikossa näkyy hyllyjen määrä.</p>
+<h3>Tietosuoja, tuki, versio</h3>
+<p>Linkit johtavat tietosuojaselosteeseen ja tähän tukisivuun. Aivan alareunasta löydät sovelluksen <strong>version</strong> – ilmoita se, kun otat meihin yhteyttä.</p>
+
+<!-- ───────────────── 12 ───────────────── -->
+<h2 id="sync">12. Kahden laitteen synkronointi</h2>
+
+<ol>
+<li><strong>Ensimmäinen laite:</strong> Asetukset → Tallennuspaikka → <em>Pilvi</em> → <em>Luo uusi synkronointikoodi</em>. Koodi ilmestyy näytölle; toiminnolla <em>Tallenna koodi sähköpostiin</em> lähetät sen itsellesi.</li>
+<li><strong>Toinen laite:</strong> Asetukset → Tallennuspaikka → <em>Pilvi</em> → syötä koodi (pienillä kirjaimilla, ilman välilyöntejä) → Yhdistä. Jos laitteella on jo viinejä, sovellus kysyy, yhdistetäänkö ne pilvitietoihin.</li>
+<li>Sen jälkeen molemmat laitteet synkronoituvat automaattisesti (esim. kun sovellus avataan); <em>Synkronoi nyt</em> käynnistää sen käsin. Sääntö on: <strong>uusin muutos voittaa</strong>.</li>
+</ol>
+<p>Viinit, toivelista, historia, hyllyt ja asetukset, kuten kieli ja valuutta, synkronoidaan. <strong>Ei synkronoida</strong> omia kuvia eikä laitekohtaisia tietoja. Jokainen, joka tietää koodisi, näkee viinisi – jaa se vain luotettaville ihmisille. Pidä myös JSON-varmuuskopio.</p>
+
+<!-- ───────────────── 13 ───────────────── -->
+<h2 id="privacy">13. Tekoäly, tietosuoja ja kustannukset</h2>
+
+<ul>
+<li><strong>Mihin tekoälyä käytetään?</strong> Etiketin skannaus, viinin tietojen haku, hintojen haku ja ”Päivitä kaikki viinit”. Kuva tai viinin nimi lähetetään palvelimemme kautta tekoälypalveluun (Anthropic, USA) arvioitavaksi – ilman nimiä tai tilejä. Sovellus pyytää suostumuksesi ennen ensimmäistä käyttökertaa.</li>
+<li><strong>Viivakoodin skannaus</strong> lähettää vain numeron ilmaiseen tuotetietokantaan eikä maksa tekoälykrediittiä.</li>
+<li><strong>Kustannukset (iPhone-sovellus):</strong> 50 tekoälykutsua asennusta kohti sisältyy ostohintaan; lisää voi ostaa valinnaisena kertaostoksena (ei tilausta, krediitit eivät vanhene). Kaikki muu sovelluksessa on ilmaista. Kun krediitit on käytetty, kaikki paitsi tekoälytoiminnot toimivat edelleen.</li>
+<li><strong>Tiedot:</strong> Kaikki pysyy laitteellasi, kunhan et ota pilveä käyttöön. Ei mainoksia, ei seurantaa, ei käyttäjätiliä. Lisätietoja <a href="datenschutz.html">tietosuojaselosteessa</a> (saksaksi).</li>
+</ul>
+
+<!-- ───────────────── 14 ───────────────── -->
+<h2 id="faq">14. Vinkit ja UKK</h2>
+
+<ul>
+<li><strong>iPadilla tai tietokoneella</strong> asettelu mukautuu: leveämpi sarake, useita kortteja vierekkäin ja tietokoneella (sekä iPadilla vaaka-asennossa) navigointi vasemmalla. Puhelinkin toimii vaaka-asennossa. Tietokoneella <kbd>Esc</kbd> sulkee ylimmän ikkunan; puhelimella pyyhkäise ikkunaa alas sulkeaksesi sen.</li>
+<li><strong>Viinini ovat kadonneet:</strong> Katso <a href="support.html">Tuki</a> – palauta synkronointikoodilla tai JSON-varmuuskopiolla.</li>
+<li><strong>Viinille ei löydy viivakoodia:</strong> Normaalia pienille viinitiloille. Käytä etikettiskannausta.</li>
+<li><strong>Tekoäly luki jotain väärin:</strong> Korjaa kenttä käsin ja tallenna; tekoälyn arvot ovat ehdotuksia.</li>
+<li><strong>Juomaikkuna vaikuttaa liian aikaiselta/myöhäiseltä:</strong> Nämä ovat viinityyppiin ja rypäleeseen perustuvia nyrkkisääntöjä. Säädä ”Juo asti” viinikohtaisesti, jos tiedät paremmin.</li>
+<li><strong>Sivu näyttää yhä vanhaa versiota (web):</strong> Lataa sivu uudelleen (tietokoneella <kbd>Ctrl</kbd>+<kbd>F5</kbd>).</li>
+</ul>
+<p>Lisää kysyttävää? Kirjoita osoitteeseen <a href="mailto:t.knecht@web.de?subject=Weinkeller%20K%C3%A4ytt%C3%B6ohje">t.knecht@web.de</a> ja ilmoita sovelluksen versio (Asetukset, aivan alareunassa).</p>
+
+<p style="margin-top:36px"><small>Weinkeller · Thomas Knecht · Scheidemannstr. 29 · 42781 Haan · Deutschland</small></p>
+
+</body></html>
