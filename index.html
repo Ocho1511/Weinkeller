@@ -3364,6 +3364,30 @@ function hideEnrichProgress() {
 // (setTimeout statt requestAnimationFrame, damit es auch läuft, wenn die App im Hintergrund ist)
 function nextFrame() { return new Promise(r => setTimeout(r, 0)); }
 
+// Bildschirm während langer Läufe wach halten: iOS friert eine Seite bei Bildschirmsperre ein, der Lauf bliebe stehen.
+// iPhone-App: Capacitor-Plugin KeepAwake (verhindert die automatische Sperre). Browser/PWA: Screen Wake Lock (wird beim Verlassen der Seite freigegeben und bei der Rückkehr erneut angefordert).
+let keepAwakeWanted = false, wakeSentinel = null;
+const keepAwakePlugin = () => window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.KeepAwake;
+async function acquireWake() {
+  const K = keepAwakePlugin();
+  if (isNativeApp() && K) { try { await K.keepAwake(); return; } catch (e) {} }
+  if (navigator.wakeLock && document.visibilityState === 'visible') {
+    try { wakeSentinel = await navigator.wakeLock.request('screen'); wakeSentinel.addEventListener('release', () => { wakeSentinel = null; }); } catch (e) {}
+  }
+}
+async function keepAwake(on) {
+  keepAwakeWanted = on;
+  if (on) { await acquireWake(); return; }
+  const K = keepAwakePlugin();
+  if (K) { try { await K.allowSleep(); } catch (e) {} }
+  if (wakeSentinel) { try { await wakeSentinel.release(); } catch (e) {} wakeSentinel = null; }
+}
+document.addEventListener('visibilitychange', () => { if (keepAwakeWanted && document.visibilityState === 'visible' && !wakeSentinel) acquireWake(); });
+// Ist die App im Hintergrund (z. B. Sperre trotzdem erfolgt), erst bei Rückkehr weitermachen, statt Anfragen ins Leere zu schicken
+function whenVisible() {
+  if (document.visibilityState === 'visible') return Promise.resolve();
+  return new Promise(res => { const h = () => { if (document.visibilityState === 'visible') { document.removeEventListener('visibilitychange', h); res(); } }; document.addEventListener('visibilitychange', h); });
+}
 let enrichRunning = false, enrichRetryMs = [8000, 16000];   // Wartezeiten vor erneuten Versuchen, wenn die Bildsuche nicht antwortet
 async function enrichAllWines() {
   if (enrichRunning) { showToast(t('toast_enrich_busy')); return; }
@@ -3380,16 +3404,20 @@ async function enrichAllWines() {
     if (needAi > aiCredits && !confirm(t('credits_enrich_warn', { n: needAi, c: aiCredits }))) return;
   }
   enrichRunning = true;
+  keepAwake(true);
   const btn = document.getElementById('enrich-btn');
   if (btn) btn.classList.add('is-busy');
   let updated = 0, imgFailed = 0;
   showEnrichProgress(0, targets.length, targets[0] ? targets[0].name : '');
   await nextFrame();
   try {
-    for (let i = 0; i < targets.length; i++) {
-      const w = targets[i];
-      showEnrichProgress(i, targets.length, w.name);
+    const queue = targets.slice(), retried = new Set();   // Weine, bei denen die KI-Abfrage scheiterte (z. B. weil die App kurz eingefroren war), kommen am Ende noch einmal dran
+    for (let i = 0; i < queue.length; i++) {
+      const w = queue[i];
+      await whenVisible();
+      showEnrichProgress(i, queue.length, w.name);
       await nextFrame();
+      let failed = false;
       try {
         let changed = false;
         // 1) Flaschenbild zuerst (schnell, Vivino; alle Kriterien gebündelt) – damit Bilder zügig für JEDEN Wein erscheinen, sofort speichern
@@ -3429,15 +3457,17 @@ async function enrichAllWines() {
             if (!w.price && info.price != null) { w.price = parseFloat(info.price)||null; changed = true; }
             // Falls Vivino kein Bild hatte: KI-Direktbild / og:image als Rückfall (mit jetzt ggf. ergänzten Kriterien)
             if (!w.image && !autoImagesOff()) { const alt = await resolveWineImage(info, wineCriteria(w), { noVivino: true }); if (alt) { w.image = alt; changed = true; } }
-          }
+          } else failed = true;
         }
         if (changed) { updated++; save(); }
-      } catch {}
-      showEnrichProgress(i+1, targets.length, w.name);
+      } catch { failed = true; }
+      if (failed && !retried.has(w.id)) { retried.add(w.id); queue.push(w); }
+      showEnrichProgress(Math.min(i + 1, queue.length), queue.length, w.name);
       await nextFrame();
     }
   } finally {
     enrichRunning = false;
+    keepAwake(false);
     if (btn) btn.classList.remove('is-busy');
   }
   renderKeller();
