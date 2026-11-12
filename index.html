@@ -3154,9 +3154,9 @@ async function adminLogin() {
   if (!pw) return;
   if (await loadAdminStats(pw)) { adminPw = pw; closeModal('admin-login-modal'); openAdminTab(); }
 }
-async function loadAdminStats(pw) {
+async function loadAdminStats(pw, extra) {
   try {
-    const r = await fetch(SCAN_PROXY_URL + '/admin/stats', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pw }) });
+    const r = await fetch(SCAN_PROXY_URL + '/admin/stats', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ password: pw }, extra || {})) });
     const j = await r.json().catch(() => ({}));
     if (r.status === 403) { showToast('Passwort falsch'); return false; }
     if (r.status === 429) { showToast('Zu viele Versuche – bitte später erneut'); return false; }
@@ -3167,6 +3167,13 @@ async function loadAdminStats(pw) {
     return true;
   } catch (e) { showToast('Keine Verbindung'); return false; }
 }
+async function adminOwn(add, remove) {
+  if (!adminPw) return;
+  const ok = await loadAdminStats(adminPw, { own: { add, remove } });
+  if (ok) showToast(add.length ? 'Als eigenes Gerät markiert' : 'Markierung aufgehoben');
+}
+const adminOwnAdd = (id) => adminOwn([id], []);
+const adminOwnRemove = (id) => adminOwn([], [id]);
 function openAdminTab() {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -3201,6 +3208,22 @@ function renderAdmin(j) {
     ${card(tt.unlimited ?? 0, 'Freigeschaltet')}
     ${card((j.globalToday ?? 0) + ' / ' + (j.globalLimit ?? '–'), 'KI heute (ca.)')}
   </div>`;
+  // Eigene Geräte: aus allen Zahlen oben herausgerechnet (nicht aus "KI heute" und den Kosten: die zeigen die tatsächliche Gesamtnutzung)
+  const myId = getInstallId().slice(0, 8), own = j.own || { ids: [], devices: [] }, iAmOwn = own.ids.includes(myId);
+  html += `<div class="stats-title" style="margin-top:6px">Eigene Geräte (ausgeblendet: ${own.ids.length})</div>
+    <div class="stats-card" style="margin-bottom:8px;display:flex;align-items:center;gap:12px">
+      <div style="flex:1;min-width:0"><div style="font-size:13px">Dieses Gerät: <span style="font-family:monospace">${esc(myId)}</span></div>
+      <div style="font-size:11px;color:var(--text-muted)">${iAmOwn ? 'ist als eigenes Gerät markiert und zählt nicht mit' : 'zählt noch in den Zahlen mit'}</div></div>
+      <button class="wine-btn${iAmOwn ? '' : ' primary'}" style="width:auto;padding:6px 12px" onclick="${iAmOwn ? 'adminOwnRemove' : 'adminOwnAdd'}('${esc(myId)}')">${iAmOwn ? 'Markierung aufheben' : 'Als meins markieren'}</button>
+    </div>`;
+  own.devices.filter(d => d.id !== myId).forEach(d => {
+    html += `<div class="stats-card" style="margin-bottom:8px;display:flex;align-items:center;gap:12px">
+      <div style="flex:1;min-width:0"><div style="font-size:13px;font-family:monospace">${esc(d.id)}</div>
+      <div style="font-size:11px;color:var(--text-muted)">zuletzt ${fmt(d.lastSeen)} · seit ${fmt(d.createdAt)} · ${d.used} genutzt</div></div>
+      <button class="wine-btn" style="width:auto;padding:6px 12px" onclick="adminOwnRemove('${esc(d.id)}')">Aufheben</button>
+    </div>`;
+  });
+  html += `<div style="font-size:11px;color:var(--text-muted);margin:2px 0 14px">Markierte Geräte sind aus allen Zahlen herausgerechnet (Installationen, aktiv, neu, KI-Aufrufe, Verlauf, Nutzerliste). „KI heute" und die Kosten zeigen weiter die tatsächliche Gesamtnutzung.</div>`;
   html += `<div class="stats-title" style="margin-top:6px">Letzte 14 Tage</div>`;
   const days = j.perDay || [];
   const max = Math.max(1, ...days.map(d => Math.max(d.newInstalls, d.active)));
@@ -3218,7 +3241,8 @@ function renderAdmin(j) {
     const cr = r.unlimited ? '∞' : (r.credits ?? '–');
     html += `<div class="stats-card" style="margin-bottom:8px;display:flex;align-items:center;gap:12px">
       <div style="flex:1;min-width:0"><div style="font-size:13px;font-family:monospace">${esc(r.id)}${r.unlimited ? ' 🔓' : ''}</div>
-      <div style="font-size:11px;color:var(--text-muted)">zuletzt ${fmt(r.lastSeen)} · seit ${fmt(r.createdAt)}</div></div>
+      <div style="font-size:11px;color:var(--text-muted)">zuletzt ${fmt(r.lastSeen)} · seit ${fmt(r.createdAt)}</div>
+      <button class="wine-btn" style="width:auto;margin-top:6px;padding:3px 10px;font-size:11px" onclick="adminOwnAdd('${esc(r.id)}')">Mein Gerät</button></div>
       <div style="text-align:right;white-space:nowrap"><div style="font-size:13px;font-weight:700">Guthaben ${cr}</div><div style="font-size:11px;color:var(--text-muted)">${r.used} genutzt</div></div>
     </div>`;
   });
