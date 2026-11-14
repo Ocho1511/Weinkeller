@@ -1003,6 +1003,7 @@ input[type="file"] { display: none; }
   color: var(--text-muted);
   margin-top: 12px;
 }
+.contact-build { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-top: 6px; }
 /* ── GROSSE BILDSCHIRME ──────────────────────────────────────────────────────────
    Handy: unverändert (Spalte bis 430 px, untere Leiste, Fenster von unten).
    iPad/Tablet (ab 700 px): breitere Spalte, Karten in zwei Spalten, Fenster als Dialog in der Mitte.
@@ -1187,7 +1188,7 @@ input[type="file"] { display: none; }
   </div>
   <div class="keller-stats" id="keller-stats"></div>
   <div class="search-filter">
-    <input class="search-input" id="search-input" placeholder="🔍  Wein suchen…" data-i18n-ph="search_ph" oninput="renderKeller()">
+    <input class="search-input" id="search-input" placeholder="🔍  Wein suchen…" data-i18n-ph="search_ph" oninput="renderKellerDebounced()">
   </div>
   <div class="filter-scroll" id="filter-scroll"></div>
   <div class="sort-row">
@@ -1346,6 +1347,7 @@ input[type="file"] { display: none; }
         <a class="contact-line" href="mailto:t.knecht@web.de">✉️ t.knecht@web.de</a>
         <a class="contact-line" href="tel:+491722644305">📞 +49 172 2644305</a>
         <div class="contact-copyright">© 2026 Thomas Knecht. All rights reserved.</div>
+        <div class="contact-build">Last Build: <span id="last-build">2026-11-14</span></div>
       </div>
     </details>
   </div>
@@ -14442,6 +14444,8 @@ function buildTypeLabels() {
 }
 
 // Untere Leiste: Beschriftungen nie mitten im Wort umbrechen; zu lange Wörter (z. B. "Статистика", "Export/Import") werden verkleinert, bis sie passen
+let _searchTimer = 0;
+function renderKellerDebounced() { clearTimeout(_searchTimer); _searchTimer = setTimeout(renderKeller, 120); }   // nicht bei jedem Tastendruck die ganze Liste neu bauen
 function fitNavLabels() {
   document.querySelectorAll('.nav-btn').forEach((btn) => {
     const el = btn.querySelector('span:last-child');
@@ -14450,7 +14454,8 @@ function fitNavLabels() {
     el.textContent = el.textContent.replace(/\u200B/g, '').replace(/\//g, '/\u200B');   // nach "/" darf umbrochen werden ("Export/" + "Import")
     let size = parseFloat(getComputedStyle(el).fontSize) || 9, guard = 0;
     const room = () => btn.clientWidth - 4;
-    while (el.scrollWidth > room() && size > 8 && guard++ < 6) { size -= 0.5; el.style.fontSize = size + 'px'; }
+    const minSize = innerWidth < 370 ? 6.5 : 8;   // sehr schmale Handys (320 px): lange Woerter duerfen kleiner werden
+    while (el.scrollWidth > room() && size > minSize && guard++ < 9) { size -= 0.5; el.style.fontSize = size + 'px'; }
   });
 }
 window.addEventListener('resize', fitNavLabels);
