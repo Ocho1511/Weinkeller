@@ -1725,6 +1725,8 @@ input[type="file"] { display: none; }
       <input type="file" id="photo-input" accept="image/*" onchange="handlePhotoPick(event)">
       <button type="button" class="scan-btn" onclick="document.getElementById('photo-input').click()" data-i18n="photo_btn">📷  Foto aufnehmen / auswählen</button>
       <button type="button" class="btn-secondary" id="photo-remove" onclick="removeFormPhoto()" style="display:none;margin-top:8px" data-i18n="photo_remove">Foto entfernen</button>
+      <div id="photo-where-wrap" style="display:none;margin-top:10px"><label data-i18n="photo_where">Foto speichern</label>
+        <select id="f-photo-where"><option value="cloud" data-i18n="photo_where_cloud">☁️ In der Cloud (auf allen Geräten)</option><option value="local" data-i18n="photo_where_local">📱 Nur auf diesem Handy</option></select></div>
       <div class="qr-hint" data-i18n="photo_hint">Das Foto bleibt auf diesem Gerät und wird nicht synchronisiert.</div>
     </div>
     <div class="form-group">
@@ -2091,6 +2093,7 @@ function cleanWine(w, used) {
     placements: cleanPlacements(w, count),
     ean: /^\d{8,14}$/.test(String(w.ean || '')) ? String(w.ean) : null,
     photo: ID_RE.test(String(w.photo || '')) ? String(w.photo) : null,
+    photoCloud: !!w.photoCloud && ID_RE.test(String(w.photo || '')),
     minMax: cleanMinMax(w.minMax),
     location: cleanText(w.location, 200),
     drinkFrom: dw.from, drinkTo: dw.to,
@@ -2220,7 +2223,7 @@ function touchData() {
 // CLOUD-SYNC (newest wins)
 // ═══════════════════════════════════════
 function collectData() {
-  return { dv: 3, wines, wishes, drunkWines, racks: settings.racks || [], cellars: settings.cellars || [], owner: settings.owner || '', prefs: collectPrefs() };
+  return { dv: 4, wines, wishes, drunkWines, racks: settings.racks || [], cellars: settings.cellars || [], owner: settings.owner || '', prefs: collectPrefs() };
 }
 // Einstellungen, die mit in die Cloud gehen (gerätegebundenes bleibt draußen: Sync-Code und Speicherort, E-Mail, KI-Einwilligung, Gerätekennung)
 const PREF_KEYS = ['lang', 'currency', 'font', 'celeb', 'tempUnit', 'blinkUrgent', 'blinkOver', 'blinkPeak', 'blinkOptimal'];
@@ -2303,6 +2306,37 @@ function cloudPushDebounced() {
 // Ein Abgleich mit der Cloud. Erst lesen, dann entscheiden – so überschreibt ein Gerät mit altem Stand nie neuere Daten:
 //   nur Cloud geändert  -> übernehmen        beide geändert -> zusammenführen und hochladen
 //   nur hier geändert   -> hochladen         nichts geändert -> nichts tun
+// ── Eigene Fotos in der Cloud (pro Foto wählbar: nur lokal oder Cloud) ──
+function photoCloudOn() { return settings.storage === 'cloud' && !!settings.syncCode; }
+async function photoCall(op, extra) {
+  const resp = await fetch(SCAN_PROXY_URL + '/photo', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(Object.assign({ op, code: settings.syncCode }, extra || {}))
+  });
+  if (!resp.ok) throw new Error('photo_http_' + resp.status);
+  return resp.json();
+}
+// Hochladen, was fehlt; herunterladen, was auf diesem Gerät fehlt; Verwaistes in der Cloud löschen
+async function photoSyncCycle() {
+  if (!photoCloudOn()) return;
+  const remote = new Set((await photoCall('list')).ids || []);
+  const want = wines.filter(w => w.photo && w.photoCloud);
+  let got = false;
+  for (const w of want) {
+    const id = w.photo;
+    if (photoCache.has(id)) {
+      if (!remote.has(id)) await photoCall('put', { id, data: photoCache.get(id) });
+    } else if (remote.has(id)) {
+      const r = await photoCall('get', { id });
+      if (r && r.found && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(r.data) && r.data.length < 4000000) { await photoPut(id, r.data); got = true; }
+    }
+  }
+  if (wines.length) {
+    const used = new Set(want.map(w => w.photo));
+    for (const id of remote) if (!used.has(id)) await photoCall('del', { id });
+  }
+  if (got) { try { rerenderActive(); } catch (e) {} }
+}
 async function syncCycle() {
   const r = await cloudCall('pull');
   const exists = !!(r && r.exists);
@@ -2330,7 +2364,7 @@ async function cloudPush() {
   if (settings.storage !== 'cloud' || !settings.syncCode) return;
   if (cloudBusy) { cloudAgain = true; return; }       // Änderung während eines laufenden Abgleichs: danach erneut
   cloudBusy = true;
-  try { await syncCycle(); updateSyncStatus(); }
+  try { await syncCycle(); try { await photoSyncCycle(); } catch (e) { /* Fotos später erneut */ } updateSyncStatus(); }
   catch (e) { updateSyncStatus('err'); }
   finally { cloudBusy = false; if (cloudAgain) { cloudAgain = false; cloudPushDebounced(); } }
 }
@@ -2339,7 +2373,7 @@ async function syncNow(silent) {
   if (cloudBusy) return;
   if (!silent) showToast(t('sync_running'));
   cloudBusy = true;
-  try { await syncCycle(); updateSyncStatus(); if (!silent) showToast(t('sync_done')); }
+  try { await syncCycle(); try { await photoSyncCycle(); } catch (e) { /* Fotos später erneut */ } updateSyncStatus(); if (!silent) showToast(t('sync_done')); }
   catch (e) { updateSyncStatus('err'); if (!silent) showToast(t('sync_fail')); }
   finally { cloudBusy = false; if (cloudAgain) { cloudAgain = false; cloudPushDebounced(); } }
 }
@@ -2673,6 +2707,7 @@ function updateFormPhoto() {
   box.innerHTML = u ? '<img src="' + u + '" alt="">' : '';
   box.style.display = u ? 'block' : 'none';
   rm.style.display = u ? '' : 'none';
+  const ww = document.getElementById('photo-where-wrap'); if (ww) ww.style.display = (u && photoCloudOn()) ? 'block' : 'none';
 }
 function showPhoto(id) {
   const u = photoCache.get(id);
@@ -3919,6 +3954,9 @@ de: {
   shelf_moveall_done: "{n} Flasche(n) verschoben ✓",
   photo_label: "Eigenes Foto",
   photo_btn: "📷  Foto aufnehmen / auswählen",
+  photo_where: "Foto speichern",
+  photo_where_cloud: "☁️ In der Cloud (auf allen Geräten)",
+  photo_where_local: "📱 Nur auf diesem Handy",
   photo_remove: "Foto entfernen",
   photo_saved: "Foto gespeichert ✓",
   photo_fail: "Foto konnte nicht gespeichert werden",
@@ -4373,6 +4411,9 @@ en: {
   shelf_moveall_done: "{n} bottle(s) moved ✓",
   photo_label: "Own photo",
   photo_btn: "📷  Take / choose photo",
+  photo_where: "Save photo",
+  photo_where_cloud: "☁️ In the cloud (on all devices)",
+  photo_where_local: "📱 Only on this phone",
   photo_remove: "Remove photo",
   photo_saved: "Photo saved ✓",
   photo_fail: "Photo could not be saved",
@@ -4827,6 +4868,9 @@ es: {
   shelf_moveall_done: "{n} botella(s) movida(s) ✓",
   photo_label: "Foto propia",
   photo_btn: "📷  Hacer / elegir foto",
+  photo_where: "Guardar foto",
+  photo_where_cloud: "☁️ En la nube (en todos los dispositivos)",
+  photo_where_local: "📱 Solo en este móvil",
   photo_remove: "Quitar foto",
   photo_saved: "Foto guardada ✓",
   photo_fail: "No se pudo guardar la foto",
@@ -5281,6 +5325,9 @@ sv: {
   shelf_moveall_done: "{n} flaska/flaskor flyttade ✓",
   photo_label: "Eget foto",
   photo_btn: "📷  Ta / välj foto",
+  photo_where: "Spara foto",
+  photo_where_cloud: "☁️ I molnet (på alla enheter)",
+  photo_where_local: "📱 Bara på den här telefonen",
   photo_remove: "Ta bort foto",
   photo_saved: "Foto sparat ✓",
   photo_fail: "Fotot kunde inte sparas",
@@ -5735,6 +5782,9 @@ da: {
   shelf_moveall_done: "{n} flaske(r) flyttet ✓",
   photo_label: "Eget foto",
   photo_btn: "📷  Tag / vælg foto",
+  photo_where: "Gem foto",
+  photo_where_cloud: "☁️ I skyen (på alle enheder)",
+  photo_where_local: "📱 Kun på denne telefon",
   photo_remove: "Fjern foto",
   photo_saved: "Foto gemt ✓",
   photo_fail: "Fotoet kunne ikke gemmes",
@@ -6189,6 +6239,9 @@ fi: {
   shelf_moveall_done: "{n} pulloa siirretty ✓",
   photo_label: "Oma kuva",
   photo_btn: "📷  Ota / valitse kuva",
+  photo_where: "Tallenna kuva",
+  photo_where_cloud: "☁️ Pilveen (kaikille laitteille)",
+  photo_where_local: "📱 Vain tälle puhelimelle",
   photo_remove: "Poista kuva",
   photo_saved: "Kuva tallennettu ✓",
   photo_fail: "Kuvaa ei voitu tallentaa",
@@ -6643,6 +6696,9 @@ ru: {
   shelf_moveall_done: "Перемещено бутылок: {n} ✓",
   photo_label: "Своё фото",
   photo_btn: "📷  Сделать / выбрать фото",
+  photo_where: "Сохранить фото",
+  photo_where_cloud: "☁️ В облаке (на всех устройствах)",
+  photo_where_local: "📱 Только на этом телефоне",
   photo_remove: "Удалить фото",
   photo_saved: "Фото сохранено ✓",
   photo_fail: "Не удалось сохранить фото",
@@ -7097,6 +7153,9 @@ it: {
   shelf_moveall_done: "Bottiglie spostate: {n} ✓",
   photo_label: "Foto personale",
   photo_btn: "📷  Scatta / scegli foto",
+  photo_where: "Salva foto",
+  photo_where_cloud: "☁️ Nel cloud (su tutti i dispositivi)",
+  photo_where_local: "📱 Solo su questo telefono",
   photo_remove: "Rimuovi foto",
   photo_saved: "Foto salvata ✓",
   photo_fail: "Impossibile salvare la foto",
@@ -7551,6 +7610,9 @@ fr: {
   shelf_moveall_done: "{n} bouteille(s) déplacée(s) ✓",
   photo_label: "Photo personnelle",
   photo_btn: "📷  Prendre / choisir une photo",
+  photo_where: "Enregistrer la photo",
+  photo_where_cloud: "☁️ Dans le cloud (sur tous les appareils)",
+  photo_where_local: "📱 Uniquement sur ce téléphone",
   photo_remove: "Supprimer la photo",
   photo_saved: "Photo enregistrée ✓",
   photo_fail: "La photo n'a pas pu être enregistrée",
@@ -8005,6 +8067,9 @@ pl: {
   shelf_moveall_done: "Przeniesiono butelki: {n} ✓",
   photo_label: "Własne zdjęcie",
   photo_btn: "📷  Zrób / wybierz zdjęcie",
+  photo_where: "Zapisz zdjęcie",
+  photo_where_cloud: "☁️ W chmurze (na wszystkich urządzeniach)",
+  photo_where_local: "📱 Tylko na tym telefonie",
   photo_remove: "Usuń zdjęcie",
   photo_saved: "Zdjęcie zapisane ✓",
   photo_fail: "Nie udało się zapisać zdjęcia",
@@ -8459,6 +8524,9 @@ hu: {
   shelf_moveall_done: "{n} palack áthelyezve ✓",
   photo_label: "Saját fotó",
   photo_btn: "📷  Fotó készítése / kiválasztása",
+  photo_where: "Fotó mentése",
+  photo_where_cloud: "☁️ A felhőben (minden eszközön)",
+  photo_where_local: "📱 Csak ezen a telefonon",
   photo_remove: "Fotó törlése",
   photo_saved: "Fotó mentve ✓",
   photo_fail: "A fotót nem sikerült menteni",
@@ -8913,6 +8981,9 @@ cs: {
   shelf_moveall_done: "Přesunuto lahví: {n} ✓",
   photo_label: "Vlastní foto",
   photo_btn: "📷  Vyfotit / vybrat foto",
+  photo_where: "Uložit fotku",
+  photo_where_cloud: "☁️ V cloudu (na všech zařízeních)",
+  photo_where_local: "📱 Jen v tomto telefonu",
   photo_remove: "Odebrat foto",
   photo_saved: "Foto uloženo ✓",
   photo_fail: "Foto se nepodařilo uložit",
@@ -9367,6 +9438,9 @@ sk: {
   shelf_moveall_done: "Presunuté fľaše: {n} ✓",
   photo_label: "Vlastné foto",
   photo_btn: "📷  Odfotiť / vybrať foto",
+  photo_where: "Uložiť fotku",
+  photo_where_cloud: "☁️ V cloude (na všetkých zariadeniach)",
+  photo_where_local: "📱 Iba v tomto telefóne",
   photo_remove: "Odstrániť foto",
   photo_saved: "Foto uložené ✓",
   photo_fail: "Foto sa nepodarilo uložiť",
@@ -9821,6 +9895,9 @@ ro: {
   shelf_moveall_done: "Sticle mutate: {n} ✓",
   photo_label: "Fotografie proprie",
   photo_btn: "📷  Fă / alege o fotografie",
+  photo_where: "Salvează fotografia",
+  photo_where_cloud: "☁️ În cloud (pe toate dispozitivele)",
+  photo_where_local: "📱 Doar pe acest telefon",
   photo_remove: "Elimină fotografia",
   photo_saved: "Fotografie salvată ✓",
   photo_fail: "Fotografia nu a putut fi salvată",
@@ -10275,6 +10352,9 @@ hr: {
   shelf_moveall_done: "Premješteno boca: {n} ✓",
   photo_label: "Vlastita fotografija",
   photo_btn: "📷  Snimi / odaberi fotografiju",
+  photo_where: "Spremi fotografiju",
+  photo_where_cloud: "☁️ U oblaku (na svim uređajima)",
+  photo_where_local: "📱 Samo na ovom telefonu",
   photo_remove: "Ukloni fotografiju",
   photo_saved: "Fotografija spremljena ✓",
   photo_fail: "Fotografiju nije moguće spremiti",
@@ -10729,6 +10809,9 @@ pt: {
   shelf_moveall_done: "{n} garrafa(s) movida(s) ✓",
   photo_label: "Foto própria",
   photo_btn: "📷  Tirar / escolher foto",
+  photo_where: "Guardar foto",
+  photo_where_cloud: "☁️ Na nuvem (em todos os dispositivos)",
+  photo_where_local: "📱 Apenas neste telemóvel",
   photo_remove: "Remover foto",
   photo_saved: "Foto guardada ✓",
   photo_fail: "Não foi possível guardar a foto",
@@ -11183,6 +11266,9 @@ no: {
   shelf_moveall_done: "{n} flaske(r) flyttet ✓",
   photo_label: "Eget bilde",
   photo_btn: "📷  Ta / velg bilde",
+  photo_where: "Lagre bilde",
+  photo_where_cloud: "☁️ I skyen (på alle enheter)",
+  photo_where_local: "📱 Bare på denne telefonen",
   photo_remove: "Fjern bilde",
   photo_saved: "Bilde lagret ✓",
   photo_fail: "Bildet kunne ikke lagres",
@@ -11637,6 +11723,9 @@ nl: {
   shelf_moveall_done: "{n} fles(sen) verplaatst ✓",
   photo_label: "Eigen foto",
   photo_btn: "📷  Foto maken / kiezen",
+  photo_where: "Foto opslaan",
+  photo_where_cloud: "☁️ In de cloud (op alle apparaten)",
+  photo_where_local: "📱 Alleen op deze telefoon",
   photo_remove: "Foto verwijderen",
   photo_saved: "Foto opgeslagen ✓",
   photo_fail: "Foto kon niet worden opgeslagen",
@@ -12091,6 +12180,9 @@ el: {
   shelf_moveall_done: "Μετακινήθηκαν μπουκάλια: {n} ✓",
   photo_label: "Δική μου φωτογραφία",
   photo_btn: "📷  Λήψη / επιλογή φωτογραφίας",
+  photo_where: "Αποθήκευση φωτογραφίας",
+  photo_where_cloud: "☁️ Στο cloud (σε όλες τις συσκευές)",
+  photo_where_local: "📱 Μόνο σε αυτό το κινητό",
   photo_remove: "Αφαίρεση φωτογραφίας",
   photo_saved: "Η φωτογραφία αποθηκεύτηκε ✓",
   photo_fail: "Δεν ήταν δυνατή η αποθήκευση της φωτογραφίας",
@@ -12545,6 +12637,9 @@ uk: {
   shelf_moveall_done: "Переміщено пляшок: {n} ✓",
   photo_label: "Власне фото",
   photo_btn: "📷  Зробити / вибрати фото",
+  photo_where: "Зберегти фото",
+  photo_where_cloud: "☁️ У хмарі (на всіх пристроях)",
+  photo_where_local: "📱 Лише на цьому телефоні",
   photo_remove: "Видалити фото",
   photo_saved: "Фото збережено ✓",
   photo_fail: "Не вдалося зберегти фото",
@@ -12999,6 +13094,9 @@ ja: {
   shelf_moveall_done: "{n}本のボトルを移動しました ✓",
   photo_label: "自分の写真",
   photo_btn: "📷  写真を撮る / 選ぶ",
+  photo_where: "写真の保存先",
+  photo_where_cloud: "☁️ クラウド（すべてのデバイス）",
+  photo_where_local: "📱 このスマホのみ",
   photo_remove: "写真を削除",
   photo_saved: "写真を保存しました ✓",
   photo_fail: "写真を保存できませんでした",
@@ -13453,6 +13551,9 @@ ko: {
   shelf_moveall_done: "{n}병 이동 완료 ✓",
   photo_label: "내 사진",
   photo_btn: "📷  사진 촬영 / 선택",
+  photo_where: "사진 저장",
+  photo_where_cloud: "☁️ 클라우드(모든 기기)",
+  photo_where_local: "📱 이 휴대폰에만",
   photo_remove: "사진 삭제",
   photo_saved: "사진을 저장했어요 ✓",
   photo_fail: "사진을 저장하지 못했어요",
@@ -13907,6 +14008,9 @@ zh: {
   shelf_moveall_done: "已移动 {n} 瓶 ✓",
   photo_label: "自己的照片",
   photo_btn: "📷  拍照 / 选择照片",
+  photo_where: "保存照片",
+  photo_where_cloud: "☁️ 云端（所有设备）",
+  photo_where_local: "📱 仅此手机",
   photo_remove: "删除照片",
   photo_saved: "照片已保存 ✓",
   photo_fail: "无法保存照片",
@@ -14361,6 +14465,9 @@ hi: {
   shelf_moveall_done: "{n} बोतल(ें) स्थानांतरित ✓",
   photo_label: "अपनी फ़ोटो",
   photo_btn: "📷  फ़ोटो लें / चुनें",
+  photo_where: "फ़ोटो सहेजें",
+  photo_where_cloud: "☁️ क्लाउड में (सभी डिवाइस पर)",
+  photo_where_local: "📱 केवल इस फ़ोन पर",
   photo_remove: "फ़ोटो हटाएँ",
   photo_saved: "फ़ोटो सहेजी गई ✓",
   photo_fail: "फ़ोटो सहेजी नहीं जा सकी",
@@ -15189,6 +15296,7 @@ function editWine(id) {
   document.getElementById('f-image').value = urlImage(w) || '';
   document.getElementById('f-ean').value = w.ean || '';
   document.getElementById('f-photo').value = w.photo || '';
+  document.getElementById('f-photo-where').value = w.photoCloud ? 'cloud' : 'local';
   formPhotoPending = null;
   updateFormPhoto();
   renderMinMaxFields(w);
@@ -15220,6 +15328,7 @@ function openAddModal() {
   ['f-name','f-year','f-region','f-country','f-grape','f-loc-regal','f-loc-ebene','f-loc-platz','f-note','f-drink-from','f-drink-to','f-temp-from','f-temp-to','f-price','f-image','f-ean','f-photo'].forEach(id => document.getElementById(id).value = '');
   updateImagePreview();
   if (formPhotoPending) photoDel(formPhotoPending);
+  document.getElementById('f-photo-where').value = 'cloud';
   formPhotoPending = null; updateFormPhoto(); renderMinMaxFields(null);
   document.getElementById('f-count').value = 1;
   document.getElementById('f-type').value = 'rot';
@@ -15313,6 +15422,7 @@ function saveWine() {
     note: document.getElementById('f-note').value.trim()||null,
     ean: document.getElementById('f-ean').value || null,
     photo: document.getElementById('f-photo').value || null,
+    photoCloud: !!document.getElementById('f-photo').value && (photoCloudOn() ? document.getElementById('f-photo-where').value === 'cloud' : !!(editId && (wines.find(x => x.id === editId) || {}).photoCloud)),
     minMax: readMinMaxFields(),
     added: editId ? (wines.find(w=>w.id===editId)||{}).added : new Date().toISOString()
   });
