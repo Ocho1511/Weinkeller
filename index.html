@@ -1134,7 +1134,7 @@ input[type="file"] { display: none; }
 
 <!-- FAB -->
 <button class="fab fab-drink" onclick="document.getElementById('drink-camera-input').click()" id="fab-drink" title="Wein trinken (Scan)">🥂</button>
-<button class="fab" onclick="openAddModal()" id="fab">+</button>
+<button class="fab" onclick="fabAdd()" id="fab">+</button>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
@@ -1421,6 +1421,13 @@ input[type="file"] { display: none; }
         <option value="both" data-i18n="celeb_both">Konfetti und Sound</option>
         <option value="confetti" data-i18n="celeb_confetti">Nur Konfetti</option>
         <option value="off" data-i18n="celeb_off">Aus</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-top:14px">
+      <label data-i18n="setup_scanadd">Beim Hinzufügen direkt scannen</label>
+      <select id="setup-scanadd" onchange="setScanAdd(this.value)">
+        <option value="on" data-i18n="scanadd_on">An – Kamera startet mit dem +</option>
+        <option value="off" data-i18n="scanadd_off">Aus – Formular von Hand ausfüllen</option>
       </select>
     </div>
     <div class="form-group" style="margin-top:14px">
@@ -2248,7 +2255,7 @@ function adoptPrefs(p) {
   saveSettings();
   try {
     const set = (id, v) => { const e = document.getElementById(id); if (e && v != null) e.value = v; };
-    set('setup-lang', settings.lang); set('setup-currency', settings.currency); set('setup-font', settings.font || 'inter'); set('setup-celeb', settings.celeb || 'both'); set('setup-tempunit', settings.tempUnit === 'F' ? 'F' : 'C');
+    set('setup-lang', settings.lang); set('setup-currency', settings.currency); set('setup-font', settings.font || 'inter'); set('setup-celeb', settings.celeb || 'both'); set('setup-scanadd', settings.scanAdd === false ? 'off' : 'on'); set('setup-tempunit', settings.tempUnit === 'F' ? 'F' : 'C');
     applyI18n();
   } catch (e) {}
 }
@@ -3987,6 +3994,9 @@ de: {
   celeb_both: "Konfetti und Sound",
   celeb_confetti: "Nur Konfetti",
   celeb_off: "Aus",
+  setup_scanadd: "Beim Hinzufügen direkt scannen",
+  scanadd_on: "An – Kamera startet mit dem +",
+  scanadd_off: "Aus – Formular von Hand ausfüllen",
   loc_slot: "Platz",
   rack_cap_low: "Auf dieser Ebene liegen bis zu {n} Flaschen in einem Platz.",
   sync_code_notfound: "Code nicht gefunden – bitte prüfen",
@@ -4444,6 +4454,9 @@ en: {
   celeb_both: "Confetti and sound",
   celeb_confetti: "Confetti only",
   celeb_off: "Off",
+  setup_scanadd: "Scan right away when adding",
+  scanadd_on: "On – camera starts with the +",
+  scanadd_off: "Off – fill in the form by hand",
   loc_slot: "Slot",
   rack_cap_low: "Up to {n} bottles are stored in one slot on this level.",
   sync_code_notfound: "Code not found – please check it",
@@ -4901,6 +4914,9 @@ es: {
   celeb_both: "Confeti y sonido",
   celeb_confetti: "Solo confeti",
   celeb_off: "Desactivado",
+  setup_scanadd: "Escanear directamente al añadir",
+  scanadd_on: "Sí – la cámara se abre con el +",
+  scanadd_off: "No – rellenar el formulario a mano",
   loc_slot: "Sitio",
   rack_cap_low: "En este nivel hay hasta {n} botellas en un hueco.",
   sync_code_notfound: "Código no encontrado: compruébalo",
@@ -5358,6 +5374,9 @@ sv: {
   celeb_both: "Konfetti och ljud",
   celeb_confetti: "Bara konfetti",
   celeb_off: "Av",
+  setup_scanadd: "Skanna direkt vid tillägg",
+  scanadd_on: "På – kameran startar med +",
+  scanadd_off: "Av – fyll i formuläret för hand",
   loc_slot: "Plats",
   rack_cap_low: "På den här hyllan finns upp till {n} flaskor på en plats.",
   sync_code_notfound: "Koden hittades inte – kontrollera den",
@@ -5815,6 +5834,9 @@ da: {
   celeb_both: "Konfetti og lyd",
   celeb_confetti: "Kun konfetti",
   celeb_off: "Fra",
+  setup_scanadd: "Scan med det samme ved tilføjelse",
+  scanadd_on: "Til – kameraet starter med +",
+  scanadd_off: "Fra – udfyld formularen i hånden",
   loc_slot: "Plads",
   rack_cap_low: "På denne hylde ligger op til {n} flasker på én plads.",
   sync_code_notfound: "Koden blev ikke fundet – tjek den",
@@ -6272,6 +6294,9 @@ fi: {
   celeb_both: "Konfetti ja ääni",
   celeb_confetti: "Vain konfetti",
   celeb_off: "Pois",
+  setup_scanadd: "Skannaa heti lisättäessä",
+  scanadd_on: "Päällä – kamera käynnistyy +-painikkeesta",
+  scanadd_off: "Pois – täytä lomake käsin",
   loc_slot: "Paikka",
   rack_cap_low: "Tällä tasolla yhdellä paikalla on jopa {n} pulloa.",
   sync_code_notfound: "Koodia ei löytynyt – tarkista se",
@@ -6729,6 +6754,9 @@ ru: {
   celeb_both: "Конфетти и звук",
   celeb_confetti: "Только конфетти",
   celeb_off: "Выкл.",
+  setup_scanadd: "Сразу сканировать при добавлении",
+  scanadd_on: "Вкл. – камера запускается по +",
+  scanadd_off: "Выкл. – заполнять форму вручную",
   loc_slot: "Место",
   rack_cap_low: "На этом ярусе в одном месте лежит до {n} бутылок.",
   sync_code_notfound: "Код не найден – проверьте его",
@@ -7186,6 +7214,9 @@ it: {
   celeb_both: "Coriandoli e suono",
   celeb_confetti: "Solo coriandoli",
   celeb_off: "Disattivato",
+  setup_scanadd: "Scansiona subito all'aggiunta",
+  scanadd_on: "Sì – la fotocamera si apre con il +",
+  scanadd_off: "No – compilare il modulo a mano",
   loc_slot: "Posto",
   rack_cap_low: "Su questo ripiano ci sono fino a {n} bottiglie in un posto.",
   sync_code_notfound: "Codice non trovato – controllalo",
@@ -7643,6 +7674,9 @@ fr: {
   celeb_both: "Confettis et son",
   celeb_confetti: "Confettis seulement",
   celeb_off: "Désactivé",
+  setup_scanadd: "Scanner directement à l'ajout",
+  scanadd_on: "Oui – l'appareil photo s'ouvre avec le +",
+  scanadd_off: "Non – remplir le formulaire à la main",
   loc_slot: "Place",
   rack_cap_low: "Sur ce niveau, jusqu'à {n} bouteilles sont rangées dans un emplacement.",
   sync_code_notfound: "Code introuvable – vérifiez-le",
@@ -8100,6 +8134,9 @@ pl: {
   celeb_both: "Konfetti i dźwięk",
   celeb_confetti: "Tylko konfetti",
   celeb_off: "Wyłączone",
+  setup_scanadd: "Skanuj od razu przy dodawaniu",
+  scanadd_on: "Wł. – aparat włącza się po naciśnięciu +",
+  scanadd_off: "Wył. – wypełniaj formularz ręcznie",
   loc_slot: "Miejsce",
   rack_cap_low: "Na tym poziomie w jednym miejscu leży do {n} butelek.",
   sync_code_notfound: "Nie znaleziono kodu – sprawdź go",
@@ -8557,6 +8594,9 @@ hu: {
   celeb_both: "Konfetti és hang",
   celeb_confetti: "Csak konfetti",
   celeb_off: "Ki",
+  setup_scanadd: "Azonnali szkennelés hozzáadáskor",
+  scanadd_on: "Be – a kamera a +-ra indul",
+  scanadd_off: "Ki – az űrlap kézi kitöltése",
   loc_slot: "Hely",
   rack_cap_low: "Ezen a szinten egy helyen legfeljebb {n} üveg van.",
   sync_code_notfound: "A kód nem található – ellenőrizd",
@@ -9014,6 +9054,9 @@ cs: {
   celeb_both: "Konfety a zvuk",
   celeb_confetti: "Pouze konfety",
   celeb_off: "Vypnuto",
+  setup_scanadd: "Při přidání ihned skenovat",
+  scanadd_on: "Zap. – fotoaparát se spustí tlačítkem +",
+  scanadd_off: "Vyp. – formulář vyplnit ručně",
   loc_slot: "Místo",
   rack_cap_low: "Na této úrovni je na jednom místě až {n} lahví.",
   sync_code_notfound: "Kód nebyl nalezen – zkontrolujte jej",
@@ -9471,6 +9514,9 @@ sk: {
   celeb_both: "Konfety a zvuk",
   celeb_confetti: "Iba konfety",
   celeb_off: "Vypnuté",
+  setup_scanadd: "Pri pridaní ihneď skenovať",
+  scanadd_on: "Zap. – fotoaparát sa spustí tlačidlom +",
+  scanadd_off: "Vyp. – formulár vyplniť ručne",
   loc_slot: "Miesto",
   rack_cap_low: "Na tejto úrovni je na jednom mieste až {n} fliaš.",
   sync_code_notfound: "Kód sa nenašiel – skontrolujte ho",
@@ -9928,6 +9974,9 @@ ro: {
   celeb_both: "Confetti și sunet",
   celeb_confetti: "Doar confetti",
   celeb_off: "Oprit",
+  setup_scanadd: "Scanează direct la adăugare",
+  scanadd_on: "Pornit – camera pornește cu +",
+  scanadd_off: "Oprit – completez formularul manual",
   loc_slot: "Loc",
   rack_cap_low: "Pe acest nivel, într-un loc sunt până la {n} sticle.",
   sync_code_notfound: "Codul nu a fost găsit – verifică-l",
@@ -10385,6 +10434,9 @@ hr: {
   celeb_both: "Konfeti i zvuk",
   celeb_confetti: "Samo konfeti",
   celeb_off: "Isključeno",
+  setup_scanadd: "Skeniraj odmah pri dodavanju",
+  scanadd_on: "Uklj. – kamera se pokreće s +",
+  scanadd_off: "Isklj. – obrazac ispunjavam ručno",
   loc_slot: "Mjesto",
   rack_cap_low: "Na ovoj razini u jednom je mjestu do {n} boca.",
   sync_code_notfound: "Kod nije pronađen – provjerite ga",
@@ -10842,6 +10894,9 @@ pt: {
   celeb_both: "Confetes e som",
   celeb_confetti: "Só confetes",
   celeb_off: "Desligado",
+  setup_scanadd: "Digitalizar logo ao adicionar",
+  scanadd_on: "Ligado – a câmara abre com o +",
+  scanadd_off: "Desligado – preencher o formulário à mão",
   loc_slot: "Lugar",
   rack_cap_low: "Neste nível há até {n} garrafas num lugar.",
   sync_code_notfound: "Código não encontrado – verifique-o",
@@ -11299,6 +11354,9 @@ no: {
   celeb_both: "Konfetti og lyd",
   celeb_confetti: "Bare konfetti",
   celeb_off: "Av",
+  setup_scanadd: "Skann med en gang ved tillegg",
+  scanadd_on: "På – kameraet starter med +",
+  scanadd_off: "Av – fyll ut skjemaet for hånd",
   loc_slot: "Plass",
   rack_cap_low: "På denne hyllen ligger opptil {n} flasker på én plass.",
   sync_code_notfound: "Koden ble ikke funnet – sjekk den",
@@ -11756,6 +11814,9 @@ nl: {
   celeb_both: "Confetti en geluid",
   celeb_confetti: "Alleen confetti",
   celeb_off: "Uit",
+  setup_scanadd: "Direct scannen bij toevoegen",
+  scanadd_on: "Aan – camera start met de +",
+  scanadd_off: "Uit – formulier met de hand invullen",
   loc_slot: "Plaats",
   rack_cap_low: "Op dit niveau liggen tot {n} flessen op één plek.",
   sync_code_notfound: "Code niet gevonden – controleer hem",
@@ -12213,6 +12274,9 @@ el: {
   celeb_both: "Κομφετί και ήχος",
   celeb_confetti: "Μόνο κομφετί",
   celeb_off: "Απενεργοποιημένο",
+  setup_scanadd: "Άμεση σάρωση κατά την προσθήκη",
+  scanadd_on: "Ενεργό – η κάμερα ανοίγει με το +",
+  scanadd_off: "Ανενεργό – συμπλήρωση της φόρμας με το χέρι",
   loc_slot: "Θέση",
   rack_cap_low: "Σε αυτό το επίπεδο αποθηκεύονται έως {n} φιάλες σε μία θέση.",
   sync_code_notfound: "Ο κωδικός δεν βρέθηκε – ελέγξτε τον",
@@ -12670,6 +12734,9 @@ uk: {
   celeb_both: "Конфеті та звук",
   celeb_confetti: "Лише конфеті",
   celeb_off: "Вимк.",
+  setup_scanadd: "Одразу сканувати під час додавання",
+  scanadd_on: "Увімк. – камера запускається за +",
+  scanadd_off: "Вимк. – заповнювати форму вручну",
   loc_slot: "Місце",
   rack_cap_low: "На цьому рівні в одному місці зберігається до {n} пляшок.",
   sync_code_notfound: "Код не знайдено – перевірте його",
@@ -13127,6 +13194,9 @@ ja: {
   celeb_both: "紙吹雪とサウンド",
   celeb_confetti: "紙吹雪のみ",
   celeb_off: "オフ",
+  setup_scanadd: "追加時にすぐスキャン",
+  scanadd_on: "オン – ＋でカメラが起動",
+  scanadd_off: "オフ – フォームを手入力",
   loc_slot: "場所",
   rack_cap_low: "この段では、1か所に最大{n}本まで保管されます。",
   sync_code_notfound: "コードが見つかりません – ご確認ください",
@@ -13584,6 +13654,9 @@ ko: {
   celeb_both: "색종이와 소리",
   celeb_confetti: "색종이만",
   celeb_off: "끔",
+  setup_scanadd: "추가할 때 바로 스캔",
+  scanadd_on: "켜짐 – +를 누르면 카메라 시작",
+  scanadd_off: "꺼짐 – 양식을 직접 입력",
   loc_slot: "칸",
   rack_cap_low: "이 단에서는 한 칸에 최대 {n}병이 보관돼요.",
   sync_code_notfound: "코드를 찾을 수 없어요 – 확인해 주세요",
@@ -14041,6 +14114,9 @@ zh: {
   celeb_both: "彩带和音效",
   celeb_confetti: "仅彩带",
   celeb_off: "关闭",
+  setup_scanadd: "添加时直接扫描",
+  scanadd_on: "开 – 点击 + 即启动相机",
+  scanadd_off: "关 – 手动填写表单",
   loc_slot: "位",
   rack_cap_low: "此层每个位最多存放 {n} 瓶。",
   sync_code_notfound: "未找到同步码 – 请检查",
@@ -14498,6 +14574,9 @@ hi: {
   celeb_both: "कंफ़ेटी और ध्वनि",
   celeb_confetti: "सिर्फ़ कंफ़ेटी",
   celeb_off: "बंद",
+  setup_scanadd: "जोड़ते समय सीधे स्कैन करें",
+  scanadd_on: "चालू – + दबाने पर कैमरा खुलता है",
+  scanadd_off: "बंद – फ़ॉर्म हाथ से भरें",
   loc_slot: "स्थान",
   rack_cap_low: "इस स्तर पर एक स्थान में अधिकतम {n} बोतलें रखी जाती हैं।",
   sync_code_notfound: "कोड नहीं मिला – कृपया जाँच लें",
@@ -14726,6 +14805,7 @@ function setFont(f) { settings.font = f; saveSettings(); applyFont(); touchData(
 // Alles selbst erzeugt (Canvas und Web Audio): keine Sound-Dateien, keine Bibliotheken, keine Rechte Dritter.
 // ═══════════════════════════════════════
 function setCelebrate(v) { settings.celeb = v; saveSettings(); touchData(); }
+function setScanAdd(v) { settings.scanAdd = v !== 'off'; saveSettings(); }   // gerätegebunden, nicht in der Cloud
 let audioCtx = null;
 function audioContext() {
   const AC = window.AudioContext || window.webkitAudioContext;
@@ -15318,6 +15398,11 @@ function startStoreFromScan() {
   document.getElementById('modal-title').textContent = t('store_modal_title');
   const sb = document.getElementById('add-save-btn'); sb.dataset.i18n = 'store_save_btn'; sb.textContent = t('store_save_btn');
   document.getElementById('camera-input').click();   // im selben Tipp, damit iOS die Kamera zulässt
+}
+// "+": Formular öffnen und, wenn im Setup eingestellt (Standard), im selben Tipp die Etikett-Kamera starten; Abbrechen führt ins Formular
+function fabAdd() {
+  openAddModal();
+  if (settings.scanAdd !== false) { const c = document.getElementById('camera-input'); if (c) c.click(); }
 }
 function openAddModal() {
   showBarcodeMiss(false);
