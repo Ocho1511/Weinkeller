@@ -1688,8 +1688,8 @@ input[type="file"] { display: none; }
       <label data-i18n="l_location">Lagerplatz (Regal · Ebene · Platz von links)</label>
       <div class="input-with-scan">
         <input id="f-loc-regal" placeholder="Regal" data-i18n-ph="ph_regal" type="text">
-        <input id="f-loc-ebene" placeholder="Ebene" data-i18n-ph="ph_ebene" type="text">
-        <input id="f-loc-platz" placeholder="Platz v.l." data-i18n-ph="ph_platz" type="text">
+        <input id="f-loc-ebene" placeholder="Ebene" data-i18n-ph="ph_ebene" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+        <input id="f-loc-platz" placeholder="Platz v.l." data-i18n-ph="ph_platz" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
         <button type="button" class="mini-scan-btn" onclick="document.getElementById('location-camera-input').click()" title="Lagerplatz scannen">📷</button>
         <button type="button" class="mini-scan-btn" onclick="scanShelfForForm()" title="QR">▦</button>
       </div>
