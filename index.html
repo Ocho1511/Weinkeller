@@ -610,6 +610,15 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .store-scan-btn { background: #1f5c30; color: #fff; border: none; font-weight: 700; }
 .rack-clear-btn { border-color: var(--danger, #c0392b); color: var(--danger, #e57373); }
 .wine-temp, .ripeness-temp { font-size: 12px; font-weight: 600; color: var(--sparkling); margin: 0 0 8px; }
+.wine-pair { margin: 0 0 8px; }
+.pair-btn, .pair-text { background: none; border: 1px dashed var(--border); border-radius: 12px; color: var(--text-muted); font-family: inherit; font-size: 12px; font-weight: 600; padding: 5px 10px; cursor: pointer; text-align: left; line-height: 1.4; }
+.pair-text { border-style: solid; color: var(--text); }
+.pair-re { color: var(--gold); margin-left: 4px; }
+.pair-busy { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+.tonight-pick { cursor: pointer; margin-bottom: 8px; }
+.tonight-pick .tp-name { font-family: var(--heading-font, 'Playfair Display', serif); font-size: 15px; color: var(--gold-light, var(--gold)); }
+.tonight-pick .tp-tag { display: inline-block; font-size: 11px; font-weight: 700; margin-left: 6px; }
+.tonight-pick .tp-why { font-size: 13px; margin-top: 4px; line-height: 1.45; }
 .wine-temp.est, .ripeness-temp.est { opacity: .75; font-style: italic; }
 .loc-chip.loc-store { border-color: var(--gold); color: var(--gold); }
 .rack-un-filter { margin-bottom: 10px; }
@@ -1611,6 +1620,22 @@ input[type="file"] { display: none; }
   </div>
 </div>
 <div id="qr-print-sheet"></div>
+
+<div class="modal-overlay" id="tonight-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2 data-i18n="tonight_title">Was passt heute?</h2>
+    <div class="form-group">
+      <input id="tonight-dish" type="text" maxlength="120" autocomplete="off" placeholder="Ich koche heute … (z. B. Rinderbraten)" data-i18n-ph="tonight_ph" onkeydown="if(event.key==='Enter')tonightAsk()">
+      <div style="font-size:12px; font-weight:600; color:var(--text-muted); margin-top:4px" data-i18n="tonight_hint">Die KI wählt aus deinem Keller und bevorzugt Weine, die bald getrunken werden sollten. Nutzt einen KI-Aufruf.</div>
+    </div>
+    <div id="tonight-result"></div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="closeModal('tonight-modal')" data-i18n="qr_close">Schließen</button>
+      <button class="btn-primary" id="tonight-go" onclick="tonightAsk()" data-i18n="tonight_go">Wein vorschlagen</button>
+    </div>
+  </div>
+</div>
 
 <div class="modal-overlay" id="shop-modal">
   <div class="modal">
@@ -3842,6 +3867,17 @@ de: {
   store_filter: "Einlagern: {name} · {n} Fl. – freies Fach antippen",
   store_filter_off: "Alle anzeigen",
   store_back: "← Zum Keller",
+  pair_btn: "🍽 Passt zu …",
+  pair_loading: "Die KI sucht passende Speisen …",
+  pair_fail: "Keine Empfehlung erhalten. Bitte später erneut versuchen.",
+  pair_refresh: "Neu vorschlagen lassen",
+  tonight_btn: "🍽 Was passt heute?",
+  tonight_title: "Was passt heute?",
+  tonight_ph: "Ich koche heute … (z. B. Rinderbraten)",
+  tonight_hint: "Die KI wählt aus deinem Keller und bevorzugt Weine, die bald getrunken werden sollten. Nutzt einen KI-Aufruf.",
+  tonight_go: "Wein vorschlagen",
+  tonight_need: "Bitte ein Gericht eintragen",
+  tonight_none: "Zu diesem Gericht passt kein Wein aus deinem Keller.",
   setup_remind: "Erinnerung an die Trinkreife",
   remind_off: "Aus",
   remind_weekly: "Wöchentlich (Samstag, 10 Uhr)",
@@ -4312,6 +4348,17 @@ en: {
   store_filter: "Store: {name} · {n} btl. – tap a free slot",
   store_filter_off: "Show all",
   store_back: "← To cellar",
+  pair_btn: "🍽 Pairs with …",
+  pair_loading: "The AI is looking for matching dishes …",
+  pair_fail: "No suggestion received. Please try again later.",
+  pair_refresh: "Suggest again",
+  tonight_btn: "🍽 What goes with tonight?",
+  tonight_title: "What goes with tonight?",
+  tonight_ph: "Tonight I am cooking … (e.g. roast beef)",
+  tonight_hint: "The AI picks from your cellar and prefers wines that should be drunk soon. Uses one AI call.",
+  tonight_go: "Suggest a wine",
+  tonight_need: "Please enter a dish",
+  tonight_none: "No wine in your cellar goes with this dish.",
   setup_remind: "Drinking window reminder",
   remind_off: "Off",
   remind_weekly: "Weekly (Saturday, 10 am)",
@@ -4782,6 +4829,17 @@ es: {
   store_filter: "Colocar: {name} · {n} bot. – toca un hueco libre",
   store_filter_off: "Mostrar todo",
   store_back: "← A la bodega",
+  pair_btn: "🍽 Combina con …",
+  pair_loading: "La IA busca platos que combinen …",
+  pair_fail: "No se recibió ninguna sugerencia. Inténtalo de nuevo más tarde.",
+  pair_refresh: "Sugerir de nuevo",
+  tonight_btn: "🍽 ¿Qué va bien hoy?",
+  tonight_title: "¿Qué va bien hoy?",
+  tonight_ph: "Hoy cocino … (p. ej. asado de ternera)",
+  tonight_hint: "La IA elige de tu bodega y prefiere vinos que conviene beber pronto. Usa una llamada de IA.",
+  tonight_go: "Sugerir un vino",
+  tonight_need: "Escribe un plato",
+  tonight_none: "Ningún vino de tu bodega combina con este plato.",
   setup_remind: "Recordatorio de consumo",
   remind_off: "Desactivado",
   remind_weekly: "Semanal (sábado, 10:00)",
@@ -5252,6 +5310,17 @@ sv: {
   store_filter: "Placera: {name} · {n} fl. – tryck på en ledig plats",
   store_filter_off: "Visa alla",
   store_back: "← Till källaren",
+  pair_btn: "🍽 Passar till …",
+  pair_loading: "AI:n letar efter passande rätter …",
+  pair_fail: "Inget förslag mottogs. Försök igen senare.",
+  pair_refresh: "Föreslå igen",
+  tonight_btn: "🍽 Vad passar ikväll?",
+  tonight_title: "Vad passar ikväll?",
+  tonight_ph: "Ikväll lagar jag … (t.ex. oxstek)",
+  tonight_hint: "AI:n väljer ur din källare och föredrar viner som snart bör drickas. Använder ett AI-anrop.",
+  tonight_go: "Föreslå ett vin",
+  tonight_need: "Ange en rätt",
+  tonight_none: "Inget vin i din källare passar till den här rätten.",
   setup_remind: "Påminnelse om dryckesfönster",
   remind_off: "Av",
   remind_weekly: "Varje vecka (lördag kl. 10)",
@@ -5722,6 +5791,17 @@ da: {
   store_filter: "Placér: {name} · {n} fl. – tryk på en ledig plads",
   store_filter_off: "Vis alle",
   store_back: "← Til kælderen",
+  pair_btn: "🍽 Passer til …",
+  pair_loading: "AI’en leder efter passende retter …",
+  pair_fail: "Intet forslag modtaget. Prøv igen senere.",
+  pair_refresh: "Foreslå igen",
+  tonight_btn: "🍽 Hvad passer i dag?",
+  tonight_title: "Hvad passer i dag?",
+  tonight_ph: "I dag laver jeg … (fx oksesteg)",
+  tonight_hint: "AI’en vælger fra din kælder og foretrækker vine, der snart bør drikkes. Bruger ét AI-kald.",
+  tonight_go: "Foreslå en vin",
+  tonight_need: "Indtast en ret",
+  tonight_none: "Ingen vin i din kælder passer til denne ret.",
   setup_remind: "Påmindelse om drikkevindue",
   remind_off: "Fra",
   remind_weekly: "Ugentligt (lørdag kl. 10)",
@@ -6192,6 +6272,17 @@ fi: {
   store_filter: "Sijoita: {name} · {n} pul. – napauta vapaata paikkaa",
   store_filter_off: "Näytä kaikki",
   store_back: "← Kellariin",
+  pair_btn: "🍽 Sopii seuraan …",
+  pair_loading: "Tekoäly etsii sopivia ruokia …",
+  pair_fail: "Ehdotusta ei saatu. Yritä myöhemmin uudelleen.",
+  pair_refresh: "Ehdota uudelleen",
+  tonight_btn: "🍽 Mikä sopii tänään?",
+  tonight_title: "Mikä sopii tänään?",
+  tonight_ph: "Tänään laitan ruoaksi … (esim. paahtopaistia)",
+  tonight_hint: "Tekoäly valitsee kellaristasi ja suosii viinejä, jotka kannattaa juoda pian. Käyttää yhden tekoälykutsun.",
+  tonight_go: "Ehdota viiniä",
+  tonight_need: "Kirjoita ruokalaji",
+  tonight_none: "Mikään kellarisi viini ei sovi tähän ruokaan.",
   setup_remind: "Muistutus juomaikkunasta",
   remind_off: "Pois",
   remind_weekly: "Viikoittain (lauantaina klo 10)",
@@ -6662,6 +6753,17 @@ ru: {
   store_filter: "Разместить: {name} · {n} бут. – коснитесь свободной ячейки",
   store_filter_off: "Показать все",
   store_back: "← В погреб",
+  pair_btn: "🍽 Подходит к …",
+  pair_loading: "ИИ подбирает подходящие блюда …",
+  pair_fail: "Рекомендация не получена. Попробуйте позже.",
+  pair_refresh: "Предложить снова",
+  tonight_btn: "🍽 Что подойдёт сегодня?",
+  tonight_title: "Что подойдёт сегодня?",
+  tonight_ph: "Сегодня я готовлю … (например, ростбиф)",
+  tonight_hint: "ИИ выбирает из вашего погреба и отдаёт предпочтение винам, которые стоит выпить скоро. Использует один вызов ИИ.",
+  tonight_go: "Подобрать вино",
+  tonight_need: "Введите блюдо",
+  tonight_none: "К этому блюду не подходит ни одно вино из вашего погреба.",
   setup_remind: "Напоминание об окне употребления",
   remind_off: "Выкл.",
   remind_weekly: "Раз в неделю (суббота, 10:00)",
@@ -7132,6 +7234,17 @@ it: {
   store_filter: "Riponi: {name} · {n} bott. – tocca uno scomparto libero",
   store_filter_off: "Mostra tutto",
   store_back: "← Alla cantina",
+  pair_btn: "🍽 Si abbina a …",
+  pair_loading: "L’IA cerca piatti abbinabili …",
+  pair_fail: "Nessun suggerimento ricevuto. Riprova più tardi.",
+  pair_refresh: "Suggerisci di nuovo",
+  tonight_btn: "🍽 Cosa si abbina stasera?",
+  tonight_title: "Cosa si abbina stasera?",
+  tonight_ph: "Stasera cucino … (es. arrosto di manzo)",
+  tonight_hint: "L’IA sceglie dalla tua cantina e preferisce i vini da bere presto. Usa una chiamata IA.",
+  tonight_go: "Suggerisci un vino",
+  tonight_need: "Inserisci un piatto",
+  tonight_none: "Nessun vino della tua cantina si abbina a questo piatto.",
   setup_remind: "Promemoria finestra di consumo",
   remind_off: "Disattivato",
   remind_weekly: "Settimanale (sabato, ore 10)",
@@ -7602,6 +7715,17 @@ fr: {
   store_filter: "Ranger : {name} · {n} bout. – touchez un emplacement libre",
   store_filter_off: "Tout afficher",
   store_back: "← Vers la cave",
+  pair_btn: "🍽 Se marie avec …",
+  pair_loading: "L’IA cherche des plats qui s’accordent …",
+  pair_fail: "Aucune suggestion reçue. Réessayez plus tard.",
+  pair_refresh: "Proposer à nouveau",
+  tonight_btn: "🍽 Que boire ce soir ?",
+  tonight_title: "Que boire ce soir ?",
+  tonight_ph: "Ce soir je cuisine … (p. ex. rôti de bœuf)",
+  tonight_hint: "L’IA choisit dans votre cave et privilégie les vins à boire bientôt. Utilise un appel IA.",
+  tonight_go: "Proposer un vin",
+  tonight_need: "Indiquez un plat",
+  tonight_none: "Aucun vin de votre cave ne s’accorde avec ce plat.",
   setup_remind: "Rappel de la fenêtre de dégustation",
   remind_off: "Désactivé",
   remind_weekly: "Hebdomadaire (samedi, 10 h)",
@@ -8072,6 +8196,17 @@ pl: {
   store_filter: "Ułóż: {name} · {n} but. – dotknij wolne miejsce",
   store_filter_off: "Pokaż wszystko",
   store_back: "← Do piwnicy",
+  pair_btn: "🍽 Pasuje do …",
+  pair_loading: "AI szuka pasujących dań …",
+  pair_fail: "Nie otrzymano propozycji. Spróbuj ponownie później.",
+  pair_refresh: "Zaproponuj ponownie",
+  tonight_btn: "🍽 Co pasuje dziś?",
+  tonight_title: "Co pasuje dziś?",
+  tonight_ph: "Dziś gotuję … (np. pieczeń wołową)",
+  tonight_hint: "AI wybiera z Twojej piwniczki i preferuje wina, które warto wypić wkrótce. Zużywa jedno wywołanie AI.",
+  tonight_go: "Zaproponuj wino",
+  tonight_need: "Wpisz danie",
+  tonight_none: "Żadne wino z Twojej piwniczki nie pasuje do tego dania.",
   setup_remind: "Przypomnienie o oknie spożycia",
   remind_off: "Wył.",
   remind_weekly: "Co tydzień (sobota, godz. 10)",
@@ -8542,6 +8677,17 @@ hu: {
   store_filter: "Elhelyezés: {name} · {n} üveg – koppints egy szabad helyre",
   store_filter_off: "Összes mutatása",
   store_back: "← A pincéhez",
+  pair_btn: "🍽 Illik hozzá …",
+  pair_loading: "A mesterséges intelligencia illő ételeket keres …",
+  pair_fail: "Nem érkezett javaslat. Próbáld újra később.",
+  pair_refresh: "Új javaslat kérése",
+  tonight_btn: "🍽 Mi illik ma estére?",
+  tonight_title: "Mi illik ma estére?",
+  tonight_ph: "Ma … főzök (pl. marhasült)",
+  tonight_hint: "A mesterséges intelligencia a te pincédből választ, és előnyben részesíti a hamarosan elfogyasztandó borokat. Egy MI-hívást használ.",
+  tonight_go: "Bor javaslása",
+  tonight_need: "Írj be egy ételt",
+  tonight_none: "A pincédből egyetlen bor sem illik ehhez az ételhez.",
   setup_remind: "Emlékeztető az ivási időablakra",
   remind_off: "Ki",
   remind_weekly: "Hetente (szombat, 10 óra)",
@@ -9012,6 +9158,17 @@ cs: {
   store_filter: "Uložit: {name} · {n} lahví – klepni na volné místo",
   store_filter_off: "Zobrazit vše",
   store_back: "← Do sklepa",
+  pair_btn: "🍽 Hodí se k …",
+  pair_loading: "AI hledá vhodná jídla …",
+  pair_fail: "Doporučení nebylo získáno. Zkuste to později.",
+  pair_refresh: "Navrhnout znovu",
+  tonight_btn: "🍽 Co se hodí dnes?",
+  tonight_title: "Co se hodí dnes?",
+  tonight_ph: "Dnes vařím … (např. hovězí pečeni)",
+  tonight_hint: "AI vybírá z vašeho sklípku a upřednostňuje vína, která je vhodné brzy vypít. Využije jedno volání AI.",
+  tonight_go: "Navrhnout víno",
+  tonight_need: "Zadejte jídlo",
+  tonight_none: "K tomuto jídlu se nehodí žádné víno z vašeho sklípku.",
   setup_remind: "Připomenutí okna pití",
   remind_off: "Vyp.",
   remind_weekly: "Týdně (sobota, 10:00)",
@@ -9482,6 +9639,17 @@ sk: {
   store_filter: "Uložiť: {name} · {n} fliaš – ťukni na voľné miesto",
   store_filter_off: "Zobraziť všetko",
   store_back: "← Do pivnice",
+  pair_btn: "🍽 Hodí sa k …",
+  pair_loading: "AI hľadá vhodné jedlá …",
+  pair_fail: "Odporúčanie sa nepodarilo získať. Skúste to neskôr.",
+  pair_refresh: "Navrhnúť znova",
+  tonight_btn: "🍽 Čo sa hodí dnes?",
+  tonight_title: "Čo sa hodí dnes?",
+  tonight_ph: "Dnes varím … (napr. hovädzie pečené)",
+  tonight_hint: "AI vyberá z vašej pivnice a uprednostňuje vína, ktoré je vhodné čoskoro vypiť. Využije jedno volanie AI.",
+  tonight_go: "Navrhnúť víno",
+  tonight_need: "Zadajte jedlo",
+  tonight_none: "K tomuto jedlu sa nehodí žiadne víno z vašej pivnice.",
   setup_remind: "Pripomenutie okna pitia",
   remind_off: "Vyp.",
   remind_weekly: "Týždenne (sobota, 10:00)",
@@ -9952,6 +10120,17 @@ ro: {
   store_filter: "Așază: {name} · {n} stic. – atinge un loc liber",
   store_filter_off: "Arată tot",
   store_back: "← La pivniță",
+  pair_btn: "🍽 Se potrivește cu …",
+  pair_loading: "AI caută preparate potrivite …",
+  pair_fail: "Nu s-a primit nicio sugestie. Încearcă mai târziu.",
+  pair_refresh: "Sugerează din nou",
+  tonight_btn: "🍽 Ce se potrivește azi?",
+  tonight_title: "Ce se potrivește azi?",
+  tonight_ph: "Azi gătesc … (de ex. friptură de vită)",
+  tonight_hint: "AI alege din pivnița ta și preferă vinurile care ar trebui băute curând. Folosește un apel AI.",
+  tonight_go: "Sugerează un vin",
+  tonight_need: "Introdu un preparat",
+  tonight_none: "Niciun vin din pivnița ta nu se potrivește cu acest preparat.",
   setup_remind: "Memento pentru intervalul de consum",
   remind_off: "Oprit",
   remind_weekly: "Săptămânal (sâmbătă, ora 10)",
@@ -10422,6 +10601,17 @@ hr: {
   store_filter: "Pohrani: {name} · {n} boc. – dodirni slobodno mjesto",
   store_filter_off: "Prikaži sve",
   store_back: "← U podrum",
+  pair_btn: "🍽 Slaže se uz …",
+  pair_loading: "AI traži odgovarajuća jela …",
+  pair_fail: "Prijedlog nije primljen. Pokušajte kasnije.",
+  pair_refresh: "Predloži ponovno",
+  tonight_btn: "🍽 Što paše danas?",
+  tonight_title: "Što paše danas?",
+  tonight_ph: "Danas kuham … (npr. goveđi odrezak)",
+  tonight_hint: "AI bira iz vašeg podruma i daje prednost vinima koja bi uskoro trebalo popiti. Koristi jedan AI poziv.",
+  tonight_go: "Predloži vino",
+  tonight_need: "Unesite jelo",
+  tonight_none: "Nijedno vino iz vašeg podruma ne paše uz ovo jelo.",
   setup_remind: "Podsjetnik za razdoblje pijenja",
   remind_off: "Isklj.",
   remind_weekly: "Tjedno (subota, 10 sati)",
@@ -10892,6 +11082,17 @@ pt: {
   store_filter: "Arrumar: {name} · {n} gar. – toca num lugar livre",
   store_filter_off: "Mostrar tudo",
   store_back: "← Para a adega",
+  pair_btn: "🍽 Combina com …",
+  pair_loading: "A IA procura pratos que combinem …",
+  pair_fail: "Nenhuma sugestão recebida. Tente novamente mais tarde.",
+  pair_refresh: "Sugerir de novo",
+  tonight_btn: "🍽 O que combina hoje?",
+  tonight_title: "O que combina hoje?",
+  tonight_ph: "Hoje vou cozinhar … (p. ex. assado de vaca)",
+  tonight_hint: "A IA escolhe na sua garrafeira e prefere vinhos que devem ser bebidos em breve. Usa uma chamada de IA.",
+  tonight_go: "Sugerir um vinho",
+  tonight_need: "Indique um prato",
+  tonight_none: "Nenhum vinho da sua garrafeira combina com este prato.",
   setup_remind: "Lembrete da janela de consumo",
   remind_off: "Desligado",
   remind_weekly: "Semanal (sábado, 10 h)",
@@ -11362,6 +11563,17 @@ no: {
   store_filter: "Plasser: {name} · {n} fl. – trykk på en ledig plass",
   store_filter_off: "Vis alle",
   store_back: "← Til kjelleren",
+  pair_btn: "🍽 Passer til …",
+  pair_loading: "KI-en leter etter passende retter …",
+  pair_fail: "Ingen anbefaling mottatt. Prøv igjen senere.",
+  pair_refresh: "Foreslå på nytt",
+  tonight_btn: "🍽 Hva passer i dag?",
+  tonight_title: "Hva passer i dag?",
+  tonight_ph: "I dag lager jeg … (f.eks. oksestek)",
+  tonight_hint: "KI-en velger fra kjelleren din og foretrekker viner som snart bør drikkes. Bruker ett KI-kall.",
+  tonight_go: "Foreslå en vin",
+  tonight_need: "Skriv inn en rett",
+  tonight_none: "Ingen vin i kjelleren din passer til denne retten.",
   setup_remind: "Påminnelse om drikkevindu",
   remind_off: "Av",
   remind_weekly: "Ukentlig (lørdag kl. 10)",
@@ -11832,6 +12044,17 @@ nl: {
   store_filter: "Opbergen: {name} · {n} fl. – tik op een vrij vak",
   store_filter_off: "Toon alles",
   store_back: "← Naar de kelder",
+  pair_btn: "🍽 Past bij …",
+  pair_loading: "De AI zoekt passende gerechten …",
+  pair_fail: "Geen suggestie ontvangen. Probeer het later opnieuw.",
+  pair_refresh: "Opnieuw voorstellen",
+  tonight_btn: "🍽 Wat past er vandaag?",
+  tonight_title: "Wat past er vandaag?",
+  tonight_ph: "Vandaag kook ik … (bijv. rosbief)",
+  tonight_hint: "De AI kiest uit je kelder en geeft de voorkeur aan wijnen die binnenkort gedronken moeten worden. Gebruikt één AI-aanroep.",
+  tonight_go: "Wijn voorstellen",
+  tonight_need: "Voer een gerecht in",
+  tonight_none: "Geen enkele wijn uit je kelder past bij dit gerecht.",
   setup_remind: "Herinnering aan het drinkvenster",
   remind_off: "Uit",
   remind_weekly: "Wekelijks (zaterdag, 10 uur)",
@@ -12302,6 +12525,17 @@ el: {
   store_filter: "Τοποθέτηση: {name} · {n} φιάλ. – πατήστε μια ελεύθερη θέση",
   store_filter_off: "Εμφάνιση όλων",
   store_back: "← Στο κελάρι",
+  pair_btn: "🍽 Ταιριάζει με …",
+  pair_loading: "Η ΤΝ ψάχνει κατάλληλα πιάτα …",
+  pair_fail: "Δεν ελήφθη πρόταση. Δοκιμάστε ξανά αργότερα.",
+  pair_refresh: "Νέα πρόταση",
+  tonight_btn: "🍽 Τι ταιριάζει σήμερα;",
+  tonight_title: "Τι ταιριάζει σήμερα;",
+  tonight_ph: "Σήμερα μαγειρεύω … (π.χ. ψητό μοσχαρίσιο)",
+  tonight_hint: "Η ΤΝ επιλέγει από το κελάρι σας και προτιμά κρασιά που πρέπει να πιούν σύντομα. Χρησιμοποιεί μία κλήση ΤΝ.",
+  tonight_go: "Πρόταση κρασιού",
+  tonight_need: "Γράψτε ένα πιάτο",
+  tonight_none: "Κανένα κρασί από το κελάρι σας δεν ταιριάζει με αυτό το πιάτο.",
   setup_remind: "Υπενθύμιση παραθύρου κατανάλωσης",
   remind_off: "Ανενεργό",
   remind_weekly: "Εβδομαδιαία (Σάββατο, 10:00)",
@@ -12772,6 +13006,17 @@ uk: {
   store_filter: "Розмістити: {name} · {n} пл. – торкніться вільного місця",
   store_filter_off: "Показати все",
   store_back: "← До погреба",
+  pair_btn: "🍽 Пасує до …",
+  pair_loading: "ШІ шукає відповідні страви …",
+  pair_fail: "Пропозицію не отримано. Спробуйте пізніше.",
+  pair_refresh: "Запропонувати знову",
+  tonight_btn: "🍽 Що пасує сьогодні?",
+  tonight_title: "Що пасує сьогодні?",
+  tonight_ph: "Сьогодні я готую … (наприклад, ростбіф)",
+  tonight_hint: "ШІ вибирає з вашого погреба й віддає перевагу винам, які варто випити найближчим часом. Використовує один виклик ШІ.",
+  tonight_go: "Підібрати вино",
+  tonight_need: "Введіть страву",
+  tonight_none: "До цієї страви не пасує жодне вино з вашого погреба.",
   setup_remind: "Нагадування про вікно вживання",
   remind_off: "Вимк.",
   remind_weekly: "Щотижня (субота, 10:00)",
@@ -13242,6 +13487,17 @@ ja: {
   store_filter: "配置: {name} · {n}本 – 空いている場所をタップ",
   store_filter_off: "すべて表示",
   store_back: "← セラーへ戻る",
+  pair_btn: "🍽 合う料理 …",
+  pair_loading: "AI が合う料理を探しています …",
+  pair_fail: "提案を取得できませんでした。後でもう一度お試しください。",
+  pair_refresh: "もう一度提案",
+  tonight_btn: "🍽 今日は何が合う？",
+  tonight_title: "今日は何が合う？",
+  tonight_ph: "今日は … を作ります（例：ローストビーフ）",
+  tonight_hint: "AI があなたのセラーから選びます。早めに飲むべきワインを優先します。AI を 1 回使用します。",
+  tonight_go: "ワインを提案",
+  tonight_need: "料理を入力してください",
+  tonight_none: "この料理に合うワインはセラーにありません。",
   setup_remind: "飲み頃のリマインダー",
   remind_off: "オフ",
   remind_weekly: "毎週（土曜 10時）",
@@ -13712,6 +13968,17 @@ ko: {
   store_filter: "보관: {name} · {n}병 – 빈 칸을 탭하세요",
   store_filter_off: "모두 보기",
   store_back: "← 셀러로",
+  pair_btn: "🍽 어울리는 음식 …",
+  pair_loading: "AI가 어울리는 음식을 찾고 있어요 …",
+  pair_fail: "추천을 받지 못했습니다. 나중에 다시 시도해 주세요.",
+  pair_refresh: "다시 추천",
+  tonight_btn: "🍽 오늘은 뭐가 어울릴까요?",
+  tonight_title: "오늘은 뭐가 어울릴까요?",
+  tonight_ph: "오늘은 … 를 요리해요 (예: 로스트비프)",
+  tonight_hint: "AI가 내 셀러에서 고르며, 곧 마셔야 할 와인을 우선합니다. AI를 1회 사용합니다.",
+  tonight_go: "와인 추천",
+  tonight_need: "요리를 입력해 주세요",
+  tonight_none: "이 요리에 어울리는 와인이 셀러에 없습니다.",
   setup_remind: "음용 시기 알림",
   remind_off: "끄기",
   remind_weekly: "매주(토요일 오전 10시)",
@@ -14182,6 +14449,17 @@ zh: {
   store_filter: "存放：{name} · {n} 瓶 – 请点按空位",
   store_filter_off: "显示全部",
   store_back: "← 返回酒窖",
+  pair_btn: "🍽 适合搭配 …",
+  pair_loading: "AI 正在寻找合适的菜肴 …",
+  pair_fail: "未收到推荐，请稍后再试。",
+  pair_refresh: "重新推荐",
+  tonight_btn: "🍽 今天配什么？",
+  tonight_title: "今天配什么？",
+  tonight_ph: "今天我做 …（例如烤牛肉）",
+  tonight_hint: "AI 会从您的酒窖中挑选，并优先推荐需要尽快喝的酒。会使用一次 AI 调用。",
+  tonight_go: "推荐葡萄酒",
+  tonight_need: "请输入一道菜",
+  tonight_none: "您的酒窖里没有适合这道菜的酒。",
   setup_remind: "适饮期提醒",
   remind_off: "关闭",
   remind_weekly: "每周（周六上午 10 点）",
@@ -14652,6 +14930,17 @@ hi: {
   store_filter: "रखें: {name} · {n} बोतल – खाली स्थान पर टैप करें",
   store_filter_off: "सब दिखाएँ",
   store_back: "← सेलर पर",
+  pair_btn: "🍽 इसके साथ अच्छा लगता है …",
+  pair_loading: "AI उपयुक्त व्यंजन खोज रहा है …",
+  pair_fail: "कोई सुझाव नहीं मिला। कृपया बाद में फिर कोशिश करें।",
+  pair_refresh: "फिर से सुझाव दें",
+  tonight_btn: "🍽 आज क्या जमेगा?",
+  tonight_title: "आज क्या जमेगा?",
+  tonight_ph: "आज मैं … बना रहा हूँ (जैसे रोस्ट बीफ़)",
+  tonight_hint: "AI आपके सेलर में से चुनता है और उन वाइनों को प्राथमिकता देता है जिन्हें जल्द पीना चाहिए। एक AI कॉल इस्तेमाल होता है।",
+  tonight_go: "वाइन सुझाएँ",
+  tonight_need: "कृपया कोई व्यंजन लिखें",
+  tonight_none: "आपके सेलर में इस व्यंजन के साथ कोई वाइन नहीं जमती।",
   setup_remind: "पीने की अवधि का रिमाइंडर",
   remind_off: "बंद",
   remind_weekly: "साप्ताहिक (शनिवार, सुबह 10 बजे)",
@@ -15227,6 +15516,80 @@ function initRemind() {
   try { P.addListener('localNotificationActionPerformed', (ev) => { const g = ev && ev.notification && ev.notification.extra && ev.notification.extra.go; goToRipeStatus(g === 'peak' ? 'peak' : 'over'); }); } catch (e) {}
   scheduleRemind();
 }
+// ── Speiseempfehlung per KI: "Passt zu …" je Wein (Ergebnis nur auf diesem Gerät gemerkt) und "Was passt heute?" aus dem eigenen Keller ──
+function pairLoad() { try { return JSON.parse(localStorage.getItem('wk_pairing_v1') || '{}') || {}; } catch (e) { return {}; } }
+function pairSave(o) { try { localStorage.setItem('wk_pairing_v1', JSON.stringify(o)); } catch (e) {} }
+function aiLangName() { const c = baseLang(); try { return new Intl.DisplayNames(['en'], { type: 'language' }).of(c) || c; } catch (e) { return c; } }
+function aiJsonFrom(data) {   // erstes JSON-Objekt aus der Textantwort der KI
+  const text = ((data && data.content) || []).filter(b => b.type === 'text').map(b => b.text).join('');
+  try { return JSON.parse(text.replace(/```json?|```/g, '').match(/\{[\s\S]*\}/)[0]); } catch (e) { return {}; }
+}
+function pairHtml(w) {
+  const c = pairLoad()[w.id];
+  if (c && c.lang === baseLang() && Array.isArray(c.dishes) && c.dishes.length) return '<button class="pair-text" title="' + esc(t('pair_refresh')) + '" onclick="pairWine(\'' + w.id + '\', true)">🍽 ' + c.dishes.map(esc).join(' · ') + ' <span class="pair-re">↻</span></button>';
+  return '<button class="pair-btn" onclick="pairWine(\'' + w.id + '\')">' + esc(t('pair_btn')) + '</button>';
+}
+async function pairWine(id) {
+  const w = wines.find(x => x.id === id);
+  if (!w) return;
+  const box = () => document.querySelector('.wine-card[data-wine-id="' + id + '"] .wine-pair');
+  if (box()) box().innerHTML = '<span class="pair-busy">' + esc(t('pair_loading')) + '</span>';
+  try {
+    const resp = await aiFetch(SCAN_PROXY_URL, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6', max_tokens: 300,
+        system: 'Du bist ein erfahrener Sommelier. Antworte NUR mit einem JSON-Objekt ohne Markdown. Feld: dishes (Liste von 3 bis 4 Speisen oder Gerichten, die gut zu diesem Wein passen, je höchstens fünf Wörter, ohne Rezepte). Schreibe die Gerichte in der Sprache: ' + aiLangName() + '.',
+        messages: [{ role: 'user', content: 'Wein: ' + w.name + (w.year ? ' (' + w.year + ')' : '') + '. Typ: ' + (TYPE_LABELS[w.type] || w.type) + '. Rebsorte: ' + (w.grape || 'unbekannt') + '. Region: ' + ([w.region, w.country].filter(Boolean).join(', ') || 'unbekannt') + '.' }]
+      })
+    });
+    const info = aiJsonFrom(await aiJson(resp));
+    const dishes = (Array.isArray(info.dishes) ? info.dishes : []).map(x => cleanStr(x, 60).trim()).filter(Boolean).slice(0, 5);
+    if (!dishes.length) throw new Error('empty');
+    const all = pairLoad(); all[id] = { lang: baseLang(), at: Date.now(), dishes }; pairSave(all);
+  } catch (e) { if (!(e && (e.noCredits || e.noConsent))) showToast(t('pair_fail')); }
+  if (box()) box().innerHTML = pairHtml(w);
+}
+function openTonight() {
+  document.getElementById('tonight-result').innerHTML = '';
+  document.getElementById('tonight-modal').classList.add('show');
+  setTimeout(() => { const i = document.getElementById('tonight-dish'); if (i) i.focus(); }, 150);
+}
+async function tonightAsk() {
+  const dish = document.getElementById('tonight-dish').value.trim().slice(0, 120);
+  if (!dish) { showToast(t('tonight_need')); return; }
+  const have = wines.filter(w => (w.count || 1) > 0);
+  if (!have.length) { showToast(t('toast_enrich_none')); return; }
+  const rank = { over: 0, peak: 1, optimal: 2, young: 3 };
+  const cellar = have.map(w => ({ w, st: (w.drinkFrom || w.drinkTo) ? ripeStatusKey(w) : '' }))
+    .sort((a, b) => (rank[a.st] ?? 4) - (rank[b.st] ?? 4)).slice(0, 120)   // bei großem Keller: erst die, die bald getrunken werden sollten
+    .map(({ w, st }) => ({ id: w.id, name: w.name, year: w.year || null, type: w.type, grape: w.grape || '', region: w.region || '', ripe: st }));
+  const out = document.getElementById('tonight-result'), go = document.getElementById('tonight-go');
+  out.innerHTML = '<span class="pair-busy">' + esc(t('pair_loading')) + '</span>';
+  if (go) go.disabled = true;
+  try {
+    const resp = await aiFetch(SCAN_PROXY_URL, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6', max_tokens: 600,
+        system: 'Du bist ein erfahrener Sommelier. Der Nutzer will zu einem Gericht einen Wein aus SEINEM Keller. Antworte NUR mit einem JSON-Objekt ohne Markdown. Feld: picks (Liste mit 1 bis 3 Einträgen, der beste zuerst). Jeder Eintrag hat id (genau eine id aus der Weinliste) und why (ein Satz, höchstens 20 Wörter, warum der Wein passt). Nimm ausschließlich Weine aus der Liste. Das Feld ripe zeigt die Trinkreife (over = überschritten, peak = auf dem Höhepunkt, optimal, young = noch zu jung, leer = unbekannt): Wenn mehrere Weine gut passen, bevorzuge over und peak, weil sie bald getrunken werden sollten, und sage das kurz in why. Passt gar kein Wein, gib eine leere Liste zurück. Schreibe why in der Sprache: ' + aiLangName() + '.',
+        messages: [{ role: 'user', content: 'Gericht: ' + dish + '\nWeinliste (JSON): ' + JSON.stringify(cellar) }]
+      })
+    });
+    const info = aiJsonFrom(await aiJson(resp));
+    const seen = new Set(), picks = [];
+    (Array.isArray(info.picks) ? info.picks : []).forEach(p => { const id = p && String(p.id), w = wines.find(x => x.id === id); if (w && !seen.has(id) && cleanStr(p.why, 200).trim()) { seen.add(id); picks.push({ w, why: cleanStr(p.why, 200).trim() }); } });
+    const tagCol = { over: 'var(--red-alert)', peak: 'var(--gold)', optimal: 'var(--green)', young: 'var(--sparkling)' };
+    out.innerHTML = picks.length ? picks.slice(0, 3).map(({ w, why }) => {
+      const st = (w.drinkFrom || w.drinkTo) ? ripeStatusKey(w) : '';
+      return '<div class="stats-card tonight-pick" onclick="closeModal(\'tonight-modal\');goToWine(\'' + w.id + '\')"><div><span class="tp-name">' + esc(w.name) + (w.year ? ' · ' + w.year : '') + '</span>' + (st ? '<span class="tp-tag" style="color:' + tagCol[st] + '">' + esc(t('seg_' + st)) + '</span>' : '') + '</div><div class="tp-why">' + esc(why) + '</div></div>';
+    }).join('') : '<div class="stats-card" style="color:var(--text-muted);font-size:13px">' + esc(t('tonight_none')) + '</div>';
+  } catch (e) {
+    out.innerHTML = '';
+    if (!(e && (e.noCredits || e.noConsent))) showToast(t('pair_fail'));
+  }
+  if (go) go.disabled = false;
+}
 function setLanguage(l) {
   const was = settings.lang, oldCur = settings.currency;
   settings.lang = l;
@@ -15391,6 +15754,7 @@ function renderKeller() {
   `).join('') + `
     <button class="filter-chip ${viewMode==='list'?'active':''}" onclick="toggleViewMode()">${t('list_chip')}</button>
     ${shoppingChipHtml()}
+    <button class="filter-chip" onclick="openTonight()">${t('tonight_btn')}</button>
   `;
 
   // list
@@ -15470,6 +15834,7 @@ function renderKeller() {
         <div class="wine-count-badge">${w.count||1} ${t('fl')}</div>
       </div>
       ${serveTempHtml(w, 'wine-temp')}
+      <div class="wine-pair">${pairHtml(w)}</div>
       ${loc || settings.racks.length ? `<div class="card-slots">${wineSlotChips(w)}</div>` : ''}
       ${mmBadgeHtml(w)}
       ${ripe ? `
