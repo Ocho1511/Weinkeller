@@ -612,6 +612,9 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .wine-temp, .ripeness-temp { font-size: 12px; font-weight: 600; color: var(--sparkling); margin: 0 0 8px; }
 .wine-pair { margin: 0 0 8px; }
 .taste-box { margin-top: 8px; }
+.photo-wrap { position: relative; display: inline-block; max-width: 100%; }
+.photo-wrap img { max-width: 100%; max-height: 220px; border-radius: 10px; display: block; }
+.photo-wait { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 8px; border-radius: 10px; background: rgba(0,0,0,0.5); color: #fff; font-size: 13px; font-weight: 700; }
 .taste-box img { max-width: 100%; max-height: 200px; border-radius: 10px; display: block; }
 .hist-note { font-size: 12px; font-style: italic; color: var(--text); margin-top: 4px; line-height: 1.4; white-space: pre-wrap; }
 .hist-thumb { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; margin-top: 6px; cursor: pointer; display: block; }
@@ -2764,17 +2767,18 @@ async function handlePhotoPick(e) {
   const file = e.target.files[0];
   e.target.value = '';
   if (!file) return;
+  { const cur = document.getElementById('f-photo').value; if (cur && photoCache.has(cur) && !confirm(t('photo_replace_ask'))) return; }
   photoBusy('add-modal', true);
   try {
-    const dataUrl = await photoPrepare(file);
+    const pr = await photoPrepare(file, 'f-photo-box');
     const id = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-    await photoPut(id, dataUrl);
+    await photoPut(id, pr.url);
     if (formPhotoPending) photoDel(formPhotoPending);   // ein früher gewähltes, nicht gespeichertes Foto verwerfen
     formPhotoPending = id;
     document.getElementById('f-photo').value = id;
     updateFormPhoto();
-    showToast(t('photo_saved'));
-  } catch (err) { showToast(t('photo_fail')); }
+    showToast(t(pr.framed ? 'photo_saved' : 'photo_noframe'));
+  } catch (err) { updateFormPhoto(); showToast(t('photo_fail')); }
   photoBusy('add-modal', false);
 }
 function removeFormPhoto() {
@@ -2814,26 +2818,71 @@ async function photoCrop(dataUrl, rect, maxDim) {
   c.getContext('2d').drawImage(img, r.x, r.y, r.w, r.h, 0, 0, c.width, c.height);
   return c.toDataURL('image/jpeg', 0.88);
 }
-// box = [x1, y1, x2, y2] auf einer Skala von 0 bis 1000; liefert den Ausschnitt in Pixeln (mit etwas Rand) oder null, wenn nichts zu beschneiden ist
+// box = [x1, y1, x2, y2] in Einheiten, in denen die Bildbreite 1000 entspricht (die Höhe ist dann H/W*1000); liefert den Ausschnitt in Pixeln (mit etwas Rand) oder null, wenn nichts zu beschneiden ist
 function photoFrameRect(box, W, H) {
   if (!Array.isArray(box) || box.length !== 4) return null;
-  const v = box.map(n => Math.min(1000, Math.max(0, Number(n))));
+  const k = W / 1000, HU = H / k;
+  const v = box.map(Number);
   if (v.some(n => !Number.isFinite(n))) return null;
-  let x1 = Math.min(v[0], v[2]) / 1000 * W, x2 = Math.max(v[0], v[2]) / 1000 * W, y1 = Math.min(v[1], v[3]) / 1000 * H, y2 = Math.max(v[1], v[3]) / 1000 * H;
+  let x1 = Math.max(0, Math.min(v[0], v[2])), x2 = Math.min(1000, Math.max(v[0], v[2])), y1 = Math.max(0, Math.min(v[1], v[3])), y2 = Math.min(HU, Math.max(v[1], v[3]));
   const bw = x2 - x1, bh = y2 - y1;
-  if (bw < W * 0.04 || bh < H * 0.15) return null;   // unplausibel klein: der KI-Angabe nicht trauen
-  const mx = bw * 0.10, my = bh * 0.04;
-  x1 = Math.max(0, x1 - mx); x2 = Math.min(W, x2 + mx); y1 = Math.max(0, y1 - my); y2 = Math.min(H, y2 + my);
-  const w = x2 - x1, h = y2 - y1;
-  if (w >= W * 0.94 && h >= H * 0.94) return null;   // Flasche füllt schon das ganze Bild
-  return { x: Math.round(x1), y: Math.round(y1), w: Math.round(w), h: Math.round(h) };
+  if (bw < 40 || bh < HU * 0.15) return null;   // unplausibel klein: der KI-Angabe nicht trauen
+  if (bw >= 940 && bh >= HU * 0.7) return null;   // Box umfasst praktisch das ganze Bild
+  const mx = bw * 0.2, my = bh * 0.08;   // großzügig: die enge Anpassung übernimmt photoRefine
+  x1 = Math.max(0, x1 - mx); x2 = Math.min(1000, x2 + mx); y1 = Math.max(0, y1 - my); y2 = Math.min(HU, y2 + my);
+  if (x2 - x1 >= 940 && y2 - y1 >= HU * 0.94) return null;   // Flasche füllt schon das ganze Bild
+  return { x: Math.round(x1 * k), y: Math.round(y1 * k), w: Math.round((x2 - x1) * k), h: Math.round((y2 - y1) * k) };
 }
-async function photoBottleBox(dataUrl) {
+// Ausschnitt rect (Pixel von img) enger an die Flasche legen. Zuverlässig nur bei halbwegs ruhigem Hintergrund; sonst bleibt rect unverändert.
+async function photoRefine(dataUrl, rect) {
+  try {
+    const img = await photoLoadImg(dataUrl);
+    const sc = Math.min(1, 240 / Math.max(rect.w, rect.h));
+    const w = Math.max(8, Math.round(rect.w * sc)), h = Math.max(8, Math.round(rect.h * sc));
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const cx = c.getContext('2d', { willReadFrequently: true });
+    cx.drawImage(img, rect.x, rect.y, rect.w, rect.h, 0, 0, w, h);
+    const d = cx.getImageData(0, 0, w, h).data;
+    const px = (x, y) => { const i = (y * w + x) * 4; return [d[i], d[i + 1], d[i + 2]]; };
+    const med = (a) => { a.sort((p, q) => p - q); return a[a.length >> 1]; };
+    const border = [];
+    for (let x = 0; x < w; x++) { border.push(px(x, 0), px(x, 1), px(x, h - 1), px(x, h - 2)); }
+    for (let y = 2; y < h - 2; y++) { border.push(px(0, y), px(1, y), px(w - 1, y), px(w - 2, y)); }
+    const bg = [0, 1, 2].map(k => med(border.map(p => p[k])));
+    const dist = (p) => Math.hypot(p[0] - bg[0], p[1] - bg[1], p[2] - bg[2]);
+    const bd = border.map(dist).sort((p, q) => p - q);
+    const thr = Math.max(42, 2.5 * bd[Math.floor(bd.length * 0.9)]);
+    const col = new Array(w).fill(0), row = new Array(h).fill(0);
+    let fg = 0;
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { if (dist(px(x, y)) > thr) { col[x]++; row[y]++; fg++; } }
+    const share = fg / (w * h);
+    if (share < 0.06 || share > 0.85) return rect;   // Hintergrund zu unruhig oder Flasche kaum abgrenzbar
+    // größter zusammenhängender Bereich (Lücken bis 3 Zeilen/Spalten erlaubt) mit genügend Vordergrund
+    const run = (arr, min) => {
+      let best = null, cur = null, gap = 0;
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i] >= min) { if (!cur) cur = { a: i, b: i, m: 0 }; cur.b = i; cur.m += arr[i]; gap = 0; }
+        else if (cur && ++gap > 3) { if (!best || cur.m > best.m) best = cur; cur = null; gap = 0; }
+      }
+      if (cur && (!best || cur.m > best.m)) best = cur;
+      return best;
+    };
+    const rx = run(col, Math.max(2, h * 0.05)), ry = run(row, Math.max(2, w * 0.05));
+    if (!rx || !ry) return rect;
+    const bw = rx.b - rx.a + 1, bh = ry.b - ry.a + 1;
+    if (bw < w * 0.12 || bh < h * 0.3) return rect;   // zu klein: der Analyse nicht trauen
+    const mx = Math.max(2, bw * 0.05), my = Math.max(2, bh * 0.03);
+    const x1 = Math.max(0, rx.a - mx), x2 = Math.min(w, rx.b + 1 + mx), y1 = Math.max(0, ry.a - my), y2 = Math.min(h, ry.b + 1 + my);
+    return { x: Math.round(rect.x + x1 / sc), y: Math.round(rect.y + y1 / sc), w: Math.round((x2 - x1) / sc), h: Math.round((y2 - y1) / sc) };
+  } catch (e) { return rect; }
+}
+async function photoBottleBox(dataUrl, W, H) {
+  const HU = Math.round(H * 1000 / W);
   const resp = await aiFetch(SCAN_PROXY_URL, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'claude-sonnet-4-6', max_tokens: 150,
-      system: 'Du findest Flaschen auf Fotos. Antworte NUR mit einem JSON-Objekt ohne Markdown. Felder: found (true, wenn eine Wein-, Sekt- oder andere Flasche klar zu sehen ist, sonst false) und box (vier ganze Zahlen [x1, y1, x2, y2] von 0 bis 1000, relativ zu Breite und Höhe des Bildes, links oben ist 0,0). Die Box umschließt die auffälligste Flasche vollständig und eng: von der Kapsel oder dem Hals bis zum Boden und von Rand zu Rand der Flasche, ohne Gläser, Tisch oder Hintergrund. Sind mehrere Flaschen zu sehen, umschließe nur die auffälligste.',
+      system: 'Du findest Flaschen auf Fotos. Antworte NUR mit einem JSON-Objekt ohne Markdown. Felder: found (true, wenn eine Wein-, Sekt- oder andere Flasche klar zu sehen ist, sonst false) und box (vier ganze Zahlen [x1, y1, x2, y2]; links oben ist 0,0). Die Koordinaten sind Einheiten, in denen die Bildbreite genau 1000 entspricht; die Bildhöhe ist dann ' + HU + ' Einheiten. Die Box umschließt die auffälligste Flasche vollständig und eng: von der Kapsel oder dem Hals bis zum Boden und von Rand zu Rand der Flasche, ohne Gläser, Tisch oder Hintergrund. Sind mehrere Flaschen zu sehen, umschließe nur die auffälligste.',
       messages: [{ role: 'user', content: [
         { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: dataUrl.split(',')[1] } },
         { type: 'text', text: 'Wo steht die Flasche?' }
@@ -2843,18 +2892,26 @@ async function photoBottleBox(dataUrl) {
   const info = aiJsonFrom(await aiJson(resp));
   return info && info.found === true ? info.box : null;
 }
-// Foto aus dem Auswahldialog -> fertige Daten-URL (längste Seite höchstens 1000 px)
-async function photoPrepare(file) {
+// Vorschau-Kasten: sofort nach "Bild verwenden" das Foto zeigen, mit Hinweis, dass die KI es gerade zuschneidet
+function photoShowWaiting(boxId, dataUrl) {
+  const box = document.getElementById(boxId);
+  if (!box) return;
+  box.innerHTML = '<div class="photo-wrap"><img src="' + dataUrl + '" alt=""><div class="photo-wait">' + esc(t('photo_framing')) + '</div></div>';
+  box.style.display = 'block';
+}
+// Foto aus dem Auswahldialog -> { url: fertige Daten-URL (längste Seite höchstens 1000 px), framed: wurde auf die Flasche zugeschnitten }
+async function photoPrepare(file, boxId) {
   const big = 'data:image/jpeg;base64,' + await imageToBase64(file, 1600);
+  const small = await photoCrop(big, null, 900);
+  if (boxId) photoShowWaiting(boxId, small);
   let rect = null;
   try {
-    showToast(t('photo_framing'));
-    const small = await photoCrop(big, null, 900);
-    const box = await photoBottleBox(small);
-    const img = await photoLoadImg(big);
-    rect = photoFrameRect(box, img.naturalWidth, img.naturalHeight);
+    const si = await photoLoadImg(small), bi = await photoLoadImg(big);
+    const box = await photoBottleBox(small, si.naturalWidth, si.naturalHeight);
+    rect = photoFrameRect(box, bi.naturalWidth, bi.naturalHeight);
+    if (rect) rect = await photoRefine(big, rect);
   } catch (e) { rect = null; }   // kein Guthaben/keine Einwilligung/Netz: Foto bleibt, wie es ist
-  return photoCrop(big, rect, 1000);
+  return { url: await photoCrop(big, rect, 1000), framed: !!rect };
 }
 // Speichern-Knopf eines Fensters sperren, solange das Foto noch bearbeitet wird (sonst ginge es beim schnellen Speichern verloren)
 function photoBusy(modalId, on) { const b = document.querySelector('#' + modalId + ' .btn-primary, #' + modalId + ' #add-save-btn'); if (b) b.disabled = !!on; }
@@ -2880,16 +2937,17 @@ async function tastePick(p, e) {
   if (!file) return;
   const c = tasteCur[p] || (tasteCur[p] = { id: null, orig: null, fresh: [] });
   const modalId = p === 'drink' ? 'drink-modal' : 'hist-edit-modal';
+  if (c.id && photoCache.has(c.id) && !confirm(t('photo_replace_ask'))) return;
   photoBusy(modalId, true);
   try {
-    const dataUrl = await photoPrepare(file);
+    const pr = await photoPrepare(file, p + '-tphoto-box');
     const id = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-    await photoPut(id, dataUrl);
+    await photoPut(id, pr.url);
     if (c.id) tasteDropFresh(c, c.id);   // ein in dieser Sitzung zuvor gewähltes Foto verwerfen
     c.fresh.push(id); c.id = id;
     tasteRender(p);
-    showToast(t('photo_saved'));
-  } catch (err) { showToast(t('photo_fail')); }
+    showToast(t(pr.framed ? 'photo_saved' : 'photo_noframe'));
+  } catch (err) { tasteRender(p); showToast(t('photo_fail')); }
   photoBusy(modalId, false);
 }
 function tasteRemove(p) {
@@ -4040,6 +4098,8 @@ de: {
   store_filter: "Einlagern: {name} · {n} Fl. – freies Fach antippen",
   store_filter_off: "Alle anzeigen",
   store_back: "← Zum Keller",
+  photo_replace_ask: "Es ist schon ein Foto gespeichert. Soll das neue Foto es ersetzen?\n\nOK = ersetzen\nAbbrechen = altes Foto behalten",
+  photo_noframe: "Foto übernommen – ohne Zuschnitt (keine Flasche erkannt)",
   pair_hide: "Vorschlag ausblenden",
   photo_framing: "Foto wird auf die Flasche zugeschnitten …",
   dm_tnote: "Verkostungsnotiz (optional)",
@@ -4536,6 +4596,8 @@ en: {
   store_filter: "Store: {name} · {n} btl. – tap a free slot",
   store_filter_off: "Show all",
   store_back: "← To cellar",
+  photo_replace_ask: "A photo is already saved. Replace it with the new photo?\n\nOK = replace\nCancel = keep the old photo",
+  photo_noframe: "Photo saved – not cropped (no bottle recognised)",
   pair_hide: "Hide suggestion",
   photo_framing: "Cropping the photo to the bottle …",
   dm_tnote: "Tasting note (optional)",
@@ -5032,6 +5094,8 @@ es: {
   store_filter: "Colocar: {name} · {n} bot. – toca un hueco libre",
   store_filter_off: "Mostrar todo",
   store_back: "← A la bodega",
+  photo_replace_ask: "Ya hay una foto guardada. ¿Sustituirla por la nueva?\n\nAceptar = sustituir\nCancelar = conservar la foto anterior",
+  photo_noframe: "Foto guardada, sin recorte (no se reconoció ninguna botella)",
   pair_hide: "Ocultar sugerencia",
   photo_framing: "Recortando la foto a la botella …",
   dm_tnote: "Nota de cata (opcional)",
@@ -5528,6 +5592,8 @@ sv: {
   store_filter: "Placera: {name} · {n} fl. – tryck på en ledig plats",
   store_filter_off: "Visa alla",
   store_back: "← Till källaren",
+  photo_replace_ask: "Ett foto är redan sparat. Ska det nya fotot ersätta det?\n\nOK = ersätt\nAvbryt = behåll det gamla fotot",
+  photo_noframe: "Foto sparat utan beskärning (ingen flaska hittades)",
   pair_hide: "Dölj förslaget",
   photo_framing: "Beskär fotot kring flaskan …",
   dm_tnote: "Provningsanteckning (valfritt)",
@@ -6024,6 +6090,8 @@ da: {
   store_filter: "Placér: {name} · {n} fl. – tryk på en ledig plads",
   store_filter_off: "Vis alle",
   store_back: "← Til kælderen",
+  photo_replace_ask: "Der er allerede gemt et foto. Skal det nye foto erstatte det?\n\nOK = erstat\nAnnuller = behold det gamle foto",
+  photo_noframe: "Foto gemt uden beskæring (ingen flaske fundet)",
   pair_hide: "Skjul forslaget",
   photo_framing: "Beskærer fotoet til flasken …",
   dm_tnote: "Smagsnote (valgfrit)",
@@ -6520,6 +6588,8 @@ fi: {
   store_filter: "Sijoita: {name} · {n} pul. – napauta vapaata paikkaa",
   store_filter_off: "Näytä kaikki",
   store_back: "← Kellariin",
+  photo_replace_ask: "Kuva on jo tallennettu. Korvataanko se uudella kuvalla?\n\nOK = korvaa\nPeruuta = säilytä vanha kuva",
+  photo_noframe: "Kuva tallennettu ilman rajausta (pulloa ei tunnistettu)",
   pair_hide: "Piilota ehdotus",
   photo_framing: "Rajataan kuva pullon ympärille …",
   dm_tnote: "Maistelumuistiinpano (valinnainen)",
@@ -7016,6 +7086,8 @@ ru: {
   store_filter: "Разместить: {name} · {n} бут. – коснитесь свободной ячейки",
   store_filter_off: "Показать все",
   store_back: "← В погреб",
+  photo_replace_ask: "Фото уже сохранено. Заменить его новым?\n\nOK = заменить\nОтмена = оставить старое фото",
+  photo_noframe: "Фото сохранено без обрезки (бутылка не найдена)",
   pair_hide: "Скрыть подсказку",
   photo_framing: "Фото обрезается по бутылке …",
   dm_tnote: "Заметка о дегустации (необязательно)",
@@ -7512,6 +7584,8 @@ it: {
   store_filter: "Riponi: {name} · {n} bott. – tocca uno scomparto libero",
   store_filter_off: "Mostra tutto",
   store_back: "← Alla cantina",
+  photo_replace_ask: "È già salvata una foto. Sostituirla con la nuova?\n\nOK = sostituisci\nAnnulla = mantieni la foto precedente",
+  photo_noframe: "Foto salvata senza ritaglio (nessuna bottiglia riconosciuta)",
   pair_hide: "Nascondi suggerimento",
   photo_framing: "Ritaglio della foto sulla bottiglia …",
   dm_tnote: "Nota di degustazione (facoltativa)",
@@ -8008,6 +8082,8 @@ fr: {
   store_filter: "Ranger : {name} · {n} bout. – touchez un emplacement libre",
   store_filter_off: "Tout afficher",
   store_back: "← Vers la cave",
+  photo_replace_ask: "Une photo est déjà enregistrée. La remplacer par la nouvelle ?\n\nOK = remplacer\nAnnuler = garder l’ancienne photo",
+  photo_noframe: "Photo enregistrée sans recadrage (aucune bouteille reconnue)",
   pair_hide: "Masquer la suggestion",
   photo_framing: "Recadrage de la photo sur la bouteille …",
   dm_tnote: "Note de dégustation (facultatif)",
@@ -8504,6 +8580,8 @@ pl: {
   store_filter: "Ułóż: {name} · {n} but. – dotknij wolne miejsce",
   store_filter_off: "Pokaż wszystko",
   store_back: "← Do piwnicy",
+  photo_replace_ask: "Zdjęcie jest już zapisane. Zastąpić je nowym?\n\nOK = zastąp\nAnuluj = zachowaj stare zdjęcie",
+  photo_noframe: "Zdjęcie zapisane bez przycięcia (nie rozpoznano butelki)",
   pair_hide: "Ukryj propozycję",
   photo_framing: "Przycinanie zdjęcia do butelki …",
   dm_tnote: "Notatka z degustacji (opcjonalnie)",
@@ -9000,6 +9078,8 @@ hu: {
   store_filter: "Elhelyezés: {name} · {n} üveg – koppints egy szabad helyre",
   store_filter_off: "Összes mutatása",
   store_back: "← A pincéhez",
+  photo_replace_ask: "Már van elmentett fotó. Lecseréli az újra?\n\nOK = csere\nMégse = a régi fotó marad",
+  photo_noframe: "A fotó mentve vágás nélkül (nem találtam üveget)",
   pair_hide: "Javaslat elrejtése",
   photo_framing: "A fotó az üvegre vágása …",
   dm_tnote: "Kóstolási jegyzet (nem kötelező)",
@@ -9496,6 +9576,8 @@ cs: {
   store_filter: "Uložit: {name} · {n} lahví – klepni na volné místo",
   store_filter_off: "Zobrazit vše",
   store_back: "← Do sklepa",
+  photo_replace_ask: "Fotka je již uložena. Nahradit ji novou?\n\nOK = nahradit\nZrušit = ponechat starou fotku",
+  photo_noframe: "Fotka uložena bez oříznutí (láhev nebyla rozpoznána)",
   pair_hide: "Skrýt návrh",
   photo_framing: "Fotka se ořezává na láhev …",
   dm_tnote: "Poznámka z degustace (nepovinné)",
@@ -9992,6 +10074,8 @@ sk: {
   store_filter: "Uložiť: {name} · {n} fliaš – ťukni na voľné miesto",
   store_filter_off: "Zobraziť všetko",
   store_back: "← Do pivnice",
+  photo_replace_ask: "Fotka je už uložená. Nahradiť ju novou?\n\nOK = nahradiť\nZrušiť = ponechať starú fotku",
+  photo_noframe: "Fotka uložená bez orezania (fľaša nebola rozpoznaná)",
   pair_hide: "Skryť návrh",
   photo_framing: "Fotka sa orezáva na fľašu …",
   dm_tnote: "Poznámka z degustácie (nepovinné)",
@@ -10488,6 +10572,8 @@ ro: {
   store_filter: "Așază: {name} · {n} stic. – atinge un loc liber",
   store_filter_off: "Arată tot",
   store_back: "← La pivniță",
+  photo_replace_ask: "Există deja o fotografie salvată. O înlocuiți cu cea nouă?\n\nOK = înlocuiește\nAnulare = păstrează fotografia veche",
+  photo_noframe: "Fotografie salvată fără decupare (nicio sticlă recunoscută)",
   pair_hide: "Ascunde sugestia",
   photo_framing: "Se decupează fotografia pe sticlă …",
   dm_tnote: "Notă de degustare (opțional)",
@@ -10984,6 +11070,8 @@ hr: {
   store_filter: "Pohrani: {name} · {n} boc. – dodirni slobodno mjesto",
   store_filter_off: "Prikaži sve",
   store_back: "← U podrum",
+  photo_replace_ask: "Fotografija je već spremljena. Zamijeniti je novom?\n\nOK = zamijeni\nOdustani = zadrži staru fotografiju",
+  photo_noframe: "Fotografija spremljena bez obrezivanja (boca nije prepoznata)",
   pair_hide: "Sakrij prijedlog",
   photo_framing: "Fotografija se obrezuje na bocu …",
   dm_tnote: "Bilješka s kušanja (neobavezno)",
@@ -11480,6 +11568,8 @@ pt: {
   store_filter: "Arrumar: {name} · {n} gar. – toca num lugar livre",
   store_filter_off: "Mostrar tudo",
   store_back: "← Para a adega",
+  photo_replace_ask: "Já existe uma foto guardada. Substituí-la pela nova?\n\nOK = substituir\nCancelar = manter a foto antiga",
+  photo_noframe: "Foto guardada sem recorte (nenhuma garrafa reconhecida)",
   pair_hide: "Ocultar sugestão",
   photo_framing: "A recortar a foto na garrafa …",
   dm_tnote: "Nota de prova (opcional)",
@@ -11976,6 +12066,8 @@ no: {
   store_filter: "Plasser: {name} · {n} fl. – trykk på en ledig plass",
   store_filter_off: "Vis alle",
   store_back: "← Til kjelleren",
+  photo_replace_ask: "Et bilde er allerede lagret. Skal det nye bildet erstatte det?\n\nOK = erstatt\nAvbryt = behold det gamle bildet",
+  photo_noframe: "Bildet er lagret uten beskjæring (ingen flaske funnet)",
   pair_hide: "Skjul forslaget",
   photo_framing: "Beskjærer bildet rundt flasken …",
   dm_tnote: "Smaksnotat (valgfritt)",
@@ -12472,6 +12564,8 @@ nl: {
   store_filter: "Opbergen: {name} · {n} fl. – tik op een vrij vak",
   store_filter_off: "Toon alles",
   store_back: "← Naar de kelder",
+  photo_replace_ask: "Er is al een foto opgeslagen. Vervangen door de nieuwe?\n\nOK = vervangen\nAnnuleren = oude foto behouden",
+  photo_noframe: "Foto opgeslagen zonder bijsnijden (geen fles herkend)",
   pair_hide: "Suggestie verbergen",
   photo_framing: "Foto wordt bijgesneden op de fles …",
   dm_tnote: "Proefnotitie (optioneel)",
@@ -12968,6 +13062,8 @@ el: {
   store_filter: "Τοποθέτηση: {name} · {n} φιάλ. – πατήστε μια ελεύθερη θέση",
   store_filter_off: "Εμφάνιση όλων",
   store_back: "← Στο κελάρι",
+  photo_replace_ask: "Υπάρχει ήδη αποθηκευμένη φωτογραφία. Να αντικατασταθεί με τη νέα;\n\nOK = αντικατάσταση\nΑκύρωση = διατήρηση της παλιάς φωτογραφίας",
+  photo_noframe: "Η φωτογραφία αποθηκεύτηκε χωρίς περικοπή (δεν αναγνωρίστηκε μπουκάλι)",
   pair_hide: "Απόκρυψη πρότασης",
   photo_framing: "Περικοπή της φωτογραφίας στο μπουκάλι …",
   dm_tnote: "Σημείωση γευστικής δοκιμής (προαιρετικό)",
@@ -13464,6 +13560,8 @@ uk: {
   store_filter: "Розмістити: {name} · {n} пл. – торкніться вільного місця",
   store_filter_off: "Показати все",
   store_back: "← До погреба",
+  photo_replace_ask: "Фото вже збережено. Замінити його новим?\n\nOK = замінити\nСкасувати = залишити старе фото",
+  photo_noframe: "Фото збережено без обрізання (пляшку не знайдено)",
   pair_hide: "Приховати підказку",
   photo_framing: "Фото обрізається за пляшкою …",
   dm_tnote: "Нотатка про дегустацію (необов’язково)",
@@ -13960,6 +14058,8 @@ ja: {
   store_filter: "配置: {name} · {n}本 – 空いている場所をタップ",
   store_filter_off: "すべて表示",
   store_back: "← セラーへ戻る",
+  photo_replace_ask: "すでに写真が保存されています。新しい写真に置き換えますか？\n\nOK = 置き換える\nキャンセル = 元の写真を残す",
+  photo_noframe: "写真を保存しました（ボトルが見つからず、トリミングなし）",
   pair_hide: "提案を非表示",
   photo_framing: "ボトルに合わせて写真をトリミング中 …",
   dm_tnote: "テイスティングメモ（任意）",
@@ -14456,6 +14556,8 @@ ko: {
   store_filter: "보관: {name} · {n}병 – 빈 칸을 탭하세요",
   store_filter_off: "모두 보기",
   store_back: "← 셀러로",
+  photo_replace_ask: "이미 저장된 사진이 있어요. 새 사진으로 바꿀까요?\n\n확인 = 바꾸기\n취소 = 기존 사진 유지",
+  photo_noframe: "사진을 저장했어요(병을 찾지 못해 자르지 않음)",
   pair_hide: "추천 숨기기",
   photo_framing: "병에 맞춰 사진을 자르는 중 …",
   dm_tnote: "테이스팅 노트(선택)",
@@ -14952,6 +15054,8 @@ zh: {
   store_filter: "存放：{name} · {n} 瓶 – 请点按空位",
   store_filter_off: "显示全部",
   store_back: "← 返回酒窖",
+  photo_replace_ask: "已保存了一张照片。要用新照片替换吗？\n\n确定 = 替换\n取消 = 保留旧照片",
+  photo_noframe: "照片已保存，未裁剪（未识别到酒瓶）",
   pair_hide: "隐藏建议",
   photo_framing: "正在按酒瓶裁剪照片 …",
   dm_tnote: "品鉴笔记（可选）",
@@ -15448,6 +15552,8 @@ hi: {
   store_filter: "रखें: {name} · {n} बोतल – खाली स्थान पर टैप करें",
   store_filter_off: "सब दिखाएँ",
   store_back: "← सेलर पर",
+  photo_replace_ask: "एक फ़ोटो पहले से सहेजी हुई है। क्या नई फ़ोटो से बदलें?\n\nठीक है = बदलें\nरद्द करें = पुरानी फ़ोटो रखें",
+  photo_noframe: "फ़ोटो सहेजी गई, बिना क्रॉप किए (बोतल नहीं मिली)",
   pair_hide: "सुझाव छिपाएँ",
   photo_framing: "फ़ोटो को बोतल के अनुसार काटा जा रहा है …",
   dm_tnote: "टेस्टिंग नोट (वैकल्पिक)",
