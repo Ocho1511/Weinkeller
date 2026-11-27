@@ -618,6 +618,8 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .pair-btn, .pair-text { background: none; border: 1px dashed var(--border); border-radius: 12px; color: var(--text-muted); font-family: inherit; font-size: 12px; font-weight: 600; padding: 5px 10px; cursor: pointer; text-align: left; line-height: 1.4; }
 .pair-text { border-style: solid; color: var(--text); }
 .pair-re { color: var(--gold); margin-left: 4px; }
+.pair-row { display: flex; align-items: flex-start; gap: 6px; }
+.pair-x { background: none; border: 1px solid var(--border); border-radius: 12px; color: var(--text-muted); font-family: inherit; font-size: 12px; font-weight: 700; padding: 5px 9px; cursor: pointer; line-height: 1.4; flex-shrink: 0; }
 .pair-busy { font-size: 12px; font-weight: 600; color: var(--text-muted); }
 .tonight-pick { cursor: pointer; margin-bottom: 8px; }
 .tonight-pick .tp-name { font-family: var(--heading-font, 'Playfair Display', serif); font-size: 15px; color: var(--gold-light, var(--gold)); }
@@ -4014,6 +4016,7 @@ de: {
   store_filter: "Einlagern: {name} · {n} Fl. – freies Fach antippen",
   store_filter_off: "Alle anzeigen",
   store_back: "← Zum Keller",
+  pair_hide: "Vorschlag ausblenden",
   photo_framing: "Foto wird auf die Flasche zugeschnitten …",
   dm_tnote: "Verkostungsnotiz (optional)",
   dm_tnote_ph: "Duft, Geschmack, Eindruck…",
@@ -4509,6 +4512,7 @@ en: {
   store_filter: "Store: {name} · {n} btl. – tap a free slot",
   store_filter_off: "Show all",
   store_back: "← To cellar",
+  pair_hide: "Hide suggestion",
   photo_framing: "Cropping the photo to the bottle …",
   dm_tnote: "Tasting note (optional)",
   dm_tnote_ph: "Aroma, taste, impression…",
@@ -5004,6 +5008,7 @@ es: {
   store_filter: "Colocar: {name} · {n} bot. – toca un hueco libre",
   store_filter_off: "Mostrar todo",
   store_back: "← A la bodega",
+  pair_hide: "Ocultar sugerencia",
   photo_framing: "Recortando la foto a la botella …",
   dm_tnote: "Nota de cata (opcional)",
   dm_tnote_ph: "Aroma, sabor, impresión…",
@@ -5499,6 +5504,7 @@ sv: {
   store_filter: "Placera: {name} · {n} fl. – tryck på en ledig plats",
   store_filter_off: "Visa alla",
   store_back: "← Till källaren",
+  pair_hide: "Dölj förslaget",
   photo_framing: "Beskär fotot kring flaskan …",
   dm_tnote: "Provningsanteckning (valfritt)",
   dm_tnote_ph: "Doft, smak, intryck…",
@@ -5994,6 +6000,7 @@ da: {
   store_filter: "Placér: {name} · {n} fl. – tryk på en ledig plads",
   store_filter_off: "Vis alle",
   store_back: "← Til kælderen",
+  pair_hide: "Skjul forslaget",
   photo_framing: "Beskærer fotoet til flasken …",
   dm_tnote: "Smagsnote (valgfrit)",
   dm_tnote_ph: "Duft, smag, indtryk…",
@@ -6489,6 +6496,7 @@ fi: {
   store_filter: "Sijoita: {name} · {n} pul. – napauta vapaata paikkaa",
   store_filter_off: "Näytä kaikki",
   store_back: "← Kellariin",
+  pair_hide: "Piilota ehdotus",
   photo_framing: "Rajataan kuva pullon ympärille …",
   dm_tnote: "Maistelumuistiinpano (valinnainen)",
   dm_tnote_ph: "Tuoksu, maku, vaikutelma…",
@@ -6984,6 +6992,7 @@ ru: {
   store_filter: "Разместить: {name} · {n} бут. – коснитесь свободной ячейки",
   store_filter_off: "Показать все",
   store_back: "← В погреб",
+  pair_hide: "Скрыть подсказку",
   photo_framing: "Фото обрезается по бутылке …",
   dm_tnote: "Заметка о дегустации (необязательно)",
   dm_tnote_ph: "Аромат, вкус, впечатление…",
@@ -7479,6 +7488,7 @@ it: {
   store_filter: "Riponi: {name} · {n} bott. – tocca uno scomparto libero",
   store_filter_off: "Mostra tutto",
   store_back: "← Alla cantina",
+  pair_hide: "Nascondi suggerimento",
   photo_framing: "Ritaglio della foto sulla bottiglia …",
   dm_tnote: "Nota di degustazione (facoltativa)",
   dm_tnote_ph: "Profumo, gusto, impressione…",
@@ -7974,6 +7984,7 @@ fr: {
   store_filter: "Ranger : {name} · {n} bout. – touchez un emplacement libre",
   store_filter_off: "Tout afficher",
   store_back: "← Vers la cave",
+  pair_hide: "Masquer la suggestion",
   photo_framing: "Recadrage de la photo sur la bouteille …",
   dm_tnote: "Note de dégustation (facultatif)",
   dm_tnote_ph: "Arôme, goût, impression…",
@@ -8469,6 +8480,7 @@ pl: {
   store_filter: "Ułóż: {name} · {n} but. – dotknij wolne miejsce",
   store_filter_off: "Pokaż wszystko",
   store_back: "← Do piwnicy",
+  pair_hide: "Ukryj propozycję",
   photo_framing: "Przycinanie zdjęcia do butelki …",
   dm_tnote: "Notatka z degustacji (opcjonalnie)",
   dm_tnote_ph: "Aromat, smak, wrażenia…",
@@ -8964,6 +8976,7 @@ hu: {
   store_filter: "Elhelyezés: {name} · {n} üveg – koppints egy szabad helyre",
   store_filter_off: "Összes mutatása",
   store_back: "← A pincéhez",
+  pair_hide: "Javaslat elrejtése",
   photo_framing: "A fotó az üvegre vágása …",
   dm_tnote: "Kóstolási jegyzet (nem kötelező)",
   dm_tnote_ph: "Illat, íz, benyomás…",
@@ -9459,6 +9472,7 @@ cs: {
   store_filter: "Uložit: {name} · {n} lahví – klepni na volné místo",
   store_filter_off: "Zobrazit vše",
   store_back: "← Do sklepa",
+  pair_hide: "Skrýt návrh",
   photo_framing: "Fotka se ořezává na láhev …",
   dm_tnote: "Poznámka z degustace (nepovinné)",
   dm_tnote_ph: "Vůně, chuť, dojem…",
@@ -9954,6 +9968,7 @@ sk: {
   store_filter: "Uložiť: {name} · {n} fliaš – ťukni na voľné miesto",
   store_filter_off: "Zobraziť všetko",
   store_back: "← Do pivnice",
+  pair_hide: "Skryť návrh",
   photo_framing: "Fotka sa orezáva na fľašu …",
   dm_tnote: "Poznámka z degustácie (nepovinné)",
   dm_tnote_ph: "Vôňa, chuť, dojem…",
@@ -10449,6 +10464,7 @@ ro: {
   store_filter: "Așază: {name} · {n} stic. – atinge un loc liber",
   store_filter_off: "Arată tot",
   store_back: "← La pivniță",
+  pair_hide: "Ascunde sugestia",
   photo_framing: "Se decupează fotografia pe sticlă …",
   dm_tnote: "Notă de degustare (opțional)",
   dm_tnote_ph: "Aromă, gust, impresie…",
@@ -10944,6 +10960,7 @@ hr: {
   store_filter: "Pohrani: {name} · {n} boc. – dodirni slobodno mjesto",
   store_filter_off: "Prikaži sve",
   store_back: "← U podrum",
+  pair_hide: "Sakrij prijedlog",
   photo_framing: "Fotografija se obrezuje na bocu …",
   dm_tnote: "Bilješka s kušanja (neobavezno)",
   dm_tnote_ph: "Miris, okus, dojam…",
@@ -11439,6 +11456,7 @@ pt: {
   store_filter: "Arrumar: {name} · {n} gar. – toca num lugar livre",
   store_filter_off: "Mostrar tudo",
   store_back: "← Para a adega",
+  pair_hide: "Ocultar sugestão",
   photo_framing: "A recortar a foto na garrafa …",
   dm_tnote: "Nota de prova (opcional)",
   dm_tnote_ph: "Aroma, sabor, impressão…",
@@ -11934,6 +11952,7 @@ no: {
   store_filter: "Plasser: {name} · {n} fl. – trykk på en ledig plass",
   store_filter_off: "Vis alle",
   store_back: "← Til kjelleren",
+  pair_hide: "Skjul forslaget",
   photo_framing: "Beskjærer bildet rundt flasken …",
   dm_tnote: "Smaksnotat (valgfritt)",
   dm_tnote_ph: "Duft, smak, inntrykk…",
@@ -12429,6 +12448,7 @@ nl: {
   store_filter: "Opbergen: {name} · {n} fl. – tik op een vrij vak",
   store_filter_off: "Toon alles",
   store_back: "← Naar de kelder",
+  pair_hide: "Suggestie verbergen",
   photo_framing: "Foto wordt bijgesneden op de fles …",
   dm_tnote: "Proefnotitie (optioneel)",
   dm_tnote_ph: "Geur, smaak, indruk…",
@@ -12924,6 +12944,7 @@ el: {
   store_filter: "Τοποθέτηση: {name} · {n} φιάλ. – πατήστε μια ελεύθερη θέση",
   store_filter_off: "Εμφάνιση όλων",
   store_back: "← Στο κελάρι",
+  pair_hide: "Απόκρυψη πρότασης",
   photo_framing: "Περικοπή της φωτογραφίας στο μπουκάλι …",
   dm_tnote: "Σημείωση γευστικής δοκιμής (προαιρετικό)",
   dm_tnote_ph: "Άρωμα, γεύση, εντύπωση…",
@@ -13419,6 +13440,7 @@ uk: {
   store_filter: "Розмістити: {name} · {n} пл. – торкніться вільного місця",
   store_filter_off: "Показати все",
   store_back: "← До погреба",
+  pair_hide: "Приховати підказку",
   photo_framing: "Фото обрізається за пляшкою …",
   dm_tnote: "Нотатка про дегустацію (необов’язково)",
   dm_tnote_ph: "Аромат, смак, враження…",
@@ -13914,6 +13936,7 @@ ja: {
   store_filter: "配置: {name} · {n}本 – 空いている場所をタップ",
   store_filter_off: "すべて表示",
   store_back: "← セラーへ戻る",
+  pair_hide: "提案を非表示",
   photo_framing: "ボトルに合わせて写真をトリミング中 …",
   dm_tnote: "テイスティングメモ（任意）",
   dm_tnote_ph: "香り、味わい、印象…",
@@ -14409,6 +14432,7 @@ ko: {
   store_filter: "보관: {name} · {n}병 – 빈 칸을 탭하세요",
   store_filter_off: "모두 보기",
   store_back: "← 셀러로",
+  pair_hide: "추천 숨기기",
   photo_framing: "병에 맞춰 사진을 자르는 중 …",
   dm_tnote: "테이스팅 노트(선택)",
   dm_tnote_ph: "향, 맛, 인상…",
@@ -14904,6 +14928,7 @@ zh: {
   store_filter: "存放：{name} · {n} 瓶 – 请点按空位",
   store_filter_off: "显示全部",
   store_back: "← 返回酒窖",
+  pair_hide: "隐藏建议",
   photo_framing: "正在按酒瓶裁剪照片 …",
   dm_tnote: "品鉴笔记（可选）",
   dm_tnote_ph: "香气、口感、印象…",
@@ -15399,6 +15424,7 @@ hi: {
   store_filter: "रखें: {name} · {n} बोतल – खाली स्थान पर टैप करें",
   store_filter_off: "सब दिखाएँ",
   store_back: "← सेलर पर",
+  pair_hide: "सुझाव छिपाएँ",
   photo_framing: "फ़ोटो को बोतल के अनुसार काटा जा रहा है …",
   dm_tnote: "टेस्टिंग नोट (वैकल्पिक)",
   dm_tnote_ph: "सुगंध, स्वाद, अनुभव…",
@@ -16009,9 +16035,20 @@ function aiJsonFrom(data) {   // erstes JSON-Objekt aus der Textantwort der KI
 }
 function pairHtml(w) {
   const c = pairLoad()[w.id];
-  if (c && c.lang === baseLang() && Array.isArray(c.dishes) && c.dishes.length) return '<button class="pair-text" title="' + esc(t('pair_refresh')) + '" onclick="pairWine(\'' + w.id + '\', true)">🍽 ' + c.dishes.map(esc).join(' · ') + ' <span class="pair-re">↻</span></button>';
+  if (c && c.lang === baseLang() && Array.isArray(c.dishes) && c.dishes.length) {
+    if (c.hide) return '<button class="pair-btn" onclick="pairShow(\'' + w.id + '\')">' + esc(t('pair_btn')) + '</button>';
+    return '<div class="pair-row"><button class="pair-text" title="' + esc(t('pair_refresh')) + '" onclick="pairWine(\'' + w.id + '\', true)">🍽 ' + c.dishes.map(esc).join(' · ') + ' <span class="pair-re">↻</span></button><button class="pair-x" title="' + esc(t('pair_hide')) + '" aria-label="' + esc(t('pair_hide')) + '" onclick="pairHide(\'' + w.id + '\')">✕</button></div>';
+  }
   return '<button class="pair-btn" onclick="pairWine(\'' + w.id + '\')">' + esc(t('pair_btn')) + '</button>';
 }
+function pairSetHide(id, hide) {
+  const all = pairLoad(); if (!all[id]) return;
+  all[id].hide = !!hide; pairSave(all);
+  const w = wines.find(x => x.id === id), box = document.querySelector('.wine-card[data-wine-id="' + id + '"] .wine-pair');
+  if (w && box) box.innerHTML = pairHtml(w);
+}
+function pairHide(id) { pairSetHide(id, true); }
+function pairShow(id) { pairSetHide(id, false); }
 async function pairWine(id) {
   const w = wines.find(x => x.id === id);
   if (!w) return;
