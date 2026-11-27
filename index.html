@@ -3486,7 +3486,7 @@ async function lookupWineData(name, year) {
       model: 'claude-sonnet-4-6',
       max_tokens: 1200,
       tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 3 }],
-      system: `Du bist ein Wein-Experte. Recherchiere den aktuellen durchschnittlichen Marktpreis (Endverbraucher, 0,75-l-Flasche) mit der Websuche. Antworte am Ende mit GENAU EINEM JSON-Objekt (ohne Markdown) mit den Feldern: type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), land (Herkunftsland auf Deutsch oder null), grape (Hauptrebsorte oder null), drinkFrom (Jahr als Zahl oder null), drinkTo (Jahr als Zahl oder null), tempFrom (empfohlene Trinktemperatur, untere Grenze in °C als ganze Zahl, z. B. 16, oder null), tempTo (obere Grenze in °C als ganze Zahl, z. B. 18, oder null), price (aktueller Durchschnittspreis pro Flasche in ${currencyName()} als Zahl ohne Währungssymbol, gerundet, oder null), image (eine direkte, öffentlich erreichbare URL zu einem Foto DER FLASCHE, die direkt auf eine Bilddatei zeigt und auf .jpg/.jpeg/.png/.webp endet; nur eine URL, die du über die Websuche tatsächlich gesehen hast, sonst null), page (die URL EINER Webseite, auf der die Flasche abgebildet ist – bevorzugt Wikipedia, die Seite des Weinguts oder ein Wein-Shop/Vivino; eine echte, über die Websuche gefundene Seiten-URL, sonst null). Für Beschreibungsfelder nutze dein Wissen; für Preis, Bild und Seite die Websuche. Nutze null nur wenn keine sinnvolle Angabe möglich ist. Das Trinkfenster beginnt nie vor dem Jahrgang, und drinkTo liegt immer nach drinkFrom.`,
+      system: `Du bist ein Wein-Experte. Recherchiere den aktuellen durchschnittlichen Marktpreis (Endverbraucher, 0,75-l-Flasche) mit der Websuche. Antworte am Ende mit GENAU EINEM JSON-Objekt (ohne Markdown) mit den Feldern: type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), land (Herkunftsland auf Deutsch oder null), grape (Hauptrebsorte oder null), drinkFrom (Jahr als Zahl oder null), drinkTo (Jahr als Zahl oder null), tempFrom (empfohlene Trinktemperatur, untere Grenze in °C als ganze Zahl, z. B. 16, oder null), tempTo (obere Grenze in °C als ganze Zahl, z. B. 18, oder null), price (aktueller Durchschnittspreis pro Flasche in ${currencyName()} als Zahl ohne Währungssymbol, gerundet, oder null; bevorzuge Preise von Shops, die in dieser Währung verkaufen), priceCurrency (ISO-4217-Code der Währung, in der price tatsächlich angegeben ist, z. B. EUR oder CHF; findest du den Preis nur in einer anderen Währung, nenne genau diese Währung und rechne nicht selbst um), image (eine direkte, öffentlich erreichbare URL zu einem Foto DER FLASCHE, die direkt auf eine Bilddatei zeigt und auf .jpg/.jpeg/.png/.webp endet; nur eine URL, die du über die Websuche tatsächlich gesehen hast, sonst null), page (die URL EINER Webseite, auf der die Flasche abgebildet ist – bevorzugt Wikipedia, die Seite des Weinguts oder ein Wein-Shop/Vivino; eine echte, über die Websuche gefundene Seiten-URL, sonst null). Für Beschreibungsfelder nutze dein Wissen; für Preis, Bild und Seite die Websuche. Nutze null nur wenn keine sinnvolle Angabe möglich ist. Das Trinkfenster beginnt nie vor dem Jahrgang, und drinkTo liegt immer nach drinkFrom.`,
       messages: [{ role: 'user', content: `Wein: ${name}${year ? ' (Jahrgang ' + year + ')' : ''}. Nenne Typ, Region, Land, Hauptrebsorte, ein geschätztes Trinkfenster, den aktuellen Durchschnittspreis pro Flasche in ${currencyName()}, eine direkte Bild-URL der Flasche und die URL einer Webseite, auf der die Flasche abgebildet ist.` }]
     })
   });
@@ -3499,8 +3499,32 @@ async function lookupWineData(name, year) {
     const info = JSON.parse(m[0]);
     const y = parseInt(year);
     if (info && drinkYearOk(y)) info.drinkFrom = ruleFrom(y, info.drinkFrom);
+    if (info) info.price = await priceInOwnCurrency(info.price, info.priceCurrency);
     return info;
   } catch { return null; }
+}
+// Preis aus dem Internet in die eingestellte Währung bringen. Nennt die KI eine andere Währung, wird mit dem EZB-Kurs umgerechnet;
+// geht das nicht (kein Kurs, z. B. RUB/UAH, oder Netzfehler), bleibt das Feld lieber leer, als eine falsche Zahl einzutragen.
+var ratesMemo = null;
+async function priceInOwnCurrency(price, cur) {
+  const p = Number(price);
+  if (!Number.isFinite(p) || p <= 0) return null;
+  const want = CUR_ISO[settings.currency] || settings.currency, got = String(cur || '').trim().toUpperCase();
+  const fin = (v, iso) => (WHOLE_CUR.includes(iso) ? Math.round(v) : Math.round(v * 100) / 100);
+  if (!got || !/^[A-Z]{3}$/.test(got)) return fin(p, want);          // keine Angabe: wie gefragt in der eingestellten Währung
+  if (got === want) return fin(p, want);
+  try {
+    if (!ratesMemo || Date.now() - ratesMemo.at > 6 * 3600 * 1000) {
+      const resp = await fetch(SCAN_PROXY_URL + '/rates', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+      if (!resp.ok) throw new Error('http ' + resp.status);
+      const d = await resp.json();
+      if (!d || !d.rates) throw new Error('rates');
+      ratesMemo = { at: Date.now(), rates: d.rates };
+    }
+    const rt = ratesMemo.rates;
+    if (!rt[got] || !rt[want]) return null;
+    return fin(p * rt[want] / rt[got], want);
+  } catch (e) { return null; }
 }
 
 async function lookupWine() {
