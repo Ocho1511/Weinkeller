@@ -15,11 +15,12 @@
   .back{margin:0 0 6px} .toapp{display:none} @media (display-mode: standalone){.toapp{display:inline}}
   @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
 </style></head><body>
+<!--update-2026-11-27-->
 <p class="back"><span class="toapp"><a href="index.html">← A pincéhez</a> &nbsp;·&nbsp; </span><a href="support.html">← Vissza a támogatáshoz</a></p>
 <div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html">Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html" selected>Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
 
 <h1>Felhasználói útmutató – Weinkeller</h1>
-<p><small>Frissítve: 2026. november 10. · Az alkalmazás verziója: 2.0</small></p>
+<p><small>Frissítve: 2026. november 27. · Az alkalmazás verziója: 2.0</small></p>
 
 <div class="toc">
 
@@ -75,7 +76,7 @@
 <ul>
 <li><strong>Ivási időablak:</strong> Amint megadod az évjáratot, az alkalmazás az „Iható ettől” mezőt <strong>évjárat + 1</strong> értékre állítja. Az „Iható eddig” a bortípustól és a szőlőtől függ (a vörös tovább eláll, mint a rosé). Mindkettőt bármikor módosíthatod.</li>
 <li><strong>Készlet, Min és Max:</strong> Ha megadsz egy minimumot, az alkalmazás figyelmeztet, ha a készlet ez alá csökken, és felajánlja, hogy a bort felveszi a kívánságlistára (<a href="#cellar">3. fejezet</a>).</li>
-<li><strong>Saját fotó:</strong> A „Fotó készítése / kiválasztása” fotót csatol a borhoz. A fotó ezen az eszközön marad, része a JSON biztonsági mentésnek, de a felhővel nem szinkronizálódik.</li>
+<li><strong>Saját fotó:</strong> A „Fotó készítése / kiválasztása” fotót csatol a borhoz. Az MI megkeresi a palackot a fotón, és szorosan köré vágja a képet (ez egy MI-hívásba kerül; ha nem talál palackot, vagy az MI nem érhető el, a fotó változatlan marad). A fotó ezen az eszközön marad, és része a JSON biztonsági mentésnek. Bekapcsolt felhőtárhely esetén fotónként választhatod, hogy „A felhőben” (minden eszközön) vagy „Csak ezen a telefonon” legyen mentve.</li>
 </ul>
 <h3>b) Címke beolvasása (MI)</h3>
 <p>Koppints a <em>Címke beolvasása (MI)</em> gombra, és fényképezd le a palack címkéjét. Az MI kiolvassa a nevet, az évjáratot, a típust, a régiót, az országot és a szőlőt, és megbecsüli az ivási időablakot és a felszolgálási hőmérsékletet. Ellenőrizd az értékeket, majd mentsd el. Az első használat előtt az alkalmazás megkérdezi a hozzájárulásodat (<a href="#privacy">13. fejezet</a>).</p>
@@ -104,6 +105,9 @@
 <p>A kártya alján: <em>Szerkesztés</em>, <em>Iszom</em> és 🗑 (bor törlése).</p>
 <h3>Készlet, Min/Max és a bevásárlólista</h3>
 <p>Ha megadsz egy bornak minimumot (és opcionálisan maximumot), a kártya a „Készlet · Min · Max” értékeket mutatja, és ⚠ jellel figyelmeztet, ha alatta vagy. Az <em>Utánrendelés</em> gomb megnyitja a <strong>bevásárlólistát</strong>: ez felsorolja az összes minimum alatti bort (a cél a maximum, ennek hiányában a minimum). A listát megoszthatod, kimásolhatod, vagy felveheted a borokat a kívánságlistára.</p>
+<h3>Ételjavaslatok (MI)</h3>
+<p>Minden borkártyán az <em>Illik hozzá …</em> három-négy olyan ételt kér az MI-től, amely illik a borhoz (egy MI-hívás, ezen az eszközön megjegyezve). A <strong>↻</strong> új javaslatot kér; a <strong>✕</strong> ismét elrejti a javaslatot – az <em>Illik hozzá …</em> ilyenkor újra a megjegyzett javaslatot mutatja, új MI-hívás nélkül.</p>
+<p><em>Mi illik ma estére?</em> a pincében: add meg, mit főzöl, az MI pedig egy-három bort választ a saját pincédből, lehetőleg olyanokat, amelyeket hamarosan meg kellene inni (túlhaladott vagy a csúcson lévő). Egy találatra koppintva megnyílik a bor.</p>
 
 <!-- ───────────────── 4 ───────────────── -->
 <h2 id="drink">4. Bor elfogyasztása</h2>
@@ -112,6 +116,8 @@
 <ul>
 <li><strong>Melyik helyről vették ki?</strong> – válaszd ki azt a polchelyet, ahonnan a palack származott, vagy az „Elhelyezetlen üveg” lehetőséget. A hely felszabadul.</li>
 <li><strong>Kivel ittad?</strong> – a vendégeid nevei (nem kötelező).</li>
+<li><strong>Mit ettetek mellé (nem kötelező)</strong> – az étel, amelyhez a bort ittad.</li>
+<li><strong>Kóstolási jegyzet (nem kötelező)</strong> – a benyomásod saját szavaiddal, kívánság szerint fotóval (készített vagy kiválasztott; az MI a palackra vágja, mint a bor saját fotóját).</li>
 <li><strong>Alkalom</strong> – Tavasz, Nyár, Ősz, Tél, Születésnap, Buli vagy „Csak úgy” (többet is választhatsz).</li>
 </ul>
 <p><em>Iszom</em>: levon egy palackot, és létrehoz egy bejegyzést a <a href="#history">Naplóban</a>. Konfetti és hang ünnepli meg (a Beállításokban kikapcsolható). Ha ez az <strong>utolsó palack</strong>, az alkalmazás szól: a bor ekkor eltűnik a pincéből (de a Naplóban megmarad).</p>
@@ -159,7 +165,7 @@
 <!-- ───────────────── 7 ───────────────── -->
 <h2 id="history">7. Napló</h2>
 
-<p>A Napló felsorolja az összes megivott bort dátummal, borral, értékkel, vendégekkel és alkalommal. Szűrhetsz bortípus és alkalom szerint, és szerkeszthetsz egy bejegyzést (vendégek, alkalom). A Napló táplálja a Statisztika „Megivott havonta/évente” kimutatásait, a költést és a gyakoriságot.</p>
+<p>A napló felsorolja az összes megivott bort dátummal, borral, értékkel, vendégekkel, alkalommal, a mellé fogyasztott étellel és a fotóval ellátott kóstolási jegyzeteddel (a fotóra koppintva megnő). Szűrhetsz bortípus és alkalom szerint, és szerkeszthetsz egy bejegyzést (vendégek, alkalom, étel, jegyzet, fotó). A statisztikában a napló adataiból készülnek a „Megivott havonta/évente” kimutatások, a kiadások és a gyakoriság.</p>
 
 <!-- ───────────────── 8 ───────────────── -->
 <h2 id="wish">8. Kívánságlista</h2>
@@ -197,6 +203,7 @@
 <tr><td>CSV exportálása</td><td>Táblázat Excelhez vagy Numbershez</td></tr>
 <tr><td>Excel exportálása</td><td>.xlsx fájlként</td></tr>
 <tr><td>PDF exportálása</td><td>Nyomtatható áttekintés</td></tr>
+<tr><td>Pincekönyv (PDF)</td><td>Szépen megtervezett könyv a pincédről: összefoglaló oldal, országok szerint csoportosított borok, oldalankénti és végösszegek – biztosításhoz leltárlistaként is használható (az értékek a saját áraidból származnak)</td></tr>
 <tr><td><strong>JSON biztonsági mentés</strong></td><td><strong>Teljes adatmentés</strong> (borok, kívánságlista, napló, polcok, megjelenített név, saját fotók)</td></tr>
 <tr><td>Vágólapra</td><td>Szöveges lista másolása</td></tr>
 <tr><td>JSON / CSV / Excel importálása</td><td>Biztonsági mentés visszaállítása vagy táblázat beolvasása</td></tr>
@@ -214,6 +221,7 @@
 <li><strong>Konfetti és hang ivásnál:</strong> mindkettő, csak konfetti, vagy ki.</li>
 <li><strong>Betűtípus:</strong> tíz betűtípus közül választhatsz.</li>
 <li><strong>Hőmérséklet-mértékegység:</strong> °C vagy °F (az angol (US) automatikusan °F-ot állít be).</li>
+<li><strong>Emlékeztető az ivási időablakra (csak iPhone-alkalmazás):</strong> „Ki” vagy „Hetente (szombat, 10 óra)”. Hetente egyszer az alkalmazás értesítést küld, de csak akkor, ha vannak túlhaladott vagy a csúcson lévő palackok. Ez csak ezen az eszközön fut, szerver nélkül; első alkalommal az iOS engedélyt kér az értesítésekhez.</li>
 </ul>
 <h3>Tárolás helye</h3>
 <p><em>Csak ezen az eszközön</em> vagy <em>Felhő</em> (szinkronkód, <a href="#sync">12. fejezet</a>).</p>
@@ -237,13 +245,13 @@
 <li><strong>Második eszköz:</strong> Beállítások → Tárolás helye → <em>Felhő</em> → add meg a kódot (kisbetűkkel, szóközök nélkül) → Csatlakozás. Ha az eszközön már vannak borok, az alkalmazás megkérdezi, egyesítse-e őket a felhőadatokkal.</li>
 <li>Ezután mindkét eszköz automatikusan szinkronizál (pl. az alkalmazás megnyitásakor); a <em>Szinkronizálás most</em> kézzel indítja el. A szabály: <strong>a legutóbbi módosítás nyer</strong>.</li>
 </ol>
-<p>A borok, a kívánságlista, a napló, a polcok és a beállítások, például a nyelv és a pénznem szinkronizálódnak. <strong>Nem szinkronizálódnak</strong> a saját fotók és az eszközspecifikus adatok. Aki ismeri a kódodat, látja a boraidat – csak megbízható emberekkel oszd meg. Készíts JSON biztonsági mentést is.</p>
+<p>Szinkronizálódnak a borok, a kívánságlista, a napló, a polcok és a beállítások, például a nyelv és a pénznem. A saját fotók akkor szinkronizálódnak, ha a felhőtárhely be van kapcsolva, és a fotó „A felhőben” van mentve (a kóstolási fotók bekapcsolt felhőtárhely mellett automatikusan a felhőbe kerülnek); az eszközhöz kötött adatok soha nem szinkronizálódnak. Aki ismeri a kódodat, láthatja a boraidat – csak olyanokkal oszd meg, akikben megbízol. Készíts emellett JSON biztonsági mentést is.</p>
 
 <!-- ───────────────── 13 ───────────────── -->
 <h2 id="privacy">13. MI, adatvédelem és költségek</h2>
 
 <ul>
-<li><strong>Mire használjuk az MI-t?</strong> Címke beolvasása, bor keresése, árak keresése és az „Összes bor frissítése”. A fotót vagy a bor nevét a szerverünkön keresztül elküldjük egy MI-szolgáltatásnak (Anthropic, USA) kiértékelésre – nevek és fiókok nélkül. Az alkalmazás az első használat előtt megkérdezi a hozzájárulásodat.</li>
+<li><strong>Mire való az MI?</strong> Címkék beolvasására, borok kikeresésére, árak keresésére, az „Összes bor frissítése” funkcióra, ételjavaslatokra („Illik hozzá …”, „Mi illik ma estére?”) és saját fotóid palackra vágására. Ennek során a fotót, illetve a bor nevét (a pincéből adott javaslatnál a boraid listáját is, árak nélkül) szerverünkön keresztül elküldjük egy MI-szolgáltatásnak (Anthropic, USA) kiértékelésre – nevek és fiókok nélkül. Az alkalmazás az első használat előtt kéri a beleegyezésedet.</li>
 <li><strong>Vonalkód-beolvasás:</strong> csak a számot küldi el egy ingyenes termékadatbázisnak, és nem kerül MI-kreditbe.</li>
 <li><strong>Költségek (iPhone-alkalmazás):</strong> telepítésenként 50 MI-hívás benne van a vételárban; továbbiak opcionális, egyszeri vásárlással szerezhetők (nincs előfizetés, a kreditek nem járnak le). Az alkalmazásban minden más ingyenes. Ha a kreditek elfogytak, az MI-funkciókon kívül minden tovább működik.</li>
 <li><strong>Adatok:</strong> Minden az eszközödön marad, amíg nem kapcsolod be a felhőt. Nincs hirdetés, nincs követés, nincs felhasználói fiók. A részletek az <a href="datenschutz.html">adatvédelmi nyilatkozatban</a> (németül) találhatók.</li>

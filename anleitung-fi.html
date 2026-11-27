@@ -15,11 +15,12 @@
   .back{margin:0 0 6px} .toapp{display:none} @media (display-mode: standalone){.toapp{display:inline}}
   @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
 </style></head><body>
+<!--update-2026-11-27-->
 <p class="back"><span class="toapp"><a href="index.html">← Kellariin</a> &nbsp;·&nbsp; </span><a href="support.html">← Takaisin tukeen</a></p>
 <div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html">Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html" selected>Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
 
 <h1>Käyttöohje – Weinkeller</h1>
-<p><small>Päivitetty: 10. marraskuuta 2026 · Sovelluksen versio 2.0</small></p>
+<p><small>Päivitetty: 27. marraskuuta 2026 · Sovelluksen versio 2.0</small></p>
 
 <div class="toc">
 
@@ -75,7 +76,7 @@
 <ul>
 <li><strong>Juomaikkuna:</strong> Heti kun syötät vuosikerran, sovellus asettaa ”Juo alkaen” -kenttään arvon <strong>vuosikerta + 1</strong>. ”Juo asti” riippuu viinityypistä ja rypäleestä (punaviini säilyy pidempään kuin rosé). Voit muuttaa molempia milloin tahansa.</li>
 <li><strong>Varasto, Min ja Maks:</strong> Jos syötät minimin, sovellus varoittaa, kun varasto laskee sen alle, ja tarjoutuu lisäämään viinin toivelistalle (<a href="#cellar">luku 3</a>).</li>
-<li><strong>Oma kuva:</strong> ”Ota / valitse kuva” liittää viiniin valokuvan. Se pysyy tällä laitteella ja sisältyy JSON-varmuuskopioon, mutta sitä ei synkronoida pilveen.</li>
+<li><strong>Oma kuva:</strong> ”Ota / valitse kuva” liittää viiniin valokuvan. Tekoäly löytää pullon kuvasta ja rajaa kuvan tiukasti sen ympärille (tämä kuluttaa yhden tekoälykutsun; jos pulloa ei löydy tai tekoäly ei ole käytettävissä, kuva pysyy sellaisenaan). Kuva pysyy tällä laitteella ja sisältyy JSON-varmuuskopioon. Kun pilvitallennus on päällä, valitset kuvakohtaisesti, tallennetaanko kuva ”Pilveen (kaikille laitteille)” vai ”Vain tälle puhelimelle”.</li>
 </ul>
 <h3>b) Skannaa etiketti (tekoäly)</h3>
 <p>Napauta <em>Skannaa etiketti (tekoäly)</em> ja ota kuva pullon etiketistä. Tekoäly lukee nimen, vuosikerran, tyypin, alueen, maan ja rypäleen sekä arvioi juomaikkunan ja tarjoilulämpötilan. Tarkista arvot ja tallenna. Ennen ensimmäistä käyttökertaa sovellus pyytää suostumuksesi (<a href="#privacy">luku 13</a>).</p>
@@ -104,6 +105,9 @@
 <p>Kortin alareunassa: <em>Muokkaa</em>, <em>Juo</em> ja 🗑 (poista viini).</p>
 <h3>Varasto, Min/Maks ja ostoslista</h3>
 <p>Jos syötät viinille minimin (ja halutessasi maksimin), kortti näyttää ”Varasto · Min · Maks” ja varoittaa merkillä ⚠, kun olet sen alapuolella. Painike <em>Täydennä</em> avaa <strong>ostoslistan</strong>: se luettelee kaikki viinit, jotka ovat minimin alla (tavoite on maksimi, muuten minimi). Voit jakaa tai kopioida listan tai lisätä viinit toivelistalle.</p>
+<h3>Ruokaehdotukset (tekoäly)</h3>
+<p>Jokaisella viinikortilla <em>Sopii seuraan …</em> kysyy tekoälyltä kolmea tai neljää ruokaa, jotka sopivat viinin kanssa (yksi tekoälykutsu, muistetaan tällä laitteella). <strong>↻</strong> hakee uuden ehdotuksen; <strong>✕</strong> piilottaa ehdotuksen taas – <em>Sopii seuraan …</em> näyttää sen jälkeen tallennetun ehdotuksen uudelleen ilman uutta tekoälykutsua.</p>
+<p><em>Mikä sopii tänään?</em> kellarissa: kirjoita, mitä laitat ruoaksi, ja tekoäly valitsee yhdestä kolmeen viiniä omasta kellaristasi, mieluiten sellaisia, jotka kannattaa juoda pian (ylitetty tai huipulla). Tuloksen napautus avaa viinin.</p>
 
 <!-- ───────────────── 4 ───────────────── -->
 <h2 id="drink">4. Viinin juominen</h2>
@@ -112,6 +116,8 @@
 <ul>
 <li><strong>Miltä paikalta otettu?</strong> – valitse hyllypaikka, jolta pullo otettiin, tai ”Pullo ilman paikkaa”. Paikka vapautuu.</li>
 <li><strong>Kenen kanssa joit?</strong> – vieraidesi nimet (valinnainen).</li>
+<li><strong>Mitä syötiin sen kanssa (valinnainen)</strong> – ruoka, jonka kanssa joit viinin.</li>
+<li><strong>Maistelumuistiinpano (valinnainen)</strong> – vaikutelmasi omin sanoin, halutessasi kuvan kanssa (otettu tai valittu; tekoäly rajaa sen pulloon, kuten viinin oman kuvan).</li>
 <li><strong>Tilaisuus</strong> – Kevät, Kesä, Syksy, Talvi, Syntymäpäivä, Juhlat tai ”Ihan vain” (voit valita useita).</li>
 </ul>
 <p><em>Juo</em> poistaa yhden pullon ja luo merkinnän <a href="#history">Historiaan</a>. Konfetti ja ääni juhlistavat hetkeä (voi kytkeä pois Asetuksissa). Jos kyseessä on <strong>viimeinen pullo</strong>, sovellus kertoo siitä: viini katoaa silloin kellarista (mutta säilyy Historiassa).</p>
@@ -159,7 +165,7 @@
 <!-- ───────────────── 7 ───────────────── -->
 <h2 id="history">7. Historia</h2>
 
-<p>Historia listaa kaikki juomasi viinit päivämäärän, viinin, arvon, vieraiden ja tilaisuuden kanssa. Voit suodattaa viinityypin ja tilaisuuden mukaan ja muokata merkintää (vieraat, tilaisuus). Historia syöttää Tilastojen analyysit ”Juodut kuukaudessa/vuodessa”, kulutuksen ja juomatiheyden.</p>
+<p>Historia listaa kaikki juomasi viinit päivämäärän, viinin, arvon, vieraiden, tilaisuuden, sen kanssa syödyn ruoan sekä maistelumuistiinpanosi ja kuvan kanssa (kuvaa napauttamalla sen saa suuremmaksi). Voit suodattaa viinityypin ja tilaisuuden mukaan ja muokata merkintää (vieraat, tilaisuus, ruoka, muistiinpano, kuva). Historia syöttää Tilastojen analyysit ”Juodut kuukaudessa/vuodessa”, kulutuksen ja juomatiheyden.</p>
 
 <!-- ───────────────── 8 ───────────────── -->
 <h2 id="wish">8. Toivelista</h2>
@@ -197,6 +203,7 @@
 <tr><td>Vie CSV</td><td>Taulukko Excelille tai Numbersille</td></tr>
 <tr><td>Vie Excel</td><td>.xlsx-tiedostona</td></tr>
 <tr><td>Vie PDF</td><td>Tulostettava yleiskatsaus</td></tr>
+<tr><td>Kellarikirja (PDF)</td><td>Kauniisti taitettu kirja kellaristasi: yhteenvetosivu, viinit maittain ryhmiteltyinä, sivu- ja loppusummat – käytettävissä myös vakuutuksen irtaimistoluettelona (arvot perustuvat omiin hintoihisi)</td></tr>
 <tr><td><strong>JSON-varmuuskopio</strong></td><td><strong>Täydellinen tietojen varmuuskopio</strong> (viinit, toivelista, historia, hyllyt, näyttönimi, omat kuvat)</td></tr>
 <tr><td>Leikepöydälle</td><td>Kopioi tekstilista</td></tr>
 <tr><td>Tuo JSON / CSV / Excel</td><td>Palauta varmuuskopio tai lue taulukko sisään</td></tr>
@@ -214,6 +221,7 @@
 <li><strong>Konfetti &amp; ääni juodessa:</strong> molemmat, vain konfetti tai pois.</li>
 <li><strong>Fontti:</strong> kymmenen fonttia valittavana.</li>
 <li><strong>Lämpötilayksikkö:</strong> °C tai °F (englanti (US) asettaa °F automaattisesti).</li>
+<li><strong>Muistutus juomaikkunasta (vain iPhone-sovellus):</strong> ”Pois” tai ”Viikoittain (lauantaina klo 10)”. Kerran viikossa sovellus lähettää ilmoituksen, mutta vain jos pulloja on ylitetty tai huipulla. Toiminto toimii vain tällä laitteella ilman palvelinta; ensimmäisellä kerralla iOS kysyy lupaa ilmoituksiin.</li>
 </ul>
 <h3>Tallennuspaikka</h3>
 <p><em>Vain tämä laite</em> tai <em>Pilvi</em> (synkronointikoodi, <a href="#sync">luku 12</a>).</p>
@@ -237,13 +245,13 @@
 <li><strong>Toinen laite:</strong> Asetukset → Tallennuspaikka → <em>Pilvi</em> → syötä koodi (pienillä kirjaimilla, ilman välilyöntejä) → Yhdistä. Jos laitteella on jo viinejä, sovellus kysyy, yhdistetäänkö ne pilvitietoihin.</li>
 <li>Sen jälkeen molemmat laitteet synkronoituvat automaattisesti (esim. kun sovellus avataan); <em>Synkronoi nyt</em> käynnistää sen käsin. Sääntö on: <strong>uusin muutos voittaa</strong>.</li>
 </ol>
-<p>Viinit, toivelista, historia, hyllyt ja asetukset, kuten kieli ja valuutta, synkronoidaan. <strong>Ei synkronoida</strong> omia kuvia eikä laitekohtaisia tietoja. Jokainen, joka tietää koodisi, näkee viinisi – jaa se vain luotettaville ihmisille. Pidä myös JSON-varmuuskopio.</p>
+<p>Viinit, toivelista, historia, hyllyt ja asetukset, kuten kieli ja valuutta, synkronoidaan. Omat kuvat synkronoidaan, kun pilvitallennus on päällä ja kuva tallennetaan ”Pilveen (kaikille laitteille)” (maistelukuvat siirtyvät pilveen automaattisesti pilvitallennuksen ollessa päällä); laitekohtaisia tietoja ei synkronoida koskaan. Jokainen, joka tietää koodisi, näkee viinisi – jaa se vain luotettaville ihmisille. Pidä myös JSON-varmuuskopio.</p>
 
 <!-- ───────────────── 13 ───────────────── -->
 <h2 id="privacy">13. Tekoäly, tietosuoja ja kustannukset</h2>
 
 <ul>
-<li><strong>Mihin tekoälyä käytetään?</strong> Etiketin skannaus, viinin tietojen haku, hintojen haku ja ”Päivitä kaikki viinit”. Kuva tai viinin nimi lähetetään palvelimemme kautta tekoälypalveluun (Anthropic, USA) arvioitavaksi – ilman nimiä tai tilejä. Sovellus pyytää suostumuksesi ennen ensimmäistä käyttökertaa.</li>
+<li><strong>Mihin tekoälyä käytetään?</strong> Etiketin skannaus, viinin tietojen haku, hintojen haku, ”Päivitä kaikki viinit”, ruokaehdotukset (”Sopii seuraan …”, ”Mikä sopii tänään?”) ja omien kuvien rajaaminen pulloon. Tätä varten kuva tai viinin nimi (kellariehdotuksessa myös luettelo viineistäsi ilman hintoja) lähetetään palvelimemme kautta tekoälypalveluun (Anthropic, USA) arvioitavaksi – ilman nimiä tai tilejä. Sovellus pyytää suostumuksesi ennen ensimmäistä käyttökertaa.</li>
 <li><strong>Viivakoodin skannaus</strong> lähettää vain numeron ilmaiseen tuotetietokantaan eikä maksa tekoälykrediittiä.</li>
 <li><strong>Kustannukset (iPhone-sovellus):</strong> 50 tekoälykutsua asennusta kohti sisältyy ostohintaan; lisää voi ostaa valinnaisena kertaostoksena (ei tilausta, krediitit eivät vanhene). Kaikki muu sovelluksessa on ilmaista. Kun krediitit on käytetty, kaikki paitsi tekoälytoiminnot toimivat edelleen.</li>
 <li><strong>Tiedot:</strong> Kaikki pysyy laitteellasi, kunhan et ota pilveä käyttöön. Ei mainoksia, ei seurantaa, ei käyttäjätiliä. Lisätietoja <a href="datenschutz.html">tietosuojaselosteessa</a> (saksaksi).</li>

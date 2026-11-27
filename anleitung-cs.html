@@ -15,11 +15,12 @@
   .back{margin:0 0 6px} .toapp{display:none} @media (display-mode: standalone){.toapp{display:inline}}
   @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
 </style></head><body>
+<!--update-2026-11-27-->
 <p class="back"><span class="toapp"><a href="index.html">← Do sklepa</a> &nbsp;·&nbsp; </span><a href="support.html">← Zpět na podporu</a></p>
 <div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html" selected>Čeština</option><option value="anleitung-da.html">Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
 
 <h1>Uživatelská příručka – Weinkeller</h1>
-<p><small>Aktualizováno: 10. listopadu 2026 · Verze aplikace 2.0</small></p>
+<p><small>Aktualizováno: 27. listopadu 2026 · Verze aplikace 2.0</small></p>
 
 <div class="toc">
 
@@ -75,7 +76,7 @@
 <ul>
 <li><strong>Okno pití:</strong> Jakmile zadáte ročník, aplikace nastaví „Pít od“ na <strong>ročník + 1</strong>. „Pít do“ závisí na typu vína a odrůdě (červené vydrží déle než rosé). Obojí můžete kdykoli změnit.</li>
 <li><strong>Zásoba, Min a Max:</strong> Zadáte-li minimum, aplikace vás upozorní, když zásoba klesne pod něj, a nabídne, že víno zapíše na seznam přání (<a href="#cellar">kapitola 3</a>).</li>
-<li><strong>Vlastní foto:</strong> „Vyfotit / vybrat foto“ připojí k vínu fotografii. Zůstane v tomto zařízení a je součástí zálohy JSON, ale do cloudu se nesynchronizuje.</li>
+<li><strong>Vlastní foto:</strong> „Vyfotit / vybrat foto“ připojí k vínu fotografii. AI najde na fotografii láhev a obrázek na ni těsně ořízne (spotřebuje jedno volání AI; pokud se láhev nenajde nebo AI není k dispozici, fotografie zůstane beze změny). Fotografie zůstane v tomto zařízení a je součástí zálohy JSON. Při zapnutém cloudu si u každé fotografie vyberete, zda se uloží „V cloudu (na všech zařízeních)“, nebo „Jen v tomto telefonu“.</li>
 </ul>
 <h3>b) Naskenovat etiketu (AI)</h3>
 <p>Klepněte na <em>Naskenovat etiketu (AI)</em> a vyfoťte etiketu lahve. AI přečte název, ročník, typ, region, zemi a odrůdu a odhadne okno pití a teplotu podávání. Hodnoty zkontrolujte a uložte. Před prvním použitím vás aplikace požádá o souhlas (<a href="#privacy">kapitola 13</a>).</p>
@@ -104,6 +105,9 @@
 <p>Dole na kartě: <em>Upravit</em>, <em>Vypít</em> a 🗑 (smazat víno).</p>
 <h3>Zásoba, Min/Max a nákupní seznam</h3>
 <p>Zadáte-li u vína minimum (a volitelně maximum), karta zobrazí „Zásoba · Min · Max“ a upozorní symbolem ⚠, když jste pod ním. Tlačítko <em>Dokoupit</em> otevře <strong>nákupní seznam</strong>: vypíše všechna vína pod minimem (cílem je maximum, jinak minimum). Seznam můžete sdílet nebo zkopírovat, případně vína zapsat na seznam přání.</p>
+<h3>Tipy na jídlo (AI)</h3>
+<p>Na každé kartě vína se <em>Hodí se k …</em> zeptá AI na tři až čtyři jídla, která k vínu pasují (jedno volání AI, tip se zapamatuje v tomto zařízení). <strong>↻</strong> vyžádá nový návrh; <strong>✕</strong> návrh opět skryje – <em>Hodí se k …</em> pak znovu zobrazí uložený návrh, bez nového volání AI.</p>
+<p><em>Co se hodí dnes?</em> ve sklepě: zadejte, co vaříte, a AI vybere jedno až tři vína z vašeho vlastního sklepa, nejraději taková, která by se měla brzy vypít (překročená nebo na vrcholu). Klepnutím na výsledek se víno otevře.</p>
 
 <!-- ───────────────── 4 ───────────────── -->
 <h2 id="drink">4. Vypití vína</h2>
@@ -112,6 +116,8 @@
 <ul>
 <li><strong>Z kterého místa byla vzata?</strong> – vyberte místo v regálu, odkud láhev pochází, nebo „Láhev bez místa“. Místo se uvolní.</li>
 <li><strong>S kým jste pili?</strong> – jména vašich hostů (volitelné).</li>
+<li><strong>Co se k tomu jedlo (nepovinné)</strong> – jídlo, ke kterému jste víno pili.</li>
+<li><strong>Poznámka z degustace (nepovinné)</strong> – váš dojem vlastními slovy, případně s fotografií (vyfocenou nebo vybranou; AI ji ořízne na láhev, stejně jako vlastní foto vína).</li>
 <li><strong>Příležitost</strong> – Jaro, Léto, Podzim, Zima, Narozeniny, Oslava nebo „Jen tak“ (lze vybrat více).</li>
 </ul>
 <p><em>Vypít</em>: odebere jednu láhev a vytvoří záznam v <a href="#history">Historii</a>. Konfety a zvuk to oslaví (v Nastavení lze vypnout). Jde-li o <strong>poslední láhev</strong>, aplikace vás upozorní: víno pak ze sklepa zmizí (ale zůstane v Historii).</p>
@@ -159,7 +165,7 @@
 <!-- ───────────────── 7 ───────────────── -->
 <h2 id="history">7. Historie</h2>
 
-<p>Historie uvádí všechna vína, která jste vypili, s datem, vínem, hodnotou, hosty a příležitostí. Můžete filtrovat podle typu vína a příležitosti a upravit záznam (hosty, příležitost). Historie dodává data pro přehledy „Vypito za měsíc/rok“, výdaje a četnost ve Statistikách.</p>
+<p>Historie uvádí všechna vypitá vína s datem, vínem, hodnotou, hosty, příležitostí, jídlem, které se k nim jedlo, a vaší poznámkou z degustace s fotografií (klepnutím na fotografii ji zvětšíte). Můžete filtrovat podle typu vína a příležitosti a upravit záznam (hosty, příležitost, jídlo, poznámku, fotografii). Historie dodává data pro přehledy „Vypito za měsíc/rok“, výdaje a četnost ve Statistikách.</p>
 
 <!-- ───────────────── 8 ───────────────── -->
 <h2 id="wish">8. Seznam přání</h2>
@@ -197,6 +203,7 @@
 <tr><td>Exportovat CSV</td><td>Tabulka pro Excel nebo Numbers</td></tr>
 <tr><td>Exportovat Excel</td><td>Jako soubor .xlsx</td></tr>
 <tr><td>Exportovat PDF</td><td>Přehled k vytištění</td></tr>
+<tr><td>Kniha sklípku (PDF)</td><td>Pěkně zpracovaná kniha vašeho sklepa: přehledová stránka, vína seskupená podle zemí, součty za stránky i celkové součty – použitelná také jako soupis majetku pro pojišťovnu (hodnoty vycházejí z vašich vlastních cen)</td></tr>
 <tr><td><strong>Záloha JSON</strong></td><td><strong>Úplná záloha dat</strong> (vína, seznam přání, historie, regály, zobrazované jméno, vlastní fotografie)</td></tr>
 <tr><td>Do schránky</td><td>Zkopírovat textový seznam</td></tr>
 <tr><td>Importovat JSON / CSV / Excel</td><td>Obnovit zálohu nebo načíst tabulku</td></tr>
@@ -214,6 +221,7 @@
 <li><strong>Konfety a zvuk při pití:</strong> obojí, jen konfety, nebo vypnuto.</li>
 <li><strong>Písmo:</strong> na výběr je deset písem.</li>
 <li><strong>Jednotka teploty:</strong> °C nebo °F (angličtina (US) nastaví °F automaticky).</li>
+<li><strong>Připomenutí okna pití (jen aplikace pro iPhone):</strong> „Vyp.“ nebo „Týdně (sobota, 10:00)“. Jednou týdně aplikace pošle oznámení, ale jen pokud jsou některé lahve překročené nebo na vrcholu. Funguje to pouze v tomto zařízení, bez serveru; při prvním použití se iOS zeptá na povolení oznámení.</li>
 </ul>
 <h3>Úložiště</h3>
 <p><em>Pouze toto zařízení</em> nebo <em>Cloud</em> (synchronizační kód, <a href="#sync">kapitola 12</a>).</p>
@@ -237,13 +245,13 @@
 <li><strong>Druhé zařízení:</strong> Nastavení → Úložiště → <em>Cloud</em> → zadejte kód (malými písmeny, bez mezer) → Připojit. Pokud zařízení už obsahuje vína, aplikace se zeptá, zda je sloučit s daty v cloudu.</li>
 <li>Poté se obě zařízení synchronizují automaticky (např. při otevření aplikace); <em>Synchronizovat nyní</em> to spustí ručně. Pravidlo zní: <strong>vyhrává nejnovější změna</strong>.</li>
 </ol>
-<p>Synchronizují se vína, seznam přání, historie, regály a nastavení, například jazyk a měna. <strong>Nesynchronizují se</strong> vlastní fotografie a údaje specifické pro zařízení. Kdokoli, kdo zná váš kód, uvidí vaše vína – sdílejte ho jen s lidmi, kterým důvěřujete. Uchovávejte také zálohu JSON.</p>
+<p>Synchronizují se vína, seznam přání, historie, regály a nastavení, například jazyk a měna. Vlastní fotografie se synchronizují, když je zapnutý cloud a fotografie je uložená „V cloudu (na všech zařízeních)“ (fotografie z degustací se při zapnutém cloudu do cloudu ukládají automaticky); údaje specifické pro zařízení se nesynchronizují nikdy. Kdokoli, kdo zná váš kód, uvidí vaše vína – sdílejte ho jen s lidmi, kterým důvěřujete. Uchovávejte také zálohu JSON.</p>
 
 <!-- ───────────────── 13 ───────────────── -->
 <h2 id="privacy">13. AI, soukromí a náklady</h2>
 
 <ul>
-<li><strong>K čemu se AI používá?</strong> Skenování etikety, vyhledání vína, hledání cen a „Aktualizovat všechna vína“. Fotografie nebo název vína se přes náš server odešle ke zpracování službě AI (Anthropic, USA) – bez jmen a bez účtů. Před prvním použitím vás aplikace požádá o souhlas.</li>
+<li><strong>K čemu se AI používá?</strong> Skenování etikety, vyhledání vína, hledání cen, „Aktualizovat všechna vína“, tipy na jídlo („Hodí se k …“, „Co se hodí dnes?“) a ořezávání vlastních fotografií na láhev. K tomu se fotografie nebo název vína (u tipu ze sklepa také seznam vašich vín, bez cen) odešle přes náš server ke zpracování službě AI (Anthropic, USA) – bez jmen a bez účtů. Před prvním použitím vás aplikace požádá o souhlas.</li>
 <li><strong>Skenování čárového kódu</strong> odesílá jen číslo do bezplatné databáze produktů a nestojí žádný AI kredit.</li>
 <li><strong>Náklady (aplikace pro iPhone):</strong> 50 volání AI na instalaci je zahrnuto v ceně nákupu; další lze dokoupit jako volitelný jednorázový nákup (žádné předplatné, kredity nevyprší). Vše ostatní v aplikaci je bez příplatku. Když se kredity vyčerpají, vše kromě funkcí AI funguje dál.</li>
 <li><strong>Data:</strong> Vše zůstává ve vašem zařízení, dokud nezapnete cloud. Žádné reklamy, žádné sledování, žádný uživatelský účet. Podrobnosti v <a href="datenschutz.html">zásadách ochrany osobních údajů</a> (německy).</li>

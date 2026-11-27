@@ -15,11 +15,12 @@
   .back{margin:0 0 6px} .toapp{display:none} @media (display-mode: standalone){.toapp{display:inline}}
   @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
 </style></head><body>
+<!--update-2026-11-27-->
 <p class="back"><span class="toapp"><a href="index.html">← Naar de kelder</a> &nbsp;·&nbsp; </span><a href="support.html">← Terug naar support</a></p>
 <div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html">Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html" selected>Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
 
 <h1>Gebruikershandleiding – Weinkeller</h1>
-<p><small>Bijgewerkt: 10 november 2026 · App-versie 2.0</small></p>
+<p><small>Bijgewerkt: 27 november 2026 · App-versie 2.0</small></p>
 
 <div class="toc">
 
@@ -75,7 +76,7 @@
 <ul>
 <li><strong>Drinkvenster:</strong> Zodra je de jaargang invult, zet de app “Drinken vanaf” op <strong>jaargang + 1</strong>. “Drinken tot” hangt af van wijntype en druif (een rode wijn houdt langer dan een rosé). Je kunt beide op elk moment aanpassen.</li>
 <li><strong>Voorraad, Min en Max:</strong> Als je een minimum invult, waarschuwt de app je zodra de voorraad daaronder zakt en biedt ze aan de wijn op de verlanglijst te zetten (<a href="#cellar">hoofdstuk 3</a>).</li>
-<li><strong>Eigen foto:</strong> “Foto maken / kiezen” voegt een foto aan de wijn toe. Die blijft op dit apparaat, zit in de JSON-back-up, maar wordt niet met de cloud gesynchroniseerd.</li>
+<li><strong>Eigen foto:</strong> Met “Foto maken / kiezen” voeg je een foto aan de wijn toe. De AI vindt de fles op de foto en snijdt het beeld strak op de fles bij (dit kost één AI-aanroep; als er geen fles wordt gevonden of de AI niet beschikbaar is, blijft de foto ongewijzigd). De foto blijft op dit apparaat en zit in de JSON-back-up. Als cloudopslag aanstaat, kies je per foto of die “In de cloud” (op alle apparaten) of “Alleen op deze telefoon” wordt opgeslagen.</li>
 </ul>
 <h3>b) Etiket scannen (AI)</h3>
 <p>Tik op <em>Etiket scannen (AI)</em> en fotografeer het flesetiket. De AI leest naam, jaargang, type, regio, land en druif uit en schat het drinkvenster en de serveertemperatuur in. Controleer de waarden en sla op. Vóór het eerste gebruik vraagt de app om je toestemming (<a href="#privacy">hoofdstuk 13</a>).</p>
@@ -104,6 +105,9 @@
 <p>Onderaan de kaart: <em>Bewerken</em>, <em>Drinken</em> en 🗑 (wijn verwijderen).</p>
 <h3>Voorraad, Min/Max en de boodschappenlijst</h3>
 <p>Als je voor een wijn een minimum (en eventueel een maximum) invult, toont de kaart “Voorraad · Min · Max” en waarschuwt met ⚠ als je eronder zit. De knop <em>Bijbestellen</em> opent de <strong>boodschappenlijst</strong>: die toont alle wijnen onder hun minimum (het streefaantal is het maximum, anders het minimum). Je kunt de lijst delen of kopiëren, of de wijnen op de verlanglijst zetten.</p>
+<h3>Gerechtsuggesties (AI)</h3>
+<p>Op elke wijnkaart vraagt <em>Past bij …</em> de AI om drie tot vier gerechten die bij de wijn passen (één AI-aanroep, onthouden op dit apparaat). <strong>↻</strong> haalt een nieuw voorstel op; <strong>✕</strong> verbergt het voorstel weer – <em>Past bij …</em> toont dan opnieuw het onthouden voorstel, zonder nieuwe AI-aanroep.</p>
+<p><em>Wat past er vandaag?</em> in de kelder: vul in wat je kookt, en de AI kiest één tot drie wijnen uit je eigen kelder, bij voorkeur wijnen die snel gedronken moeten worden (overschreden of op hun piek). Tik op een resultaat om de wijn te openen.</p>
 
 <!-- ───────────────── 4 ───────────────── -->
 <h2 id="drink">4. Een wijn drinken</h2>
@@ -112,6 +116,8 @@
 <ul>
 <li><strong>Uit welke plek genomen?</strong> – kies de rekplek waaruit de fles kwam, of “Fles zonder plek”. De plek komt vrij.</li>
 <li><strong>Met wie heb je gedronken?</strong> – de namen van je gasten (optioneel).</li>
+<li><strong>Wat er bij gegeten is (optioneel)</strong> – het gerecht waarbij je de wijn hebt gedronken.</li>
+<li><strong>Proefnotitie (optioneel)</strong> – je indruk in eigen woorden, desgewenst met een foto (gemaakt of gekozen; de AI snijdt die bij op de fles, net als de eigen foto van een wijn).</li>
 <li><strong>Gelegenheid</strong> – Lente, Zomer, Herfst, Winter, Verjaardag, Feest of “Zomaar” (meerdere mogelijk).</li>
 </ul>
 <p><em>Drinken</em> haalt één fles weg en maakt een vermelding in de <a href="#history">Historie</a>. Confetti en geluid vieren het (uit te zetten in Opties). Is het de <strong>laatste fles</strong>, dan meldt de app dat: de wijn verdwijnt dan uit de kelder (maar blijft in de Historie staan).</p>
@@ -159,7 +165,7 @@
 <!-- ───────────────── 7 ───────────────── -->
 <h2 id="history">7. Historie</h2>
 
-<p>De Historie toont alle wijnen die je hebt gedronken met datum, wijn, waarde, gasten en gelegenheid. Je kunt filteren op wijntype en gelegenheid en een vermelding bewerken (gasten, gelegenheid). De Historie voedt de overzichten “Gedronken per maand/jaar”, de uitgaven en de frequentie in Cijfers.</p>
+<p>De historie toont alle gedronken wijnen met datum, wijn, waarde, gasten, gelegenheid, het gerecht dat erbij gegeten is en je proefnotitie met foto (tik op de foto om hem te vergroten). Je kunt filteren op wijntype en gelegenheid en een item bewerken (gasten, gelegenheid, gerecht, notitie, foto). De historie voedt in de statistieken de overzichten “Gedronken per maand/jaar”, de uitgaven en de frequentie.</p>
 
 <!-- ───────────────── 8 ───────────────── -->
 <h2 id="wish">8. Verlanglijst</h2>
@@ -197,6 +203,7 @@
 <tr><td>CSV exporteren</td><td>Tabel voor Excel of Numbers</td></tr>
 <tr><td>Excel exporteren</td><td>Als .xlsx-bestand</td></tr>
 <tr><td>PDF exporteren</td><td>Afdrukbaar overzicht</td></tr>
+<tr><td>Kelderboek (PDF)</td><td>Mooi vormgegeven boek van je kelder: overzichtspagina, wijnen gegroepeerd per land, pagina- en eindtotalen – ook bruikbaar als inventarislijst voor de verzekering (de waarden komen uit je eigen prijzen)</td></tr>
 <tr><td><strong>JSON-back-up</strong></td><td><strong>Volledige back-up van de gegevens</strong> (wijnen, verlanglijst, historie, rekken, weergavenaam, eigen foto’s)</td></tr>
 <tr><td>Naar klembord</td><td>Een tekstlijst kopiëren</td></tr>
 <tr><td>JSON / CSV / Excel importeren</td><td>Een back-up herstellen of een tabel inlezen</td></tr>
@@ -214,6 +221,7 @@
 <li><strong>Confetti &amp; geluid bij het drinken:</strong> beide, alleen confetti of uit.</li>
 <li><strong>Lettertype:</strong> tien lettertypen om uit te kiezen.</li>
 <li><strong>Temperatuureenheid:</strong> °C of °F (Engels (VS) zet automatisch °F).</li>
+<li><strong>Herinnering aan het drinkvenster (alleen iPhone-app):</strong> “Uit” of “Wekelijks (zaterdag, 10 uur)”. Eén keer per week stuurt de app een melding, maar alleen als er flessen overschreden zijn of op hun piek zijn. Dit draait alleen op dit apparaat, zonder server; de eerste keer vraagt iOS om toestemming voor meldingen.</li>
 </ul>
 <h3>Opslaglocatie</h3>
 <p><em>Alleen dit apparaat</em> of <em>Cloud</em> (synccode, <a href="#sync">hoofdstuk 12</a>).</p>
@@ -237,13 +245,13 @@
 <li><strong>Tweede apparaat:</strong> Opties → Opslaglocatie → <em>Cloud</em> → voer de code in (kleine letters, zonder spaties) → Verbinden. Bevat het apparaat al wijnen, dan vraagt de app of ze met de cloudgegevens moeten worden samengevoegd.</li>
 <li>Daarna synchroniseren beide apparaten automatisch (bijvoorbeeld wanneer de app wordt geopend); <em>Nu synchroniseren</em> start het met de hand. De regel is: <strong>de laatste wijziging wint</strong>.</li>
 </ol>
-<p>Wijnen, verlanglijst, historie, rekken en instellingen zoals taal en valuta worden gesynchroniseerd. <strong>Niet gesynchroniseerd</strong> worden eigen foto’s en apparaatspecifieke gegevens. Iedereen die je code kent, kan je wijnen zien – deel hem alleen met mensen die je vertrouwt. Bewaar ook een JSON-back-up.</p>
+<p>Gesynchroniseerd worden wijnen, verlanglijst, historie, rekken en instellingen zoals taal en valuta. Eigen foto’s worden gesynchroniseerd als cloudopslag aanstaat en de foto “In de cloud” is opgeslagen (proeffoto’s gaan automatisch naar de cloud zolang cloudopslag aanstaat); apparaatspecifieke gegevens worden nooit gesynchroniseerd. Wie je code kent, kan je wijnen zien – deel hem alleen met mensen die je vertrouwt. Maak daarnaast ook een JSON-back-up.</p>
 
 <!-- ───────────────── 13 ───────────────── -->
 <h2 id="privacy">13. AI, privacy en kosten</h2>
 
 <ul>
-<li><strong>Waarvoor wordt AI gebruikt?</strong> Etiket scannen, wijn opzoeken, prijzen zoeken en “Alle wijnen bijwerken”. De foto of de naam van de wijn wordt via onze server naar een AI-dienst (Anthropic, VS) gestuurd voor analyse – zonder namen of accounts. De app vraagt vóór het eerste gebruik om je toestemming.</li>
+<li><strong>Waarvoor dient de AI?</strong> Etiketten scannen, wijnen opzoeken, prijzen zoeken, “Alle wijnen bijwerken”, gerechtsuggesties (“Past bij …”, “Wat past er vandaag?”) en het bijsnijden van je eigen foto’s op de fles. Daarbij worden de foto of de naam van de wijn (bij het voorstel uit de kelder ook de lijst van je wijnen, zonder prijzen) via onze server naar een AI-dienst (Anthropic, VS) gestuurd voor analyse – zonder namen of accounts. De app vraagt vóór het eerste gebruik om je toestemming.</li>
 <li><strong>Barcodes scannen</strong> stuurt alleen het nummer naar een gratis productdatabase en kost geen AI-tegoed.</li>
 <li><strong>Kosten (iPhone-app):</strong> 50 AI-aanroepen per installatie zijn bij de aanschafprijs inbegrepen; meer kun je kopen als optionele eenmalige aankoop (geen abonnement, het tegoed verloopt niet). Al het andere in de app kost niets extra. Als het tegoed op is, blijft alles behalve de AI-functies gewoon werken.</li>
 <li><strong>Gegevens:</strong> Alles blijft op je apparaat zolang je de cloud niet inschakelt. Geen advertenties, geen tracking, geen gebruikersaccount. Details in het <a href="datenschutz.html">privacybeleid</a> (in het Duits).</li>

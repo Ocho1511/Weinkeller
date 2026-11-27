@@ -15,11 +15,12 @@
   .back{margin:0 0 6px} .toapp{display:none} @media (display-mode: standalone){.toapp{display:inline}}
   @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
 </style></head><body>
+<!--update-2026-11-27-->
 <p class="back"><span class="toapp"><a href="index.html">← U podrum</a> &nbsp;·&nbsp; </span><a href="support.html">← Natrag na podršku</a></p>
 <div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html">Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html" selected>Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
 
 <h1>Korisnički priručnik – Weinkeller</h1>
-<p><small>Ažurirano: 10. studenoga 2026. · Verzija aplikacije 2.0</small></p>
+<p><small>Ažurirano: 27. studenoga 2026. · Verzija aplikacije 2.0</small></p>
 
 <div class="toc">
 
@@ -75,7 +76,7 @@
 <ul>
 <li><strong>Razdoblje pijenja:</strong> Čim uneseš godište, aplikacija postavlja „Piti od” na <strong>godište + 1</strong>. „Piti do” ovisi o vrsti vina i sorti (crno se čuva dulje od rosea). Oba podatka možeš promijeniti u svakom trenutku.</li>
 <li><strong>Zalihe, Min i Maks:</strong> Ako uneseš minimum, aplikacija te upozorava kad zalihe padnu ispod njega i nudi da vino stavi na listu želja (<a href="#cellar">odjeljak 3</a>).</li>
-<li><strong>Vlastita fotografija:</strong> „Snimi / odaberi fotografiju” dodaje vinu fotografiju. Ostaje na ovom uređaju i uključena je u JSON sigurnosnu kopiju, ali se ne sinkronizira u oblak.</li>
+<li><strong>Vlastita fotografija:</strong> „Snimi / odaberi fotografiju” dodaje vinu fotografiju. UI pronalazi bocu na fotografiji i usko izrezuje sliku oko nje (to troši jedan UI poziv; ako boca nije pronađena ili UI nije dostupan, fotografija ostaje nepromijenjena). Fotografija ostaje na ovom uređaju i uključena je u JSON sigurnosnu kopiju. Kad je pohrana u oblaku uključena, za svaku fotografiju biraš hoće li se spremiti „U oblaku” (na svim uređajima) ili „Samo na ovom telefonu”.</li>
 </ul>
 <h3>b) Skeniraj etiketu (UI)</h3>
 <p>Dodirni <em>Skeniraj etiketu (UI)</em> i fotografiraj etiketu na boci. UI čita naziv, godište, vrstu, regiju, zemlju i sortu te procjenjuje razdoblje pijenja i temperaturu posluživanja. Provjeri vrijednosti i spremi. Prije prve uporabe aplikacija traži tvoj pristanak (<a href="#privacy">odjeljak 13</a>).</p>
@@ -104,6 +105,9 @@
 <p>Na dnu kartice: <em>Uredi</em>, <em>Popij</em> i 🗑 (brisanje vina).</p>
 <h3>Zalihe, Min/Maks i popis za kupnju</h3>
 <p>Ako za vino uneseš minimum (i po želji maksimum), kartica prikazuje „Zalihe · Min · Maks” i upozorava znakom ⚠ kad si ispod njega. Gumb <em>Dokupi</em> otvara <strong>popis za kupnju</strong>: na njemu su sva vina ispod minimuma (cilj je maksimum, a ako ga nema, minimum). Popis možeš podijeliti ili kopirati, a vina staviti na listu želja.</p>
+<h3>Prijedlozi jela (UI)</h3>
+<p>Na svakoj kartici vina <em>Slaže se uz …</em> traži od UI-ja tri do četiri jela koja pristaju uz vino (jedan UI poziv, zapamćeno na ovom uređaju). <strong>↻</strong> traži novi prijedlog; <strong>✕</strong> ponovno skriva prijedlog – <em>Slaže se uz …</em> tada ponovno prikazuje spremljeni prijedlog, bez novog UI poziva.</p>
+<p><em>Što paše danas?</em> u podrumu: upiši što kuhaš, a UI iz tvog vlastitog podruma bira jedno do tri vina, najradije ona koja bi uskoro trebalo popiti (prekoračena ili na vrhuncu). Dodir na rezultat otvara vino.</p>
 
 <!-- ───────────────── 4 ───────────────── -->
 <h2 id="drink">4. Pijenje vina</h2>
@@ -112,6 +116,8 @@
 <ul>
 <li><strong>Iz kojeg je mjesta uzeta?</strong> – odaberi mjesto na polici s kojeg je boca uzeta ili „Boca bez mjesta”. Mjesto postaje slobodno.</li>
 <li><strong>S kim ste pili?</strong> – imena tvojih gostiju (neobavezno).</li>
+<li><strong>Što se jelo uz vino (neobavezno)</strong> – jelo uz koje si popio vino.</li>
+<li><strong>Bilješka s kušanja (neobavezno)</strong> – tvoj dojam svojim riječima, po želji s fotografijom (snimljenom ili odabranom; UI je izrezuje na bocu, kao i vlastitu fotografiju vina).</li>
 <li><strong>Prigoda</strong> – Proljeće, Ljeto, Jesen, Zima, Rođendan, Zabava ili „Bez razloga” (može se odabrati više).</li>
 </ul>
 <p><em>Popij</em> uklanja jednu bocu i stvara unos u <a href="#history">Povijesti</a>. Konfeti i zvuk slave to (u Postavkama se mogu isključiti). Ako je to <strong>posljednja boca</strong>, aplikacija te obavještava: vino tada nestaje iz podruma (ali ostaje u Povijesti).</p>
@@ -159,7 +165,7 @@
 <!-- ───────────────── 7 ───────────────── -->
 <h2 id="history">7. Povijest</h2>
 
-<p>Povijest navodi sva vina koja si popio/popila s datumom, vinom, vrijednošću, gostima i prigodom. Možeš filtrirati po vrsti vina i prigodi te urediti unos (gosti, prigoda). Povijest daje podatke za analize „Popijeno po mjesecu/godini”, potrošnju i učestalost u Statistici.</p>
+<p>Povijest navodi sva popijena vina s datumom, vinom, vrijednošću, gostima, prigodom, jelom uz vino i tvojom bilješkom s kušanja s fotografijom (dodir na fotografiju je povećava). Možeš filtrirati po vrsti vina i prigodi te urediti unos (gosti, prigoda, jelo, bilješka, fotografija). Povijest daje podatke za prikaze „Popijeno po mjesecu/godini”, potrošnju i učestalost u statistici.</p>
 
 <!-- ───────────────── 8 ───────────────── -->
 <h2 id="wish">8. Lista želja</h2>
@@ -197,6 +203,7 @@
 <tr><td>Izvezi CSV</td><td>Tablica za Excel ili Numbers</td></tr>
 <tr><td>Izvezi Excel</td><td>Kao .xlsx datoteka</td></tr>
 <tr><td>Izvezi PDF</td><td>Pregled za ispis</td></tr>
+<tr><td>Knjiga podruma (PDF)</td><td>Lijepo oblikovana knjiga tvog podruma: stranica sa sažetkom, vina grupirana po zemlji, zbrojevi po stranici i ukupni zbroj – može poslužiti i kao popis inventara za osiguranje (vrijednosti potječu iz tvojih vlastitih cijena)</td></tr>
 <tr><td><strong>JSON sigurnosna kopija</strong></td><td><strong>Potpuna sigurnosna kopija podataka</strong> (vina, lista želja, povijest, police, prikazano ime, vlastite fotografije)</td></tr>
 <tr><td>U međuspremnik</td><td>Kopiraj tekstualni popis</td></tr>
 <tr><td>Uvezi JSON / CSV / Excel</td><td>Vrati sigurnosnu kopiju ili učitaj tablicu</td></tr>
@@ -214,6 +221,7 @@
 <li><strong>Konfeti i zvuk pri pijenju:</strong> oboje, samo konfeti ili isključeno.</li>
 <li><strong>Font:</strong> deset fontova za odabir.</li>
 <li><strong>Jedinica temperature:</strong> °C ili °F (engleski (SAD) automatski postavlja °F).</li>
+<li><strong>Podsjetnik za razdoblje pijenja (samo iPhone aplikacija):</strong> „Isklj.” ili „Tjedno (subota, 10 sati)”. Jednom tjedno aplikacija šalje obavijest, ali samo ako su boce prekoračene ili na vrhuncu. Radi samo na ovom uređaju, bez poslužitelja; iOS prvi put traži dopuštenje za obavijesti.</li>
 </ul>
 <h3>Pohrana</h3>
 <p><em>Samo ovaj uređaj</em> ili <em>Oblak</em> (kôd za sinkronizaciju, <a href="#sync">odjeljak 12</a>).</p>
@@ -237,13 +245,13 @@
 <li><strong>Drugi uređaj:</strong> Postavke → Pohrana → <em>Oblak</em> → unesi kôd (malim slovima, bez razmaka) → Poveži. Ako uređaj već sadrži vina, aplikacija pita želiš li ih spojiti s podacima u oblaku.</li>
 <li>Nakon toga se oba uređaja sinkroniziraju automatski (npr. pri otvaranju aplikacije); <em>Sinkroniziraj sada</em> pokreće sinkronizaciju ručno. Pravilo je: <strong>pobjeđuje posljednja promjena</strong>.</li>
 </ol>
-<p>Sinkroniziraju se vina, lista želja, povijest, police i postavke poput jezika i valute. <strong>Ne sinkroniziraju se</strong> vlastite fotografije i podaci specifični za uređaj. Svatko tko zna tvoj kôd može vidjeti tvoja vina – podijeli ga samo s osobama kojima vjeruješ. Čuvaj i JSON sigurnosnu kopiju.</p>
+<p>Sinkroniziraju se vina, lista želja, povijest, police i postavke poput jezika i valute. Vlastite fotografije sinkroniziraju se kad je pohrana u oblaku uključena i fotografija je spremljena „U oblaku” (fotografije s kušanja idu u oblak automatski dok je pohrana u oblaku uključena); podaci vezani uz uređaj nikad se ne sinkroniziraju. Tko zna tvoj kôd, može vidjeti tvoja vina – dijeli ga samo s ljudima kojima vjeruješ. Spremi i JSON sigurnosnu kopiju.</p>
 
 <!-- ───────────────── 13 ───────────────── -->
 <h2 id="privacy">13. UI, privatnost i troškovi</h2>
 
 <ul>
-<li><strong>Za što se koristi UI?</strong> Skeniranje etikete, pretraživanje vina, traženje cijena i „Ažuriraj sva vina”. Fotografija ili naziv vina šalju se preko našeg poslužitelja AI usluzi (Anthropic, SAD) na procjenu – bez imena ili računa. Aplikacija traži tvoj pristanak prije prve uporabe.</li>
+<li><strong>Čemu služi UI?</strong> Skeniranju etiketa, traženju vina, traženju cijena, „Ažuriraj sva vina”, prijedlozima jela („Slaže se uz …”, „Što paše danas?”) i izrezivanju vlastitih fotografija na bocu. Pritom se fotografija odnosno naziv vina (kod prijedloga iz podruma i popis tvojih vina, bez cijena) šalje preko našeg poslužitelja UI usluzi (Anthropic, SAD) na procjenu – bez imena ili računa. Aplikacija traži tvoj pristanak prije prve upotrebe.</li>
 <li><strong>Skeniranje barkoda</strong> šalje samo broj besplatnoj bazi proizvoda i ne troši AI kredit.</li>
 <li><strong>Troškovi (aplikacija za iPhone):</strong> 50 AI poziva po instalaciji uključeno je u kupovnu cijenu; više ih možeš kupiti kao neobaveznu jednokratnu kupnju (bez pretplate, krediti ne istječu). Sve ostalo u aplikaciji ne košta ništa dodatno. Kad se krediti potroše, sve osim AI funkcija i dalje radi.</li>
 <li><strong>Podaci:</strong> Sve ostaje na tvom uređaju dok ne uključiš oblak. Bez oglasa, bez praćenja, bez korisničkog računa. Pojedinosti u <a href="datenschutz.html">pravilima privatnosti</a> (na njemačkom).</li>

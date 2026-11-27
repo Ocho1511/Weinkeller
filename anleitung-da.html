@@ -15,11 +15,12 @@
   .back{margin:0 0 6px} .toapp{display:none} @media (display-mode: standalone){.toapp{display:inline}}
   @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
 </style></head><body>
+<!--update-2026-11-27-->
 <p class="back"><span class="toapp"><a href="index.html">← Til kælderen</a> &nbsp;·&nbsp; </span><a href="support.html">← Tilbage til support</a></p>
 <div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html" selected>Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
 
 <h1>Brugervejledning – Weinkeller</h1>
-<p><small>Opdateret: 10. november 2026 · Appversion 2.0</small></p>
+<p><small>Opdateret: 27. november 2026 · Appversion 2.0</small></p>
 
 <div class="toc">
 
@@ -75,7 +76,7 @@
 <ul>
 <li><strong>Drikkevindue:</strong> Så snart du angiver årgangen, sætter appen ”Drik fra” til <strong>årgang + 1</strong>. ”Drik til” afhænger af vintype og drue (en rødvin holder længere end en rosé). Du kan til enhver tid ændre begge.</li>
 <li><strong>Beholdning, Min og Maks:</strong> Hvis du angiver et minimum, advarer appen, når beholdningen falder under det, og tilbyder at sætte vinen på ønskelisten (<a href="#cellar">afsnit 3</a>).</li>
-<li><strong>Eget foto:</strong> ”Tag / vælg foto” knytter et foto til vinen. Det bliver på denne enhed og er med i JSON-backuppen, men synkroniseres ikke til skyen.</li>
+<li><strong>Eget foto:</strong> ”Tag / vælg foto” knytter et foto til vinen. AI’en finder flasken på fotoet og beskærer billedet tæt omkring den (det koster ét AI-kald; hvis der ikke findes en flaske, eller AI ikke er tilgængelig, bliver fotoet uændret). Fotoet bliver på denne enhed og er med i JSON-backuppen. Når skylagring er slået til, vælger du for hvert foto, om det gemmes ”I skyen (på alle enheder)” eller ”Kun på denne telefon”.</li>
 </ul>
 <h3>b) Scan etiket (AI)</h3>
 <p>Tryk på <em>Scan etiket (AI)</em> og fotografér flaskens etiket. AI’en aflæser navn, årgang, type, region, land og drue og vurderer drikkevindue og serveringstemperatur. Kontrollér værdierne og gem. Før første brug beder appen om dit samtykke (<a href="#privacy">afsnit 13</a>).</p>
@@ -104,6 +105,9 @@
 <p>Nederst på kortet: <em>Rediger</em>, <em>Drik</em> og 🗑 (slet vin).</p>
 <h3>Beholdning, Min/Maks og indkøbslisten</h3>
 <p>Hvis du angiver et minimum (og eventuelt et maksimum) for en vin, viser kortet ”Beholdning · Min · Maks” og advarer med ⚠, når du ligger under. Knappen <em>Genbestil</em> åbner <strong>indkøbslisten</strong>: den viser alle vine under deres minimum (målet er maksimum, ellers minimum). Du kan dele eller kopiere listen eller sætte vinene på ønskelisten.</p>
+<h3>Madforslag (AI)</h3>
+<p>På hvert vinkort spørger <em>Passer til …</em> AI’en om tre til fire retter, der passer til vinen (ét AI-kald, husket på denne enhed). <strong>↻</strong> henter et nyt forslag; <strong>✕</strong> skjuler forslaget igen – <em>Passer til …</em> viser derefter det gemte forslag igen, uden et nyt AI-kald.</p>
+<p><em>Hvad passer i dag?</em> i kælderen: skriv, hvad du laver mad, og AI’en vælger en til tre vine fra din egen kælder, helst nogle, der snart bør drikkes (overskredet eller på toppen). Et tryk på et resultat åbner vinen.</p>
 
 <!-- ───────────────── 4 ───────────────── -->
 <h2 id="drink">4. Drik en vin</h2>
@@ -112,6 +116,8 @@
 <ul>
 <li><strong>Fra hvilken plads blev den taget?</strong> – vælg den reolplads, flasken kom fra, eller ”Flaske uden plads”. Pladsen bliver ledig.</li>
 <li><strong>Med hvem drak du?</strong> – navnene på dine gæster (valgfrit).</li>
+<li><strong>Hvad spiste I til (valgfrit)</strong> – retten, du drak vinen til.</li>
+<li><strong>Smagsnote (valgfrit)</strong> – dit indtryk med egne ord, evt. med foto (taget eller valgt; AI’en beskærer det til flasken, ligesom et vins eget foto).</li>
 <li><strong>Anledning</strong> – Forår, Sommer, Efterår, Vinter, Fødselsdag, Fest eller ”Bare fordi” (flere kan vælges).</li>
 </ul>
 <p><em>Drik</em> fjerner én flaske og opretter en post i <a href="#history">Historik</a>. Konfetti og lyd fejrer det (kan slås fra i Opsætning). Hvis det er den <strong>sidste flaske</strong>, giver appen besked: vinen forsvinder så fra kælderen (men bliver i Historik).</p>
@@ -159,7 +165,7 @@
 <!-- ───────────────── 7 ───────────────── -->
 <h2 id="history">7. Historik</h2>
 
-<p>Historikken viser alle vine, du har drukket, med dato, vin, værdi, gæster og anledning. Du kan filtrere efter vintype og anledning og redigere en post (gæster, anledning). Historikken danner grundlag for opgørelserne ”Drukket pr. måned/år”, forbruget og hyppigheden i Statistik.</p>
+<p>Historikken viser alle drukne vine med dato, vin, værdi, gæster, anledning, retten, der blev spist til, og din smagsnote med foto (tryk på fotoet for at forstørre det). Du kan filtrere efter vintype og anledning og redigere en post (gæster, anledning, ret, note, foto). Historikken danner grundlag for opgørelserne ”Drukket pr. måned/år”, forbruget og hyppigheden i Statistik.</p>
 
 <!-- ───────────────── 8 ───────────────── -->
 <h2 id="wish">8. Ønskeliste</h2>
@@ -197,6 +203,7 @@
 <tr><td>Eksportér CSV</td><td>Tabel til Excel eller Numbers</td></tr>
 <tr><td>Eksportér Excel</td><td>Som .xlsx-fil</td></tr>
 <tr><td>Eksportér PDF</td><td>Printvenlig oversigt</td></tr>
+<tr><td>Kælderbog (PDF)</td><td>Flot opsat bog over din kælder: oversigtsside, vine grupperet efter land, side- og totalsummer – kan også bruges som inventarliste til forsikringen (værdierne stammer fra dine egne priser)</td></tr>
 <tr><td><strong>JSON-backup</strong></td><td><strong>Komplet backup af data</strong> (vine, ønskeliste, historik, reoler, visningsnavn, egne fotos)</td></tr>
 <tr><td>Til udklipsholder</td><td>Kopiér en tekstliste</td></tr>
 <tr><td>Importér JSON / CSV / Excel</td><td>Gendan en backup eller indlæs en tabel</td></tr>
@@ -214,6 +221,7 @@
 <li><strong>Konfetti &amp; lyd, når du drikker:</strong> begge dele, kun konfetti eller slået fra.</li>
 <li><strong>Skrifttype:</strong> ti skrifttyper at vælge imellem.</li>
 <li><strong>Temperaturenhed:</strong> °C eller °F (engelsk (US) sætter automatisk °F).</li>
+<li><strong>Påmindelse om drikkevindue (kun iPhone-appen):</strong> ”Fra” eller ”Ugentligt (lørdag kl. 10)”. Én gang om ugen sender appen en notifikation, men kun hvis flasker er overskredet eller på toppen. Det kører kun på denne enhed, uden server; første gang spørger iOS om tilladelse til notifikationer.</li>
 </ul>
 <h3>Lagringssted</h3>
 <p><em>Kun denne enhed</em> eller <em>Sky</em> (synk-kode, <a href="#sync">afsnit 12</a>).</p>
@@ -237,13 +245,13 @@
 <li><strong>Anden enhed:</strong> Opsætning → Lagringssted → <em>Sky</em> → indtast koden (små bogstaver, uden mellemrum) → Tilslut. Hvis enheden allerede indeholder vine, spørger appen, om de skal flettes med skydataene.</li>
 <li>Derefter synkroniserer begge enheder automatisk (f.eks. når appen åbnes); <em>Synkronisér nu</em> starter det manuelt. Reglen er: <strong>den seneste ændring vinder</strong>.</li>
 </ol>
-<p>Vine, ønskeliste, historik, reoler og indstillinger som sprog og valuta bliver synkroniseret. <strong>Ikke synkroniseret</strong> er egne fotos og enhedsspecifikke data. Alle, der kender din kode, kan se dine vine – del den kun med personer, du stoler på. Gem også en JSON-backup.</p>
+<p>Vine, ønskeliste, historik, reoler og indstillinger som sprog og valuta bliver synkroniseret. Egne fotos synkroniseres, når skylagring er slået til, og fotoet gemmes ”I skyen (på alle enheder)” (smagsfotos går automatisk i skyen, mens skylagring er slået til); enhedsspecifikke data synkroniseres aldrig. Alle, der kender din kode, kan se dine vine – del den kun med personer, du stoler på. Gem også en JSON-backup.</p>
 
 <!-- ───────────────── 13 ───────────────── -->
 <h2 id="privacy">13. AI, privatliv og omkostninger</h2>
 
 <ul>
-<li><strong>Hvad bruges AI til?</strong> Scan etiket, slå vin op, søg priser og ”Opdater alle vine”. Fotoet eller vinens navn sendes via vores server til en AI-tjeneste (Anthropic, USA) til analyse – uden navne eller konti. Appen beder om dit samtykke før første brug.</li>
+<li><strong>Hvad bruges AI til?</strong> Scan etiket, slå vin op, søg priser, ”Opdater alle vine”, madforslag (”Passer til …”, ”Hvad passer i dag?”) og beskæring af egne fotos til flasken. Dertil sendes fotoet eller vinens navn (ved forslaget fra kælderen også listen over dine vine, uden priser) via vores server til en AI-tjeneste (Anthropic, USA) til analyse – uden navne eller konti. Appen beder om dit samtykke før første brug.</li>
 <li><strong>Stregkodescanning</strong> sender kun nummeret til en gratis produktdatabase og koster ingen AI-kredit.</li>
 <li><strong>Omkostninger (iPhone-appen):</strong> 50 AI-kald pr. installation er inkluderet i købsprisen; flere kan købes som et valgfrit engangskøb (intet abonnement, kreditterne udløber ikke). Alt andet i appen koster ikke ekstra. Når kreditterne er brugt op, virker alt undtagen AI-funktionerne stadig.</li>
 <li><strong>Data:</strong> Alt bliver på din enhed, så længe du ikke aktiverer skyen. Ingen reklamer, ingen tracking, ingen brugerkonto. Detaljer i <a href="datenschutz.html">privatlivspolitikken</a> (på tysk).</li>

@@ -15,11 +15,12 @@
   .back{margin:0 0 6px} .toapp{display:none} @media (display-mode: standalone){.toapp{display:inline}}
   @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
 </style></head><body>
+<!--update-2026-11-27-->
 <p class="back"><span class="toapp"><a href="index.html">← La pivniță</a> &nbsp;·&nbsp; </span><a href="support.html">← Înapoi la asistență</a></p>
 <div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html">Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html" selected>Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
 
 <h1>Ghid de utilizare – Weinkeller</h1>
-<p><small>Actualizat: 10 noiembrie 2026 · Versiunea aplicației 2.0</small></p>
+<p><small>Actualizat: 27 noiembrie 2026 · Versiunea aplicației 2.0</small></p>
 
 <div class="toc">
 
@@ -75,7 +76,7 @@
 <ul>
 <li><strong>Interval de consum:</strong> De îndată ce introduci anul, aplicația setează „Bea de la” la <strong>anul + 1</strong>. „Bea până” depinde de tipul de vin și de soi (un roșu se păstrează mai mult decât un rosé). Poți modifica oricând ambele valori.</li>
 <li><strong>Stoc, Min și Max:</strong> Dacă introduci un minim, aplicația te avertizează când stocul scade sub el și îți propune să pui vinul pe lista de dorințe (<a href="#cellar">secțiunea 3</a>).</li>
-<li><strong>Fotografie proprie:</strong> „Fă / alege o fotografie” atașează o fotografie la vin. Rămâne pe acest dispozitiv și este inclusă în backup-ul JSON, dar nu se sincronizează în cloud.</li>
+<li><strong>Fotografie proprie:</strong> „Fă / alege o fotografie” atașează o fotografie la vin. IA găsește sticla în fotografie și decupează imaginea strâns în jurul ei (asta folosește un apel IA; dacă nu se găsește nicio sticlă sau IA nu este disponibilă, fotografia rămâne neschimbată). Fotografia rămâne pe acest dispozitiv și este inclusă în backup-ul JSON. Cu stocarea în cloud activată, alegi pentru fiecare fotografie dacă se salvează „În cloud” (pe toate dispozitivele) sau „Doar pe acest telefon”.</li>
 </ul>
 <h3>b) Scanează eticheta (IA)</h3>
 <p>Apasă <em>Scanează eticheta (IA)</em> și fotografiază eticheta sticlei. IA citește numele, anul, tipul, regiunea, țara și soiul și estimează intervalul de consum și temperatura de servire. Verifică valorile și salvează. Înainte de prima utilizare, aplicația îți cere acordul (<a href="#privacy">secțiunea 13</a>).</p>
@@ -104,6 +105,9 @@
 <p>În partea de jos a cardului: <em>Editează</em>, <em>Bea</em> și 🗑 (șterge vinul).</p>
 <h3>Stoc, Min/Max și lista de cumpărături</h3>
 <p>Dacă introduci un minim (și, opțional, un maxim) pentru un vin, cardul afișează „Stoc · Min · Max” și te avertizează cu ⚠ când ești sub el. Butonul <em>De recumpărat</em> deschide <strong>lista de cumpărături</strong>: aceasta cuprinde toate vinurile aflate sub minim (ținta este maximul, altfel minimul). Poți distribui sau copia lista ori pune vinurile pe lista de dorințe.</p>
+<h3>Sugestii de preparate (IA)</h3>
+<p>Pe fiecare card de vin, <em>Se potrivește cu …</em> cere IA trei-patru preparate care merg cu vinul (un apel IA, reținut pe acest dispozitiv). <strong>↻</strong> cere o sugestie nouă; <strong>✕</strong> ascunde din nou sugestia – <em>Se potrivește cu …</em> arată apoi din nou sugestia reținută, fără un nou apel IA.</p>
+<p><em>Ce se potrivește azi?</em> în pivniță: scrie ce gătești, iar IA alege unul până la trei vinuri din propria ta pivniță, de preferință cele care ar trebui băute curând (depășite sau la apogeu). O atingere pe un rezultat deschide vinul.</p>
 
 <!-- ───────────────── 4 ───────────────── -->
 <h2 id="drink">4. Consumarea unui vin</h2>
@@ -112,6 +116,8 @@
 <ul>
 <li><strong>Din ce loc a fost luată?</strong> – alege locul din raft de unde a fost luată sticla sau „Sticlă fără loc”. Locul devine liber.</li>
 <li><strong>Cu cine ai băut?</strong> – numele invitaților tăi (opțional).</li>
+<li><strong>Ce s-a mâncat alături (opțional)</strong> – preparatul cu care ai băut vinul.</li>
+<li><strong>Notă de degustare (opțional)</strong> – impresia ta în cuvintele tale, opțional cu fotografie (făcută sau aleasă; IA o decupează pe sticlă, ca fotografia proprie a unui vin).</li>
 <li><strong>Ocazie</strong> – Primăvară, Vară, Toamnă, Iarnă, Zi de naștere, Petrecere sau „Pur și simplu” (se pot alege mai multe).</li>
 </ul>
 <p><em>Bea</em> scoate o sticlă și creează o înregistrare în <a href="#history">Istoric</a>. Confetti și sunet sărbătoresc momentul (se pot dezactiva în Setări). Dacă este <strong>ultima sticlă</strong>, aplicația te anunță: vinul dispare apoi din pivniță (dar rămâne în Istoric).</p>
@@ -159,7 +165,7 @@
 <!-- ───────────────── 7 ───────────────── -->
 <h2 id="history">7. Istoric</h2>
 
-<p>Istoricul listează toate vinurile pe care le-ai băut, cu data, vinul, valoarea, invitații și ocazia. Poți filtra după tipul de vin și ocazie și poți edita o înregistrare (invitați, ocazie). Istoricul alimentează evaluările „Băut pe lună/an”, cheltuielile și frecvența din Statistici.</p>
+<p>Istoricul listează toate vinurile pe care le-ai băut, cu data, vinul, valoarea, invitații, ocazia, preparatul mâncat alături și nota ta de degustare cu fotografie (atinge fotografia pentru a o mări). Poți filtra după tipul de vin și ocazie și poți edita o înregistrare (invitați, ocazie, preparat, notă, fotografie). Istoricul alimentează evaluările „Băut pe lună/an”, cheltuielile și frecvența din Statistici.</p>
 
 <!-- ───────────────── 8 ───────────────── -->
 <h2 id="wish">8. Listă de dorințe</h2>
@@ -197,6 +203,7 @@
 <tr><td>Exportă CSV</td><td>Tabel pentru Excel sau Numbers</td></tr>
 <tr><td>Exportă Excel</td><td>Ca fișier .xlsx</td></tr>
 <tr><td>Exportă PDF</td><td>Prezentare generală de tipărit</td></tr>
+<tr><td>Cartea pivniței (PDF)</td><td>Carte frumos concepută a pivniței tale: pagină de sinteză, vinuri grupate pe țări, totaluri pe pagină și totaluri generale – utilizabilă și ca listă de inventar pentru asigurare (valorile provin din prețurile tale)</td></tr>
 <tr><td><strong>Backup JSON</strong></td><td><strong>Backup complet al datelor</strong> (vinuri, listă de dorințe, istoric, rafturi, nume afișat, fotografii proprii)</td></tr>
 <tr><td>În clipboard</td><td>Copiază o listă text</td></tr>
 <tr><td>Importă JSON / CSV / Excel</td><td>Restaurează un backup sau importă un tabel</td></tr>
@@ -214,6 +221,7 @@
 <li><strong>Confetti și sunet la băut:</strong> ambele, doar confetti sau dezactivat.</li>
 <li><strong>Font:</strong> zece fonturi la alegere.</li>
 <li><strong>Unitate de temperatură:</strong> °C sau °F (engleza (SUA) setează automat °F).</li>
+<li><strong>Memento pentru intervalul de consum (doar aplicația pentru iPhone):</strong> „Oprit” sau „Săptămânal (sâmbătă, ora 10)”. O dată pe săptămână aplicația trimite o notificare, dar numai dacă există sticle depășite sau la apogeu. Funcționează doar pe acest dispozitiv, fără server; prima dată, iOS cere permisiunea de a trimite notificări.</li>
 </ul>
 <h3>Stocare</h3>
 <p><em>Doar acest dispozitiv</em> sau <em>Cloud</em> (cod de sincronizare, <a href="#sync">secțiunea 12</a>).</p>
@@ -237,13 +245,13 @@
 <li><strong>Al doilea dispozitiv:</strong> Setări → Stocare → <em>Cloud</em> → introdu codul (litere mici, fără spații) → Conectează. Dacă dispozitivul conține deja vinuri, aplicația întreabă dacă să le îmbine cu datele din cloud.</li>
 <li>După aceea, ambele dispozitive se sincronizează automat (de exemplu la deschiderea aplicației); <em>Sincronizează acum</em> declanșează sincronizarea manual. Regula este: <strong>ultima modificare câștigă</strong>.</li>
 </ol>
-<p>Se sincronizează vinurile, lista de dorințe, istoricul, rafturile și setările precum limba și moneda. <strong>Nu se sincronizează</strong> fotografiile proprii și datele specifice dispozitivului. Oricine îți cunoaște codul îți poate vedea vinurile – dă-l doar persoanelor în care ai încredere. Păstrează și un backup JSON.</p>
+<p>Se sincronizează vinurile, lista de dorințe, istoricul, rafturile și setările precum limba și moneda. Fotografiile proprii se sincronizează când stocarea în cloud este activată și fotografia este salvată „În cloud” (fotografiile de degustare ajung automat în cloud cât timp stocarea în cloud este activată); datele specifice dispozitivului nu se sincronizează niciodată. Oricine îți cunoaște codul îți poate vedea vinurile – dă-l doar persoanelor în care ai încredere. Păstrează și un backup JSON.</p>
 
 <!-- ───────────────── 13 ───────────────── -->
 <h2 id="privacy">13. IA, confidențialitate și costuri</h2>
 
 <ul>
-<li><strong>Pentru ce se folosește IA?</strong> Scanarea etichetei, căutarea vinului, căutarea prețurilor și „Actualizează toate vinurile”. Fotografia sau numele vinului sunt trimise prin serverul nostru către un serviciu IA (Anthropic, SUA) pentru evaluare – fără nume sau conturi. Aplicația îți cere acordul înainte de prima utilizare.</li>
+<li><strong>Pentru ce se folosește IA?</strong> Scanarea etichetei, căutarea vinului, căutarea prețurilor, „Actualizează toate vinurile”, sugestiile de preparate („Se potrivește cu …”, „Ce se potrivește azi?”) și decuparea fotografiilor proprii pe sticlă. Pentru aceasta, fotografia sau numele vinului (la sugestia din pivniță și lista vinurilor tale, fără prețuri) sunt trimise prin serverul nostru către un serviciu IA (Anthropic, SUA) pentru evaluare – fără nume sau conturi. Aplicația îți cere acordul înainte de prima utilizare.</li>
 <li><strong>Scanarea codului de bare</strong> trimite doar numărul către o bază de date gratuită de produse și nu costă niciun credit IA.</li>
 <li><strong>Costuri (aplicația pentru iPhone):</strong> 50 de apeluri IA pe instalare sunt incluse în prețul de achiziție; mai multe se pot cumpăra printr-o achiziție unică opțională (fără abonament, creditele nu expiră). Orice altceva din aplicație nu costă nimic în plus. Când creditele s-au epuizat, totul funcționează în continuare, cu excepția funcțiilor IA.</li>
 <li><strong>Date:</strong> Totul rămâne pe dispozitivul tău atât timp cât nu activezi cloud-ul. Fără reclame, fără urmărire, fără cont de utilizator. Detalii în <a href="datenschutz.html">politica de confidențialitate</a> (în germană).</li>

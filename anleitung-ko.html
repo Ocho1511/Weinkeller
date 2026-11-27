@@ -15,11 +15,12 @@
   .back{margin:0 0 6px} .toapp{display:none} @media (display-mode: standalone){.toapp{display:inline}}
   @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
 </style></head><body>
+<!--update-2026-11-27-->
 <p class="back"><span class="toapp"><a href="index.html">← 셀러로</a> &nbsp;·&nbsp; </span><a href="support.html">← 지원으로 돌아가기</a></p>
 <div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html">Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html" selected>한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
 
 <h1>사용 설명서 – Weinkeller</h1>
-<p><small>업데이트: 2026년 11월 10일 · 앱 버전 2.0</small></p>
+<p><small>업데이트: 2026년 11월 27일 · 앱 버전 2.0</small></p>
 
 <div class="toc">
 
@@ -75,7 +76,7 @@
 <ul>
 <li><strong>음용 적기:</strong> 빈티지를 입력하면 곧바로 앱이 “마시기 시작”을 <strong>빈티지 + 1</strong>로 설정합니다. “마시기 종료”는 와인 종류와 품종에 따라 달라집니다(레드는 로제보다 오래 보관됩니다). 두 값 모두 언제든지 바꿀 수 있습니다.</li>
 <li><strong>재고, 최소, 최대:</strong> 최소 수량을 입력하면 재고가 그 아래로 떨어질 때 앱이 경고하고, 와인을 위시리스트에 올릴지 물어봅니다(<a href="#cellar">3장</a>).</li>
-<li><strong>내 사진:</strong> “사진 촬영 / 선택”으로 와인에 사진을 첨부합니다. 사진은 이 기기에 남고 JSON 백업에는 포함되지만, 클라우드에는 동기화되지 않습니다.</li>
+<li><strong>내 사진:</strong> “사진 촬영 / 선택”으로 와인에 사진을 붙일 수 있습니다. AI가 사진에서 병을 찾아 병에 딱 맞게 이미지를 잘라 줍니다(AI 호출 1회가 사용되며, 병을 찾지 못하거나 AI를 사용할 수 없으면 사진은 그대로 유지됩니다). 사진은 이 기기에 남고 JSON 백업에 포함됩니다. 클라우드 저장을 켜 두면 사진마다 “클라우드(모든 기기)” 또는 “이 휴대폰에만” 중 어디에 저장할지 고를 수 있습니다.</li>
 </ul>
 <h3>b) 라벨 스캔 (AI)</h3>
 <p>추가 화면에서 <em>라벨 스캔 (AI)</em>을 탭하고 병의 라벨을 촬영합니다. AI가 이름, 빈티지, 종류, 지역, 국가, 품종을 읽고 음용 적기와 음용 온도를 추정합니다. 값을 확인한 뒤 저장하세요. 처음 사용하기 전에 앱이 동의를 요청합니다(<a href="#privacy">13장</a>).</p>
@@ -104,6 +105,9 @@
 <p>카드 하단: <em>수정</em>, <em>마시기</em>, 🗑(와인 삭제).</p>
 <h3>재고, 최소/최대, 장보기 목록</h3>
 <p>와인에 최소 수량(선택적으로 최대 수량도)을 입력하면 카드에 “재고 · 최소 · 최대”가 표시되고, 그 아래로 내려가면 ⚠로 경고합니다. <em>재주문</em> 버튼을 누르면 <strong>장보기 목록</strong>이 열립니다: 최소 수량 미만인 모든 와인이 나열됩니다(목표는 최대 수량이며, 없으면 최소 수량). 목록을 공유하거나 복사하거나, 와인을 위시리스트에 올릴 수 있습니다.</p>
+<h3>음식 추천 (AI)</h3>
+<p>와인 카드마다 있는 <em>어울리는 음식 …</em>은 그 와인에 어울리는 음식 서너 가지를 AI에게 물어봅니다(AI 호출 1회, 이 기기에 저장됨). <strong>↻</strong>는 새로운 추천을 받고, <strong>✕</strong>는 추천을 다시 숨깁니다. 이후 <em>어울리는 음식 …</em>을 누르면 저장된 추천이 새 AI 호출 없이 다시 표시됩니다.</p>
+<p>셀러의 <em>오늘은 뭐가 어울릴까요?</em>: 만들 요리를 입력하면 AI가 내 셀러에서 와인을 한 병에서 세 병까지 골라 줍니다. 곧 마셔야 할 와인(적기 경과 또는 절정)을 우선합니다. 결과를 탭하면 해당 와인이 열립니다.</p>
 
 <!-- ───────────────── 4 ───────────────── -->
 <h2 id="drink">4. 와인 마시기</h2>
@@ -112,6 +116,8 @@
 <ul>
 <li><strong>어느 칸에서 꺼냈나요?</strong> – 병을 꺼낸 랙의 칸을 선택하거나 “칸에 없는 병”을 선택합니다. 그 칸은 비워집니다.</li>
 <li><strong>누구와 마셨나요?</strong> – 함께한 사람들의 이름(선택 사항).</li>
+<li><strong>함께 먹은 음식(선택)</strong> – 와인과 함께 먹은 음식.</li>
+<li><strong>테이스팅 노트(선택)</strong> – 내 느낌을 내 말로 적습니다. 원하면 사진도 넣을 수 있습니다(촬영 또는 선택. 와인의 내 사진처럼 AI가 병에 맞게 잘라 줍니다).</li>
 <li><strong>계기</strong> – 봄, 여름, 가을, 겨울, 생일, 파티 또는 “그냥”(여러 개 선택 가능).</li>
 </ul>
 <p><em>마시기</em>를 누르면 병이 하나 줄고 <a href="#history">기록</a>에 항목이 만들어집니다. 색종이와 소리로 축하합니다(설정에서 끌 수 있음). <strong>마지막 병</strong>이면 앱이 알려 줍니다: 그 와인은 셀러에서 사라집니다(기록에는 남습니다).</p>
@@ -159,7 +165,7 @@
 <!-- ───────────────── 7 ───────────────── -->
 <h2 id="history">7. 기록</h2>
 
-<p>기록에는 마신 모든 와인이 날짜, 와인, 금액, 함께한 사람, 계기와 함께 나열됩니다. 와인 종류와 계기로 거를 수 있고, 항목(함께한 사람, 계기)을 수정할 수 있습니다. 기록은 통계의 “월별/연도별 마신 양”, 지출, 빈도 분석에 사용됩니다.</p>
+<p>기록에는 마신 모든 와인이 날짜, 와인, 금액, 함께한 사람, 계기, 함께 먹은 음식, 그리고 사진이 있는 테이스팅 노트와 함께 나열됩니다(사진을 탭하면 확대됩니다). 와인 종류와 계기로 거를 수 있고, 항목(함께한 사람, 계기, 음식, 노트, 사진)을 수정할 수 있습니다. 기록은 통계의 “월별/연도별 마신 양”, 지출, 빈도 분석에 사용됩니다.</p>
 
 <!-- ───────────────── 8 ───────────────── -->
 <h2 id="wish">8. 위시리스트</h2>
@@ -197,6 +203,7 @@
 <tr><td>CSV 내보내기</td><td>Excel 또는 Numbers용 표</td></tr>
 <tr><td>Excel 내보내기</td><td>.xlsx 파일로</td></tr>
 <tr><td>PDF 내보내기</td><td>인쇄 가능한 개요</td></tr>
+<tr><td>셀러북(PDF)</td><td>셀러를 보기 좋게 엮은 책: 요약 페이지, 국가별로 묶은 와인, 페이지별 및 전체 합계 – 보험용 재고 목록으로도 쓸 수 있습니다(금액은 직접 입력한 가격 기준)</td></tr>
 <tr><td><strong>JSON 백업</strong></td><td><strong>전체 데이터 백업</strong>(와인, 위시리스트, 기록, 랙, 표시 이름, 내 사진)</td></tr>
 <tr><td>클립보드로</td><td>텍스트 목록 복사</td></tr>
 <tr><td>JSON / CSV / Excel 가져오기</td><td>백업 복원 또는 표 불러오기</td></tr>
@@ -214,6 +221,7 @@
 <li><strong>마실 때 색종이 &amp; 소리:</strong> 둘 다, 색종이만, 또는 끔.</li>
 <li><strong>글꼴:</strong> 열 가지 글꼴 중에서 선택할 수 있습니다.</li>
 <li><strong>온도 단위:</strong> °C 또는 °F(영어(미국)에서는 °F가 자동으로 설정됩니다).</li>
+<li><strong>음용 시기 알림(iPhone 앱만 해당):</strong> “끄기” 또는 “매주(토요일 오전 10시)”. 앱이 일주일에 한 번 알림을 보내지만, 적기가 지난 병이나 절정인 병이 있을 때만 보냅니다. 서버 없이 이 기기에서만 작동하며, 처음에는 iOS가 알림 허용 여부를 묻습니다.</li>
 </ul>
 <h3>저장 방식</h3>
 <p><em>이 기기에만</em> 또는 <em>클라우드</em>(동기화 코드, <a href="#sync">12장</a>).</p>
@@ -237,13 +245,13 @@
 <li><strong>두 번째 기기:</strong> 설정 → 저장 방식 → <em>클라우드</em> → 코드를 입력합니다(소문자, 공백 없이) → 연결. 기기에 이미 와인이 있으면 클라우드 데이터와 병합할지 앱이 묻습니다.</li>
 <li>그 후에는 두 기기가 자동으로 동기화됩니다(예: 앱을 열 때). <em>지금 동기화</em>로 직접 실행할 수도 있습니다. 규칙은 다음과 같습니다: <strong>가장 최근 변경이 우선합니다</strong>.</li>
 </ol>
-<p>와인, 위시리스트, 기록, 랙, 그리고 언어와 통화 같은 설정이 동기화됩니다. 내 사진과 기기별 데이터는 <strong>동기화되지 않습니다</strong>. 코드를 아는 사람은 누구나 내 와인을 볼 수 있으므로, 신뢰하는 사람에게만 공유하세요. JSON 백업도 함께 보관해 두세요.</p>
+<p>와인, 위시리스트, 기록, 랙, 그리고 언어와 통화 같은 설정이 동기화됩니다. 내 사진은 클라우드 저장이 켜져 있고 사진이 “클라우드(모든 기기)”에 저장된 경우에 동기화됩니다(테이스팅 사진은 클라우드 저장이 켜져 있는 동안 자동으로 클라우드에 올라갑니다). 기기별 데이터는 동기화되지 않습니다. 코드를 아는 사람은 누구나 내 와인을 볼 수 있으므로, 신뢰하는 사람에게만 공유하세요. JSON 백업도 함께 보관해 두세요.</p>
 
 <!-- ───────────────── 13 ───────────────── -->
 <h2 id="privacy">13. AI, 개인정보, 비용</h2>
 
 <ul>
-<li><strong>AI는 어디에 사용되나요?</strong> 라벨 스캔, 와인 검색, 가격 검색, “모든 와인 업데이트”에 사용됩니다. 사진 또는 와인 이름이 당사 서버를 거쳐 AI 서비스(Anthropic, 미국)로 전송되어 분석됩니다. 이름이나 계정 정보는 포함되지 않습니다. 앱은 처음 사용하기 전에 동의를 요청합니다.</li>
+<li><strong>AI는 어디에 사용되나요?</strong> 라벨 스캔, 와인 검색, 가격 검색, “모든 와인 업데이트”, 음식 추천(“어울리는 음식 …”, “오늘은 뭐가 어울릴까요?”), 그리고 내 사진을 병에 맞게 자르는 데 사용됩니다. 이때 사진 또는 와인 이름(셀러에서 추천받을 때는 가격을 제외한 내 와인 목록도)이 당사 서버를 거쳐 AI 서비스(Anthropic, 미국)로 전송되어 분석됩니다. 이름이나 계정 정보는 포함되지 않습니다. 앱은 처음 사용하기 전에 동의를 요청합니다.</li>
 <li><strong>바코드 스캔</strong>은 번호만 무료 제품 데이터베이스로 전송하며 AI 크레딧을 소모하지 않습니다.</li>
 <li><strong>비용(iPhone 앱):</strong> 설치당 AI 호출 50회가 구입 가격에 포함되어 있으며, 추가분은 선택 사항인 일회성 구매로 살 수 있습니다(구독 없음, 크레딧 만료 없음). 앱의 나머지 기능에는 추가 비용이 없습니다. 크레딧을 모두 사용해도 AI 기능을 제외한 모든 기능은 계속 작동합니다.</li>
 <li><strong>데이터:</strong> 클라우드를 켜지 않는 한 모든 것이 내 기기에만 저장됩니다. 광고, 추적, 사용자 계정이 없습니다. 자세한 내용은 <a href="datenschutz.html">개인정보 처리방침</a>(독일어)을 참조하세요.</li>

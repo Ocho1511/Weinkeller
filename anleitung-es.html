@@ -15,11 +15,12 @@
   .back{margin:0 0 6px} .toapp{display:none} @media (display-mode: standalone){.toapp{display:inline}}
   @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
 </style></head><body>
+<!--update-2026-11-27-->
 <p class="back"><span class="toapp"><a href="index.html">← A la bodega</a> &nbsp;·&nbsp; </span><a href="support.html">← Volver al soporte</a></p>
 <div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html">Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html" selected>Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
 
 <h1>Guía de usuario – Weinkeller</h1>
-<p><small>Actualizado: 10 de noviembre de 2026 · Versión de la app 2.0</small></p>
+<p><small>Actualizado: 27 de noviembre de 2026 · Versión de la app 2.0</small></p>
 
 <div class="toc">
 
@@ -75,7 +76,7 @@
 <ul>
 <li><strong>Ventana de consumo:</strong> En cuanto introduces la añada, la app pone “Beber desde” en <strong>añada + 1</strong>. “Beber hasta” depende del tipo de vino y de la uva (un tinto aguanta más que un rosado). Puedes cambiar ambos en cualquier momento.</li>
 <li><strong>Existencias, Mín y Máx:</strong> Si indicas un mínimo, la app te avisa cuando las existencias bajan de él y te ofrece añadir el vino a la lista de deseos (<a href="#cellar">apartado 3</a>).</li>
-<li><strong>Foto propia:</strong> “Hacer / elegir foto” adjunta una foto al vino. Se queda en este dispositivo y se incluye en la copia JSON, pero no se sincroniza con la nube.</li>
+<li><strong>Foto propia:</strong> “Hacer / elegir foto” adjunta una foto al vino. La IA encuentra la botella en la foto y recorta la imagen ajustándola a ella (esto usa una llamada a la IA; si no se encuentra ninguna botella o la IA no está disponible, la foto se queda como está). La foto se queda en este dispositivo y se incluye en la copia JSON. Con el almacenamiento en la nube activado, eliges para cada foto si se guarda “En la nube (en todos los dispositivos)” o “Solo en este móvil”.</li>
 </ul>
 <h3>b) Escanear etiqueta (IA)</h3>
 <p>Toca <em>Escanear etiqueta (IA)</em> y fotografía la etiqueta de la botella. La IA lee nombre, añada, tipo, región, país y uva, y estima la ventana de consumo y la temperatura de servicio. Revisa los valores y guarda. Antes del primer uso, la app te pide tu consentimiento (<a href="#privacy">apartado 13</a>).</p>
@@ -104,6 +105,9 @@
 <p>En la parte inferior de la ficha: <em>Editar</em>, <em>Beber</em> y 🗑 (eliminar vino).</p>
 <h3>Existencias, Mín/Máx y la lista de la compra</h3>
 <p>Si indicas un mínimo (y, opcionalmente, un máximo) para un vino, la ficha muestra “Existencias · Mín · Máx” y te avisa con ⚠ cuando estás por debajo. El botón <em>Reponer</em> abre la <strong>lista de la compra</strong>: incluye todos los vinos por debajo de su mínimo (el objetivo es el máximo; si no hay, el mínimo). Puedes compartir o copiar la lista, o añadir los vinos a la lista de deseos.</p>
+<h3>Sugerencias de platos (IA)</h3>
+<p>En cada ficha de vino, <em>Combina con …</em> pide a la IA tres o cuatro platos que van bien con el vino (una llamada a la IA, recordada en este dispositivo). <strong>↻</strong> pide una nueva sugerencia; <strong>✕</strong> vuelve a ocultarla – <em>Combina con …</em> muestra entonces de nuevo la sugerencia guardada, sin una nueva llamada a la IA.</p>
+<p><em>¿Qué va bien hoy?</em> en la bodega: indica qué vas a cocinar y la IA elige de uno a tres vinos de tu propia bodega, preferiblemente los que conviene beber pronto (pasados o en su punto álgido). Al tocar un resultado se abre el vino.</p>
 
 <!-- ───────────────── 4 ───────────────── -->
 <h2 id="drink">4. Beber un vino</h2>
@@ -112,6 +116,8 @@
 <ul>
 <li><strong>¿De qué hueco se sacó?</strong> – elige el hueco del estante del que salió la botella, o “Botella sin colocar”. El hueco queda libre.</li>
 <li><strong>¿Con quién lo bebiste?</strong> – nombres de tus invitados (opcional).</li>
+<li><strong>Con qué comida (opcional)</strong> – el plato con el que tomaste el vino.</li>
+<li><strong>Nota de cata (opcional)</strong> – tu impresión con tus propias palabras, si quieres con foto (hecha o elegida; la IA la recorta a la botella, como la foto propia de un vino).</li>
 <li><strong>Ocasión</strong> – Primavera, Verano, Otoño, Invierno, Cumpleaños, Fiesta o “Porque sí” (se pueden elegir varias).</li>
 </ul>
 <p><em>Beber</em> quita una botella y crea una entrada en el <a href="#history">Historial</a>. Confeti y sonido lo celebran (se pueden desactivar en Ajustes). Si es la <strong>última botella</strong>, la app te avisa: el vino desaparece entonces de la bodega (pero se queda en el Historial).</p>
@@ -159,7 +165,7 @@
 <!-- ───────────────── 7 ───────────────── -->
 <h2 id="history">7. Historial</h2>
 
-<p>El Historial muestra todos los vinos que has bebido con fecha, vino, valor, invitados y ocasión. Puedes filtrar por tipo de vino y ocasión y editar una entrada (invitados, ocasión). El Historial alimenta los análisis “Bebido por mes/año”, el gasto y la frecuencia en Datos.</p>
+<p>El Historial muestra todos los vinos que has bebido con fecha, vino, valor, invitados, ocasión, el plato con el que lo tomaste y tu nota de cata con foto (toca la foto para ampliarla). Puedes filtrar por tipo de vino y ocasión y editar una entrada (invitados, ocasión, plato, nota, foto). El Historial alimenta los análisis “Bebido por mes/año”, el gasto y la frecuencia en Datos.</p>
 
 <!-- ───────────────── 8 ───────────────── -->
 <h2 id="wish">8. Deseos</h2>
@@ -197,6 +203,7 @@
 <tr><td>Exportar CSV</td><td>Tabla para Excel o Numbers</td></tr>
 <tr><td>Exportar Excel</td><td>Como archivo .xlsx</td></tr>
 <tr><td>Exportar PDF</td><td>Resumen imprimible</td></tr>
+<tr><td>Libro de bodega (PDF)</td><td>Libro bien diseñado de tu bodega: página de resumen, vinos agrupados por país, totales por página y totales generales – también útil como lista de inventario para el seguro (los valores proceden de tus propios precios)</td></tr>
 <tr><td><strong>Copia JSON</strong></td><td><strong>Copia de seguridad completa de los datos</strong> (vinos, lista de deseos, historial, estantes, nombre, fotos propias)</td></tr>
 <tr><td>Al portapapeles</td><td>Copiar una lista de texto</td></tr>
 <tr><td>Importar JSON / CSV / Excel</td><td>Restaurar una copia o leer una tabla</td></tr>
@@ -214,6 +221,7 @@
 <li><strong>Confeti y sonido al beber:</strong> ambos, solo confeti o desactivado.</li>
 <li><strong>Fuente:</strong> diez fuentes entre las que elegir.</li>
 <li><strong>Unidad de temperatura:</strong> °C o °F (inglés (EE. UU.) establece °F automáticamente).</li>
+<li><strong>Recordatorio de consumo (solo app de iPhone):</strong> “Desactivado” o “Semanal (sábado, 10:00)”. Una vez por semana la app envía una notificación, pero solo si hay botellas pasadas o en su punto álgido. Funciona solo en este dispositivo, sin servidor; la primera vez, iOS pide permiso para enviar notificaciones.</li>
 </ul>
 <h3>Almacenamiento</h3>
 <p><em>Solo este dispositivo</em> o <em>Nube</em> (código de sync, <a href="#sync">apartado 12</a>).</p>
@@ -237,13 +245,13 @@
 <li><strong>Segundo dispositivo:</strong> Ajustes → Almacenamiento → <em>Nube</em> → introduce el código (en minúsculas, sin espacios) → Conectar. Si el dispositivo ya contiene vinos, la app pregunta si quieres fusionarlos con los datos de la nube.</li>
 <li>Después, ambos dispositivos se sincronizan automáticamente (por ejemplo, al abrir la app); <em>Sincronizar ahora</em> lo activa a mano. La regla es: <strong>gana el último cambio</strong>.</li>
 </ol>
-<p>Se sincronizan los vinos, la lista de deseos, el historial, los estantes y ajustes como el idioma y la moneda. <strong>No se sincronizan</strong> las fotos propias ni los datos específicos del dispositivo. Cualquiera que conozca tu código puede ver tus vinos; compártelo solo con personas de confianza. Guarda además una copia JSON.</p>
+<p>Se sincronizan los vinos, la lista de deseos, el historial, los estantes y ajustes como el idioma y la moneda. Las fotos propias se sincronizan cuando el almacenamiento en la nube está activado y la foto se guarda “En la nube (en todos los dispositivos)” (las fotos de cata van automáticamente a la nube mientras esté activado); los datos específicos del dispositivo nunca se sincronizan. Cualquiera que conozca tu código puede ver tus vinos; compártelo solo con personas de confianza. Guarda además una copia JSON.</p>
 
 <!-- ───────────────── 13 ───────────────── -->
 <h2 id="privacy">13. IA, privacidad y costes</h2>
 
 <ul>
-<li><strong>¿Para qué se usa la IA?</strong> Escanear etiqueta, buscar vino, buscar precios y “Actualizar todos los vinos”. La foto o el nombre del vino se envía a través de nuestro servidor a un servicio de IA (Anthropic, EE. UU.) para su evaluación, sin nombres ni cuentas. La app te pide tu consentimiento antes del primer uso.</li>
+<li><strong>¿Para qué se usa la IA?</strong> Escanear etiqueta, buscar vino, buscar precios, “Actualizar todos los vinos”, sugerencias de platos (“Combina con …”, “¿Qué va bien hoy?”) y recortar tus fotos propias a la botella. Para ello, la foto o el nombre del vino (en la sugerencia desde la bodega, también la lista de tus vinos, sin precios) se envía a través de nuestro servidor a un servicio de IA (Anthropic, EE. UU.) para su evaluación, sin nombres ni cuentas. La app te pide tu consentimiento antes del primer uso.</li>
 <li><strong>El escaneo de códigos de barras</strong> solo envía el número a una base de datos de productos gratuita y no consume crédito de IA.</li>
 <li><strong>Costes (app para iPhone):</strong> 50 llamadas a la IA por instalación están incluidas en el precio de compra; se pueden comprar más como compra única opcional (sin suscripción, los créditos no caducan). Todo lo demás de la app no cuesta nada extra. Cuando se agotan los créditos, todo sigue funcionando salvo las funciones de IA.</li>
 <li><strong>Datos:</strong> Todo se queda en tu dispositivo mientras no actives la nube. Sin anuncios, sin seguimiento, sin cuenta de usuario. Detalles en la <a href="datenschutz.html">política de privacidad</a> (en alemán).</li>

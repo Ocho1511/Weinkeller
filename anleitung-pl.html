@@ -15,11 +15,12 @@
   .back{margin:0 0 6px} .toapp{display:none} @media (display-mode: standalone){.toapp{display:inline}}
   @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
 </style></head><body>
+<!--update-2026-11-27-->
 <p class="back"><span class="toapp"><a href="index.html">← Do piwnicy</a> &nbsp;·&nbsp; </span><a href="support.html">← Wróć do wsparcia</a></p>
 <div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html">Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html" selected>Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
 
 <h1>Instrukcja obsługi – Weinkeller</h1>
-<p><small>Zaktualizowano: 10 listopada 2026 · Wersja aplikacji 2.0</small></p>
+<p><small>Zaktualizowano: 27 listopada 2026 · Wersja aplikacji 2.0</small></p>
 
 <div class="toc">
 
@@ -75,7 +76,7 @@
 <ul>
 <li><strong>Okno spożycia:</strong> Gdy tylko wpiszesz rocznik, aplikacja ustawia „Pić od” na <strong>rocznik + 1</strong>. „Pić do” zależy od typu wina i szczepu (czerwone dłużej wytrzymuje niż różowe). Obie wartości możesz zmienić w każdej chwili.</li>
 <li><strong>Zapas, Min i Maks:</strong> Jeśli wpiszesz minimum, aplikacja ostrzeże Cię, gdy zapas spadnie poniżej niego, i zaproponuje dodanie wina do listy życzeń (<a href="#cellar">rozdział 3</a>).</li>
-<li><strong>Własne zdjęcie:</strong> „Zrób / wybierz zdjęcie” dołącza do wina zdjęcie. Zostaje na tym urządzeniu i jest zawarte w kopii JSON, ale nie jest synchronizowane z chmurą.</li>
+<li><strong>Własne zdjęcie:</strong> „Zrób / wybierz zdjęcie” dołącza do wina zdjęcie. AI znajduje butelkę na zdjęciu i przycina obraz ciasno wokół niej (zużywa to jedno wywołanie AI; jeśli nie znaleziono butelki lub AI jest niedostępne, zdjęcie pozostaje bez zmian). Zdjęcie zostaje na tym urządzeniu i jest zawarte w kopii JSON. Gdy pamięć w chmurze jest włączona, dla każdego zdjęcia wybierasz, czy zapisać je „W chmurze” (na wszystkich urządzeniach), czy „Tylko na tym telefonie”.</li>
 </ul>
 <h3>b) Skanuj etykietę (AI)</h3>
 <p>Dotknij <em>Skanuj etykietę (AI)</em> i sfotografuj etykietę na butelce. AI odczytuje nazwę, rocznik, typ, region, kraj i szczep oraz szacuje okno spożycia i temperaturę podawania. Sprawdź wartości i zapisz. Przed pierwszym użyciem aplikacja prosi o Twoją zgodę (<a href="#privacy">rozdział 13</a>).</p>
@@ -104,6 +105,9 @@
 <p>Na dole karty: <em>Edytuj</em>, <em>Wypij</em> i 🗑 (usuwanie wina).</p>
 <h3>Zapas, Min/Maks i lista zakupów</h3>
 <p>Jeśli dla wina wpiszesz minimum (i opcjonalnie maksimum), karta pokazuje „Zapas · Min · Maks” i ostrzega znakiem ⚠, gdy jesteś poniżej niego. Przycisk <em>Do uzupełnienia</em> otwiera <strong>listę zakupów</strong>: znajdują się na niej wszystkie wina poniżej minimum (celem jest maksimum, a jeśli go nie ma – minimum). Listę możesz udostępnić lub skopiować albo dodać wina do listy życzeń.</p>
+<h3>Propozycje dań (AI)</h3>
+<p>Na każdej karcie wina <em>Pasuje do …</em> prosi AI o trzy do czterech dań pasujących do wina (jedno wywołanie AI, zapamiętane na tym urządzeniu). <strong>↻</strong> pobiera nową propozycję; <strong>✕</strong> ponownie ukrywa propozycję – <em>Pasuje do …</em> pokazuje wtedy znów zapamiętaną propozycję, bez nowego wywołania AI.</p>
+<p><em>Co pasuje dziś?</em> w piwniczce: wpisz, co gotujesz, a AI wybierze od jednego do trzech win z twojej własnej piwniczki, najchętniej takich, które warto wypić wkrótce (przekroczone lub u szczytu). Dotknięcie wyniku otwiera wino.</p>
 
 <!-- ───────────────── 4 ───────────────── -->
 <h2 id="drink">4. Picie wina</h2>
@@ -112,6 +116,8 @@
 <ul>
 <li><strong>Z którego miejsca zabrano?</strong> – wybierz miejsce na regale, z którego zabrano butelkę, albo „Butelka bez miejsca”. Miejsce staje się wolne.</li>
 <li><strong>Z kim piłeś?</strong> – imiona Twoich gości (opcjonalnie).</li>
+<li><strong>Co jedzono do wina (opcjonalnie)</strong> – danie, do którego wypito wino.</li>
+<li><strong>Notatka z degustacji (opcjonalnie)</strong> – twoje wrażenia własnymi słowami, w razie chęci ze zdjęciem (zrobionym lub wybranym; AI przycina je do butelki, tak jak własne zdjęcie wina).</li>
 <li><strong>Okazja</strong> – Wiosna, Lato, Jesień, Zima, Urodziny, Impreza lub „Bez okazji” (można wybrać kilka).</li>
 </ul>
 <p><em>Wypij</em> zdejmuje jedną butelkę i tworzy wpis w <a href="#history">Historii</a>. Konfetti i dźwięk uświetniają ten moment (można je wyłączyć w Ustawieniach). Jeśli to <strong>ostatnia butelka</strong>, aplikacja Cię o tym informuje: wino znika wtedy z piwnicy (ale zostaje w Historii).</p>
@@ -159,7 +165,7 @@
 <!-- ───────────────── 7 ───────────────── -->
 <h2 id="history">7. Historia</h2>
 
-<p>Historia zawiera listę wszystkich wypitych przez Ciebie win z datą, winem, wartością, gośćmi i okazją. Możesz filtrować według typu wina i okazji oraz edytować wpis (goście, okazja). Historia zasila zestawienia „Wypite według miesiąca/roku”, wydatki i częstotliwość w Statystykach.</p>
+<p>Historia wymienia wszystkie wypite wina z datą, winem, wartością, gośćmi, okazją, daniem zjedzonym do wina i twoją notatką z degustacji ze zdjęciem (dotknięcie zdjęcia powiększa je). Możesz filtrować według rodzaju wina i okazji oraz edytować wpis (goście, okazja, danie, notatka, zdjęcie). Historia zasila w statystykach zestawienia „Wypite według miesiąca/roku”, wydatki i częstotliwość.</p>
 
 <!-- ───────────────── 8 ───────────────── -->
 <h2 id="wish">8. Lista życzeń</h2>
@@ -197,6 +203,7 @@
 <tr><td>Eksportuj CSV</td><td>Tabela dla Excela lub Numbers</td></tr>
 <tr><td>Eksportuj Excel</td><td>Jako plik .xlsx</td></tr>
 <tr><td>Eksportuj PDF</td><td>Przegląd do wydruku</td></tr>
+<tr><td>Księga piwniczki (PDF)</td><td>Pięknie zaprojektowana księga twojej piwniczki: strona zbiorcza, wina pogrupowane według kraju, sumy stron i suma ogólna – można jej użyć także jako listy inwentarzowej dla ubezpieczyciela (wartości pochodzą z twoich własnych cen)</td></tr>
 <tr><td><strong>Kopia JSON</strong></td><td><strong>Kompletna kopia zapasowa danych</strong> (wina, lista życzeń, historia, regały, nazwa wyświetlana, własne zdjęcia)</td></tr>
 <tr><td>Do schowka</td><td>Skopiuj listę tekstową</td></tr>
 <tr><td>Importuj JSON / CSV / Excel</td><td>Przywróć kopię zapasową lub wczytaj tabelę</td></tr>
@@ -214,6 +221,7 @@
 <li><strong>Konfetti i dźwięk przy piciu:</strong> oba, tylko konfetti albo wyłączone.</li>
 <li><strong>Czcionka:</strong> dziesięć czcionek do wyboru.</li>
 <li><strong>Jednostka temperatury:</strong> °C lub °F (angielski (USA) ustawia °F automatycznie).</li>
+<li><strong>Przypomnienie o oknie spożycia (tylko aplikacja na iPhone’a):</strong> „Wył.” lub „Co tydzień (sobota, godz. 10)”. Raz w tygodniu aplikacja wysyła powiadomienie, ale tylko wtedy, gdy butelki są przekroczone lub u szczytu. Działa to tylko na tym urządzeniu, bez serwera; przy pierwszym użyciu iOS prosi o zgodę na powiadomienia.</li>
 </ul>
 <h3>Miejsce zapisu</h3>
 <p><em>Tylko to urządzenie</em> lub <em>Chmura</em> (kod synchronizacji, <a href="#sync">rozdział 12</a>).</p>
@@ -237,13 +245,13 @@
 <li><strong>Drugie urządzenie:</strong> Ustawienia → Miejsce zapisu → <em>Chmura</em> → wpisz kod (małymi literami, bez spacji) → Połącz. Jeśli urządzenie zawiera już wina, aplikacja pyta, czy połączyć je z danymi z chmury.</li>
 <li>Potem oba urządzenia synchronizują się automatycznie (np. po otwarciu aplikacji); <em>Synchronizuj teraz</em> uruchamia synchronizację ręcznie. Zasada brzmi: <strong>wygrywa ostatnia zmiana</strong>.</li>
 </ol>
-<p>Synchronizowane są wina, lista życzeń, historia, regały i ustawienia, takie jak język i waluta. <strong>Nie są synchronizowane</strong> własne zdjęcia i dane specyficzne dla urządzenia. Każdy, kto zna Twój kod, może zobaczyć Twoje wina – udostępniaj go tylko zaufanym osobom. Miej też kopię JSON.</p>
+<p>Synchronizowane są wina, lista życzeń, historia, regały i ustawienia, takie jak język i waluta. Własne zdjęcia są synchronizowane, gdy pamięć w chmurze jest włączona, a zdjęcie zapisano „W chmurze” (zdjęcia z degustacji trafiają do chmury automatycznie, dopóki pamięć w chmurze jest włączona); dane związane z urządzeniem nigdy nie są synchronizowane. Kto zna twój kod, może zobaczyć twoje wina – udostępniaj go tylko osobom, którym ufasz. Zrób też kopię JSON.</p>
 
 <!-- ───────────────── 13 ───────────────── -->
 <h2 id="privacy">13. AI, prywatność i koszty</h2>
 
 <ul>
-<li><strong>Do czego służy AI?</strong> Skanowanie etykiety, wyszukiwanie wina, szukanie cen i „Zaktualizuj wszystkie wina”. Zdjęcie lub nazwa wina są wysyłane przez nasz serwer do usługi AI (Anthropic, USA) w celu oceny – bez imion i kont. Aplikacja prosi o Twoją zgodę przed pierwszym użyciem.</li>
+<li><strong>Do czego służy AI?</strong> Do skanowania etykiet, wyszukiwania win, szukania cen, „Zaktualizuj wszystkie wina”, propozycji dań („Pasuje do …”, „Co pasuje dziś?”) i przycinania własnych zdjęć do butelki. Przy tym zdjęcie lub nazwa wina (przy propozycji z piwniczki także lista twoich win, bez cen) jest wysyłane przez nasz serwer do usługi AI (Anthropic, USA) w celu oceny – bez imion i kont. Aplikacja prosi o twoją zgodę przed pierwszym użyciem.</li>
 <li><strong>Skan kodu kreskowego</strong> wysyła tylko numer do bezpłatnej bazy produktów i nie zużywa kredytu AI.</li>
 <li><strong>Koszty (aplikacja na iPhone'a):</strong> 50 wywołań AI na instalację jest wliczone w cenę zakupu; więcej można dokupić jako opcjonalny zakup jednorazowy (bez subskrypcji, kredyty nie wygasają). Wszystko inne w aplikacji nie kosztuje nic dodatkowo. Gdy kredyty się wyczerpią, wszystko poza funkcjami AI nadal działa.</li>
 <li><strong>Dane:</strong> Wszystko zostaje na Twoim urządzeniu, dopóki nie włączysz chmury. Bez reklam, bez śledzenia, bez konta użytkownika. Szczegóły w <a href="datenschutz.html">polityce prywatności</a> (po niemiecku).</li>

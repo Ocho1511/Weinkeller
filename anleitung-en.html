@@ -15,11 +15,12 @@
   .back{margin:0 0 6px} .toapp{display:none} @media (display-mode: standalone){.toapp{display:inline}}
   @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
 </style></head><body>
+<!--update-2026-11-27-->
 <p class="back"><span class="toapp"><a href="index.html">← To cellar</a> &nbsp;·&nbsp; </span><a href="support.html">← Back to support</a></p>
 <div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html">Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html" selected>English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
 
 <h1>User guide – Weinkeller</h1>
-<p><small>Updated: 10 November 2026 · App version 2.0</small></p>
+<p><small>As of: 27 November 2026 · App version 2.0</small></p>
 
 <div class="toc">
 
@@ -75,7 +76,7 @@
 <ul>
 <li><strong>Drinking window:</strong> As soon as you enter the vintage, the app sets “Drink from” to <strong>vintage + 1</strong>. “Drink until” depends on wine type and grape (a red keeps longer than a rosé). You can change both at any time.</li>
 <li><strong>Stock, Min and Max:</strong> If you enter a minimum, the app warns you when the stock falls below it and offers to put the wine on the wishlist (<a href="#cellar">section 3</a>).</li>
-<li><strong>Own photo:</strong> “Take / choose photo” attaches a photo to the wine. It stays on this device and is included in the JSON backup, but is not synchronised to the cloud.</li>
+<li><strong>Own photo:</strong> “Take / choose photo” attaches a photo to the wine. The AI finds the bottle in the photo and crops the picture tightly to it (this uses one AI call; if no bottle is found or the AI is unavailable, the photo stays as it is). The photo stays on this device and is included in the JSON backup. With cloud storage switched on, you can choose per photo whether it is saved “In the cloud” (on all devices) or “Only on this phone”.</li>
 </ul>
 <h3>b) Scan label (AI)</h3>
 <p>Tap <em>Scan label (AI)</em> and photograph the bottle label. The AI reads name, vintage, type, region, country and grape and estimates drinking window and serving temperature. Check the values and save. Before the first use the app asks for your consent (<a href="#privacy">section 13</a>).</p>
@@ -104,6 +105,9 @@
 <p>At the bottom of the card: <em>Edit</em>, <em>Drink</em> and 🗑 (delete wine).</p>
 <h3>Stock, Min/Max and the shopping list</h3>
 <p>If you enter a minimum (and optionally a maximum) for a wine, the card shows “Stock · Min · Max” and warns with ⚠ when you are below it. The <em>Reorder</em> button opens the <strong>shopping list</strong>: it lists all wines under their minimum (the target is the maximum, otherwise the minimum). You can share or copy the list, or put the wines on the wishlist.</p>
+<h3>Dish suggestions (AI)</h3>
+<p>On every wine card, <em>Pairs with …</em> asks the AI for three to four dishes that suit the wine (one AI call, remembered on this device). <strong>↻</strong> asks for a new suggestion; <strong>✕</strong> hides the suggestion again – <em>Pairs with …</em> then shows the saved suggestion once more, without a new AI call.</p>
+<p><em>What goes with tonight?</em> in the cellar: enter what you are cooking, and the AI picks one to three wines from your own cellar, preferring wines that should be drunk soon (overdue or at their peak). Tapping a result opens the wine.</p>
 
 <!-- ───────────────── 4 ───────────────── -->
 <h2 id="drink">4. Drinking a wine</h2>
@@ -112,6 +116,8 @@
 <ul>
 <li><strong>Taken from which slot?</strong> – choose the rack slot the bottle came from, or “Bottle not stored”. The slot becomes free.</li>
 <li><strong>Drunk with whom?</strong> – names of your guests (optional).</li>
+<li><strong>Eaten with it (optional)</strong> – the dish you had with the wine.</li>
+<li><strong>Tasting note (optional)</strong> – your impression in your own words, optionally with a photo (taken or chosen; the AI crops it to the bottle, like the own photo of a wine).</li>
 <li><strong>Occasion</strong> – Spring, Summer, Autumn, Winter, Birthday, Party or “Just because” (several allowed).</li>
 </ul>
 <p><em>Drink</em> removes one bottle and creates an entry in the <a href="#history">History</a>. Confetti and sound celebrate it (can be switched off in Setup). If it is the <strong>last bottle</strong>, the app tells you: the wine then disappears from the cellar (but stays in the History).</p>
@@ -159,7 +165,7 @@
 <!-- ───────────────── 7 ───────────────── -->
 <h2 id="history">7. History</h2>
 
-<p>The History lists all wines you have drunk with date, wine, value, guests and occasion. You can filter by wine type and occasion and edit an entry (guests, occasion). The History feeds the evaluations “Drunk per month/year”, the spending and the frequency in the Statistics.</p>
+<p>The history lists all drunk wines with date, wine, value, guests, occasion, the dish eaten with it and your tasting note with photo (tap the photo to enlarge it). You can filter by wine type and occasion and edit an entry (guests, occasion, dish, note, photo). The history feeds the evaluations “Drunk per month/year”, spending and frequency in the statistics.</p>
 
 <!-- ───────────────── 8 ───────────────── -->
 <h2 id="wish">8. Wishlist</h2>
@@ -197,6 +203,7 @@
 <tr><td>Export CSV</td><td>Table for Excel or Numbers</td></tr>
 <tr><td>Export Excel</td><td>As .xlsx file</td></tr>
 <tr><td>Export PDF</td><td>Printable overview</td></tr>
+<tr><td>Cellar book (PDF)</td><td>Nicely designed book of your cellar: summary page, wines grouped by country, page and grand totals – also usable as an inventory list for insurance (values come from your own prices)</td></tr>
 <tr><td><strong>JSON backup</strong></td><td><strong>Complete data backup</strong> (wines, wishlist, history, racks, display name, own photos)</td></tr>
 <tr><td>To clipboard</td><td>Copy a text list</td></tr>
 <tr><td>Import JSON / CSV / Excel</td><td>Restore a backup or read in a table</td></tr>
@@ -214,6 +221,7 @@
 <li><strong>Confetti &amp; sound when drinking:</strong> both, confetti only, or off.</li>
 <li><strong>Font:</strong> ten fonts to choose from.</li>
 <li><strong>Temperature unit:</strong> °C or °F (English (US) sets °F automatically).</li>
+<li><strong>Reminder for drinking windows (iPhone app only):</strong> “Off” or “Weekly (Saturday, 10:00)”. Once a week the app sends a notification, but only if bottles are overdue or at their peak. It runs on this device only, without a server; the first time, iOS asks for permission to send notifications.</li>
 </ul>
 <h3>Storage</h3>
 <p><em>This device only</em> or <em>Cloud</em> (sync code, <a href="#sync">section 12</a>).</p>
@@ -237,13 +245,13 @@
 <li><strong>Second device:</strong> Setup → Storage → <em>Cloud</em> → enter the code (lowercase, no spaces) → Connect. If the device already contains wines, the app asks whether to merge them with the cloud data.</li>
 <li>After that both devices sync automatically (e.g. when the app is opened); <em>Sync now</em> triggers it by hand. The rule is: <strong>the latest change wins</strong>.</li>
 </ol>
-<p>Wines, wishlist, history, racks and settings such as language and currency are synchronised. <strong>Not synchronised</strong> are own photos and device-specific data. Anyone who knows your code can see your wines – only share it with people you trust. Also keep a JSON backup.</p>
+<p>Synchronised are wines, wish list, history, racks and settings such as language and currency. Own photos are synchronised when cloud storage is on and the photo is saved “In the cloud” (tasting photos go to the cloud automatically while cloud storage is on); device-specific details are never synchronised. Whoever knows your code can see your wines – only share it with people you trust. Also keep a JSON backup.</p>
 
 <!-- ───────────────── 13 ───────────────── -->
 <h2 id="privacy">13. AI, privacy and costs</h2>
 
 <ul>
-<li><strong>What is AI used for?</strong> Scan label, look up wine, find prices and “Update all wines”. The photo or the wine name is sent via our server to an AI service (Anthropic, USA) for evaluation – without names or accounts. The app asks for your consent before the first use.</li>
+<li><strong>What is the AI used for?</strong> Scanning labels, looking up wines, searching prices, “Update all wines”, dish suggestions (“Pairs with …”, “What goes with tonight?”) and cropping your own photos to the bottle. For this, the photo or the wine name (for the cellar suggestion also the list of your wines, without prices) is sent via our server to an AI service (Anthropic, USA) for evaluation – without names or accounts. The app asks for your consent before first use.</li>
 <li><strong>Barcode scan</strong> only sends the number to a free product database and costs no AI credit.</li>
 <li><strong>Costs (iPhone app):</strong> 50 AI calls per installation are included in the purchase price; more can be bought as an optional one-time purchase (no subscription, credits do not expire). Everything else in the app costs nothing extra. When the credits are used up, everything except the AI functions keeps working.</li>
 <li><strong>Data:</strong> Everything stays on your device as long as you do not enable the cloud. No ads, no tracking, no user account. Details in the <a href="datenschutz.html">privacy policy</a> (German).</li>
