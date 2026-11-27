@@ -611,6 +611,10 @@ a.wine-type-grape { cursor: pointer; padding: 4px; margin: -4px; }
 .rack-clear-btn { border-color: var(--danger, #c0392b); color: var(--danger, #e57373); }
 .wine-temp, .ripeness-temp { font-size: 12px; font-weight: 600; color: var(--sparkling); margin: 0 0 8px; }
 .wine-pair { margin: 0 0 8px; }
+.taste-box { margin-top: 8px; }
+.taste-box img { max-width: 100%; max-height: 200px; border-radius: 10px; display: block; }
+.hist-note { font-size: 12px; font-style: italic; color: var(--text); margin-top: 4px; line-height: 1.4; white-space: pre-wrap; }
+.hist-thumb { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; margin-top: 6px; cursor: pointer; display: block; }
 .pair-btn, .pair-text { background: none; border: 1px dashed var(--border); border-radius: 12px; color: var(--text-muted); font-family: inherit; font-size: 12px; font-weight: 600; padding: 5px 10px; cursor: pointer; text-align: left; line-height: 1.4; }
 .pair-text { border-style: solid; color: var(--text); }
 .pair-re { color: var(--gold); margin-left: 4px; }
@@ -1934,6 +1938,14 @@ input[type="file"] { display: none; }
       <input id="drink-meal" type="text" maxlength="200" autocomplete="off" placeholder="z.B. Rinderbraten" data-i18n-ph="dm_meal_ph">
     </div>
     <div class="form-group">
+      <label data-i18n="dm_tnote">Verkostungsnotiz (optional)</label>
+      <textarea id="drink-tnote" maxlength="1000" style="height:72px" placeholder="Duft, Geschmack, Eindruck…" data-i18n-ph="dm_tnote_ph"></textarea>
+      <div id="drink-tphoto-box" class="taste-box" style="display:none"></div>
+      <input type="file" id="drink-tphoto-input" accept="image/*" style="display:none" onchange="tastePick('drink', event)">
+      <button type="button" class="scan-btn" style="margin-top:8px" onclick="document.getElementById('drink-tphoto-input').click()" data-i18n="photo_btn">📷  Foto aufnehmen / auswählen</button>
+      <button type="button" class="btn-secondary" id="drink-tphoto-rm" onclick="tasteRemove('drink')" style="display:none;margin-top:8px" data-i18n="photo_remove">Foto entfernen</button>
+    </div>
+    <div class="form-group">
       <label data-i18n="dm_occasion">Anlass</label>
       <div class="occ-wrap" id="drink-occasions">
         <button type="button" class="occ-chip" data-occ="spring" onclick="this.classList.toggle('active')" data-i18n="occ_spring">Frühling</button>
@@ -1965,6 +1977,14 @@ input[type="file"] { display: none; }
     <div class="form-group">
       <label data-i18n="dm_meal">Dazu gegessen (optional)</label>
       <input id="hist-edit-meal" type="text" maxlength="200" autocomplete="off" placeholder="z.B. Rinderbraten" data-i18n-ph="dm_meal_ph">
+    </div>
+    <div class="form-group">
+      <label data-i18n="dm_tnote">Verkostungsnotiz (optional)</label>
+      <textarea id="hist-edit-tnote" maxlength="1000" style="height:72px" placeholder="Duft, Geschmack, Eindruck…" data-i18n-ph="dm_tnote_ph"></textarea>
+      <div id="hist-edit-tphoto-box" class="taste-box" style="display:none"></div>
+      <input type="file" id="hist-edit-tphoto-input" accept="image/*" style="display:none" onchange="tastePick('hist-edit', event)">
+      <button type="button" class="scan-btn" style="margin-top:8px" onclick="document.getElementById('hist-edit-tphoto-input').click()" data-i18n="photo_btn">📷  Foto aufnehmen / auswählen</button>
+      <button type="button" class="btn-secondary" id="hist-edit-tphoto-rm" onclick="tasteRemove('hist-edit')" style="display:none;margin-top:8px" data-i18n="photo_remove">Foto entfernen</button>
     </div>
     <div class="form-group">
       <label data-i18n="dm_occasion">Anlass</label>
@@ -2184,6 +2204,7 @@ function cleanDrunk(arr) {
     location: cleanStr(d.location, 200), price: parsePrice(d.price) || 0,
     rating: Math.min(5, Math.max(0, parseInt(d.rating) || 0)),
     companions: cleanStr(d.companions, 300), meal: cleanStr(d.meal, 200),
+    tnote: cleanStr(d.tnote, 1000), tphoto: ID_RE.test(String(d.tphoto || '')) ? String(d.tphoto) : null, tcloud: !!d.tcloud && ID_RE.test(String(d.tphoto || '')),
     occasions: Array.isArray(d.occasions) ? d.occasions.filter(o => typeof o === 'string' && /^[a-z]{2,20}$/.test(o)).slice(0, 10) : [],
     date: Number.isFinite(Date.parse(d.date)) ? new Date(Date.parse(d.date)).toISOString() : new Date().toISOString()
   }));
@@ -2264,7 +2285,7 @@ let histFilterOcc = 'alle';
 
 function save() { safeSet(STORE_KEY, JSON.stringify(wines)); touchData(); photoGC(); scheduleRemindSoon(); }
 function saveWishes() { safeSet(WISH_KEY, JSON.stringify(wishes)); touchData(); }
-function saveDrunk() { safeSet(DRUNK_KEY, JSON.stringify(drunkWines)); touchData(); }
+function saveDrunk() { safeSet(DRUNK_KEY, JSON.stringify(drunkWines)); touchData(); photoGC(); }
 function saveSettings() { safeSet(SETTINGS_KEY, JSON.stringify(settings)); }
 
 // Daten-Zeitstempel: bei jeder inhaltlichen Änderung neu setzen (nie rückwärts, auch bei falscher Geräteuhr) + (falls Cloud) abgleichen
@@ -2375,10 +2396,9 @@ async function photoCall(op, extra) {
 async function photoSyncCycle() {
   if (!photoCloudOn()) return;
   const remote = new Set((await photoCall('list')).ids || []);
-  const want = wines.filter(w => w.photo && w.photoCloud);
+  const want = wines.filter(w => w.photo && w.photoCloud).map(w => w.photo).concat(drunkWines.filter(d => d.tphoto && d.tcloud).map(d => d.tphoto));
   let got = false;
-  for (const w of want) {
-    const id = w.photo;
+  for (const id of want) {
     if (photoCache.has(id)) {
       if (!remote.has(id)) await photoCall('put', { id, data: photoCache.get(id) });
     } else if (remote.has(id)) {
@@ -2387,7 +2407,7 @@ async function photoSyncCycle() {
     }
   }
   if (wines.length) {
-    const used = new Set(want.map(w => w.photo));
+    const used = new Set(want);
     for (const id of remote) if (!used.has(id)) await photoCall('del', { id });
   }
   if (got) { try { rerenderActive(); } catch (e) {} }
@@ -2733,6 +2753,8 @@ async function photoLoadAll() {
 // Nicht mehr verwendete Fotos löschen (Wein gelöscht, Foto ersetzt oder entfernt)
 function photoGC() {
   const used = new Set(wines.map(w => w.photo).filter(Boolean));
+  drunkWines.forEach(d => { if (d.tphoto) used.add(d.tphoto); });
+  Object.keys(tasteCur).forEach(p => { const c = tasteCur[p]; if (c) { if (c.id) used.add(c.id); if (c.orig) used.add(c.orig); } });
   if (formPhotoPending) used.add(formPhotoPending);
   [...photoCache.keys()].forEach(id => { if (!used.has(id)) photoDel(id); });
 }
@@ -2740,8 +2762,9 @@ async function handlePhotoPick(e) {
   const file = e.target.files[0];
   e.target.value = '';
   if (!file) return;
+  photoBusy('add-modal', true);
   try {
-    const dataUrl = 'data:image/jpeg;base64,' + await imageToBase64(file, 1000);
+    const dataUrl = await photoPrepare(file);
     const id = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     await photoPut(id, dataUrl);
     if (formPhotoPending) photoDel(formPhotoPending);   // ein früher gewähltes, nicht gespeichertes Foto verwerfen
@@ -2750,6 +2773,7 @@ async function handlePhotoPick(e) {
     updateFormPhoto();
     showToast(t('photo_saved'));
   } catch (err) { showToast(t('photo_fail')); }
+  photoBusy('add-modal', false);
 }
 function removeFormPhoto() {
   if (formPhotoPending) { photoDel(formPhotoPending); formPhotoPending = null; }
@@ -2773,9 +2797,117 @@ function showPhoto(id) {
 async function restorePhotos(map, list) {
   if (!map || typeof map !== 'object' || !list) return;
   for (const w of list) {
-    const u = w.photo && map[w.photo];
-    if (typeof u === 'string' && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(u) && u.length < 4000000) { try { await photoPut(w.photo, u); } catch (e) {} }
+    const pid = w.photo || w.tphoto, u = pid && map[pid];
+    if (typeof u === 'string' && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(u) && u.length < 4000000) { try { await photoPut(pid, u); } catch (e) {} }
   }
+}
+// ── Eigene Fotos auf die Flasche zuschneiden (KI findet die Flasche, die App schneidet eng darauf zu; ohne Flasche / ohne KI bleibt das Foto unverändert) ──
+function photoLoadImg(src) { return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('image')); i.src = src; }); }
+async function photoCrop(dataUrl, rect, maxDim) {
+  const img = await photoLoadImg(dataUrl);
+  const r = rect || { x: 0, y: 0, w: img.naturalWidth, h: img.naturalHeight };
+  const sc = Math.min(1, maxDim / Math.max(r.w, r.h));
+  const c = document.createElement('canvas');
+  c.width = Math.max(1, Math.round(r.w * sc)); c.height = Math.max(1, Math.round(r.h * sc));
+  c.getContext('2d').drawImage(img, r.x, r.y, r.w, r.h, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', 0.88);
+}
+// box = [x1, y1, x2, y2] auf einer Skala von 0 bis 1000; liefert den Ausschnitt in Pixeln (mit etwas Rand) oder null, wenn nichts zu beschneiden ist
+function photoFrameRect(box, W, H) {
+  if (!Array.isArray(box) || box.length !== 4) return null;
+  const v = box.map(n => Math.min(1000, Math.max(0, Number(n))));
+  if (v.some(n => !Number.isFinite(n))) return null;
+  let x1 = Math.min(v[0], v[2]) / 1000 * W, x2 = Math.max(v[0], v[2]) / 1000 * W, y1 = Math.min(v[1], v[3]) / 1000 * H, y2 = Math.max(v[1], v[3]) / 1000 * H;
+  const bw = x2 - x1, bh = y2 - y1;
+  if (bw < W * 0.04 || bh < H * 0.15) return null;   // unplausibel klein: der KI-Angabe nicht trauen
+  const mx = bw * 0.10, my = bh * 0.04;
+  x1 = Math.max(0, x1 - mx); x2 = Math.min(W, x2 + mx); y1 = Math.max(0, y1 - my); y2 = Math.min(H, y2 + my);
+  const w = x2 - x1, h = y2 - y1;
+  if (w >= W * 0.94 && h >= H * 0.94) return null;   // Flasche füllt schon das ganze Bild
+  return { x: Math.round(x1), y: Math.round(y1), w: Math.round(w), h: Math.round(h) };
+}
+async function photoBottleBox(dataUrl) {
+  const resp = await aiFetch(SCAN_PROXY_URL, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6', max_tokens: 150,
+      system: 'Du findest Flaschen auf Fotos. Antworte NUR mit einem JSON-Objekt ohne Markdown. Felder: found (true, wenn eine Wein-, Sekt- oder andere Flasche klar zu sehen ist, sonst false) und box (vier ganze Zahlen [x1, y1, x2, y2] von 0 bis 1000, relativ zu Breite und Höhe des Bildes, links oben ist 0,0). Die Box umschließt die auffälligste Flasche vollständig und eng: von der Kapsel oder dem Hals bis zum Boden und von Rand zu Rand der Flasche, ohne Gläser, Tisch oder Hintergrund. Sind mehrere Flaschen zu sehen, umschließe nur die auffälligste.',
+      messages: [{ role: 'user', content: [
+        { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: dataUrl.split(',')[1] } },
+        { type: 'text', text: 'Wo steht die Flasche?' }
+      ] }]
+    })
+  });
+  const info = aiJsonFrom(await aiJson(resp));
+  return info && info.found === true ? info.box : null;
+}
+// Foto aus dem Auswahldialog -> fertige Daten-URL (längste Seite höchstens 1000 px)
+async function photoPrepare(file) {
+  const big = 'data:image/jpeg;base64,' + await imageToBase64(file, 1600);
+  let rect = null;
+  try {
+    showToast(t('photo_framing'));
+    const small = await photoCrop(big, null, 900);
+    const box = await photoBottleBox(small);
+    const img = await photoLoadImg(big);
+    rect = photoFrameRect(box, img.naturalWidth, img.naturalHeight);
+  } catch (e) { rect = null; }   // kein Guthaben/keine Einwilligung/Netz: Foto bleibt, wie es ist
+  return photoCrop(big, rect, 1000);
+}
+// Speichern-Knopf eines Fensters sperren, solange das Foto noch bearbeitet wird (sonst ginge es beim schnellen Speichern verloren)
+function photoBusy(modalId, on) { const b = document.querySelector('#' + modalId + ' .btn-primary, #' + modalId + ' #add-save-btn'); if (b) b.disabled = !!on; }
+// ── Foto zur Verkostungsnotiz (im Trinken-Fenster und beim Bearbeiten eines Historieneintrags) ──
+// tasteCur[Fenster] = { id: gewähltes Foto, orig: Foto, das schon im Eintrag steht, fresh: in dieser Sitzung neu angelegte Fotos }
+var tasteCur = {};
+function tasteOpen(p, id) { tasteCur[p] = { id: id || null, orig: id || null, fresh: [] }; tasteRender(p); }
+function tasteRender(p) {
+  const c = tasteCur[p] || {}, u = c.id && photoCache.get(c.id);
+  const box = document.getElementById(p + '-tphoto-box'), rm = document.getElementById(p + '-tphoto-rm');
+  if (!box || !rm) return;
+  box.innerHTML = u ? '<img src="' + u + '" alt="">' : '';
+  box.style.display = u ? 'block' : 'none';
+  rm.style.display = u ? '' : 'none';
+}
+function tasteDropFresh(c, id) {
+  const i = c.fresh.indexOf(id);
+  if (i >= 0) { c.fresh.splice(i, 1); photoDel(id); }
+}
+async function tastePick(p, e) {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  const c = tasteCur[p] || (tasteCur[p] = { id: null, orig: null, fresh: [] });
+  const modalId = p === 'drink' ? 'drink-modal' : 'hist-edit-modal';
+  photoBusy(modalId, true);
+  try {
+    const dataUrl = await photoPrepare(file);
+    const id = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    await photoPut(id, dataUrl);
+    if (c.id) tasteDropFresh(c, c.id);   // ein in dieser Sitzung zuvor gewähltes Foto verwerfen
+    c.fresh.push(id); c.id = id;
+    tasteRender(p);
+    showToast(t('photo_saved'));
+  } catch (err) { showToast(t('photo_fail')); }
+  photoBusy(modalId, false);
+}
+function tasteRemove(p) {
+  const c = tasteCur[p]; if (!c) return;
+  if (c.id) tasteDropFresh(c, c.id);
+  c.id = null;
+  tasteRender(p);
+}
+// Speichern: liefert die Foto-ID des Eintrags (oder null); ein ersetztes altes Foto räumt photoGC beim Speichern weg
+function tasteCommit(p) {
+  const c = tasteCur[p], id = c ? c.id : null;
+  if (c) c.fresh = c.fresh.filter(x => x === id);
+  tasteCur[p] = null;
+  return id;
+}
+// Fenster ohne Speichern geschlossen: in dieser Sitzung neu gewählte Fotos wieder löschen
+function tasteDiscard(p) {
+  const c = tasteCur[p]; if (!c) return;
+  c.fresh.forEach(id => photoDel(id));
+  tasteCur[p] = null;
 }
 photoLoadAll();
 
@@ -3882,6 +4014,9 @@ de: {
   store_filter: "Einlagern: {name} · {n} Fl. – freies Fach antippen",
   store_filter_off: "Alle anzeigen",
   store_back: "← Zum Keller",
+  photo_framing: "Foto wird auf die Flasche zugeschnitten …",
+  dm_tnote: "Verkostungsnotiz (optional)",
+  dm_tnote_ph: "Duft, Geschmack, Eindruck…",
   dm_meal: "Dazu gegessen (optional)",
   dm_meal_ph: "z.B. Rinderbraten",
   exp_book: "Kellerbuch (PDF)",
@@ -4374,6 +4509,9 @@ en: {
   store_filter: "Store: {name} · {n} btl. – tap a free slot",
   store_filter_off: "Show all",
   store_back: "← To cellar",
+  photo_framing: "Cropping the photo to the bottle …",
+  dm_tnote: "Tasting note (optional)",
+  dm_tnote_ph: "Aroma, taste, impression…",
   dm_meal: "Eaten with it (optional)",
   dm_meal_ph: "e.g. roast beef",
   exp_book: "Cellar book (PDF)",
@@ -4866,6 +5004,9 @@ es: {
   store_filter: "Colocar: {name} · {n} bot. – toca un hueco libre",
   store_filter_off: "Mostrar todo",
   store_back: "← A la bodega",
+  photo_framing: "Recortando la foto a la botella …",
+  dm_tnote: "Nota de cata (opcional)",
+  dm_tnote_ph: "Aroma, sabor, impresión…",
   dm_meal: "Con qué comida (opcional)",
   dm_meal_ph: "p.ej. asado de ternera",
   exp_book: "Libro de bodega (PDF)",
@@ -5358,6 +5499,9 @@ sv: {
   store_filter: "Placera: {name} · {n} fl. – tryck på en ledig plats",
   store_filter_off: "Visa alla",
   store_back: "← Till källaren",
+  photo_framing: "Beskär fotot kring flaskan …",
+  dm_tnote: "Provningsanteckning (valfritt)",
+  dm_tnote_ph: "Doft, smak, intryck…",
   dm_meal: "Vad åt ni till (valfritt)",
   dm_meal_ph: "t.ex. oxstek",
   exp_book: "Källarbok (PDF)",
@@ -5850,6 +5994,9 @@ da: {
   store_filter: "Placér: {name} · {n} fl. – tryk på en ledig plads",
   store_filter_off: "Vis alle",
   store_back: "← Til kælderen",
+  photo_framing: "Beskærer fotoet til flasken …",
+  dm_tnote: "Smagsnote (valgfrit)",
+  dm_tnote_ph: "Duft, smag, indtryk…",
   dm_meal: "Hvad spiste I til (valgfrit)",
   dm_meal_ph: "f.eks. oksesteg",
   exp_book: "Kælderbog (PDF)",
@@ -6342,6 +6489,9 @@ fi: {
   store_filter: "Sijoita: {name} · {n} pul. – napauta vapaata paikkaa",
   store_filter_off: "Näytä kaikki",
   store_back: "← Kellariin",
+  photo_framing: "Rajataan kuva pullon ympärille …",
+  dm_tnote: "Maistelumuistiinpano (valinnainen)",
+  dm_tnote_ph: "Tuoksu, maku, vaikutelma…",
   dm_meal: "Mitä syötiin sen kanssa (valinnainen)",
   dm_meal_ph: "esim. häränpaisti",
   exp_book: "Kellarikirja (PDF)",
@@ -6834,6 +6984,9 @@ ru: {
   store_filter: "Разместить: {name} · {n} бут. – коснитесь свободной ячейки",
   store_filter_off: "Показать все",
   store_back: "← В погреб",
+  photo_framing: "Фото обрезается по бутылке …",
+  dm_tnote: "Заметка о дегустации (необязательно)",
+  dm_tnote_ph: "Аромат, вкус, впечатление…",
   dm_meal: "Что ели к вину (необязательно)",
   dm_meal_ph: "напр. ростбиф",
   exp_book: "Книга погреба (PDF)",
@@ -7326,6 +7479,9 @@ it: {
   store_filter: "Riponi: {name} · {n} bott. – tocca uno scomparto libero",
   store_filter_off: "Mostra tutto",
   store_back: "← Alla cantina",
+  photo_framing: "Ritaglio della foto sulla bottiglia …",
+  dm_tnote: "Nota di degustazione (facoltativa)",
+  dm_tnote_ph: "Profumo, gusto, impressione…",
   dm_meal: "Cosa si è mangiato (facoltativo)",
   dm_meal_ph: "es. arrosto di manzo",
   exp_book: "Libro della cantina (PDF)",
@@ -7818,6 +7974,9 @@ fr: {
   store_filter: "Ranger : {name} · {n} bout. – touchez un emplacement libre",
   store_filter_off: "Tout afficher",
   store_back: "← Vers la cave",
+  photo_framing: "Recadrage de la photo sur la bouteille …",
+  dm_tnote: "Note de dégustation (facultatif)",
+  dm_tnote_ph: "Arôme, goût, impression…",
   dm_meal: "Plat servi avec (facultatif)",
   dm_meal_ph: "ex. rôti de bœuf",
   exp_book: "Livre de cave (PDF)",
@@ -8310,6 +8469,9 @@ pl: {
   store_filter: "Ułóż: {name} · {n} but. – dotknij wolne miejsce",
   store_filter_off: "Pokaż wszystko",
   store_back: "← Do piwnicy",
+  photo_framing: "Przycinanie zdjęcia do butelki …",
+  dm_tnote: "Notatka z degustacji (opcjonalnie)",
+  dm_tnote_ph: "Aromat, smak, wrażenia…",
   dm_meal: "Co jedzono do wina (opcjonalnie)",
   dm_meal_ph: "np. pieczeń wołowa",
   exp_book: "Księga piwniczki (PDF)",
@@ -8802,6 +8964,9 @@ hu: {
   store_filter: "Elhelyezés: {name} · {n} üveg – koppints egy szabad helyre",
   store_filter_off: "Összes mutatása",
   store_back: "← A pincéhez",
+  photo_framing: "A fotó az üvegre vágása …",
+  dm_tnote: "Kóstolási jegyzet (nem kötelező)",
+  dm_tnote_ph: "Illat, íz, benyomás…",
   dm_meal: "Mit ettetek mellé (nem kötelező)",
   dm_meal_ph: "pl. marhasült",
   exp_book: "Pincekönyv (PDF)",
@@ -9294,6 +9459,9 @@ cs: {
   store_filter: "Uložit: {name} · {n} lahví – klepni na volné místo",
   store_filter_off: "Zobrazit vše",
   store_back: "← Do sklepa",
+  photo_framing: "Fotka se ořezává na láhev …",
+  dm_tnote: "Poznámka z degustace (nepovinné)",
+  dm_tnote_ph: "Vůně, chuť, dojem…",
   dm_meal: "Co se k tomu jedlo (nepovinné)",
   dm_meal_ph: "např. hovězí pečeně",
   exp_book: "Kniha sklípku (PDF)",
@@ -9786,6 +9954,9 @@ sk: {
   store_filter: "Uložiť: {name} · {n} fliaš – ťukni na voľné miesto",
   store_filter_off: "Zobraziť všetko",
   store_back: "← Do pivnice",
+  photo_framing: "Fotka sa orezáva na fľašu …",
+  dm_tnote: "Poznámka z degustácie (nepovinné)",
+  dm_tnote_ph: "Vôňa, chuť, dojem…",
   dm_meal: "Čo sa k tomu jedlo (nepovinné)",
   dm_meal_ph: "napr. hovädzia pečeň",
   exp_book: "Kniha pivnice (PDF)",
@@ -10278,6 +10449,9 @@ ro: {
   store_filter: "Așază: {name} · {n} stic. – atinge un loc liber",
   store_filter_off: "Arată tot",
   store_back: "← La pivniță",
+  photo_framing: "Se decupează fotografia pe sticlă …",
+  dm_tnote: "Notă de degustare (opțional)",
+  dm_tnote_ph: "Aromă, gust, impresie…",
   dm_meal: "Ce s-a mâncat alături (opțional)",
   dm_meal_ph: "ex. friptură de vită",
   exp_book: "Cartea pivniței (PDF)",
@@ -10770,6 +10944,9 @@ hr: {
   store_filter: "Pohrani: {name} · {n} boc. – dodirni slobodno mjesto",
   store_filter_off: "Prikaži sve",
   store_back: "← U podrum",
+  photo_framing: "Fotografija se obrezuje na bocu …",
+  dm_tnote: "Bilješka s kušanja (neobavezno)",
+  dm_tnote_ph: "Miris, okus, dojam…",
   dm_meal: "Što se jelo uz vino (neobavezno)",
   dm_meal_ph: "npr. goveđi pečenj",
   exp_book: "Knjiga podruma (PDF)",
@@ -11262,6 +11439,9 @@ pt: {
   store_filter: "Arrumar: {name} · {n} gar. – toca num lugar livre",
   store_filter_off: "Mostrar tudo",
   store_back: "← Para a adega",
+  photo_framing: "A recortar a foto na garrafa …",
+  dm_tnote: "Nota de prova (opcional)",
+  dm_tnote_ph: "Aroma, sabor, impressão…",
   dm_meal: "O que se comeu com ele (opcional)",
   dm_meal_ph: "ex. assado de vaca",
   exp_book: "Livro da garrafeira (PDF)",
@@ -11754,6 +11934,9 @@ no: {
   store_filter: "Plasser: {name} · {n} fl. – trykk på en ledig plass",
   store_filter_off: "Vis alle",
   store_back: "← Til kjelleren",
+  photo_framing: "Beskjærer bildet rundt flasken …",
+  dm_tnote: "Smaksnotat (valgfritt)",
+  dm_tnote_ph: "Duft, smak, inntrykk…",
   dm_meal: "Hva spiste dere til (valgfritt)",
   dm_meal_ph: "f.eks. oksestek",
   exp_book: "Kjellerbok (PDF)",
@@ -12246,6 +12429,9 @@ nl: {
   store_filter: "Opbergen: {name} · {n} fl. – tik op een vrij vak",
   store_filter_off: "Toon alles",
   store_back: "← Naar de kelder",
+  photo_framing: "Foto wordt bijgesneden op de fles …",
+  dm_tnote: "Proefnotitie (optioneel)",
+  dm_tnote_ph: "Geur, smaak, indruk…",
   dm_meal: "Wat er bij gegeten is (optioneel)",
   dm_meal_ph: "bijv. rosbief",
   exp_book: "Kelderboek (PDF)",
@@ -12738,6 +12924,9 @@ el: {
   store_filter: "Τοποθέτηση: {name} · {n} φιάλ. – πατήστε μια ελεύθερη θέση",
   store_filter_off: "Εμφάνιση όλων",
   store_back: "← Στο κελάρι",
+  photo_framing: "Περικοπή της φωτογραφίας στο μπουκάλι …",
+  dm_tnote: "Σημείωση γευστικής δοκιμής (προαιρετικό)",
+  dm_tnote_ph: "Άρωμα, γεύση, εντύπωση…",
   dm_meal: "Τι φάγατε μαζί (προαιρετικό)",
   dm_meal_ph: "π.χ. ψητό βοδινό",
   exp_book: "Βιβλίο κελαριού (PDF)",
@@ -13230,6 +13419,9 @@ uk: {
   store_filter: "Розмістити: {name} · {n} пл. – торкніться вільного місця",
   store_filter_off: "Показати все",
   store_back: "← До погреба",
+  photo_framing: "Фото обрізається за пляшкою …",
+  dm_tnote: "Нотатка про дегустацію (необов’язково)",
+  dm_tnote_ph: "Аромат, смак, враження…",
   dm_meal: "Що їли до вина (необов’язково)",
   dm_meal_ph: "напр. ростбіф",
   exp_book: "Книга погреба (PDF)",
@@ -13722,6 +13914,9 @@ ja: {
   store_filter: "配置: {name} · {n}本 – 空いている場所をタップ",
   store_filter_off: "すべて表示",
   store_back: "← セラーへ戻る",
+  photo_framing: "ボトルに合わせて写真をトリミング中 …",
+  dm_tnote: "テイスティングメモ（任意）",
+  dm_tnote_ph: "香り、味わい、印象…",
   dm_meal: "合わせた料理（任意）",
   dm_meal_ph: "例：ローストビーフ",
   exp_book: "セラーブック（PDF）",
@@ -14214,6 +14409,9 @@ ko: {
   store_filter: "보관: {name} · {n}병 – 빈 칸을 탭하세요",
   store_filter_off: "모두 보기",
   store_back: "← 셀러로",
+  photo_framing: "병에 맞춰 사진을 자르는 중 …",
+  dm_tnote: "테이스팅 노트(선택)",
+  dm_tnote_ph: "향, 맛, 인상…",
   dm_meal: "함께 먹은 음식(선택)",
   dm_meal_ph: "예: 로스트비프",
   exp_book: "셀러북(PDF)",
@@ -14706,6 +14904,9 @@ zh: {
   store_filter: "存放：{name} · {n} 瓶 – 请点按空位",
   store_filter_off: "显示全部",
   store_back: "← 返回酒窖",
+  photo_framing: "正在按酒瓶裁剪照片 …",
+  dm_tnote: "品鉴笔记（可选）",
+  dm_tnote_ph: "香气、口感、印象…",
   dm_meal: "搭配的菜肴（可选）",
   dm_meal_ph: "例如：烤牛肉",
   exp_book: "酒窖册（PDF）",
@@ -15198,6 +15399,9 @@ hi: {
   store_filter: "रखें: {name} · {n} बोतल – खाली स्थान पर टैप करें",
   store_filter_off: "सब दिखाएँ",
   store_back: "← सेलर पर",
+  photo_framing: "फ़ोटो को बोतल के अनुसार काटा जा रहा है …",
+  dm_tnote: "टेस्टिंग नोट (वैकल्पिक)",
+  dm_tnote_ph: "सुगंध, स्वाद, अनुभव…",
   dm_meal: "साथ में क्या खाया (वैकल्पिक)",
   dm_meal_ph: "जैसे भुना हुआ बीफ़",
   exp_book: "सेलर बुक (PDF)",
@@ -16190,6 +16394,8 @@ function drinkOne(id, presetRef) {
   drinkId = id;
   document.getElementById('drink-with').value = '';
   document.getElementById('drink-meal').value = '';
+  document.getElementById('drink-tnote').value = '';
+  tasteOpen('drink', null);
   document.querySelectorAll('#drink-occasions .occ-chip').forEach(c => c.classList.remove('active'));
   document.getElementById('drink-modal-wine').textContent = w.name + (w.year ? ' · ' + w.year : '');
   const note = document.getElementById('drink-modal-note');
@@ -16204,6 +16410,7 @@ function confirmDrink() {
   if (!w) { closeModal('drink-modal'); return; }
   const companions = document.getElementById('drink-with').value.trim();
   const meal = document.getElementById('drink-meal').value.trim().slice(0, 200);
+  const tnote = document.getElementById('drink-tnote').value.trim().slice(0, 1000), tphoto = tasteCommit('drink');
   const occasions = [...document.querySelectorAll('#drink-occasions .occ-chip.active')].map(c => c.getAttribute('data-occ'));
   const ref = drinkSlotRef; drinkSlotRef = null;
   const rr = ref && rackById(ref.rack);
@@ -16218,7 +16425,7 @@ function confirmDrink() {
     }
     if ((w.placements||[]).length > w.count) setPlacements(w, validPlacements(w));
   }
-  recordDrunk(w, companions, occasions, where, meal);
+  recordDrunk(w, companions, occasions, where, meal, tnote, tphoto);
   save(); saveDrunk();
   closeModal('drink-modal');
   if (lvlSheetOpen()) renderLevelSheet();
@@ -16232,13 +16439,13 @@ function confirmDrink() {
   if (lowRows.length) setTimeout(() => offerRestock(w, lowRows[0]), 700);
 }
 
-function recordDrunk(w, companions, occasions, locText, meal) {
+function recordDrunk(w, companions, occasions, locText, meal, tnote, tphoto) {
   drunkWines.push({
     id: Date.now().toString() + Math.random().toString(36).slice(2,7),
     name: w.name, year: w.year||null, type: w.type||'other',
     region: w.region||'', country: w.country||'', grape: w.grape||'', location: locText != null ? locText : formatLocation(w),
     price: w.price||0, rating: w.rating||0,
-    companions: companions||'', meal: meal||'', occasions: occasions||[],
+    companions: companions||'', meal: meal||'', tnote: tnote||'', tphoto: tphoto||null, tcloud: !!tphoto && photoCloudOn(), occasions: occasions||[],
     date: new Date().toISOString()
   });
 }
@@ -16387,7 +16594,7 @@ function openAddModal() {
   document.getElementById('add-modal').classList.add('show');
 }
 
-function closeModal(id) { if (id === 'add-modal') { storeFromScan = false; const sb = document.getElementById('add-save-btn'); if (sb) { sb.dataset.i18n = 'btn_save'; sb.textContent = t('btn_save'); } formToken++; if (formPhotoPending) { photoDel(formPhotoPending); formPhotoPending = null; } } document.getElementById(id).classList.remove('show'); }
+function closeModal(id) { if (id === 'drink-modal') tasteDiscard('drink'); if (id === 'hist-edit-modal') tasteDiscard('hist-edit'); if (id === 'add-modal') { storeFromScan = false; const sb = document.getElementById('add-save-btn'); if (sb) { sb.dataset.i18n = 'btn_save'; sb.textContent = t('btn_save'); } formToken++; if (formPhotoPending) { photoDel(formPhotoPending); formPhotoPending = null; } } document.getElementById(id).classList.remove('show'); }
 
 // Fenster per Wischen nach unten schließen (wie iOS-Sheets). Gilt nur am Griff und am oberen Rand des Fensters (und nur ganz oben im Fenster),
 // damit das Scrollen im Fenster nie versehentlich schließt. Das Fenster folgt dem Finger, bei zu kurzem Zug schnappt es zurück.
@@ -17055,7 +17262,7 @@ function renderHistory() {
       const d = dt.toLocaleDateString(dateLocale());
       const time = dt.toLocaleTimeString(dateLocale(), {hour:'2-digit', minute:'2-digit'});
       html += `<div class="stats-card" onclick="editHistory('${w.id}')" style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:12px;cursor:pointer">
-        <div><div style="font-size:13px">${esc(w.name)} <span style="font-size:11px;color:var(--text-dim)">✏️</span></div><div style="font-size:11px;color:var(--text-muted)">${w.year||''}${w.grape?' · '+esc(w.grape):''}${w.location?' · 📍 '+esc(w.location):''}${w.companions?' · 👥 '+esc(w.companions):''}${w.meal?' · 🍽 '+esc(w.meal):''}${(w.occasions&&w.occasions.length)?' · 🎉 '+esc(occLabels(w.occasions)):''}</div></div>
+        <div><div style="font-size:13px">${esc(w.name)} <span style="font-size:11px;color:var(--text-dim)">✏️</span></div><div style="font-size:11px;color:var(--text-muted)">${w.year||''}${w.grape?' · '+esc(w.grape):''}${w.location?' · 📍 '+esc(w.location):''}${w.companions?' · 👥 '+esc(w.companions):''}${w.meal?' · 🍽 '+esc(w.meal):''}${(w.occasions&&w.occasions.length)?' · 🎉 '+esc(occLabels(w.occasions)):''}</div>${w.tnote?'<div class="hist-note">'+esc(w.tnote)+'</div>':''}${(w.tphoto&&photoCache.has(w.tphoto))?'<img class="hist-thumb" loading="lazy" alt="" src="'+photoCache.get(w.tphoto)+'" onclick="event.stopPropagation();showPhoto(\''+esc(w.tphoto)+'\')">':''}</div>
         <div style="font-size:11px;color:var(--text-muted);white-space:nowrap;text-align:right">${d}<br>${time}</div>
       </div>`;
     });
@@ -17071,6 +17278,8 @@ function editHistory(id) {
   document.getElementById('hist-edit-wine').textContent = w.name + (w.year ? ' · ' + w.year : '');
   document.getElementById('hist-edit-with').value = w.companions || '';
   document.getElementById('hist-edit-meal').value = w.meal || '';
+  document.getElementById('hist-edit-tnote').value = w.tnote || '';
+  tasteOpen('hist-edit', w.tphoto || null);
   document.querySelectorAll('#hist-edit-occasions .occ-chip').forEach(c =>
     c.classList.toggle('active', (w.occasions||[]).includes(c.getAttribute('data-occ'))));
   document.getElementById('hist-edit-modal').classList.add('show');
@@ -17080,6 +17289,9 @@ function saveHistoryEdit() {
   if (!w) { closeModal('hist-edit-modal'); return; }
   w.companions = document.getElementById('hist-edit-with').value.trim();
   w.meal = document.getElementById('hist-edit-meal').value.trim().slice(0, 200);
+  w.tnote = document.getElementById('hist-edit-tnote').value.trim().slice(0, 1000);
+  const prevPhoto = w.tphoto || null, newPhoto = tasteCommit('hist-edit');
+  w.tphoto = newPhoto; w.tcloud = !!newPhoto && (newPhoto === prevPhoto ? !!w.tcloud : photoCloudOn());
   w.occasions = [...document.querySelectorAll('#hist-edit-occasions .occ-chip.active')].map(c => c.getAttribute('data-occ'));
   saveDrunk();
   closeModal('hist-edit-modal');
@@ -18699,7 +18911,7 @@ async function exportPDF() {
 }
 
 async function exportJSON() {
-  const backup = { app: 'weinkeller', version: 2, dv: 2, exportedAt: new Date().toISOString(), wines, wishes, drunkWines, racks: settings.racks || [], cellars: settings.cellars || [], owner: settings.owner || '', photos: Object.fromEntries(wines.filter(w => w.photo && photoCache.has(w.photo)).map(w => [w.photo, photoCache.get(w.photo)])) };
+  const backup = { app: 'weinkeller', version: 2, dv: 2, exportedAt: new Date().toISOString(), wines, wishes, drunkWines, racks: settings.racks || [], cellars: settings.cellars || [], owner: settings.owner || '', photos: Object.fromEntries(wines.map(w => w.photo).concat(drunkWines.map(d => d.tphoto)).filter(id => id && photoCache.has(id)).map(id => [id, photoCache.get(id)])) };
   try {
     await saveFile('weinkeller_backup.json', new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json;charset=utf-8' }));
     showToast(t('toast_backup'));
@@ -18728,7 +18940,7 @@ function importJSON(e) {
           !confirm(t('import_replace_confirm', { cur: wines.length, n: nw ? nw.length : wines.length }))) { input.value = ''; return; }
       if (nw) { wines = nw; save(); restorePhotos(data.photos, nw).then(() => { try { rerenderActive(); } catch (e) {} }); }
       if (nwish) { wishes = nwish; saveWishes(); }
-      if (nd) { drunkWines = nd; saveDrunk(); }
+      if (nd) { drunkWines = nd; saveDrunk(); restorePhotos(data.photos, nd).then(() => { try { rerenderActive(); } catch (e) {} }); }
       if (Array.isArray(data.racks)) { settings.cellars = cleanCellars(data.cellars); settings.racks = cleanRacks(data.racks); fixRackCellars(); saveSettings(); }
       if (typeof data.owner === 'string') { settings.owner = cleanStr(data.owner, 60); saveSettings(); }
       renderKeller();
