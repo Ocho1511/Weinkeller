@@ -1308,6 +1308,13 @@ input[type="file"] { display: none; }
         <div class="desc" data-i18n="exp_pdf_d">Druckfähige Übersicht</div>
       </div>
     </div>
+    <div class="export-card" onclick="exportBook()">
+      <div class="export-icon">📒</div>
+      <div class="export-info">
+        <div class="title" data-i18n="exp_book">Kellerbuch (PDF)</div>
+        <div class="desc" data-i18n="exp_book_d">Schön gestaltet, auch als Inventarliste für die Versicherung</div>
+      </div>
+    </div>
     <div class="export-card" onclick="exportJSON()">
       <div class="export-icon">💾</div>
       <div class="export-info">
@@ -1923,6 +1930,10 @@ input[type="file"] { display: none; }
       <input id="drink-with" type="text" placeholder="z.B. Anna, Ben" data-i18n-ph="dm_with_ph">
     </div>
     <div class="form-group">
+      <label data-i18n="dm_meal">Dazu gegessen (optional)</label>
+      <input id="drink-meal" type="text" maxlength="200" autocomplete="off" placeholder="z.B. Rinderbraten" data-i18n-ph="dm_meal_ph">
+    </div>
+    <div class="form-group">
       <label data-i18n="dm_occasion">Anlass</label>
       <div class="occ-wrap" id="drink-occasions">
         <button type="button" class="occ-chip" data-occ="spring" onclick="this.classList.toggle('active')" data-i18n="occ_spring">Frühling</button>
@@ -1950,6 +1961,10 @@ input[type="file"] { display: none; }
     <div class="form-group">
       <label data-i18n="dm_with">Mit wem getrunken?</label>
       <input id="hist-edit-with" type="text" placeholder="z.B. Anna, Ben" data-i18n-ph="dm_with_ph">
+    </div>
+    <div class="form-group">
+      <label data-i18n="dm_meal">Dazu gegessen (optional)</label>
+      <input id="hist-edit-meal" type="text" maxlength="200" autocomplete="off" placeholder="z.B. Rinderbraten" data-i18n-ph="dm_meal_ph">
     </div>
     <div class="form-group">
       <label data-i18n="dm_occasion">Anlass</label>
@@ -2168,7 +2183,7 @@ function cleanDrunk(arr) {
     region: cleanStr(d.region, 120), country: cleanStr(d.country, 120), grape: cleanStr(d.grape, 120),
     location: cleanStr(d.location, 200), price: parsePrice(d.price) || 0,
     rating: Math.min(5, Math.max(0, parseInt(d.rating) || 0)),
-    companions: cleanStr(d.companions, 300),
+    companions: cleanStr(d.companions, 300), meal: cleanStr(d.meal, 200),
     occasions: Array.isArray(d.occasions) ? d.occasions.filter(o => typeof o === 'string' && /^[a-z]{2,20}$/.test(o)).slice(0, 10) : [],
     date: Number.isFinite(Date.parse(d.date)) ? new Date(Date.parse(d.date)).toISOString() : new Date().toISOString()
   }));
@@ -3867,6 +3882,17 @@ de: {
   store_filter: "Einlagern: {name} · {n} Fl. – freies Fach antippen",
   store_filter_off: "Alle anzeigen",
   store_back: "← Zum Keller",
+  dm_meal: "Dazu gegessen (optional)",
+  dm_meal_ph: "z.B. Rinderbraten",
+  exp_book: "Kellerbuch (PDF)",
+  exp_book_d: "Schön gestaltet, auch als Inventarliste für die Versicherung",
+  book_title: "Kellerbuch",
+  book_sub: "Stand {d}",
+  book_loc: "Lagerort",
+  book_page: "Seite {n} von {m}",
+  book_sum: "Summe dieser Seite",
+  book_total: "Gesamtsumme",
+  book_note: "Die Werte beruhen auf deinen eigenen Preisangaben (Preis je Flasche × Anzahl). Weine ohne Preis gehen nicht in die Summen ein. Es ist keine Schätzung durch Dritte.",
   pair_btn: "🍽 Passt zu …",
   pair_loading: "Die KI sucht passende Speisen …",
   pair_fail: "Keine Empfehlung erhalten. Bitte später erneut versuchen.",
@@ -4348,6 +4374,17 @@ en: {
   store_filter: "Store: {name} · {n} btl. – tap a free slot",
   store_filter_off: "Show all",
   store_back: "← To cellar",
+  dm_meal: "Eaten with it (optional)",
+  dm_meal_ph: "e.g. roast beef",
+  exp_book: "Cellar book (PDF)",
+  exp_book_d: "Nicely designed, also usable as an inventory list for insurance",
+  book_title: "Cellar book",
+  book_sub: "As of {d}",
+  book_loc: "Location",
+  book_page: "Page {n} of {m}",
+  book_sum: "Total of this page",
+  book_total: "Grand total",
+  book_note: "The values are based on your own price entries (price per bottle × number of bottles). Wines without a price are not included in the totals. This is not an appraisal by a third party.",
   pair_btn: "🍽 Pairs with …",
   pair_loading: "The AI is looking for matching dishes …",
   pair_fail: "No suggestion received. Please try again later.",
@@ -4829,6 +4866,17 @@ es: {
   store_filter: "Colocar: {name} · {n} bot. – toca un hueco libre",
   store_filter_off: "Mostrar todo",
   store_back: "← A la bodega",
+  dm_meal: "Con qué comida (opcional)",
+  dm_meal_ph: "p.ej. asado de ternera",
+  exp_book: "Libro de bodega (PDF)",
+  exp_book_d: "Con buen diseño, también como inventario para el seguro",
+  book_title: "Libro de bodega",
+  book_sub: "A fecha de {d}",
+  book_loc: "Ubicación",
+  book_page: "Página {n} de {m}",
+  book_sum: "Suma de esta página",
+  book_total: "Suma total",
+  book_note: "Los valores se basan en tus propios precios (precio por botella × número de botellas). Los vinos sin precio no se incluyen en las sumas. No es una tasación de terceros.",
   pair_btn: "🍽 Combina con …",
   pair_loading: "La IA busca platos que combinen …",
   pair_fail: "No se recibió ninguna sugerencia. Inténtalo de nuevo más tarde.",
@@ -5310,6 +5358,17 @@ sv: {
   store_filter: "Placera: {name} · {n} fl. – tryck på en ledig plats",
   store_filter_off: "Visa alla",
   store_back: "← Till källaren",
+  dm_meal: "Vad åt ni till (valfritt)",
+  dm_meal_ph: "t.ex. oxstek",
+  exp_book: "Källarbok (PDF)",
+  exp_book_d: "Snyggt utformad, kan även användas som inventarielista för försäkringen",
+  book_title: "Källarbok",
+  book_sub: "Per {d}",
+  book_loc: "Plats",
+  book_page: "Sida {n} av {m}",
+  book_sum: "Summa för sidan",
+  book_total: "Totalsumma",
+  book_note: "Värdena bygger på dina egna prisuppgifter (pris per flaska × antal). Viner utan pris ingår inte i summorna. Det är ingen värdering av tredje part.",
   pair_btn: "🍽 Passar till …",
   pair_loading: "AI:n letar efter passande rätter …",
   pair_fail: "Inget förslag mottogs. Försök igen senare.",
@@ -5791,6 +5850,17 @@ da: {
   store_filter: "Placér: {name} · {n} fl. – tryk på en ledig plads",
   store_filter_off: "Vis alle",
   store_back: "← Til kælderen",
+  dm_meal: "Hvad spiste I til (valgfrit)",
+  dm_meal_ph: "f.eks. oksesteg",
+  exp_book: "Kælderbog (PDF)",
+  exp_book_d: "Flot udformet, kan også bruges som inventarliste til forsikringen",
+  book_title: "Kælderbog",
+  book_sub: "Pr. {d}",
+  book_loc: "Placering",
+  book_page: "Side {n} af {m}",
+  book_sum: "Sum for denne side",
+  book_total: "Samlet sum",
+  book_note: "Værdierne bygger på dine egne prisangivelser (pris pr. flaske × antal). Vine uden pris indgår ikke i summerne. Det er ikke en vurdering fra tredjepart.",
   pair_btn: "🍽 Passer til …",
   pair_loading: "AI’en leder efter passende retter …",
   pair_fail: "Intet forslag modtaget. Prøv igen senere.",
@@ -6272,6 +6342,17 @@ fi: {
   store_filter: "Sijoita: {name} · {n} pul. – napauta vapaata paikkaa",
   store_filter_off: "Näytä kaikki",
   store_back: "← Kellariin",
+  dm_meal: "Mitä syötiin sen kanssa (valinnainen)",
+  dm_meal_ph: "esim. häränpaisti",
+  exp_book: "Kellarikirja (PDF)",
+  exp_book_d: "Siististi muotoiltu, käy myös vakuutuksen irtaimistoluettelona",
+  book_title: "Kellarikirja",
+  book_sub: "Tilanne {d}",
+  book_loc: "Sijainti",
+  book_page: "Sivu {n} / {m}",
+  book_sum: "Tämän sivun summa",
+  book_total: "Kokonaissumma",
+  book_note: "Arvot perustuvat omiin hintatietoihisi (hinta pulloa kohti × pullomäärä). Viinejä, joilla ei ole hintaa, ei lasketa mukaan summiin. Kyse ei ole kolmannen osapuolen arviosta.",
   pair_btn: "🍽 Sopii seuraan …",
   pair_loading: "Tekoäly etsii sopivia ruokia …",
   pair_fail: "Ehdotusta ei saatu. Yritä myöhemmin uudelleen.",
@@ -6753,6 +6834,17 @@ ru: {
   store_filter: "Разместить: {name} · {n} бут. – коснитесь свободной ячейки",
   store_filter_off: "Показать все",
   store_back: "← В погреб",
+  dm_meal: "Что ели к вину (необязательно)",
+  dm_meal_ph: "напр. ростбиф",
+  exp_book: "Книга погреба (PDF)",
+  exp_book_d: "Красиво оформлена, подходит и как опись для страховки",
+  book_title: "Книга погреба",
+  book_sub: "По состоянию на {d}",
+  book_loc: "Место",
+  book_page: "Страница {n} из {m}",
+  book_sum: "Сумма на странице",
+  book_total: "Общая сумма",
+  book_note: "Значения основаны на ваших собственных ценах (цена за бутылку × количество). Вина без цены в суммы не входят. Это не оценка третьей стороной.",
   pair_btn: "🍽 Подходит к …",
   pair_loading: "ИИ подбирает подходящие блюда …",
   pair_fail: "Рекомендация не получена. Попробуйте позже.",
@@ -7234,6 +7326,17 @@ it: {
   store_filter: "Riponi: {name} · {n} bott. – tocca uno scomparto libero",
   store_filter_off: "Mostra tutto",
   store_back: "← Alla cantina",
+  dm_meal: "Cosa si è mangiato (facoltativo)",
+  dm_meal_ph: "es. arrosto di manzo",
+  exp_book: "Libro della cantina (PDF)",
+  exp_book_d: "Ben curato, utilizzabile anche come inventario per l’assicurazione",
+  book_title: "Libro della cantina",
+  book_sub: "Aggiornato al {d}",
+  book_loc: "Posizione",
+  book_page: "Pagina {n} di {m}",
+  book_sum: "Somma di questa pagina",
+  book_total: "Somma totale",
+  book_note: "I valori si basano sui tuoi prezzi (prezzo per bottiglia × numero di bottiglie). I vini senza prezzo non rientrano nelle somme. Non è una stima di terzi.",
   pair_btn: "🍽 Si abbina a …",
   pair_loading: "L’IA cerca piatti abbinabili …",
   pair_fail: "Nessun suggerimento ricevuto. Riprova più tardi.",
@@ -7715,6 +7818,17 @@ fr: {
   store_filter: "Ranger : {name} · {n} bout. – touchez un emplacement libre",
   store_filter_off: "Tout afficher",
   store_back: "← Vers la cave",
+  dm_meal: "Plat servi avec (facultatif)",
+  dm_meal_ph: "ex. rôti de bœuf",
+  exp_book: "Livre de cave (PDF)",
+  exp_book_d: "Joliment présenté, utilisable aussi comme inventaire pour l’assurance",
+  book_title: "Livre de cave",
+  book_sub: "En date du {d}",
+  book_loc: "Emplacement",
+  book_page: "Page {n} sur {m}",
+  book_sum: "Total de cette page",
+  book_total: "Total général",
+  book_note: "Les valeurs reposent sur vos propres prix (prix par bouteille × nombre de bouteilles). Les vins sans prix ne figurent pas dans les totaux. Ce n’est pas une estimation par un tiers.",
   pair_btn: "🍽 Se marie avec …",
   pair_loading: "L’IA cherche des plats qui s’accordent …",
   pair_fail: "Aucune suggestion reçue. Réessayez plus tard.",
@@ -8196,6 +8310,17 @@ pl: {
   store_filter: "Ułóż: {name} · {n} but. – dotknij wolne miejsce",
   store_filter_off: "Pokaż wszystko",
   store_back: "← Do piwnicy",
+  dm_meal: "Co jedzono do wina (opcjonalnie)",
+  dm_meal_ph: "np. pieczeń wołowa",
+  exp_book: "Księga piwniczki (PDF)",
+  exp_book_d: "Ładnie opracowana, nadaje się też jako wykaz do ubezpieczenia",
+  book_title: "Księga piwniczki",
+  book_sub: "Stan na {d}",
+  book_loc: "Miejsce",
+  book_page: "Strona {n} z {m}",
+  book_sum: "Suma na tej stronie",
+  book_total: "Suma ogółem",
+  book_note: "Wartości opierają się na Twoich własnych cenach (cena za butelkę × liczba butelek). Wina bez ceny nie wchodzą do sum. To nie jest wycena osoby trzeciej.",
   pair_btn: "🍽 Pasuje do …",
   pair_loading: "AI szuka pasujących dań …",
   pair_fail: "Nie otrzymano propozycji. Spróbuj ponownie później.",
@@ -8677,6 +8802,17 @@ hu: {
   store_filter: "Elhelyezés: {name} · {n} üveg – koppints egy szabad helyre",
   store_filter_off: "Összes mutatása",
   store_back: "← A pincéhez",
+  dm_meal: "Mit ettetek mellé (nem kötelező)",
+  dm_meal_ph: "pl. marhasült",
+  exp_book: "Pincekönyv (PDF)",
+  exp_book_d: "Szépen kialakított, biztosításhoz leltárként is használható",
+  book_title: "Pincekönyv",
+  book_sub: "Állapot: {d}",
+  book_loc: "Hely",
+  book_page: "{n}. oldal / {m}",
+  book_sum: "Az oldal összege",
+  book_total: "Végösszeg",
+  book_note: "Az értékek a saját ármegadásaidon alapulnak (palackonkénti ár × darabszám). Az ár nélküli borok nem szerepelnek az összegekben. Nem harmadik fél becslése.",
   pair_btn: "🍽 Illik hozzá …",
   pair_loading: "A mesterséges intelligencia illő ételeket keres …",
   pair_fail: "Nem érkezett javaslat. Próbáld újra később.",
@@ -9158,6 +9294,17 @@ cs: {
   store_filter: "Uložit: {name} · {n} lahví – klepni na volné místo",
   store_filter_off: "Zobrazit vše",
   store_back: "← Do sklepa",
+  dm_meal: "Co se k tomu jedlo (nepovinné)",
+  dm_meal_ph: "např. hovězí pečeně",
+  exp_book: "Kniha sklípku (PDF)",
+  exp_book_d: "Pěkně zpracovaná, hodí se i jako soupis pro pojištění",
+  book_title: "Kniha sklípku",
+  book_sub: "Stav k {d}",
+  book_loc: "Umístění",
+  book_page: "Strana {n} z {m}",
+  book_sum: "Součet na této straně",
+  book_total: "Celkový součet",
+  book_note: "Hodnoty vycházejí z vašich vlastních cen (cena za láhev × počet). Vína bez ceny se do součtů nezapočítávají. Nejde o odhad třetí strany.",
   pair_btn: "🍽 Hodí se k …",
   pair_loading: "AI hledá vhodná jídla …",
   pair_fail: "Doporučení nebylo získáno. Zkuste to později.",
@@ -9639,6 +9786,17 @@ sk: {
   store_filter: "Uložiť: {name} · {n} fliaš – ťukni na voľné miesto",
   store_filter_off: "Zobraziť všetko",
   store_back: "← Do pivnice",
+  dm_meal: "Čo sa k tomu jedlo (nepovinné)",
+  dm_meal_ph: "napr. hovädzia pečeň",
+  exp_book: "Kniha pivnice (PDF)",
+  exp_book_d: "Pekne spracovaná, hodí sa aj ako zoznam pre poistenie",
+  book_title: "Kniha pivnice",
+  book_sub: "Stav k {d}",
+  book_loc: "Umiestnenie",
+  book_page: "Strana {n} z {m}",
+  book_sum: "Súčet na tejto strane",
+  book_total: "Celkový súčet",
+  book_note: "Hodnoty vychádzajú z vašich vlastných cien (cena za fľašu × počet). Vína bez ceny sa do súčtov nezapočítavajú. Nejde o odhad tretej strany.",
   pair_btn: "🍽 Hodí sa k …",
   pair_loading: "AI hľadá vhodné jedlá …",
   pair_fail: "Odporúčanie sa nepodarilo získať. Skúste to neskôr.",
@@ -10120,6 +10278,17 @@ ro: {
   store_filter: "Așază: {name} · {n} stic. – atinge un loc liber",
   store_filter_off: "Arată tot",
   store_back: "← La pivniță",
+  dm_meal: "Ce s-a mâncat alături (opțional)",
+  dm_meal_ph: "ex. friptură de vită",
+  exp_book: "Cartea pivniței (PDF)",
+  exp_book_d: "Frumos realizată, utilizabilă și ca inventar pentru asigurare",
+  book_title: "Cartea pivniței",
+  book_sub: "La data de {d}",
+  book_loc: "Locație",
+  book_page: "Pagina {n} din {m}",
+  book_sum: "Suma acestei pagini",
+  book_total: "Suma totală",
+  book_note: "Valorile se bazează pe prețurile tale (preț pe sticlă × număr de sticle). Vinurile fără preț nu intră în sume. Nu este o evaluare făcută de terți.",
   pair_btn: "🍽 Se potrivește cu …",
   pair_loading: "AI caută preparate potrivite …",
   pair_fail: "Nu s-a primit nicio sugestie. Încearcă mai târziu.",
@@ -10601,6 +10770,17 @@ hr: {
   store_filter: "Pohrani: {name} · {n} boc. – dodirni slobodno mjesto",
   store_filter_off: "Prikaži sve",
   store_back: "← U podrum",
+  dm_meal: "Što se jelo uz vino (neobavezno)",
+  dm_meal_ph: "npr. goveđi pečenj",
+  exp_book: "Knjiga podruma (PDF)",
+  exp_book_d: "Lijepo uređena, može poslužiti i kao popis za osiguranje",
+  book_title: "Knjiga podruma",
+  book_sub: "Stanje na dan {d}",
+  book_loc: "Mjesto",
+  book_page: "Stranica {n} od {m}",
+  book_sum: "Zbroj ove stranice",
+  book_total: "Ukupni zbroj",
+  book_note: "Vrijednosti se temelje na vašim vlastitim cijenama (cijena po boci × broj boca). Vina bez cijene ne ulaze u zbrojeve. To nije procjena treće strane.",
   pair_btn: "🍽 Slaže se uz …",
   pair_loading: "AI traži odgovarajuća jela …",
   pair_fail: "Prijedlog nije primljen. Pokušajte kasnije.",
@@ -11082,6 +11262,17 @@ pt: {
   store_filter: "Arrumar: {name} · {n} gar. – toca num lugar livre",
   store_filter_off: "Mostrar tudo",
   store_back: "← Para a adega",
+  dm_meal: "O que se comeu com ele (opcional)",
+  dm_meal_ph: "ex. assado de vaca",
+  exp_book: "Livro da garrafeira (PDF)",
+  exp_book_d: "Bem apresentado, também utilizável como inventário para o seguro",
+  book_title: "Livro da garrafeira",
+  book_sub: "À data de {d}",
+  book_loc: "Local",
+  book_page: "Página {n} de {m}",
+  book_sum: "Soma desta página",
+  book_total: "Soma total",
+  book_note: "Os valores baseiam-se nos seus próprios preços (preço por garrafa × número de garrafas). Os vinhos sem preço não entram nas somas. Não é uma avaliação de terceiros.",
   pair_btn: "🍽 Combina com …",
   pair_loading: "A IA procura pratos que combinem …",
   pair_fail: "Nenhuma sugestão recebida. Tente novamente mais tarde.",
@@ -11563,6 +11754,17 @@ no: {
   store_filter: "Plasser: {name} · {n} fl. – trykk på en ledig plass",
   store_filter_off: "Vis alle",
   store_back: "← Til kjelleren",
+  dm_meal: "Hva spiste dere til (valgfritt)",
+  dm_meal_ph: "f.eks. oksestek",
+  exp_book: "Kjellerbok (PDF)",
+  exp_book_d: "Pent utformet, kan også brukes som inventarliste til forsikringen",
+  book_title: "Kjellerbok",
+  book_sub: "Per {d}",
+  book_loc: "Plassering",
+  book_page: "Side {n} av {m}",
+  book_sum: "Sum for denne siden",
+  book_total: "Totalsum",
+  book_note: "Verdiene bygger på dine egne prisopplysninger (pris per flaske × antall). Viner uten pris er ikke med i summene. Det er ikke en verdivurdering fra tredjepart.",
   pair_btn: "🍽 Passer til …",
   pair_loading: "KI-en leter etter passende retter …",
   pair_fail: "Ingen anbefaling mottatt. Prøv igjen senere.",
@@ -12044,6 +12246,17 @@ nl: {
   store_filter: "Opbergen: {name} · {n} fl. – tik op een vrij vak",
   store_filter_off: "Toon alles",
   store_back: "← Naar de kelder",
+  dm_meal: "Wat er bij gegeten is (optioneel)",
+  dm_meal_ph: "bijv. rosbief",
+  exp_book: "Kelderboek (PDF)",
+  exp_book_d: "Mooi vormgegeven, ook bruikbaar als inventarislijst voor de verzekering",
+  book_title: "Kelderboek",
+  book_sub: "Per {d}",
+  book_loc: "Plek",
+  book_page: "Pagina {n} van {m}",
+  book_sum: "Som van deze pagina",
+  book_total: "Totaalsom",
+  book_note: "De waarden zijn gebaseerd op je eigen prijsgegevens (prijs per fles × aantal). Wijnen zonder prijs tellen niet mee in de sommen. Het is geen taxatie door een derde.",
   pair_btn: "🍽 Past bij …",
   pair_loading: "De AI zoekt passende gerechten …",
   pair_fail: "Geen suggestie ontvangen. Probeer het later opnieuw.",
@@ -12525,6 +12738,17 @@ el: {
   store_filter: "Τοποθέτηση: {name} · {n} φιάλ. – πατήστε μια ελεύθερη θέση",
   store_filter_off: "Εμφάνιση όλων",
   store_back: "← Στο κελάρι",
+  dm_meal: "Τι φάγατε μαζί (προαιρετικό)",
+  dm_meal_ph: "π.χ. ψητό βοδινό",
+  exp_book: "Βιβλίο κελαριού (PDF)",
+  exp_book_d: "Όμορφα σχεδιασμένο, κατάλληλο και ως κατάλογος για την ασφάλιση",
+  book_title: "Βιβλίο κελαριού",
+  book_sub: "Κατάσταση στις {d}",
+  book_loc: "Θέση",
+  book_page: "Σελίδα {n} από {m}",
+  book_sum: "Σύνολο σελίδας",
+  book_total: "Γενικό σύνολο",
+  book_note: "Οι τιμές βασίζονται στις δικές σας τιμές (τιμή ανά φιάλη × αριθμός φιαλών). Τα κρασιά χωρίς τιμή δεν περιλαμβάνονται στα σύνολα. Δεν πρόκειται για εκτίμηση τρίτου.",
   pair_btn: "🍽 Ταιριάζει με …",
   pair_loading: "Η ΤΝ ψάχνει κατάλληλα πιάτα …",
   pair_fail: "Δεν ελήφθη πρόταση. Δοκιμάστε ξανά αργότερα.",
@@ -13006,6 +13230,17 @@ uk: {
   store_filter: "Розмістити: {name} · {n} пл. – торкніться вільного місця",
   store_filter_off: "Показати все",
   store_back: "← До погреба",
+  dm_meal: "Що їли до вина (необов’язково)",
+  dm_meal_ph: "напр. ростбіф",
+  exp_book: "Книга погреба (PDF)",
+  exp_book_d: "Гарно оформлена, підходить і як опис для страхування",
+  book_title: "Книга погреба",
+  book_sub: "Станом на {d}",
+  book_loc: "Місце",
+  book_page: "Сторінка {n} з {m}",
+  book_sum: "Сума на сторінці",
+  book_total: "Загальна сума",
+  book_note: "Значення ґрунтуються на ваших власних цінах (ціна за пляшку × кількість). Вина без ціни до сум не входять. Це не оцінка третьої сторони.",
   pair_btn: "🍽 Пасує до …",
   pair_loading: "ШІ шукає відповідні страви …",
   pair_fail: "Пропозицію не отримано. Спробуйте пізніше.",
@@ -13487,6 +13722,17 @@ ja: {
   store_filter: "配置: {name} · {n}本 – 空いている場所をタップ",
   store_filter_off: "すべて表示",
   store_back: "← セラーへ戻る",
+  dm_meal: "合わせた料理（任意）",
+  dm_meal_ph: "例：ローストビーフ",
+  exp_book: "セラーブック（PDF）",
+  exp_book_d: "見やすく整えた一覧。保険用の財産目録としても使えます",
+  book_title: "セラーブック",
+  book_sub: "{d} 現在",
+  book_loc: "保管場所",
+  book_page: "{m} ページ中 {n} ページ",
+  book_sum: "このページの合計",
+  book_total: "総合計",
+  book_note: "金額はご自身で入力した価格（1本あたりの価格 × 本数）に基づきます。価格のないワインは合計に含まれません。第三者による鑑定ではありません。",
   pair_btn: "🍽 合う料理 …",
   pair_loading: "AI が合う料理を探しています …",
   pair_fail: "提案を取得できませんでした。後でもう一度お試しください。",
@@ -13968,6 +14214,17 @@ ko: {
   store_filter: "보관: {name} · {n}병 – 빈 칸을 탭하세요",
   store_filter_off: "모두 보기",
   store_back: "← 셀러로",
+  dm_meal: "함께 먹은 음식(선택)",
+  dm_meal_ph: "예: 로스트비프",
+  exp_book: "셀러북(PDF)",
+  exp_book_d: "보기 좋게 정리되어 보험용 재고 목록으로도 쓸 수 있습니다",
+  book_title: "셀러북",
+  book_sub: "{d} 기준",
+  book_loc: "보관 위치",
+  book_page: "{m}쪽 중 {n}쪽",
+  book_sum: "이 페이지 합계",
+  book_total: "총합계",
+  book_note: "금액은 직접 입력한 가격(병당 가격 × 병 수)을 기준으로 합니다. 가격이 없는 와인은 합계에 포함되지 않습니다. 제3자의 감정이 아닙니다.",
   pair_btn: "🍽 어울리는 음식 …",
   pair_loading: "AI가 어울리는 음식을 찾고 있어요 …",
   pair_fail: "추천을 받지 못했습니다. 나중에 다시 시도해 주세요.",
@@ -14449,6 +14706,17 @@ zh: {
   store_filter: "存放：{name} · {n} 瓶 – 请点按空位",
   store_filter_off: "显示全部",
   store_back: "← 返回酒窖",
+  dm_meal: "搭配的菜肴（可选）",
+  dm_meal_ph: "例如：烤牛肉",
+  exp_book: "酒窖册（PDF）",
+  exp_book_d: "排版美观，也可用作保险的财产清单",
+  book_title: "酒窖册",
+  book_sub: "截至 {d}",
+  book_loc: "存放位置",
+  book_page: "第 {n} 页，共 {m} 页",
+  book_sum: "本页合计",
+  book_total: "总计",
+  book_note: "金额依据您自己填写的价格（每瓶价格 × 瓶数）。没有价格的酒不计入合计。这不是第三方的估价。",
   pair_btn: "🍽 适合搭配 …",
   pair_loading: "AI 正在寻找合适的菜肴 …",
   pair_fail: "未收到推荐，请稍后再试。",
@@ -14930,6 +15198,17 @@ hi: {
   store_filter: "रखें: {name} · {n} बोतल – खाली स्थान पर टैप करें",
   store_filter_off: "सब दिखाएँ",
   store_back: "← सेलर पर",
+  dm_meal: "साथ में क्या खाया (वैकल्पिक)",
+  dm_meal_ph: "जैसे भुना हुआ बीफ़",
+  exp_book: "सेलर बुक (PDF)",
+  exp_book_d: "सुंदर रूप में तैयार, बीमा के लिए सूची के रूप में भी उपयोगी",
+  book_title: "सेलर बुक",
+  book_sub: "{d} तक",
+  book_loc: "स्थान",
+  book_page: "पृष्ठ {n} / {m}",
+  book_sum: "इस पृष्ठ का योग",
+  book_total: "कुल योग",
+  book_note: "मान आपकी अपनी दर्ज की गई कीमतों (प्रति बोतल कीमत × बोतलों की संख्या) पर आधारित हैं। बिना कीमत वाली वाइनें योग में शामिल नहीं हैं। यह किसी तीसरे पक्ष का मूल्यांकन नहीं है।",
   pair_btn: "🍽 इसके साथ अच्छा लगता है …",
   pair_loading: "AI उपयुक्त व्यंजन खोज रहा है …",
   pair_fail: "कोई सुझाव नहीं मिला। कृपया बाद में फिर कोशिश करें।",
@@ -15910,6 +16189,7 @@ function drinkOne(id, presetRef) {
   if (!w) return;
   drinkId = id;
   document.getElementById('drink-with').value = '';
+  document.getElementById('drink-meal').value = '';
   document.querySelectorAll('#drink-occasions .occ-chip').forEach(c => c.classList.remove('active'));
   document.getElementById('drink-modal-wine').textContent = w.name + (w.year ? ' · ' + w.year : '');
   const note = document.getElementById('drink-modal-note');
@@ -15923,6 +16203,7 @@ function confirmDrink() {
   const w = wines.find(x => x.id === drinkId);
   if (!w) { closeModal('drink-modal'); return; }
   const companions = document.getElementById('drink-with').value.trim();
+  const meal = document.getElementById('drink-meal').value.trim().slice(0, 200);
   const occasions = [...document.querySelectorAll('#drink-occasions .occ-chip.active')].map(c => c.getAttribute('data-occ'));
   const ref = drinkSlotRef; drinkSlotRef = null;
   const rr = ref && rackById(ref.rack);
@@ -15937,7 +16218,7 @@ function confirmDrink() {
     }
     if ((w.placements||[]).length > w.count) setPlacements(w, validPlacements(w));
   }
-  recordDrunk(w, companions, occasions, where);
+  recordDrunk(w, companions, occasions, where, meal);
   save(); saveDrunk();
   closeModal('drink-modal');
   if (lvlSheetOpen()) renderLevelSheet();
@@ -15951,13 +16232,13 @@ function confirmDrink() {
   if (lowRows.length) setTimeout(() => offerRestock(w, lowRows[0]), 700);
 }
 
-function recordDrunk(w, companions, occasions, locText) {
+function recordDrunk(w, companions, occasions, locText, meal) {
   drunkWines.push({
     id: Date.now().toString() + Math.random().toString(36).slice(2,7),
     name: w.name, year: w.year||null, type: w.type||'other',
     region: w.region||'', country: w.country||'', grape: w.grape||'', location: locText != null ? locText : formatLocation(w),
     price: w.price||0, rating: w.rating||0,
-    companions: companions||'', occasions: occasions||[],
+    companions: companions||'', meal: meal||'', occasions: occasions||[],
     date: new Date().toISOString()
   });
 }
@@ -16774,7 +17055,7 @@ function renderHistory() {
       const d = dt.toLocaleDateString(dateLocale());
       const time = dt.toLocaleTimeString(dateLocale(), {hour:'2-digit', minute:'2-digit'});
       html += `<div class="stats-card" onclick="editHistory('${w.id}')" style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:12px;cursor:pointer">
-        <div><div style="font-size:13px">${esc(w.name)} <span style="font-size:11px;color:var(--text-dim)">✏️</span></div><div style="font-size:11px;color:var(--text-muted)">${w.year||''}${w.grape?' · '+esc(w.grape):''}${w.location?' · 📍 '+esc(w.location):''}${w.companions?' · 👥 '+esc(w.companions):''}${(w.occasions&&w.occasions.length)?' · 🎉 '+esc(occLabels(w.occasions)):''}</div></div>
+        <div><div style="font-size:13px">${esc(w.name)} <span style="font-size:11px;color:var(--text-dim)">✏️</span></div><div style="font-size:11px;color:var(--text-muted)">${w.year||''}${w.grape?' · '+esc(w.grape):''}${w.location?' · 📍 '+esc(w.location):''}${w.companions?' · 👥 '+esc(w.companions):''}${w.meal?' · 🍽 '+esc(w.meal):''}${(w.occasions&&w.occasions.length)?' · 🎉 '+esc(occLabels(w.occasions)):''}</div></div>
         <div style="font-size:11px;color:var(--text-muted);white-space:nowrap;text-align:right">${d}<br>${time}</div>
       </div>`;
     });
@@ -16789,6 +17070,7 @@ function editHistory(id) {
   histEditId = id;
   document.getElementById('hist-edit-wine').textContent = w.name + (w.year ? ' · ' + w.year : '');
   document.getElementById('hist-edit-with').value = w.companions || '';
+  document.getElementById('hist-edit-meal').value = w.meal || '';
   document.querySelectorAll('#hist-edit-occasions .occ-chip').forEach(c =>
     c.classList.toggle('active', (w.occasions||[]).includes(c.getAttribute('data-occ'))));
   document.getElementById('hist-edit-modal').classList.add('show');
@@ -16797,6 +17079,7 @@ function saveHistoryEdit() {
   const w = drunkWines.find(x => x.id === histEditId);
   if (!w) { closeModal('hist-edit-modal'); return; }
   w.companions = document.getElementById('hist-edit-with').value.trim();
+  w.meal = document.getElementById('hist-edit-meal').value.trim().slice(0, 200);
   w.occasions = [...document.querySelectorAll('#hist-edit-occasions .occ-chip.active')].map(c => c.getAttribute('data-occ'));
   saveDrunk();
   closeModal('hist-edit-modal');
@@ -18263,6 +18546,135 @@ function importExcel(e) {
   r.readAsArrayBuffer(file);
 }
 
+async function buildBookPages() {
+  const W = 1240, H = 1754, M = 90;   // A4 bei 150 dpi
+  const FB = '"Inter", system-ui, -apple-system, "Segoe UI", sans-serif', FH = '"Playfair Display", Georgia, serif';
+  try { await Promise.all(['400 22px ' + FB, '700 24px ' + FB, '700 60px ' + FH].map(f => document.fonts.load(f))); } catch (e) {}
+  const loc = dateLocale();
+  const title = composeTitles(ownerForTitles()).cellar;
+  const dateStr = new Date().toLocaleDateString(loc, { day: 'numeric', month: 'long', year: 'numeric' });
+  const money = (n) => fmtMoney(Number(n).toFixed(2));
+  const cnt = (w) => w.count || 1;
+  const val = (w) => (w.price > 0 ? w.price * cnt(w) : 0);
+  const cname = (w) => String(w.country || '').trim();
+  const list = wines.slice().sort((a, b) => ((cname(a) === '') - (cname(b) === '')) || cname(a).localeCompare(cname(b), loc) || String(a.region || '').localeCompare(String(b.region || ''), loc) || String(a.name || '').localeCompare(String(b.name || ''), loc) || ((a.year || 0) - (b.year || 0)));
+  const groups = [];
+  list.forEach(w => { const k = cname(w).toLowerCase(); let g = groups[groups.length - 1]; if (!g || g.k !== k) { g = { k, label: cname(w) || t('rack_country_none'), rows: [] }; groups.push(g); } g.rows.push(w); });
+  groups.forEach(g => { g.n = g.rows.reduce((a, w) => a + cnt(w), 0); g.v = g.rows.reduce((a, w) => a + val(w), 0); });
+  const totalN = list.reduce((a, w) => a + cnt(w), 0), totalV = list.reduce((a, w) => a + val(w), 0);
+  const pricedN = list.reduce((a, w) => a + (w.price > 0 ? cnt(w) : 0), 0);
+  const mkPage = () => { const c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d'); g.fillStyle = '#ffffff'; g.fillRect(0, 0, W, H); g.textBaseline = 'alphabetic'; return { c, g }; };
+  const font = (g, w, px, fam) => { g.font = w + ' ' + px + 'px ' + (fam || FB); };
+  const fit = (g, text, maxW) => { text = String(text == null ? '' : text); if (g.measureText(text).width <= maxW) return text; while (text.length > 1 && g.measureText(text + '…').width > maxW) text = text.slice(0, -1); return text + '…'; };
+  const wrap = (g, text, maxW) => {
+    const tokens = text.indexOf(' ') >= 0 ? text.split(' ').map((w, i, a) => (i < a.length - 1 ? w + ' ' : w)) : Array.from(text);
+    const lines = []; let line = '';
+    tokens.forEach(tk => { if (line && g.measureText(line + tk).width > maxW) { lines.push(line.trimEnd()); line = tk; } else line += tk; });
+    if (line) lines.push(line.trimEnd());
+    return lines;
+  };
+  const txt = (g, s2, x, y, color, align) => { g.fillStyle = color; g.textAlign = align || 'left'; g.fillText(s2, x, y); };
+  const GOLD = '#b9972f', INK = '#1d1710', MUTE = '#6b6258', LINE = '#e4ddd0';
+  const pagesOut = [];
+
+  // ── Seite 1: Titel und Zusammenfassung ──
+  { const { c, g } = mkPage();
+    font(g, 700, 64, FH); txt(g, fit(g, title, W - 2 * M), M, M + 70, INK);
+    font(g, 400, 34, FH); txt(g, t('book_title'), M, M + 120, GOLD);
+    font(g, 400, 24); txt(g, t('book_sub', { d: dateStr }), M, M + 160, MUTE);
+    g.fillStyle = GOLD; g.fillRect(M, M + 185, W - 2 * M, 3);
+    const kp = [[String(totalN), t('pill_bottles')], [String(list.length), t('pill_wines')], [pricedN ? money(totalV) : '–', t('s_value')], [pricedN ? money(totalV / pricedN) : '–', t('s_price_avg')]];
+    const bw = (W - 2 * M - 3 * 20) / 4;
+    kp.forEach(([big, lab], i) => {
+      const x = M + i * (bw + 20), y = M + 225;
+      g.fillStyle = '#f7f2e7'; g.fillRect(x, y, bw, 140);
+      font(g, 700, 38); txt(g, fit(g, big, bw - 24), x + 14, y + 62, INK);
+      font(g, 400, 20); txt(g, fit(g, lab, bw - 24), x + 14, y + 108, MUTE);
+    });
+    let y = M + 440;
+    const section = (head, rows) => {
+      font(g, 700, 32, FH); txt(g, head, M, y, INK); y += 16;
+      g.fillStyle = LINE; g.fillRect(M, y, W - 2 * M, 2); y += 40;
+      rows.forEach(([lab, n, v]) => {
+        font(g, 400, 24); txt(g, fit(g, lab, 560), M, y, INK);
+        txt(g, n + ' ' + t('fl'), M + 700, y, MUTE, 'right');
+        txt(g, v, W - M, y, INK, 'right'); y += 44;
+      });
+      y += 28;
+    };
+    const types = ['rot', 'weiß', 'rosé', 'sekt', 'other'].map(ty => { const ws = list.filter(w => w.type === ty); return [TYPE_LABELS[ty] || ty, ws.reduce((a, w) => a + cnt(w), 0), ws.reduce((a, w) => a + val(w), 0)]; }).filter(r => r[1] > 0);
+    section(t('s_bytype'), types.map(([l, n, v]) => [l, n, v ? money(v) : '–']));
+    const byC = groups.slice().sort((a, b) => b.n - a.n), top = byC.slice(0, 10);
+    section(t('s_bycountry'), top.map(gr => [gr.label, gr.n, gr.v ? money(gr.v) : '–']).concat(byC.length > 10 ? [[t('s_more', { n: byC.length - 10 }), byC.slice(10).reduce((a, gr) => a + gr.n, 0), '']] : []));
+    font(g, 400, 20); wrap(g, t('book_note'), W - 2 * M).forEach((ln, i) => txt(g, ln, M, H - M - 110 + i * 28, MUTE));
+    pagesOut.push({ c, kind: 'sum' });
+  }
+
+  // ── Weinliste, nach Land gruppiert, mit Seitenumbruch ──
+  const GH = 54, WH = 66, CY = M + 150, CB = H - M - 60, avail = CB - CY;
+  const pages = []; let cur = null, used = 0;
+  const newPage = () => { cur = []; pages.push(cur); used = 0; };
+  groups.forEach(gr => {
+    if (!cur || used + GH + WH > avail) newPage();
+    cur.push({ type: 'g', gr }); used += GH;
+    gr.rows.forEach(w => {
+      if (used + WH > avail) { newPage(); cur.push({ type: 'g', gr }); used += GH; }   // neue Seite mitten in der Gruppe: Kopf wiederholen
+      cur.push({ type: 'w', w }); used += WH;
+    });
+  });
+  const N = 1 + pages.length;
+  const X = { name: M, qty: M + 464, price: M + 584, val: M + 724, loc: M + 740, win: M + 930 };
+  pages.forEach((items, pi) => {
+    const { c, g } = mkPage();
+    font(g, 700, 22, FH); txt(g, fit(g, title + ' · ' + t('book_title'), 760), M, M + 20, MUTE);
+    font(g, 400, 22); txt(g, dateStr, W - M, M + 20, MUTE, 'right');
+    g.fillStyle = GOLD; g.fillRect(M, M + 40, W - 2 * M, 3);
+    font(g, 700, 20);
+    txt(g, t('l_name'), X.name, M + 98, MUTE); txt(g, t('fl'), X.qty, M + 98, MUTE, 'right'); txt(g, t('l_price'), X.price, M + 98, MUTE, 'right');
+    txt(g, t('pill_value'), X.val, M + 98, MUTE, 'right'); txt(g, fit(g, t('book_loc'), 176), X.loc, M + 98, MUTE); txt(g, fit(g, t('ripe_title'), 130), X.win, M + 98, MUTE);
+    g.fillStyle = LINE; g.fillRect(M, M + 114, W - 2 * M, 2);
+    let y = CY, pageSum = 0;
+    items.forEach(it => {
+      if (it.type === 'g') {
+        g.fillStyle = '#f5efe2'; g.fillRect(M, y, W - 2 * M, GH - 6);
+        font(g, 700, 25); txt(g, fit(g, it.gr.label, 640), M + 14, y + 33, INK);
+        font(g, 400, 22); txt(g, it.gr.n + ' ' + t('fl') + (it.gr.v ? ' · ' + money(it.gr.v) : ''), W - M - 14, y + 33, MUTE, 'right');
+        y += GH;
+      } else {
+        const w = it.w, v = val(w);
+        font(g, 700, 24); txt(g, fit(g, w.name, X.qty - X.name - 80), X.name, y + 28, INK);
+        font(g, 400, 19); txt(g, fit(g, [w.year || '', w.grape || '', w.region || ''].filter(Boolean).join(' · '), X.qty - X.name - 80), X.name, y + 54, MUTE);
+        font(g, 400, 22);
+        txt(g, String(cnt(w)), X.qty, y + 28, INK, 'right');
+        txt(g, w.price > 0 ? money(w.price) : '–', X.price, y + 28, INK, 'right');
+        font(g, 700, 22); txt(g, v ? money(v) : '–', X.val, y + 28, INK, 'right');
+        font(g, 400, 20); txt(g, fit(g, formatLocation(w) || '–', 176), X.loc, y + 28, INK);
+        txt(g, fit(g, (w.drinkFrom || w.drinkTo) ? [w.drinkFrom || '', w.drinkTo || ''].join('–') : '–', 130), X.win, y + 28, INK);
+        g.fillStyle = LINE; g.fillRect(M, y + WH - 6, W - 2 * M, 1);
+        pageSum += v; y += WH;
+      }
+    });
+    // Fuß: Seitenzahl, Summe der Seite; auf der letzten Seite die Gesamtsumme
+    g.fillStyle = LINE; g.fillRect(M, H - M - 40, W - 2 * M, 2);
+    font(g, 400, 21); txt(g, t('book_page', { n: pi + 2, m: N }), M, H - M - 6, MUTE);
+    if (pi < pages.length - 1) { txt(g, t('book_sum') + ': ' + (pageSum ? money(pageSum) : '–'), W - M, H - M - 6, MUTE, 'right'); }
+    else { font(g, 700, 26); txt(g, t('book_total') + ': ' + (pricedN ? money(totalV) : '–'), W - M, H - M - 6, INK, 'right'); }
+    pagesOut.push({ c, kind: 'list' });
+  });
+  return pagesOut.map(p => p.c.toDataURL('image/jpeg', 0.88));
+}
+async function exportBook() {
+  if (!wines.length) { showToast(t('toast_enrich_none')); return; }
+  try { await loadLib('pdf'); } catch { showToast(t('toast_exportfail')); return; }
+  try {
+    const pages = await buildBookPages();
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    pages.forEach((src, i) => { if (i) doc.addPage(); doc.addImage(src, 'JPEG', 0, 0, 210, 297, undefined, 'FAST'); });
+    await saveFile('weinkeller-kellerbuch.pdf', doc.output('blob'));
+    showToast(t('toast_pdf'));
+  } catch (err) { exportFailed(err); }
+}
 async function exportPDF() {
   try { await loadLib('pdf'); } catch { showToast(t('toast_exportfail')); return; }
   const { jsPDF } = window.jspdf;
