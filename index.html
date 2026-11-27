@@ -1347,7 +1347,7 @@ input[type="file"] { display: none; }
         <a class="contact-line" href="mailto:t.knecht@web.de">✉️ t.knecht@web.de</a>
         <a class="contact-line" href="tel:+491722644305">📞 +49 172 2644305</a>
         <div class="contact-copyright">© 2026 Thomas Knecht. All rights reserved.</div>
-        <div class="contact-build">Last Build: <span id="last-build">2026-11-22</span></div>
+        <div class="contact-build">Last Build: <span id="last-build">2026-11-27</span></div>
       </div>
     </details>
   </div>
@@ -1451,6 +1451,14 @@ input[type="file"] { display: none; }
         <option value="C">°C (Celsius)</option>
         <option value="F">°F (Fahrenheit)</option>
       </select>
+    </div>
+    <div class="form-group" id="remind-row" style="margin-top:14px;display:none">
+      <label data-i18n="setup_remind">Erinnerung an die Trinkreife</label>
+      <select id="setup-remind" onchange="setRemind(this.value)">
+        <option value="off" data-i18n="remind_off">Aus</option>
+        <option value="weekly" data-i18n="remind_weekly">Wöchentlich (Samstag, 10 Uhr)</option>
+      </select>
+      <div style="font-size:12px; font-weight:600; color:var(--text-muted); margin-top:4px" data-i18n="remind_hint">Eine Mitteilung pro Woche, nur wenn Flaschen überschritten oder im Peak sind. Läuft nur auf diesem Gerät, ohne Server.</div>
     </div>
     </details>
     <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border)">
@@ -2214,7 +2222,7 @@ let ripeFilterCountry = '*';   // Land-Filter der Trinkreife ('*' = alle)
 let histFilterType = 'alle';
 let histFilterOcc = 'alle';
 
-function save() { safeSet(STORE_KEY, JSON.stringify(wines)); touchData(); photoGC(); }
+function save() { safeSet(STORE_KEY, JSON.stringify(wines)); touchData(); photoGC(); scheduleRemindSoon(); }
 function saveWishes() { safeSet(WISH_KEY, JSON.stringify(wishes)); touchData(); }
 function saveDrunk() { safeSet(DRUNK_KEY, JSON.stringify(drunkWines)); touchData(); }
 function saveSettings() { safeSet(SETTINGS_KEY, JSON.stringify(settings)); }
@@ -3834,6 +3842,12 @@ de: {
   store_filter: "Einlagern: {name} · {n} Fl. – freies Fach antippen",
   store_filter_off: "Alle anzeigen",
   store_back: "← Zum Keller",
+  setup_remind: "Erinnerung an die Trinkreife",
+  remind_off: "Aus",
+  remind_weekly: "Wöchentlich (Samstag, 10 Uhr)",
+  remind_hint: "Eine Mitteilung pro Woche, nur wenn Flaschen überschritten oder im Peak sind. Läuft nur auf diesem Gerät, ohne Server.",
+  remind_peak: "{n} Flaschen sind im Peak – jetzt trinken",
+  remind_denied: "Mitteilungen sind für die App ausgeschaltet. Bitte in den iOS-Einstellungen unter Mitteilungen erlauben.",
   temp_estimate: "Richtwert nach Weintyp (kein eigener Wert gespeichert)",
   setup_guide: "Anleitung",
   setup_version: "Version",
@@ -4298,6 +4312,12 @@ en: {
   store_filter: "Store: {name} · {n} btl. – tap a free slot",
   store_filter_off: "Show all",
   store_back: "← To cellar",
+  setup_remind: "Drinking window reminder",
+  remind_off: "Off",
+  remind_weekly: "Weekly (Saturday, 10 am)",
+  remind_hint: "One notification per week, only when bottles are overdue or at their peak. Runs on this device only, without a server.",
+  remind_peak: "{n} bottles are at their peak – drink now",
+  remind_denied: "Notifications are turned off for the app. Please allow them in the iOS settings under Notifications.",
   temp_estimate: "Guideline by wine type (no value of your own saved)",
   setup_guide: "User guide",
   setup_version: "Version",
@@ -4762,6 +4782,12 @@ es: {
   store_filter: "Colocar: {name} · {n} bot. – toca un hueco libre",
   store_filter_off: "Mostrar todo",
   store_back: "← A la bodega",
+  setup_remind: "Recordatorio de consumo",
+  remind_off: "Desactivado",
+  remind_weekly: "Semanal (sábado, 10:00)",
+  remind_hint: "Una notificación por semana, solo cuando hay botellas pasadas de su momento o en su punto álgido. Funciona solo en este dispositivo, sin servidor.",
+  remind_peak: "{n} botellas están en su punto álgido – a beber ahora",
+  remind_denied: "Las notificaciones están desactivadas para la app. Actívalas en Ajustes de iOS, en Notificaciones.",
   temp_estimate: "Valor orientativo según el tipo de vino (sin valor propio guardado)",
   setup_guide: "Guía de usuario",
   setup_version: "Versión",
@@ -5226,6 +5252,12 @@ sv: {
   store_filter: "Placera: {name} · {n} fl. – tryck på en ledig plats",
   store_filter_off: "Visa alla",
   store_back: "← Till källaren",
+  setup_remind: "Påminnelse om dryckesfönster",
+  remind_off: "Av",
+  remind_weekly: "Varje vecka (lördag kl. 10)",
+  remind_hint: "Ett meddelande per vecka, bara när flaskor har passerat sitt fönster eller är på topp. Körs bara på den här enheten, utan server.",
+  remind_peak: "{n} flaskor är på topp – drick nu",
+  remind_denied: "Aviseringar är avstängda för appen. Tillåt dem i iOS-inställningarna under Aviseringar.",
   temp_estimate: "Riktvärde efter vintyp (inget eget värde sparat)",
   setup_guide: "Användarguide",
   setup_version: "Version",
@@ -5690,6 +5722,12 @@ da: {
   store_filter: "Placér: {name} · {n} fl. – tryk på en ledig plads",
   store_filter_off: "Vis alle",
   store_back: "← Til kælderen",
+  setup_remind: "Påmindelse om drikkevindue",
+  remind_off: "Fra",
+  remind_weekly: "Ugentligt (lørdag kl. 10)",
+  remind_hint: "Én besked om ugen, kun når flasker er over deres vindue eller på toppen. Kører kun på denne enhed, uden server.",
+  remind_peak: "{n} flasker er på toppen – drik nu",
+  remind_denied: "Notifikationer er slået fra for appen. Tillad dem i iOS-indstillinger under Notifikationer.",
   temp_estimate: "Vejledende værdi efter vintype (ingen egen værdi gemt)",
   setup_guide: "Brugervejledning",
   setup_version: "Version",
@@ -6154,6 +6192,12 @@ fi: {
   store_filter: "Sijoita: {name} · {n} pul. – napauta vapaata paikkaa",
   store_filter_off: "Näytä kaikki",
   store_back: "← Kellariin",
+  setup_remind: "Muistutus juomaikkunasta",
+  remind_off: "Pois",
+  remind_weekly: "Viikoittain (lauantaina klo 10)",
+  remind_hint: "Yksi ilmoitus viikossa, vain kun pulloja on ohittanut parhaan ajan tai on huipussaan. Toimii vain tällä laitteella, ilman palvelinta.",
+  remind_peak: "{n} pulloa on huipussaan – juo nyt",
+  remind_denied: "Ilmoitukset on kytketty pois päältä sovellukselta. Salli ne iOS-asetuksissa kohdassa Ilmoitukset.",
   temp_estimate: "Ohjearvo viinityypin mukaan (omaa arvoa ei ole tallennettu)",
   setup_guide: "Käyttöohje",
   setup_version: "Versio",
@@ -6618,6 +6662,12 @@ ru: {
   store_filter: "Разместить: {name} · {n} бут. – коснитесь свободной ячейки",
   store_filter_off: "Показать все",
   store_back: "← В погреб",
+  setup_remind: "Напоминание об окне употребления",
+  remind_off: "Выкл.",
+  remind_weekly: "Раз в неделю (суббота, 10:00)",
+  remind_hint: "Одно уведомление в неделю, только если есть бутылки с истёкшим сроком или на пике. Работает только на этом устройстве, без сервера.",
+  remind_peak: "{n} бутылок на пике – пейте сейчас",
+  remind_denied: "Уведомления для приложения отключены. Разрешите их в настройках iOS в разделе «Уведомления».",
   temp_estimate: "Ориентир по типу вина (собственное значение не сохранено)",
   setup_guide: "Руководство пользователя",
   setup_version: "Версия",
@@ -7082,6 +7132,12 @@ it: {
   store_filter: "Riponi: {name} · {n} bott. – tocca uno scomparto libero",
   store_filter_off: "Mostra tutto",
   store_back: "← Alla cantina",
+  setup_remind: "Promemoria finestra di consumo",
+  remind_off: "Disattivato",
+  remind_weekly: "Settimanale (sabato, ore 10)",
+  remind_hint: "Una notifica a settimana, solo quando ci sono bottiglie oltre la finestra o al massimo. Funziona solo su questo dispositivo, senza server.",
+  remind_peak: "{n} bottiglie sono al massimo – da bere ora",
+  remind_denied: "Le notifiche sono disattivate per l’app. Attivale nelle impostazioni di iOS, alla voce Notifiche.",
   temp_estimate: "Valore indicativo in base al tipo di vino (nessun valore proprio salvato)",
   setup_guide: "Guida utente",
   setup_version: "Versione",
@@ -7546,6 +7602,12 @@ fr: {
   store_filter: "Ranger : {name} · {n} bout. – touchez un emplacement libre",
   store_filter_off: "Tout afficher",
   store_back: "← Vers la cave",
+  setup_remind: "Rappel de la fenêtre de dégustation",
+  remind_off: "Désactivé",
+  remind_weekly: "Hebdomadaire (samedi, 10 h)",
+  remind_hint: "Une notification par semaine, seulement quand des bouteilles ont dépassé leur fenêtre ou sont à leur apogée. Fonctionne uniquement sur cet appareil, sans serveur.",
+  remind_peak: "{n} bouteilles sont à leur apogée – à boire maintenant",
+  remind_denied: "Les notifications sont désactivées pour l’app. Autorisez-les dans les réglages iOS, sous Notifications.",
   temp_estimate: "Valeur indicative selon le type de vin (aucune valeur propre enregistrée)",
   setup_guide: "Guide d'utilisation",
   setup_version: "Version",
@@ -8010,6 +8072,12 @@ pl: {
   store_filter: "Ułóż: {name} · {n} but. – dotknij wolne miejsce",
   store_filter_off: "Pokaż wszystko",
   store_back: "← Do piwnicy",
+  setup_remind: "Przypomnienie o oknie spożycia",
+  remind_off: "Wył.",
+  remind_weekly: "Co tydzień (sobota, godz. 10)",
+  remind_hint: "Jedno powiadomienie tygodniowo, tylko gdy butelki przekroczyły okno lub są u szczytu. Działa tylko na tym urządzeniu, bez serwera.",
+  remind_peak: "{n} butelek jest u szczytu – pij teraz",
+  remind_denied: "Powiadomienia są wyłączone dla aplikacji. Zezwól na nie w ustawieniach iOS w sekcji Powiadomienia.",
   temp_estimate: "Wartość orientacyjna wg rodzaju wina (brak własnej wartości)",
   setup_guide: "Instrukcja obsługi",
   setup_version: "Wersja",
@@ -8474,6 +8542,12 @@ hu: {
   store_filter: "Elhelyezés: {name} · {n} üveg – koppints egy szabad helyre",
   store_filter_off: "Összes mutatása",
   store_back: "← A pincéhez",
+  setup_remind: "Emlékeztető az ivási időablakra",
+  remind_off: "Ki",
+  remind_weekly: "Hetente (szombat, 10 óra)",
+  remind_hint: "Hetente egy értesítés, csak ha vannak túllépett vagy csúcson lévő palackok. Csak ezen az eszközön fut, szerver nélkül.",
+  remind_peak: "{n} palack a csúcson van – igyál most",
+  remind_denied: "Az értesítések ki vannak kapcsolva az alkalmazásnál. Engedélyezd az iOS beállításaiban az Értesítéseknél.",
   temp_estimate: "Tájékoztató érték a bor típusa szerint (nincs saját érték mentve)",
   setup_guide: "Felhasználói útmutató",
   setup_version: "Verzió",
@@ -8938,6 +9012,12 @@ cs: {
   store_filter: "Uložit: {name} · {n} lahví – klepni na volné místo",
   store_filter_off: "Zobrazit vše",
   store_back: "← Do sklepa",
+  setup_remind: "Připomenutí okna pití",
+  remind_off: "Vyp.",
+  remind_weekly: "Týdně (sobota, 10:00)",
+  remind_hint: "Jedno upozornění týdně, jen když jsou láhve po okně nebo na vrcholu. Funguje jen v tomto zařízení, bez serveru.",
+  remind_peak: "{n} lahví je na vrcholu – pijte nyní",
+  remind_denied: "Oznámení jsou pro aplikaci vypnutá. Povolte je v nastavení iOS v části Oznámení.",
   temp_estimate: "Orientační hodnota podle druhu vína (vlastní hodnota není uložena)",
   setup_guide: "Uživatelská příručka",
   setup_version: "Verze",
@@ -9402,6 +9482,12 @@ sk: {
   store_filter: "Uložiť: {name} · {n} fliaš – ťukni na voľné miesto",
   store_filter_off: "Zobraziť všetko",
   store_back: "← Do pivnice",
+  setup_remind: "Pripomenutie okna pitia",
+  remind_off: "Vyp.",
+  remind_weekly: "Týždenne (sobota, 10:00)",
+  remind_hint: "Jedno upozornenie týždenne, len keď sú fľaše po okne alebo na vrchole. Funguje len v tomto zariadení, bez servera.",
+  remind_peak: "{n} fliaš je na vrchole – pite teraz",
+  remind_denied: "Oznámenia sú pre aplikáciu vypnuté. Povoľte ich v nastaveniach iOS v časti Oznámenia.",
   temp_estimate: "Orientačná hodnota podľa druhu vína (vlastná hodnota nie je uložená)",
   setup_guide: "Používateľská príručka",
   setup_version: "Verzia",
@@ -9866,6 +9952,12 @@ ro: {
   store_filter: "Așază: {name} · {n} stic. – atinge un loc liber",
   store_filter_off: "Arată tot",
   store_back: "← La pivniță",
+  setup_remind: "Memento pentru intervalul de consum",
+  remind_off: "Oprit",
+  remind_weekly: "Săptămânal (sâmbătă, ora 10)",
+  remind_hint: "O notificare pe săptămână, doar când există sticle care au depășit intervalul sau sunt la apogeu. Funcționează doar pe acest dispozitiv, fără server.",
+  remind_peak: "{n} sticle sunt la apogeu – de băut acum",
+  remind_denied: "Notificările sunt dezactivate pentru aplicație. Permite-le în setările iOS, la Notificări.",
   temp_estimate: "Valoare orientativă după tipul de vin (nicio valoare proprie salvată)",
   setup_guide: "Ghid de utilizare",
   setup_version: "Versiune",
@@ -10330,6 +10422,12 @@ hr: {
   store_filter: "Pohrani: {name} · {n} boc. – dodirni slobodno mjesto",
   store_filter_off: "Prikaži sve",
   store_back: "← U podrum",
+  setup_remind: "Podsjetnik za razdoblje pijenja",
+  remind_off: "Isklj.",
+  remind_weekly: "Tjedno (subota, 10 sati)",
+  remind_hint: "Jedna obavijest tjedno, samo kad su boce prošle razdoblje ili na vrhuncu. Radi samo na ovom uređaju, bez poslužitelja.",
+  remind_peak: "{n} boca je na vrhuncu – pijte sada",
+  remind_denied: "Obavijesti su za aplikaciju isključene. Dopustite ih u postavkama iOS-a u odjeljku Obavijesti.",
   temp_estimate: "Okvirna vrijednost prema vrsti vina (nema vlastite vrijednosti)",
   setup_guide: "Korisnički priručnik",
   setup_version: "Verzija",
@@ -10794,6 +10892,12 @@ pt: {
   store_filter: "Arrumar: {name} · {n} gar. – toca num lugar livre",
   store_filter_off: "Mostrar tudo",
   store_back: "← Para a adega",
+  setup_remind: "Lembrete da janela de consumo",
+  remind_off: "Desligado",
+  remind_weekly: "Semanal (sábado, 10 h)",
+  remind_hint: "Uma notificação por semana, só quando há garrafas fora do prazo ou no auge. Funciona apenas neste dispositivo, sem servidor.",
+  remind_peak: "{n} garrafas estão no auge – beber agora",
+  remind_denied: "As notificações estão desativadas para a app. Permita-as nas definições do iOS, em Notificações.",
   temp_estimate: "Valor indicativo conforme o tipo de vinho (sem valor próprio guardado)",
   setup_guide: "Guia do utilizador",
   setup_version: "Versão",
@@ -11258,6 +11362,12 @@ no: {
   store_filter: "Plasser: {name} · {n} fl. – trykk på en ledig plass",
   store_filter_off: "Vis alle",
   store_back: "← Til kjelleren",
+  setup_remind: "Påminnelse om drikkevindu",
+  remind_off: "Av",
+  remind_weekly: "Ukentlig (lørdag kl. 10)",
+  remind_hint: "Ett varsel per uke, bare når flasker er over tiden eller på topp. Kjører bare på denne enheten, uten server.",
+  remind_peak: "{n} flasker er på topp – drikk nå",
+  remind_denied: "Varsler er slått av for appen. Tillat dem i iOS-innstillinger under Varsler.",
   temp_estimate: "Veiledende verdi etter vintype (ingen egen verdi lagret)",
   setup_guide: "Brukerveiledning",
   setup_version: "Versjon",
@@ -11722,6 +11832,12 @@ nl: {
   store_filter: "Opbergen: {name} · {n} fl. – tik op een vrij vak",
   store_filter_off: "Toon alles",
   store_back: "← Naar de kelder",
+  setup_remind: "Herinnering aan het drinkvenster",
+  remind_off: "Uit",
+  remind_weekly: "Wekelijks (zaterdag, 10 uur)",
+  remind_hint: "Eén melding per week, alleen als flessen over hun hoogtepunt zijn of op hun top. Werkt alleen op dit apparaat, zonder server.",
+  remind_peak: "{n} flessen zijn op hun top – nu drinken",
+  remind_denied: "Meldingen staan uit voor de app. Sta ze toe in de iOS-instellingen onder Meldingen.",
   temp_estimate: "Richtwaarde naar wijnsoort (geen eigen waarde opgeslagen)",
   setup_guide: "Gebruikershandleiding",
   setup_version: "Versie",
@@ -12186,6 +12302,12 @@ el: {
   store_filter: "Τοποθέτηση: {name} · {n} φιάλ. – πατήστε μια ελεύθερη θέση",
   store_filter_off: "Εμφάνιση όλων",
   store_back: "← Στο κελάρι",
+  setup_remind: "Υπενθύμιση παραθύρου κατανάλωσης",
+  remind_off: "Ανενεργό",
+  remind_weekly: "Εβδομαδιαία (Σάββατο, 10:00)",
+  remind_hint: "Μία ειδοποίηση την εβδομάδα, μόνο όταν υπάρχουν φιάλες εκτός ορίου ή στο αποκορύφωμα. Λειτουργεί μόνο σε αυτή τη συσκευή, χωρίς διακομιστή.",
+  remind_peak: "{n} φιάλες είναι στο αποκορύφωμα – πιείτε τώρα",
+  remind_denied: "Οι ειδοποιήσεις είναι απενεργοποιημένες για την εφαρμογή. Επιτρέψτε τες στις ρυθμίσεις iOS, στις Ειδοποιήσεις.",
   temp_estimate: "Ενδεικτική τιμή ανά τύπο κρασιού (δεν έχει αποθηκευτεί δική σας τιμή)",
   setup_guide: "Οδηγός χρήσης",
   setup_version: "Έκδοση",
@@ -12650,6 +12772,12 @@ uk: {
   store_filter: "Розмістити: {name} · {n} пл. – торкніться вільного місця",
   store_filter_off: "Показати все",
   store_back: "← До погреба",
+  setup_remind: "Нагадування про вікно вживання",
+  remind_off: "Вимк.",
+  remind_weekly: "Щотижня (субота, 10:00)",
+  remind_hint: "Одне сповіщення на тиждень, лише коли є пляшки з минулим терміном або на піку. Працює лише на цьому пристрої, без сервера.",
+  remind_peak: "{n} пляшок на піку – пийте зараз",
+  remind_denied: "Сповіщення для застосунку вимкнено. Дозвольте їх у налаштуваннях iOS у розділі «Сповіщення».",
   temp_estimate: "Орієнтовне значення за типом вина (власного значення не збережено)",
   setup_guide: "Посібник користувача",
   setup_version: "Версія",
@@ -13114,6 +13242,12 @@ ja: {
   store_filter: "配置: {name} · {n}本 – 空いている場所をタップ",
   store_filter_off: "すべて表示",
   store_back: "← セラーへ戻る",
+  setup_remind: "飲み頃のリマインダー",
+  remind_off: "オフ",
+  remind_weekly: "毎週（土曜 10時）",
+  remind_hint: "飲み頃を過ぎた、またはピークのボトルがあるときだけ、週に1回通知します。このデバイス上だけで動作し、サーバーは使いません。",
+  remind_peak: "{n} 本がピークです – 今が飲み頃です",
+  remind_denied: "このアプリの通知はオフになっています。iOS の設定の「通知」で許可してください。",
   temp_estimate: "ワインの種類に基づく目安（独自の値は未保存）",
   setup_guide: "ユーザーガイド",
   setup_version: "バージョン",
@@ -13578,6 +13712,12 @@ ko: {
   store_filter: "보관: {name} · {n}병 – 빈 칸을 탭하세요",
   store_filter_off: "모두 보기",
   store_back: "← 셀러로",
+  setup_remind: "음용 시기 알림",
+  remind_off: "끄기",
+  remind_weekly: "매주(토요일 오전 10시)",
+  remind_hint: "음용 시기가 지났거나 절정인 병이 있을 때만 주 1회 알립니다. 이 기기에서만 작동하며 서버를 사용하지 않습니다.",
+  remind_peak: "{n}병이 절정입니다 – 지금 드세요",
+  remind_denied: "앱의 알림이 꺼져 있습니다. iOS 설정의 ‘알림’에서 허용해 주세요.",
   temp_estimate: "와인 종류에 따른 참고값(직접 입력한 값 없음)",
   setup_guide: "사용 설명서",
   setup_version: "버전",
@@ -14042,6 +14182,12 @@ zh: {
   store_filter: "存放：{name} · {n} 瓶 – 请点按空位",
   store_filter_off: "显示全部",
   store_back: "← 返回酒窖",
+  setup_remind: "适饮期提醒",
+  remind_off: "关闭",
+  remind_weekly: "每周（周六上午 10 点）",
+  remind_hint: "每周一次通知，仅在有瓶子已过适饮期或正值巅峰时发送。仅在本设备上运行，不使用服务器。",
+  remind_peak: "{n} 瓶正值巅峰 – 现在就喝",
+  remind_denied: "该应用的通知已关闭。请在 iOS 设置的“通知”中允许。",
   temp_estimate: "按酒的类型给出的参考值（未保存自定义值）",
   setup_guide: "用户指南",
   setup_version: "版本",
@@ -14506,6 +14652,12 @@ hi: {
   store_filter: "रखें: {name} · {n} बोतल – खाली स्थान पर टैप करें",
   store_filter_off: "सब दिखाएँ",
   store_back: "← सेलर पर",
+  setup_remind: "पीने की अवधि का रिमाइंडर",
+  remind_off: "बंद",
+  remind_weekly: "साप्ताहिक (शनिवार, सुबह 10 बजे)",
+  remind_hint: "हर हफ़्ते एक सूचना, केवल तब जब बोतलें अवधि पार कर चुकी हों या चरम पर हों। केवल इसी डिवाइस पर चलता है, बिना सर्वर के।",
+  remind_peak: "{n} बोतलें चरम पर हैं – अभी पिएँ",
+  remind_denied: "ऐप के लिए सूचनाएँ बंद हैं। कृपया iOS सेटिंग्स में “सूचनाएँ” के अंतर्गत अनुमति दें।",
   temp_estimate: "वाइन के प्रकार के अनुसार अनुमानित मान (अपना मान सहेजा नहीं गया)",
   setup_guide: "उपयोगकर्ता मार्गदर्शिका",
   setup_version: "संस्करण",
@@ -15012,6 +15164,69 @@ async function offerPriceConversion(fromCur, toCur) {
     showToast(t('cur_convert_fail'));
   }
 }
+// ── Erinnerung an die Trinkreife (nur iPhone-App): lokale Mitteilungen, eine pro Woche (Samstag 10 Uhr), nur wenn Flaschen überschritten oder im Peak sind ──
+// Ein Server ist nicht beteiligt. Weil der Text vorab festgelegt wird, plant die App bei jedem Start, bei Änderungen am Bestand und beim Sprachwechsel
+// die nächsten 8 Samstage neu (jeweils mit dem Stand des Jahres, in dem der Termin liegt).
+const REMIND_ID0 = 91000, REMIND_WEEKS = 8;
+function remindPlugin() { return isNativeApp() && window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications; }
+function remindCounts(year) {
+  let over = 0, peak = 0;
+  wines.forEach(w => { if (!(w.drinkFrom || w.drinkTo)) return; const k = ripeStatusKey(w, year); if (k === 'over') over += (w.count || 1); else if (k === 'peak') peak += (w.count || 1); });
+  return { over, peak };
+}
+function remindText(c) {
+  const parts = [];
+  if (c.over) parts.push(t('s_over_warn', { n: c.over }));
+  if (c.peak) parts.push(t('remind_peak', { n: c.peak }));
+  return parts.join(' · ');
+}
+function remindDates(now) {
+  now = now || new Date();
+  const d = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 10, 0, 0, 0);
+  d.setDate(d.getDate() + ((6 - d.getDay() + 7) % 7));   // nächster Samstag (heute, falls Samstag)
+  if (d <= now) d.setDate(d.getDate() + 7);              // Samstag 10 Uhr schon vorbei: nächste Woche
+  const out = [];
+  for (let i = 0; i < REMIND_WEEKS; i++) { out.push(new Date(d)); d.setDate(d.getDate() + 7); }
+  return out;
+}
+async function scheduleRemind() {
+  const P = remindPlugin();
+  if (!P) return;
+  try {
+    await P.cancel({ notifications: Array.from({ length: REMIND_WEEKS }, (_, i) => ({ id: REMIND_ID0 + i })) });
+    if (settings.remind !== 'weekly') return;
+    const notifications = [];
+    remindDates().forEach((at, i) => {
+      const c = remindCounts(at.getFullYear()), body = remindText(c);
+      if (body) notifications.push({ id: REMIND_ID0 + i, title: t('ripe_title'), body, schedule: { at }, extra: { go: c.over ? 'over' : 'peak' } });
+    });
+    if (notifications.length) await P.schedule({ notifications });
+  } catch (e) { /* ohne Berechtigung o. Ä.: keine Mitteilungen, die App läuft normal weiter */ }
+}
+function scheduleRemindSoon() {
+  if (settings.remind !== 'weekly' || !remindPlugin()) return;
+  clearTimeout(scheduleRemindSoon.t);
+  scheduleRemindSoon.t = setTimeout(scheduleRemind, 1500);
+}
+async function setRemind(v) {
+  const P = remindPlugin(), sel = document.getElementById('setup-remind');
+  if (v === 'weekly') {
+    let granted = false;
+    try { const r = await P.requestPermissions(); granted = !!(r && r.display === 'granted'); } catch (e) {}
+    if (!granted) { settings.remind = 'off'; saveSettings(); if (sel) sel.value = 'off'; showToast(t('remind_denied')); await scheduleRemind(); return; }
+  }
+  settings.remind = v === 'weekly' ? 'weekly' : 'off';
+  saveSettings();
+  await scheduleRemind();
+}
+function initRemind() {
+  const P = remindPlugin(), row = document.getElementById('remind-row'), sel = document.getElementById('setup-remind');
+  if (row) row.style.display = P ? '' : 'none';
+  if (sel) sel.value = settings.remind === 'weekly' ? 'weekly' : 'off';
+  if (!P) return;
+  try { P.addListener('localNotificationActionPerformed', (ev) => { const g = ev && ev.notification && ev.notification.extra && ev.notification.extra.go; goToRipeStatus(g === 'peak' ? 'peak' : 'over'); }); } catch (e) {}
+  scheduleRemind();
+}
 function setLanguage(l) {
   const was = settings.lang, oldCur = settings.currency;
   settings.lang = l;
@@ -15027,6 +15242,7 @@ function setLanguage(l) {
   applyTempLabels(); rerenderActive();
   if (note && CURRENCIES[note]) showToast(t('cur_auto_set', { name: t(CURRENCIES[note].key) }));
   if (note && note !== oldCur) setTimeout(() => offerPriceConversion(oldCur, note), 400);   // Rückfrage erst, wenn die Oberfläche in der neuen Sprache steht
+  scheduleRemindSoon();   // Mitteilungstexte in der neuen Sprache
 }
 function setOwner(v) { settings.owner = (v||'').trim(); saveSettings(); touchData(); applyI18n(); }
 
@@ -15957,7 +16173,7 @@ function statsRipeHtml() {
   list.forEach(w => { cnt[ripeStatusKey(w)] += (w.count || 1); });
   const rows = [['young', 'seg_young', 'var(--sparkling)'], ['optimal', 'seg_optimal', 'var(--green)'], ['peak', 'seg_peak', 'var(--gold)'], ['over', 'seg_over', 'var(--red-alert)']]
     .map(([k, key, col]) => ({ label: t(key), n: cnt[k], color: col, click: "goToRipeStatus('" + k + "')" }));
-  let h = `<div class="stats-title">${t('ripe_title')}</div>` + statBarRows(rows);
+  let h = `<div class="stats-title" data-sec="ripe_title">${t('ripe_title')}</div>` + statBarRows(rows);
   if (cnt.over > 0) h += `<div class="stats-card stat-warn" onclick="goToRipeStatus('over')">⚠ ${t('s_over_warn', { n: cnt.over })}</div>`;
   return h;
 }
@@ -15972,7 +16188,7 @@ function statsMoreHtml() {
     const all = [...g.values()].sort((a, b) => b.n - a.n || a.label.localeCompare(b.label));
     if (!all.length) return '';
     const top = all.slice(0, 8);
-    return `<div class="stats-title" style="margin-top:20px">${t(titleKey)}</div>` + statBarRows(top.map(e => ({ label: e.label, n: e.n, click: e.raw ? statSearchLink(e.raw) : null })), 'var(--gold)', true) + statMore(all.length, top.length);
+    return `<div class="stats-title" data-sec="${titleKey}" style="margin-top:20px">${t(titleKey)}</div>` + statBarRows(top.map(e => ({ label: e.label, n: e.n, click: e.raw ? statSearchLink(e.raw) : null })), 'var(--gold)', true) + statMore(all.length, top.length);
   };
   h += byField('country', 's_bycountry', true) + byField('region', 's_byregion', false) + byField('grape', 's_bygrape', false);
   // Nach Jahrgang (Säulen, seitlich scrollbar)
@@ -15980,14 +16196,14 @@ function statsMoreHtml() {
   wines.forEach(w => { if (w.year) vint.set(w.year, (vint.get(w.year) || 0) + bottles(w)); });
   if (vint.size) {
     const ys = [...vint.keys()].sort((a, b) => a - b), mx = Math.max(...vint.values());
-    h += `<div class="stats-title" style="margin-top:20px">${t('s_byvintage')}</div><div class="col-chart">` + ys.map(y => `<div class="col" title="${y}: ${vint.get(y)}"><div class="col-n">${vint.get(y)}</div><div class="col-bar" style="height:${Math.max(3, Math.round(vint.get(y) / mx * 70))}px"></div><div class="col-l">${y}</div></div>`).join('') + '</div>';
+    h += `<div class="stats-title" data-sec="s_byvintage" style="margin-top:20px">${t('s_byvintage')}</div><div class="col-chart">` + ys.map(y => `<div class="col" title="${y}: ${vint.get(y)}"><div class="col-n">${vint.get(y)}</div><div class="col-bar" style="height:${Math.max(3, Math.round(vint.get(y) / mx * 70))}px"></div><div class="col-l">${y}</div></div>`).join('') + '</div>';
   }
   // Preise
   const priced = wines.filter(w => w.price > 0);
   if (priced.length) {
     const nb = priced.reduce((a, w) => a + bottles(w), 0), sum = priced.reduce((a, w) => a + w.price * bottles(w), 0);
     const cheap = priced.reduce((a, w) => w.price < a.price ? w : a), dear = priced.reduce((a, w) => w.price > a.price ? w : a);
-    h += `<div class="stats-title" style="margin-top:20px">${t('s_price')}</div><div class="stats-grid">
+    h += `<div class="stats-title" data-sec="s_price" style="margin-top:20px">${t('s_price')}</div><div class="stats-grid">
       <div class="stats-card full"><div class="big">${fmtMoney(Math.round(sum / nb))}</div><div class="label">${t('s_price_avg')}</div></div>
       <div class="stats-card clickable" onclick="${statSearchLink(cheap.name)}"><div class="big">${fmtMoney(Math.round(cheap.price))}</div><div class="label">${t('s_price_min')}</div><div class="sub">${esc(cheap.name)}</div></div>
       <div class="stats-card clickable" onclick="${statSearchLink(dear.name)}"><div class="big">${fmtMoney(Math.round(dear.price))}</div><div class="label">${t('s_price_max')}</div><div class="sub">${esc(dear.name)}</div></div>
@@ -15996,18 +16212,18 @@ function statsMoreHtml() {
     const labels = ['< ' + fmtMoney(th[0]), fmtMoney(th[0]) + ' – ' + fmtMoney(th[1]), fmtMoney(th[1]) + ' – ' + fmtMoney(th[2]), fmtMoney(th[2]) + ' – ' + fmtMoney(th[3]), '≥ ' + fmtMoney(th[3])];
     const cls = [0, 0, 0, 0, 0];
     priced.forEach(w => { const i = th.findIndex(x => w.price < x); cls[i < 0 ? 4 : i] += bottles(w); });
-    h += `<div class="stats-title" style="margin-top:6px">${t('s_price_classes')}</div>` + statBarRows(labels.map((l, i) => ({ label: l, n: cls[i] })), 'var(--gold)', true);
+    h += `<div class="stats-title" data-sec="s_price_classes" style="margin-top:6px">${t('s_price_classes')}</div>` + statBarRows(labels.map((l, i) => ({ label: l, n: cls[i] })), 'var(--gold)', true);
     const vc = new Map();
     priced.forEach(w => { const raw = String(w.country || '').trim(), k = raw.toLowerCase(), e = vc.get(k) || { label: raw || none, v: 0 }; e.v += w.price * bottles(w); vc.set(k, e); });
     const vrows = [...vc.values()].sort((a, b) => b.v - a.v).slice(0, 5);
-    h += `<div class="stats-title" style="margin-top:6px">${t('s_value_country')}</div>` + statBarRows(vrows.map(e => ({ label: e.label, n: e.v, text: fmtMoney(Math.round(e.v)) })), 'var(--gold)', true) + statMore(vc.size, vrows.length);
+    h += `<div class="stats-title" data-sec="s_value_country" style="margin-top:6px">${t('s_value_country')}</div>` + statBarRows(vrows.map(e => ({ label: e.label, n: e.v, text: fmtMoney(Math.round(e.v)) })), 'var(--gold)', true) + statMore(vc.size, vrows.length);
   }
   // Lager: Belegung gesamt und je Regal
   if (settings.racks.length) {
     let total = 0, filled = 0;
     const rrows = settings.racks.map((r, i) => { const f = rackFillCounts(r); total += f.total; filled += f.filled; return { label: r.name, n: f.total ? f.filled / f.total * 100 : 0, text: f.filled + '/' + f.total, click: 'goToRack(' + i + ')' }; });
     const unplaced = wines.reduce((a, w) => a + unplacedCount(w), 0);
-    h += `<div class="stats-title" style="margin-top:20px">${t('s_storage')}</div><div class="stats-grid">
+    h += `<div class="stats-title" data-sec="s_storage" style="margin-top:20px">${t('s_storage')}</div><div class="stats-grid">
       <div class="stats-card full"><div class="big">${total ? Math.round(filled / total * 100) : 0} %</div><div class="label">${t('s_occ')} · ${filled}/${total}</div></div>
       <div class="stats-card"><div class="big">${Math.max(0, total - filled)}</div><div class="label">${t('s_free')}</div></div>
       <div class="stats-card"><div class="big">${unplaced}</div><div class="label">${t('s_unplaced')}</div></div>
@@ -16020,11 +16236,11 @@ function statsMoreHtml() {
     const byYear = new Map();
     drunkWines.forEach(x => { const d = new Date(x.date); if (isNaN(d)) return; const m = months.find(o => o.key === d.getFullYear() + '-' + d.getMonth()); if (m) m.n++; byYear.set(d.getFullYear(), (byYear.get(d.getFullYear()) || 0) + 1); });
     const mx = Math.max(1, ...months.map(m => m.n));
-    h += `<div class="stats-title" style="margin-top:20px">${t('s_drunk_month')}</div><div class="col-chart">` + months.map(m => `<div class="col" title="${esc(m.full)}: ${m.n}"><div class="col-n">${m.n || ''}</div><div class="col-bar" style="height:${m.n ? Math.max(3, Math.round(m.n / mx * 70)) : 2}px;${m.n ? '' : 'opacity:.35'}"></div><div class="col-l">${esc(m.label)}</div></div>`).join('') + '</div>';
+    h += `<div class="stats-title" data-sec="s_drunk_month" style="margin-top:20px">${t('s_drunk_month')}</div><div class="col-chart">` + months.map(m => `<div class="col" title="${esc(m.full)}: ${m.n}"><div class="col-n">${m.n || ''}</div><div class="col-bar" style="height:${m.n ? Math.max(3, Math.round(m.n / mx * 70)) : 2}px;${m.n ? '' : 'opacity:.35'}"></div><div class="col-l">${esc(m.label)}</div></div>`).join('') + '</div>';
     const yrows = [...byYear].sort((a, b) => b[0] - a[0]).slice(0, 8).map(([y, n]) => ({ label: String(y), n }));
-    if (yrows.length) h += `<div class="stats-title" style="margin-top:6px">${t('s_drunk_year')}</div>` + statBarRows(yrows, 'var(--wine-light)') + statMore(byYear.size, yrows.length);
+    if (yrows.length) h += `<div class="stats-title" data-sec="s_drunk_year" style="margin-top:6px">${t('s_drunk_year')}</div>` + statBarRows(yrows, 'var(--wine-light)') + statMore(byYear.size, yrows.length);
     const spent = drunkWines.filter(x => x.price > 0), sp = spent.reduce((a, x) => a + x.price, 0);
-    if (spent.length) h += `<div class="stats-title" style="margin-top:20px">${t('s_spent')}</div><div class="stats-grid">
+    if (spent.length) h += `<div class="stats-title" data-sec="s_spent" style="margin-top:20px">${t('s_spent')}</div><div class="stats-grid">
       <div class="stats-card"><div class="big">${fmtMoney(Math.round(sp))}</div><div class="label">${t('s_spent_total')}</div></div>
       <div class="stats-card"><div class="big">${fmtMoney(Math.round(sp / spent.length))}</div><div class="label">${t('s_price_avg')}</div></div>
     </div>`;
@@ -16036,7 +16252,7 @@ function statsMoreHtml() {
     ratedItems.forEach(it => { const raw = String(it[field] || '').trim(); if (!raw) return; const k = raw.toLowerCase(), e = g.get(k) || { label: raw, sum: 0, n: 0 }; e.sum += it.r; e.n++; g.set(k, e); });
     const rows = [...g.values()].map(e => ({ label: e.label, avg: e.sum / e.n, cnt: e.n })).sort((a, b) => b.avg - a.avg || b.cnt - a.cnt).slice(0, 5);
     if (!rows.length) return '';
-    return `<div class="stats-title" style="margin-top:20px">${t(titleKey)}</div>` + statBarRows(rows.map(e => ({ label: e.label, n: e.avg, text: e.avg.toFixed(1) + '★ (' + e.cnt + ')', click: statSearchLink(e.label) })), 'var(--gold)', true, 5) + statMore(g.size, rows.length);
+    return `<div class="stats-title" data-sec="${titleKey}" style="margin-top:20px">${t(titleKey)}</div>` + statBarRows(rows.map(e => ({ label: e.label, n: e.avg, text: e.avg.toFixed(1) + '★ (' + e.cnt + ')', click: statSearchLink(e.label) })), 'var(--gold)', true, 5) + statMore(g.size, rows.length);
   };
   h += favBy('country', 's_fav_country') + favBy('grape', 's_fav_grape');
   // Nachkaufen: unter Mindestbestand, offene Wunschliste und ihr Wert (günstigste Preise, nur in der aktuellen Währung)
@@ -16045,7 +16261,7 @@ function statsMoreHtml() {
   let wishVal = 0;
   openW.forEach(w => { const p = w.prices; if (p && p.items && p.items.length && (p.cur || '€') === settings.currency) wishVal += Math.min(...p.items.map(i => i.price)) * (w.qty || 1); });
   if (hasMM || openW.length) {
-    h += `<div class="stats-title" style="margin-top:20px">${t('s_restock')}</div><div class="stats-grid">`;
+    h += `<div class="stats-title" data-sec="s_restock" style="margin-top:20px">${t('s_restock')}</div><div class="stats-grid">`;
     if (hasMM) h += `<div class="stats-card clickable" onclick="openShoppingList()"><div class="big">${shoppingItems().length}</div><div class="label">${t('s_below_min')}</div></div>`;
     h += `<div class="stats-card clickable" onclick="goToTab('wishlist')"><div class="big">${openW.length}</div><div class="label">${t('s_wish_open')}</div></div>`;
     if (wishVal > 0) h += `<div class="stats-card full"><div class="big">${fmtMoney(Math.round(wishVal))}</div><div class="label">${t('s_wish_value')}</div></div>`;
@@ -16071,7 +16287,7 @@ function renderStats() {
       <div class="stats-card"><div class="big">${avg}</div><div class="label">${t('s_avg')}</div></div>
     </div>
     ${statsRipeHtml()}
-    <div class="stats-title">${t('s_bytype')}</div>
+    <div class="stats-title" data-sec="s_bytype">${t('s_bytype')}</div>
   `;
   ['rot','weiß','rosé','sekt','other'].forEach(ty => {
     const cnt = types[ty]||0;
@@ -16086,7 +16302,7 @@ function renderStats() {
   // Favoriten: bewertete Weine mit Sterne-Filter + Trink-Häufigkeit
   const ratedAll = wines.filter(w => w.rating);
   if (ratedAll.length) {
-    html += `<div class="stats-title" style="margin-top:20px">${t('s_top')}</div>`;
+    html += `<div class="stats-title" data-sec="s_top" style="margin-top:20px">${t('s_top')}</div>`;
     // Sterne-Filter-Chips (nur vorhandene Stufen), mehrfach wählbar
     const levels = [5,4,3,2,1].filter(n => ratedAll.some(w => w.rating === n));
     html += `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px">`;
@@ -16124,6 +16340,36 @@ function renderStats() {
 
   html += statsMoreHtml();
   document.getElementById('stats-content').innerHTML = html;
+  foldStatSections(document.getElementById('stats-content'));
+}
+
+// Statistik: Abschnitte einklappbar wie im Setup (gleiche Klassen und Technik); Zustand pro Abschnitt nur auf diesem Gerät gemerkt, Standard = offen
+function foldStatSections(box) {
+  if (!box) return;
+  const kids = Array.from(box.children);
+  let det = null;
+  kids.forEach((el) => {
+    if (el.matches && el.matches('.stats-title[data-sec]')) {
+      const key = 'wk_sfold_' + el.dataset.sec;
+      const d = det = document.createElement('details');
+      det.className = 'setup-fold stat-fold';
+      det.dataset.sfold = el.dataset.sec;
+      det.style.marginTop = el.style.marginTop || '0';
+      let v = null;
+      try { v = localStorage.getItem(key); } catch (e) {}
+      det.open = v !== '0';
+      const sum = document.createElement('summary');
+      sum.addEventListener('click', () => { try { localStorage.setItem(key, d.open ? '0' : '1'); } catch (e) {} }); // vor dem Umschalten: neuer Zustand = Gegenteil
+      sum.className = 'stats-title';
+      sum.style.marginBottom = '4px';
+      sum.textContent = el.textContent;
+      det.appendChild(sum);
+      box.insertBefore(det, el);
+      box.removeChild(el);
+    } else if (det) {
+      det.appendChild(el);
+    }
+  });
 }
 
 // ═══════════════════════════════════════
@@ -17327,8 +17573,8 @@ function goToWine(id) {
   }, 50);
 }
 
-function ripeStatusKey(w) {
-  const now = new Date().getFullYear();
+function ripeStatusKey(w, year) {
+  const now = year || new Date().getFullYear();
   const from = w.drinkFrom || now;
   const to = w.drinkTo || from + 5;
   const peak = Math.round(from + (to - from) * 0.6);
@@ -17848,8 +18094,10 @@ syncOnLoad();
 let lastVisSync = Date.now();
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && Date.now() - lastVisSync > 20000) { lastVisSync = Date.now(); syncNow(true); recoverPurchases(); }
+  if (document.visibilityState === 'visible') scheduleRemindSoon();
 });
 splashInit();
+initRemind();
 // Setup: Abschnitte einklappbar; der Zustand wird nur auf diesem Gerät gemerkt (Bequemlichkeit, ohne Speicher funktioniert alles). "Allgemein" ist beim ersten Start offen, der Rest zu.
 document.querySelectorAll('details.setup-fold[data-fold]').forEach((d) => {
   const key = 'wk_fold_' + d.dataset.fold;
