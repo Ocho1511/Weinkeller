@@ -15,7 +15,7 @@
   .back{margin:0 0 6px} .toapp{display:none} @media (display-mode: standalone){.toapp{display:inline}}
   @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
 </style></head><body>
-<!--update-2026-11-27--><!--update-2026-11-28-->
+<!--update-2026-11-27--><!--update-2026-11-28--><!--update3-->
 <p class="back"><span class="toapp"><a href="index.html">← Til kælderen</a> &nbsp;·&nbsp; </span><a href="support.html">← Tilbage til support</a></p>
 <div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html" selected>Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
 
@@ -76,10 +76,10 @@
 <ul>
 <li><strong>Drikkevindue:</strong> Så snart du angiver årgangen, sætter appen ”Drik fra” til <strong>årgang + 1</strong>. ”Drik til” afhænger af vintype og drue (en rødvin holder længere end en rosé). Du kan til enhver tid ændre begge.</li>
 <li><strong>Beholdning, Min og Maks:</strong> Hvis du angiver et minimum, advarer appen, når beholdningen falder under det, og tilbyder at sætte vinen på ønskelisten (<a href="#cellar">afsnit 3</a>).</li>
-<li><strong>Eget foto:</strong> ”Tag / vælg foto” knytter et foto til vinen. AI’en finder flasken på fotoet og placerer den midt i en rolig portrætramme; hvor flasken står tæt på fotoets kant, fortsættes kanten (det koster ét AI-kald; hvis der ikke findes en flaske, eller AI ikke er tilgængelig, bliver fotoet uændret, og appen fortæller dig det). Har vinen allerede et foto, spørger appen, om det nye skal erstatte det. Fotoet bliver på denne enhed og er med i JSON-backuppen. Når skylagring er slået til, vælger du for hvert foto, om det gemmes ”I skyen (på alle enheder)” eller ”Kun på denne telefon”.</li>
+<li><strong>Eget foto:</strong> ”Tag / vælg foto” knytter et foto til vinen. AI’en finder flasken på fotoet (det koster ét AI-kald); derefter frisætter appen flasken fra baggrunden, fjerner det, der står ved siden af den, retter den op og placerer den midt på en rolig lys baggrund med en blød skygge. Selve frisætningen kører på din enhed med en lille indbygget model. Findes der ingen flaske, eller fungerer noget ikke, bliver fotoet kun beskåret omkring flasken eller forbliver uændret, og appen fortæller dig det. Har vinen allerede et foto, spørger appen, om det nye skal erstatte det. Fotoet bliver på denne enhed og er med i JSON-backuppen. Når skylagring er slået til, vælger du for hvert foto, om det gemmes ”I skyen (på alle enheder)” eller ”Kun på denne telefon”.</li>
 </ul>
 <h3>b) Scan etiket (AI)</h3>
-<p>Tryk på <em>Scan etiket (AI)</em> og fotografér flaskens etiket. AI’en aflæser navn, årgang, type, region, land og drue og vurderer drikkevindue og serveringstemperatur. Kontrollér værdierne og gem. Før første brug beder appen om dit samtykke (<a href="#privacy">afsnit 13</a>).</p>
+<p>Tryk på <em>Scan etiket (AI)</em> og fotografér flaskens etiket. AI’en aflæser navn, årgang, type, region, land og drue og vurderer drikkevindue og serveringstemperatur. Kontrollér værdierne og gem. Før første brug beder appen om dit samtykke (<a href="#privacy">afsnit 13</a>). Fotoet fra etiketscanningen overtages samtidig som vinens eget foto: Flasken findes i samme AI-kald (uden ekstra omkostninger), frisættes fra baggrunden, rettes op og placeres midt i billedet. Har vinen allerede et foto, spørger appen, om det skal erstattes.</p>
 <h3>c) Scan stregkode</h3>
 <p>Tryk på <em>Scan stregkode</em> og hold flaskens stregkode inden for rammen. Appen slår nummeret op i en gratis produktdatabase (uden omkostninger, ingen AI-kredit) og udfylder, hvis den finder det, <strong>navn, producent og vintype</strong>. Årgangen udleder den af navnet, ellers spørger den efter den.</p>
 <ul>
@@ -117,7 +117,7 @@
 <li><strong>Fra hvilken plads blev den taget?</strong> – vælg den reolplads, flasken kom fra, eller ”Flaske uden plads”. Pladsen bliver ledig.</li>
 <li><strong>Med hvem drak du?</strong> – navnene på dine gæster (valgfrit).</li>
 <li><strong>Hvad spiste I til (valgfrit)</strong> – retten, du drak vinen til.</li>
-<li><strong>Smagsnote (valgfrit)</strong> – dit indtryk med egne ord, evt. med foto (taget eller valgt; AI’en beskærer det til flasken, ligesom et vins eget foto).</li>
+<li><strong>Smagsnote (valgfrit)</strong> – dit indtryk med egne ord, evt. med foto (taget eller valgt; det behandles som et vins eget foto: flasken frisættes, rettes op og placeres midt i billedet).</li>
 <li><strong>Anledning</strong> – Forår, Sommer, Efterår, Vinter, Fødselsdag, Fest eller ”Bare fordi” (flere kan vælges).</li>
 </ul>
 <p><em>Drik</em> fjerner én flaske og opretter en post i <a href="#history">Historik</a>. Konfetti og lyd fejrer det (kan slås fra i Opsætning). Hvis det er den <strong>sidste flaske</strong>, giver appen besked: vinen forsvinder så fra kælderen (men bliver i Historik).</p>
@@ -250,7 +250,7 @@
 <h2 id="privacy">13. AI, privatliv og omkostninger</h2>
 
 <ul>
-<li><strong>Hvad bruges AI til?</strong> Scan etiket, slå vin op, søg priser, ”Opdater alle vine”, madforslag (”Passer til …”, ”Hvad passer i dag?”) og beskæring af egne fotos til flasken. Dertil sendes fotoet eller vinens navn (ved forslaget fra kælderen også listen over dine vine, uden priser) via vores server til en AI-tjeneste (Anthropic, USA) til analyse – uden navne eller konti. Appen beder om dit samtykke før første brug.</li>
+<li><strong>Hvad bruges AI til?</strong> Scan etiket, slå vin op, søg priser, ”Opdater alle vine”, madforslag (”Passer til …”, ”Hvad passer i dag?”) og at finde flasken på egne fotos. Dertil sendes fotoet eller vinens navn (ved forslaget fra kælderen også listen over dine vine, uden priser) via vores server til en AI-tjeneste (Anthropic, USA) til analyse – uden navne eller konti. Den efterfølgende frisætning af flasken kører på din enhed. Appen beder om dit samtykke før første brug.</li>
 <li><strong>Stregkodescanning</strong> sender kun nummeret til en gratis produktdatabase og koster ingen AI-kredit.</li>
 <li><strong>Omkostninger (iPhone-appen):</strong> 50 AI-kald pr. installation er inkluderet i købsprisen; flere kan købes som et valgfrit engangskøb (intet abonnement, kreditterne udløber ikke). Alt andet i appen koster ikke ekstra. Når kreditterne er brugt op, virker alt undtagen AI-funktionerne stadig.</li>
 <li><strong>Data:</strong> Alt bliver på din enhed, så længe du ikke aktiverer skyen. Ingen reklamer, ingen tracking, ingen brugerkonto. Detaljer i <a href="datenschutz.html">privatlivspolitikken</a> (på tysk).</li>

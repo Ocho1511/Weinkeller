@@ -15,7 +15,7 @@
   .back{margin:0 0 6px} .toapp{display:none} @media (display-mode: standalone){.toapp{display:inline}}
   @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
 </style></head><body>
-<!--update-2026-11-27--><!--update-2026-11-28-->
+<!--update-2026-11-27--><!--update-2026-11-28--><!--update3-->
 <p class="back"><span class="toapp"><a href="index.html">← 返回酒窖</a> &nbsp;·&nbsp; </span><a href="support.html">← 返回支持页面</a></p>
 <div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html">Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html" selected>简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
 
@@ -76,10 +76,10 @@
 <ul>
 <li><strong>适饮期：</strong>一旦输入年份，应用就会把“适饮起”设为<strong>年份 + 1</strong>。“适饮至”则取决于葡萄酒类型和葡萄品种（红葡萄酒比桃红保存得更久）。这两项您随时都可以修改。</li>
 <li><strong>库存、最低和最高：</strong>如果您设置了最低库存，当库存低于该值时应用会提醒您，并提供将这款酒加入心愿单的选项（<a href="#cellar">第 3 节</a>）。</li>
-<li><strong>自己的照片：</strong>通过“拍照 / 选择照片”可以给葡萄酒附上一张照片。AI 会在照片中找到酒瓶，并把它放在简洁的竖版画框正中；如果酒瓶靠近照片边缘，会把边缘向外延伸补全（这会使用一次 AI 调用；如果没有找到酒瓶或 AI 不可用，照片保持原样，应用会告知您）。如果这款葡萄酒已经有照片，应用会询问是否用新照片替换。照片保存在本设备上，并包含在 JSON 备份中。开启云端存储后，您可以为每张照片选择保存到“云端（所有设备）”还是“仅此手机”。</li>
+<li><strong>自己的照片：</strong>通过“拍照 / 选择照片”可以给葡萄酒附上一张照片。AI 会在照片中找到酒瓶（这会使用一次 AI 调用）；随后应用会把酒瓶从背景中抠出，去掉旁边的其他物体，把酒瓶摆正，并放在柔和明亮、带有淡淡阴影的背景正中。抠图本身由内置的小型模型在您的设备上完成。如果没有找到酒瓶或某一步出了问题，照片只会围绕酒瓶进行裁剪或保持原样，应用会告知您。如果这款葡萄酒已经有照片，应用会询问是否用新照片替换。照片保存在本设备上，并包含在 JSON 备份中。开启云端存储后，您可以为每张照片选择保存到“云端（所有设备）”还是“仅此手机”。</li>
 </ul>
 <h3>b) 扫描酒标（AI）</h3>
-<p>点按<em>扫描酒标（AI）</em>并拍下酒瓶的酒标。AI 会识别名称、年份、类型、产区、国家和葡萄品种，并估算适饮期和适饮温度。请核对各项数值后保存。首次使用前，应用会征求您的同意（<a href="#privacy">第 13 节</a>）。</p>
+<p>点按<em>扫描酒标（AI）</em>并拍下酒瓶的酒标。AI 会识别名称、年份、类型、产区、国家和葡萄品种，并估算适饮期和适饮温度。请核对各项数值后保存。首次使用前，应用会征求您的同意（<a href="#privacy">第 13 节</a>）。 酒标扫描的照片也会同时保存为这款葡萄酒自己的照片：酒瓶在同一次 AI 调用中被找到（无需额外费用），然后被抠出、摆正并居中放置。如果这款葡萄酒已经有照片，应用会询问是否替换。</p>
 <h3>c) 扫描条形码</h3>
 <p>点按<em>扫描条形码</em>，将酒瓶的条形码对准取景框。应用会在免费的商品数据库中查询该号码（不收费，也不消耗 AI 额度），如果找到，就会自动填入<strong>名称、生产商和葡萄酒类型</strong>。年份会从名称中补全，或者向您询问。</p>
 <ul>
@@ -117,7 +117,7 @@
 <li><strong>从哪个位置取出？</strong>——选择这瓶酒取自的酒架位置，或选择“酒瓶不在任何位置”。该位置随之变为空闲。</li>
 <li><strong>和谁一起喝的？</strong>——您的客人姓名（可选）。</li>
 <li><strong>搭配的菜肴（可选）</strong>——和这款酒一起吃的菜。</li>
-<li><strong>品鉴笔记（可选）</strong>——用自己的话写下感受，也可以附上照片（拍摄或选择；和葡萄酒自己的照片一样，AI 会按酒瓶裁剪）。</li>
+<li><strong>品鉴笔记（可选）</strong>——用自己的话写下感受，也可以附上照片（拍摄或选择；处理方式与葡萄酒自己的照片相同：抠出酒瓶、摆正并居中）。</li>
 <li><strong>场合</strong>——春天、夏天、秋天、冬天、生日、派对或“随心小酌”（可多选）。</li>
 </ul>
 <p><em>饮用</em>会减少一瓶，并在<a href="#history">历史</a>中新增一条记录。彩带和音效会为此庆祝（可在设置中关闭）。如果这是<strong>最后一瓶</strong>，应用会提示您：这款酒随后会从酒窖中消失（但仍保留在历史中）。</p>
@@ -250,7 +250,7 @@
 <h2 id="privacy">13. AI、隐私与费用</h2>
 
 <ul>
-<li><strong>AI 用于什么？</strong>扫描酒标、查询葡萄酒、搜索价格、“更新所有葡萄酒”、菜肴推荐（“适合搭配 …”“今天配什么？”），以及把您自己的照片按酒瓶裁剪。为此，照片或葡萄酒名称（酒窖推荐时还包括您的葡萄酒清单，不含价格）会通过我们的服务器发送给 AI 服务（Anthropic，美国）进行分析——不含姓名或账号。首次使用前，应用会征求您的同意。</li>
+<li><strong>AI 用于什么？</strong>扫描酒标、查询葡萄酒、搜索价格、“更新所有葡萄酒”、菜肴推荐（“适合搭配 …”“今天配什么？”），以及在您自己的照片中找到酒瓶。为此，照片或葡萄酒名称（酒窖推荐时还包括您的葡萄酒清单，不含价格）会通过我们的服务器发送给 AI 服务（Anthropic，美国）进行分析——不含姓名或账号。之后的酒瓶抠图在您的设备上完成。首次使用前，应用会征求您的同意。</li>
 <li><strong>条形码扫描</strong>只会把号码发送到免费的商品数据库，不消耗 AI 额度。</li>
 <li><strong>费用（iPhone 应用）：</strong>每次安装包含在购买价格内的 AI 调用次数为 50 次；更多次数可作为可选的一次性购买项目购买（无需订阅，额度不会过期）。应用中的其他一切都不额外收费。额度用完后，除 AI 功能外的所有功能仍可继续使用。</li>
 <li><strong>数据：</strong>只要您不启用云端，所有内容都保存在您的设备上。没有广告，没有跟踪，没有用户账号。详情见<a href="datenschutz.html">隐私政策</a>（德语）。</li>
