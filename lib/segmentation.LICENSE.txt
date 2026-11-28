@@ -1,0 +1,10 @@
+﻿Freistellen der Flasche (Fotos): läuft komplett auf dem Gerät, es werden keine Bilder an Dritte gesendet.
+
+1) ONNX Runtime Web 1.17.3 (ort.wasm.min.js, ort-wasm-simd.wasm)
+   Copyright (c) Microsoft Corporation. MIT License.
+   https://github.com/microsoft/onnxruntime
+
+2) U2-Net "u2netp" (u2netp.onnx, ONNX-Export aus dem Projekt rembg)
+   Modell: Xuebin Qin et al., "U^2-Net: Going Deeper with Nested U-Structure for Salient Object Detection", Pattern Recognition 2020.
+   https://github.com/xuebinqin/U-2-Net  -  Apache License 2.0
+   ONNX-Datei: https://github.com/danielgatis/rembg (MIT)

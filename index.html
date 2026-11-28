@@ -1087,27 +1087,26 @@ input[type="file"] { display: none; }
   <div class="splash-inner">
     <div class="splash-logo">
       <svg viewBox="0 0 72 72" width="150" height="150" aria-hidden="true">
-        <defs>
-          <linearGradient id="spG" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#f3dfa0"/><stop offset=".5" stop-color="#d4af5a"/><stop offset="1" stop-color="#a98532"/>
-          </linearGradient>
-        </defs>
-        <circle cx="36" cy="36" r="33" fill="rgba(212,175,90,.06)" stroke="url(#spG)" stroke-width="2"/>
-        <circle cx="36" cy="36" r="29.5" fill="none" stroke="url(#spG)" stroke-width=".8" opacity=".8"/>
-        <g transform="translate(36 34) scale(.58) translate(-36 -36)">
-          <path d="M19 12 C12 26 12 48 19 62 C31 66 41 66 53 62 C60 48 60 26 53 12 C41 8 31 8 19 12 Z" fill="rgba(212,175,90,.10)" stroke="url(#spG)" stroke-width="2.4" stroke-linejoin="round"/>
-          <ellipse cx="36" cy="11.5" rx="17" ry="4.4" fill="none" stroke="url(#spG)" stroke-width="2"/>
-          <g fill="none" stroke="url(#spG)" stroke-width="2" stroke-linecap="round">
-            <path d="M15.2 24 Q36 31.5 56.8 24"/><path d="M13.4 38 Q36 46.5 58.6 38"/><path d="M15.6 54 Q36 61 56.4 54"/>
+          <defs>
+            <linearGradient id="spG" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#f3dfa0"/><stop offset=".5" stop-color="#d4af5a"/><stop offset="1" stop-color="#a98532"/>
+            </linearGradient>
+            <radialGradient id="spW" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fcfde6"/><stop offset=".55" stop-color="#d9e48f"/><stop offset="1" stop-color="#9fb054"/></radialGradient>
+            <radialGradient id="spR" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ef7f88"/><stop offset=".5" stop-color="#b3212f"/><stop offset="1" stop-color="#66101b"/></radialGradient>
+          </defs>
+          <circle cx="36" cy="36" r="33" fill="rgba(212,175,90,.06)" stroke="url(#spG)" stroke-width="2"/>
+          <circle cx="36" cy="36" r="29.5" fill="none" stroke="url(#spG)" stroke-width=".8" opacity=".8"/>
+          <g transform="translate(36 34) scale(.58) translate(-36 -36)">
+            <path d="M19 12 C12 26 12 48 19 62 C31 66 41 66 53 62 C60 48 60 26 53 12 C41 8 31 8 19 12 Z" fill="rgba(212,175,90,.10)" stroke="url(#spG)" stroke-width="2.4" stroke-linejoin="round"/>
+            <ellipse cx="36" cy="11.5" rx="17" ry="4.4" fill="none" stroke="url(#spG)" stroke-width="2"/>
+            <g fill="none" stroke="url(#spG)" stroke-width="2" stroke-linecap="round">
+              <path d="M15.2 24 Q36 31.5 56.8 24"/><path d="M13.4 38 Q36 46.5 58.6 38"/><path d="M15.6 54 Q36 61 56.4 54"/>
+            </g>
+            <path d="M36 16 L36 66" stroke="url(#spG)" stroke-width="1" opacity=".5"/>
           </g>
-          <path d="M36 16 L36 66" stroke="url(#spG)" stroke-width="1" opacity=".5"/>
-        </g>
-        <g fill="url(#spG)" opacity=".95">
-          <path d="M12 52 C9 46 12 40 17 38 C18 44 16 49 12 52 Z"/><path d="M17 58 C13 55 12 50 14 46 C19 48 20 54 17 58 Z"/>
-          <path d="M60 52 C63 46 60 40 55 38 C54 44 56 49 60 52 Z"/><path d="M55 58 C59 55 60 50 58 46 C53 48 52 54 55 58 Z"/>
-        </g>
-        <g fill="url(#spG)"><circle cx="31" cy="60" r="2"/><circle cx="36" cy="62" r="2"/><circle cx="41" cy="60" r="2"/><circle cx="36" cy="57" r="1.8" opacity=".9"/></g>
-      </svg>
+          <path d="M14.6 39 L14.6 35.4" fill="none" stroke="url(#spG)" stroke-width="1.2" stroke-linecap="round"/><path d="M14.6 37.4 Q13 32.2 7.199999999999999 32.6 Q8.8 37.8 14.6 37.4 Z" fill="url(#spG)" opacity=".95"/><circle cx="10.5" cy="41" r="2.1" fill="url(#spW)" stroke="rgba(0,0,0,.28)" stroke-width=".35"/><circle cx="14.6" cy="41" r="2.1" fill="url(#spW)" stroke="rgba(0,0,0,.28)" stroke-width=".35"/><circle cx="18.7" cy="41" r="2.1" fill="url(#spW)" stroke="rgba(0,0,0,.28)" stroke-width=".35"/><circle cx="12.55" cy="45.4" r="2.1" fill="url(#spW)" stroke="rgba(0,0,0,.28)" stroke-width=".35"/><circle cx="16.65" cy="45.4" r="2.1" fill="url(#spW)" stroke="rgba(0,0,0,.28)" stroke-width=".35"/><circle cx="14.6" cy="49.8" r="2.1" fill="url(#spW)" stroke="rgba(0,0,0,.28)" stroke-width=".35"/>
+          <path d="M57.4 39 L57.4 35.4" fill="none" stroke="url(#spG)" stroke-width="1.2" stroke-linecap="round"/><path d="M57.4 37.4 Q59 32.2 64.8 32.6 Q63.199999999999996 37.8 57.4 37.4 Z" fill="url(#spG)" opacity=".95"/><circle cx="61.5" cy="41" r="2.1" fill="url(#spR)" stroke="rgba(0,0,0,.28)" stroke-width=".35"/><circle cx="57.4" cy="41" r="2.1" fill="url(#spR)" stroke="rgba(0,0,0,.28)" stroke-width=".35"/><circle cx="53.3" cy="41" r="2.1" fill="url(#spR)" stroke="rgba(0,0,0,.28)" stroke-width=".35"/><circle cx="59.45" cy="45.4" r="2.1" fill="url(#spR)" stroke="rgba(0,0,0,.28)" stroke-width=".35"/><circle cx="55.35" cy="45.4" r="2.1" fill="url(#spR)" stroke="rgba(0,0,0,.28)" stroke-width=".35"/><circle cx="57.4" cy="49.8" r="2.1" fill="url(#spR)" stroke="rgba(0,0,0,.28)" stroke-width=".35"/>
+        </svg>
     </div>
     <div class="splash-title" id="splash-title">Weinkeller</div>
   </div>
@@ -1175,11 +1174,13 @@ input[type="file"] { display: none; }
   <div class="page-header">
     <div class="header-lockup">
       <div class="header-barrel" aria-hidden="true">
-        <svg viewBox="0 0 72 72" width="60" height="60">
+        <svg viewBox="0 0 72 72" width="60" height="60" aria-hidden="true">
           <defs>
             <linearGradient id="hbG" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stop-color="#f3dfa0"/><stop offset=".5" stop-color="#d4af5a"/><stop offset="1" stop-color="#a98532"/>
             </linearGradient>
+            <radialGradient id="hbW" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fcfde6"/><stop offset=".55" stop-color="#d9e48f"/><stop offset="1" stop-color="#9fb054"/></radialGradient>
+            <radialGradient id="hbR" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ef7f88"/><stop offset=".5" stop-color="#b3212f"/><stop offset="1" stop-color="#66101b"/></radialGradient>
           </defs>
           <circle cx="36" cy="36" r="33" fill="rgba(212,175,90,.06)" stroke="url(#hbG)" stroke-width="2"/>
           <circle cx="36" cy="36" r="29.5" fill="none" stroke="url(#hbG)" stroke-width=".8" opacity=".8"/>
@@ -1191,11 +1192,8 @@ input[type="file"] { display: none; }
             </g>
             <path d="M36 16 L36 66" stroke="url(#hbG)" stroke-width="1" opacity=".5"/>
           </g>
-          <g fill="url(#hbG)" opacity=".95">
-            <path d="M12 52 C9 46 12 40 17 38 C18 44 16 49 12 52 Z"/><path d="M17 58 C13 55 12 50 14 46 C19 48 20 54 17 58 Z"/>
-            <path d="M60 52 C63 46 60 40 55 38 C54 44 56 49 60 52 Z"/><path d="M55 58 C59 55 60 50 58 46 C53 48 52 54 55 58 Z"/>
-          </g>
-          <g fill="url(#hbG)"><circle cx="31" cy="60" r="2"/><circle cx="36" cy="62" r="2"/><circle cx="41" cy="60" r="2"/><circle cx="36" cy="57" r="1.8" opacity=".9"/></g>
+          <path d="M14.6 39 L14.6 35.4" fill="none" stroke="url(#hbG)" stroke-width="1.2" stroke-linecap="round"/><path d="M14.6 37.4 Q13 32.2 7.199999999999999 32.6 Q8.8 37.8 14.6 37.4 Z" fill="url(#hbG)" opacity=".95"/><circle cx="10.5" cy="41" r="2.1" fill="url(#hbW)" stroke="rgba(0,0,0,.28)" stroke-width=".35"/><circle cx="14.6" cy="41" r="2.1" fill="url(#hbW)" stroke="rgba(0,0,0,.28)" stroke-width=".35"/><circle cx="18.7" cy="41" r="2.1" fill="url(#hbW)" stroke="rgba(0,0,0,.28)" stroke-width=".35"/><circle cx="12.55" cy="45.4" r="2.1" fill="url(#hbW)" stroke="rgba(0,0,0,.28)" stroke-width=".35"/><circle cx="16.65" cy="45.4" r="2.1" fill="url(#hbW)" stroke="rgba(0,0,0,.28)" stroke-width=".35"/><circle cx="14.6" cy="49.8" r="2.1" fill="url(#hbW)" stroke="rgba(0,0,0,.28)" stroke-width=".35"/>
+          <path d="M57.4 39 L57.4 35.4" fill="none" stroke="url(#hbG)" stroke-width="1.2" stroke-linecap="round"/><path d="M57.4 37.4 Q59 32.2 64.8 32.6 Q63.199999999999996 37.8 57.4 37.4 Z" fill="url(#hbG)" opacity=".95"/><circle cx="61.5" cy="41" r="2.1" fill="url(#hbR)" stroke="rgba(0,0,0,.28)" stroke-width=".35"/><circle cx="57.4" cy="41" r="2.1" fill="url(#hbR)" stroke="rgba(0,0,0,.28)" stroke-width=".35"/><circle cx="53.3" cy="41" r="2.1" fill="url(#hbR)" stroke="rgba(0,0,0,.28)" stroke-width=".35"/><circle cx="59.45" cy="45.4" r="2.1" fill="url(#hbR)" stroke="rgba(0,0,0,.28)" stroke-width=".35"/><circle cx="55.35" cy="45.4" r="2.1" fill="url(#hbR)" stroke="rgba(0,0,0,.28)" stroke-width=".35"/><circle cx="57.4" cy="49.8" r="2.1" fill="url(#hbR)" stroke="rgba(0,0,0,.28)" stroke-width=".35"/>
         </svg>
       </div>
       <div class="header-text">
@@ -2821,10 +2819,11 @@ function photoFrameRect(box, W, H) {
   const bw = x2 - x1, bh = y2 - y1;
   if (bw < 40 || bh < HU * 0.15) return null;   // unplausibel klein: der KI-Angabe nicht trauen
   if (bw >= 940 && bh >= HU * 0.7) return null;   // Box umfasst praktisch das ganze Bild
+  const tx = x1, ty = y1, tw = bw, th = bh;   // enge KI-Box (Einheiten)
   const mx = bw * 0.2, my = bh * 0.08;   // großzügig: die enge Anpassung übernimmt photoRefine
   x1 = Math.max(0, x1 - mx); x2 = Math.min(1000, x2 + mx); y1 = Math.max(0, y1 - my); y2 = Math.min(HU, y2 + my);
   if (x2 - x1 >= 940 && y2 - y1 >= HU * 0.94) return null;   // Flasche füllt schon das ganze Bild
-  return { x: Math.round(x1 * k), y: Math.round(y1 * k), w: Math.round((x2 - x1) * k), h: Math.round((y2 - y1) * k) };
+  return { x: Math.round(x1 * k), y: Math.round(y1 * k), w: Math.round((x2 - x1) * k), h: Math.round((y2 - y1) * k), tx: Math.round(tx * k), ty: Math.round(ty * k), tw: Math.round(tw * k), th: Math.round(th * k) };
 }
 // Ausschnitt rect (Pixel von img) enger an die Flasche legen. Zuverlässig nur bei halbwegs ruhigem Hintergrund; sonst bleibt rect unverändert.
 async function photoRefine(dataUrl, rect) {
@@ -2868,6 +2867,119 @@ async function photoRefine(dataUrl, rect) {
     const x1 = Math.max(0, rx.a - mx), x2 = Math.min(w, rx.b + 1 + mx), y1 = Math.max(0, ry.a - my), y2 = Math.min(h, ry.b + 1 + my);
     return { x: Math.round(rect.x + x1 / sc), y: Math.round(rect.y + y1 / sc), w: Math.round((x2 - x1) / sc), h: Math.round((y2 - y1) / sc) };
   } catch (e) { return rect; }
+}
+// ── Flasche freistellen, gerade stellen und auf ruhigen Grund setzen ──
+// Ein kleines Modell (lib/u2netp.onnx, Apache-2.0) trennt die Flasche vom Rest; die KI-Box (Position der Flasche) begrenzt, wo gesucht wird,
+// so bleiben Glas, Kerze usw. neben der Flasche draußen. Alles läuft auf dem Gerät, es werden keine Bilder an Dritte gesendet.
+// Gelingt etwas nicht (Modell nicht ladbar, unplausibles Ergebnis), liefert photoStudio null und es bleibt beim Zuschnitt ohne Freistellen.
+var segState = { sess: null, loading: null };
+function segSession() {
+  if (segState.sess) return Promise.resolve(segState.sess);
+  if (!segState.loading) segState.loading = (async () => {
+    await loadScriptOnce('lib/ort.wasm.min.js');
+    ort.env.wasm.wasmPaths = 'lib/'; ort.env.wasm.numThreads = 1; ort.env.wasm.proxy = false;
+    segState.sess = await ort.InferenceSession.create('lib/u2netp.onnx', { executionProviders: ['wasm'] });
+    return segState.sess;
+  })().catch((e) => { segState.loading = null; throw e; });
+  return segState.loading;
+}
+async function photoStudio(dataUrl, rect) {
+  if (!rect || rect.tw == null) return null;
+  const img = await photoLoadImg(dataUrl);
+  const sess = await segSession();
+  // 1) Ausschnitt (großzügig um die KI-Box) für das Modell vorbereiten
+  const S = 320, cin = document.createElement('canvas'); cin.width = S; cin.height = S;
+  const gin = cin.getContext('2d', { willReadFrequently: true });
+  gin.drawImage(img, rect.x, rect.y, rect.w, rect.h, 0, 0, S, S);
+  const d = gin.getImageData(0, 0, S, S).data, mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225], inp = new Float32Array(3 * S * S);
+  for (let i = 0; i < S * S; i++) for (let k = 0; k < 3; k++) inp[k * S * S + i] = (d[i * 4 + k] / 255 - mean[k]) / std[k];
+  const out = await sess.run({ [sess.inputNames[0]]: new ort.Tensor('float32', inp, [1, 3, S, S]) });
+  const p = out[sess.outputNames[0]].data;
+  let mi = 1e9, ma = -1e9;
+  for (let i = 0; i < p.length; i++) { if (p[i] < mi) mi = p[i]; if (p[i] > ma) ma = p[i]; }
+  // 2) Maske auf Arbeitsgröße hochrechnen (weich), außerhalb der erweiterten KI-Box verwerfen
+  const sc = Math.min(1, 640 / Math.max(rect.w, rect.h)), cw = Math.max(8, Math.round(rect.w * sc)), ch = Math.max(8, Math.round(rect.h * sc));
+  const mc = document.createElement('canvas'); mc.width = S; mc.height = S;
+  const mg = mc.getContext('2d'), mid = mg.createImageData(S, S);
+  for (let i = 0; i < S * S; i++) { mid.data[i * 4] = mid.data[i * 4 + 1] = mid.data[i * 4 + 2] = 255; mid.data[i * 4 + 3] = Math.round(255 * (p[i] - mi) / (ma - mi || 1)); }
+  mg.putImageData(mid, 0, 0);
+  const wc = document.createElement('canvas'); wc.width = cw; wc.height = ch;
+  const wg = wc.getContext('2d', { willReadFrequently: true });
+  wg.imageSmoothingEnabled = true; wg.imageSmoothingQuality = 'high';
+  wg.drawImage(mc, 0, 0, cw, ch);
+  const ad = wg.getImageData(0, 0, cw, ch).data, alpha = new Uint8ClampedArray(cw * ch);
+  const px = (rect.tx - rect.x) * sc, py = (rect.ty - rect.y) * sc, pw = rect.tw * sc, ph = rect.th * sc;
+  const bx1 = px - pw * 0.08, bx2 = px + pw * 1.08, by1 = py - ph * 0.04, by2 = py + ph * 1.04;
+  for (let y = 0; y < ch; y++) for (let x = 0; x < cw; x++) {
+    if (x < bx1 || x > bx2 || y < by1 || y > by2) continue;
+    const v = ad[(y * cw + x) * 4 + 3] / 255, t = Math.min(1, Math.max(0, (v - 0.35) / 0.3));   // weiche Kante zwischen 0,35 und 0,65
+    alpha[y * cw + x] = Math.round(255 * t * t * (3 - 2 * t));
+  }
+  // 3) größter zusammenhängender Bereich (grobe Zellen) behalten: Reste wie Spiegelungen oder Schatten fliegen raus
+  const cell = 4, gw = Math.ceil(cw / cell), gh = Math.ceil(ch / cell), grid = new Uint8Array(gw * gh);
+  for (let y = 0; y < ch; y++) for (let x = 0; x < cw; x++) if (alpha[y * cw + x] > 127) grid[((y / cell) | 0) * gw + ((x / cell) | 0)] = 1;
+  const lab = new Int32Array(gw * gh); let best = 0, bestN = 0, nl = 0;
+  for (let i = 0; i < grid.length; i++) {
+    if (!grid[i] || lab[i]) continue;
+    nl++; let n = 0; const st = [i]; lab[i] = nl;
+    while (st.length) { const j = st.pop(); n++; const x = j % gw, y = (j / gw) | 0; for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const xx = x + dx, yy = y + dy; if (xx < 0 || yy < 0 || xx >= gw || yy >= gh) continue; const k = yy * gw + xx; if (grid[k] && !lab[k]) { lab[k] = nl; st.push(k); } }
+    }
+    if (n > bestN) { bestN = n; best = nl; }
+  }
+  if (!best) return null;
+  const keep = new Uint8Array(gw * gh);   // behaltener Bereich, um eine Zelle erweitert (die weiche Kante bleibt erhalten)
+  for (let i = 0; i < lab.length; i++) if (lab[i] === best) { const x = i % gw, y = (i / gw) | 0; for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) { const xx = x + dx, yy = y + dy; if (xx >= 0 && yy >= 0 && xx < gw && yy < gh) keep[yy * gw + xx] = 1; } }
+  let n = 0, sx = 0, sy = 0, sxx = 0, syy = 0, sxy = 0, x1 = cw, x2 = 0, y1 = ch, y2 = 0;
+  for (let y = 0; y < ch; y++) for (let x = 0; x < cw; x++) {
+    const i = y * cw + x;
+    if (!keep[((y / cell) | 0) * gw + ((x / cell) | 0)]) alpha[i] = 0;
+    if (alpha[i] > 127) { n++; sx += x; sy += y; sxx += x * x; syy += y * y; sxy += x * y; if (x < x1) x1 = x; if (x > x2) x2 = x; if (y < y1) y1 = y; if (y > y2) y2 = y; }
+  }
+  // 4) Plausibilität: die Maske muss zur KI-Box passen, sonst kein Freistellen
+  const bh = y2 - y1 + 1, bw = x2 - x1 + 1;
+  if (n < 50 || bh < ph * 0.6 || bw < pw * 0.25 || n > pw * ph * 1.05) return null;
+  // 5) Neigung aus der Hauptachse der Maske; Flasche aufrichten (Hals nach oben)
+  const mx = sx / n, my = sy / n, cxx = sxx / n - mx * mx, cyy = syy / n - my * my, cxy = sxy / n - mx * my;
+  const tr = cxx + cyy, det = cxx * cyy - cxy * cxy, disc = Math.sqrt(Math.max(0, tr * tr / 4 - det)), l1 = tr / 2 + disc, l2 = Math.max(1e-6, tr / 2 - disc);
+  let rot = 0;   // Drehung im Uhrzeigersinn in Grad
+  if (Math.sqrt(l1 / l2) >= 1.6) {
+    const ang = 0.5 * Math.atan2(2 * cxy, cxx - cyy);   // Winkel der Hauptachse zur x-Achse (Bildkoordinaten, y nach unten)
+    let fromVertical = ang * 180 / Math.PI - 90;          // Abweichung der Achse von der Senkrechten
+    while (fromVertical > 90) fromVertical -= 180; while (fromVertical <= -90) fromVertical += 180;
+    rot = -fromVertical;
+    if (Math.abs(rot) < 1.5) rot = 0;
+  }
+  // 6) Freisteller auf Leinwand bauen, drehen, Ränder bestimmen
+  const cut = document.createElement('canvas'); cut.width = cw; cut.height = ch;
+  const cg = cut.getContext('2d', { willReadFrequently: true });
+  cg.drawImage(img, rect.x, rect.y, rect.w, rect.h, 0, 0, cw, ch);
+  const cd = cg.getImageData(0, 0, cw, ch);
+  for (let i = 0; i < cw * ch; i++) cd.data[i * 4 + 3] = alpha[i];
+  cg.putImageData(cd, 0, 0);
+  const diag = Math.ceil(Math.hypot(cw, ch)) + 4, rc = document.createElement('canvas'); rc.width = diag; rc.height = diag;
+  const rg = rc.getContext('2d', { willReadFrequently: true });
+  rg.translate(diag / 2, diag / 2); rg.rotate(rot * Math.PI / 180); rg.drawImage(cut, -mx, -my); rg.setTransform(1, 0, 0, 1, 0, 0);
+  const rd = rg.getImageData(0, 0, diag, diag).data;
+  let a1 = diag, a2 = 0, b1 = diag, b2 = 0;
+  for (let y = 0; y < diag; y++) for (let x = 0; x < diag; x++) if (rd[(y * diag + x) * 4 + 3] > 40) { if (x < a1) a1 = x; if (x > a2) a2 = x; if (y < b1) b1 = y; if (y > b2) b2 = y; }
+  if (a2 <= a1 || b2 <= b1) return null;
+  // Steht die Flasche auf dem Kopf (breiteres Ende oben)? Dann um 180° drehen.
+  let upside = false;
+  { const band = Math.max(3, Math.round((b2 - b1) * 0.15)), wid = (y0, y1b) => { let tot = 0, rows = 0; for (let y = y0; y < y1b; y++) { let c = 0; for (let x = a1; x <= a2; x++) if (rd[(y * diag + x) * 4 + 3] > 127) c++; tot += c; rows++; } return rows ? tot / rows : 0; };
+    // nur bei liegenden bzw. stark gekippten Flaschen prüfen (Hals oben?); aufrecht stehende Flaschen werden nie umgedreht, auch wenn der Hals im Bild fehlt
+    upside = Math.abs(rot) > 35 && wid(b1, b1 + band) > wid(b2 - band, b2 + 1) * 1.25; }
+  // 7) Szene: ruhiger heller Grund mit Weichzeichner-Schatten, Flasche mittig in einem Hochformat-Rahmen 2:3
+  const FW = 667, FH = 1000, out2 = document.createElement('canvas'); out2.width = FW; out2.height = FH;
+  const g = out2.getContext('2d');
+  const bgr = g.createLinearGradient(0, 0, 0, FH); bgr.addColorStop(0, '#f6f3ee'); bgr.addColorStop(1, '#e8e3da');
+  g.fillStyle = bgr; g.fillRect(0, 0, FW, FH);
+  const sw = a2 - a1 + 1, sh = b2 - b1 + 1, scale = Math.min(FH * 0.84 / sh, FW * 0.9 / sw), dw = sw * scale, dh = sh * scale, dx = (FW - dw) / 2, dy = (FH - dh) / 2 - FH * 0.01;
+  const shadow = g.createRadialGradient(FW / 2, dy + dh, 1, FW / 2, dy + dh, dw * 0.75);
+  shadow.addColorStop(0, 'rgba(60,45,30,0.30)'); shadow.addColorStop(1, 'rgba(60,45,30,0)');
+  g.save(); g.translate(FW / 2, dy + dh); g.scale(1, 0.18); g.translate(-FW / 2, -(dy + dh)); g.fillStyle = shadow; g.beginPath(); g.arc(FW / 2, dy + dh, dw * 0.75, 0, Math.PI * 2); g.fill(); g.restore();
+  if (upside) { g.save(); g.translate(FW / 2, FH / 2); g.rotate(Math.PI); g.translate(-FW / 2, -FH / 2); g.drawImage(rc, a1, b1, sw, sh, FW - dx - dw, FH - dy - dh, dw, dh); g.restore(); }
+  else g.drawImage(rc, a1, b1, sw, sh, dx, dy, dw, dh);
+  return out2.toDataURL('image/jpeg', 0.9);
 }
 // Flasche (Rechteck rect in Pixeln von dataUrl) mittig in einen ruhigen Rahmen im Hochformat setzen (längste Seite maxDim)
 async function photoCompose(dataUrl, rect, maxDim) {
@@ -2922,6 +3034,30 @@ async function photoCompose(dataUrl, rect, maxDim) {
   }
   return c.toDataURL('image/jpeg', 0.88);
 }
+// Zusatz für den Prompt des Etikett-Scans: die KI liefert im selben Aufruf auch die Position der Flasche (kein zweiter KI-Aufruf nötig)
+function photoBoxPrompt(HU) {
+  return ' Zusätzlich bottle: ein Objekt mit found (true, wenn die Flasche als Ganzes zu sehen ist, sonst false) und box (vier ganze Zahlen [x1, y1, x2, y2]; links oben ist 0,0). Die Koordinaten sind Einheiten, in denen die Bildbreite genau 1000 entspricht; die Bildhöhe ist dann ' + HU + ' Einheiten. Die Box umschließt die auffälligste Flasche vollständig und eng, von der Kapsel oder dem Hals bis zum Boden und von Rand zu Rand der Flasche, ohne Gläser, Tisch oder Hintergrund.';
+}
+// Foto des Etikett-Scans als eigenes Foto des Weins übernehmen (auf die Flasche zugeschnitten und mittig gesetzt, wenn die KI die Flasche gefunden hat).
+// Hat der Wein im Formular schon ein Foto, wird gefragt. Fehler hier dürfen den Scan nie stören.
+async function scanPhotoFromLabel(big, bottle, W, H) {
+  try {
+    const cur = document.getElementById('f-photo').value;
+    if (cur && photoCache.has(cur) && !confirm(t('photo_replace_ask'))) return;
+    let rect = null;
+    try { rect = photoFrameRect(bottle && bottle.found === true ? bottle.box : null, W, H); } catch (e) { rect = null; }
+    let url = null;
+    if (rect) { try { url = await photoStudio(big, rect); } catch (e) { url = null; } }
+    if (!url && rect) { let tight = rect; try { tight = await photoRefine(big, rect); } catch (e) {} url = await photoCompose(big, tight, 1000); }
+    if (!url) url = await photoCrop(big, null, 1000);
+    const id = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    await photoPut(id, url);
+    if (formPhotoPending) photoDel(formPhotoPending);
+    formPhotoPending = id;
+    document.getElementById('f-photo').value = id;
+    updateFormPhoto();
+  } catch (e) { /* kein Foto übernommen, der Scan selbst ist davon unberührt */ }
+}
 async function photoBottleBox(dataUrl, W, H) {
   const HU = Math.round(H * 1000 / W);
   const resp = await aiFetch(SCAN_PROXY_URL, {
@@ -2955,9 +3091,14 @@ async function photoPrepare(file, boxId) {
     const si = await photoLoadImg(small), bi = await photoLoadImg(big);
     const box = await photoBottleBox(small, si.naturalWidth, si.naturalHeight);
     rect = photoFrameRect(box, bi.naturalWidth, bi.naturalHeight);
-    if (rect) rect = await photoRefine(big, rect);
-  } catch (e) { rect = null; }   // kein Guthaben/keine Einwilligung/Netz: Foto bleibt, wie es ist
-  return { url: rect ? await photoCompose(big, rect, 1000) : await photoCrop(big, null, 1000), framed: !!rect };
+  } catch (e) { rect = null; }
+  if (!rect) return { url: await photoCrop(big, null, 1000), framed: false };
+  let studio = null;
+  try { studio = await photoStudio(big, rect); } catch (e) { studio = null; }
+  if (studio) return { url: studio, framed: true };
+  let tight = rect;
+  try { tight = await photoRefine(big, rect); } catch (e) {}
+  return { url: await photoCompose(big, tight, 1000), framed: true };
 }
 // Speichern-Knopf eines Fensters sperren, solange das Foto noch bearbeitet wird (sonst ginge es beim schnellen Speichern verloren)
 function photoBusy(modalId, on) { const b = document.querySelector('#' + modalId + ' .btn-primary, #' + modalId + ' #add-save-btn'); if (b) b.disabled = !!on; }
@@ -16964,13 +17105,15 @@ async function handleScan(e) {
   showBarcodeMiss(false);
   try {
     const base64 = await imageToBase64(file);
+    const big = 'data:image/jpeg;base64,' + base64;
+    const bi = await photoLoadImg(big), HU = Math.round(bi.naturalHeight * 1000 / bi.naturalWidth);
     const resp = await aiFetch(SCAN_PROXY_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 1000,
-        system: 'Du bist ein Weinetikett- und Trinkreife-Experte. Antworte NUR mit einem JSON-Objekt ohne Markdown-Backticks. Felder: name (Weingut + Weinname), year (Jahrgang als Zahl oder null), type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), land (Herkunftsland auf Deutsch, z.B. Frankreich, oder null), grape (Rebsorte oder null), drinkFrom (Jahr als Zahl, ab dem der Wein grob geschätzt trinkreif ist, basierend auf Rebsorte/Region/Jahrgang, oder null), drinkTo (Jahr als Zahl, bis zu dem er grob geschätzt getrunken werden sollte, oder null), tempFrom und tempTo (empfohlene Trinktemperatur als untere und obere Grenze in °C, ganze Zahlen, z. B. 16 und 18, passend zu Weinart und Rebsorte, oder null). drinkFrom/drinkTo sind nur grobe Schätzungen, keine Angabe vom Etikett selbst. drinkFrom liegt nie vor dem Jahrgang (year), und drinkTo liegt immer nach drinkFrom. Zusätzlich art (welche Art Getränk auf dem Etikett steht: gin, whiskey, wine oder other). Wenn etwas nicht erkennbar ist oder keine sinnvolle Schätzung möglich ist, nutze null.',
+        system: 'Du bist ein Weinetikett- und Trinkreife-Experte. Antworte NUR mit einem JSON-Objekt ohne Markdown-Backticks. Felder: name (Weingut + Weinname), year (Jahrgang als Zahl oder null), type (rot/weiß/rosé/sekt/other), region (Anbaugebiet oder null), land (Herkunftsland auf Deutsch, z.B. Frankreich, oder null), grape (Rebsorte oder null), drinkFrom (Jahr als Zahl, ab dem der Wein grob geschätzt trinkreif ist, basierend auf Rebsorte/Region/Jahrgang, oder null), drinkTo (Jahr als Zahl, bis zu dem er grob geschätzt getrunken werden sollte, oder null), tempFrom und tempTo (empfohlene Trinktemperatur als untere und obere Grenze in °C, ganze Zahlen, z. B. 16 und 18, passend zu Weinart und Rebsorte, oder null). drinkFrom/drinkTo sind nur grobe Schätzungen, keine Angabe vom Etikett selbst. drinkFrom liegt nie vor dem Jahrgang (year), und drinkTo liegt immer nach drinkFrom. Zusätzlich art (welche Art Getränk auf dem Etikett steht: gin, whiskey, wine oder other). Wenn etwas nicht erkennbar ist oder keine sinnvolle Schätzung möglich ist, nutze null.' + photoBoxPrompt(HU),
         messages: [{ role: 'user', content: [
           { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: base64 } },
           { type: 'text', text: 'Analysiere dieses Weinetikett.' }
@@ -16992,6 +17135,7 @@ async function handleScan(e) {
     fixFormDrinkWindow();
     if (info.tempFrom != null) document.getElementById('f-temp-from').value = tempToDisplay(info.tempFrom);
     if (info.tempTo != null) document.getElementById('f-temp-to').value = tempToDisplay(info.tempTo);
+    await scanPhotoFromLabel(big, info.bottle, bi.naturalWidth, bi.naturalHeight);
     showToast(info.drinkFrom || info.drinkTo ? t('toast_label_ripe') : t('toast_label'));
   } catch {
     showToast(t('toast_scanfail'));
