@@ -15,12 +15,12 @@
   .back{margin:0 0 6px} .toapp{display:none} @media (display-mode: standalone){.toapp{display:inline}}
   @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
 </style></head><body>
-<!--update-2026-11-27-->
+<!--update-2026-11-27--><!--update-2026-11-28-->
 <p class="back"><span class="toapp"><a href="index.html">← La pivniță</a> &nbsp;·&nbsp; </span><a href="support.html">← Înapoi la asistență</a></p>
 <div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html">Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html" selected>Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
 
 <h1>Ghid de utilizare – Weinkeller</h1>
-<p><small>Actualizat: 27 noiembrie 2026 · Versiunea aplicației 2.0</small></p>
+<p><small>Actualizat: 28 noiembrie 2026 · Versiunea aplicației 2.0</small></p>
 
 <div class="toc">
 
@@ -76,7 +76,7 @@
 <ul>
 <li><strong>Interval de consum:</strong> De îndată ce introduci anul, aplicația setează „Bea de la” la <strong>anul + 1</strong>. „Bea până” depinde de tipul de vin și de soi (un roșu se păstrează mai mult decât un rosé). Poți modifica oricând ambele valori.</li>
 <li><strong>Stoc, Min și Max:</strong> Dacă introduci un minim, aplicația te avertizează când stocul scade sub el și îți propune să pui vinul pe lista de dorințe (<a href="#cellar">secțiunea 3</a>).</li>
-<li><strong>Fotografie proprie:</strong> „Fă / alege o fotografie” atașează o fotografie la vin. IA găsește sticla în fotografie și decupează imaginea strâns în jurul ei (asta folosește un apel IA; dacă nu se găsește nicio sticlă sau IA nu este disponibilă, fotografia rămâne neschimbată). Fotografia rămâne pe acest dispozitiv și este inclusă în backup-ul JSON. Cu stocarea în cloud activată, alegi pentru fiecare fotografie dacă se salvează „În cloud” (pe toate dispozitivele) sau „Doar pe acest telefon”.</li>
+<li><strong>Fotografie proprie:</strong> „Fă / alege o fotografie” atașează o fotografie la vin. IA găsește sticla în fotografie și o așază centrat într-un cadru vertical, liniștit; acolo unde sticla este aproape de marginea fotografiei, marginea este prelungită (asta folosește un apel IA; dacă nu se găsește nicio sticlă sau IA nu este disponibilă, fotografia rămâne neschimbată, iar aplicația îți spune acest lucru). Dacă vinul are deja o fotografie, aplicația întreabă dacă noua fotografie trebuie să o înlocuiască. Fotografia rămâne pe acest dispozitiv și este inclusă în backup-ul JSON. Cu stocarea în cloud activată, alegi pentru fiecare fotografie dacă se salvează „În cloud” (pe toate dispozitivele) sau „Doar pe acest telefon”.</li>
 </ul>
 <h3>b) Scanează eticheta (IA)</h3>
 <p>Apasă <em>Scanează eticheta (IA)</em> și fotografiază eticheta sticlei. IA citește numele, anul, tipul, regiunea, țara și soiul și estimează intervalul de consum și temperatura de servire. Verifică valorile și salvează. Înainte de prima utilizare, aplicația îți cere acordul (<a href="#privacy">secțiunea 13</a>).</p>
@@ -135,7 +135,7 @@
 <tr><td><strong>Depășit</strong></td><td>După „Bea până” – bea-l cât mai repede</td></tr>
 </tbody></table>
 <p><strong>Filtre:</strong> după tipul de vin, după stare și după <strong>țară</strong> (listă derulantă cu numărul pentru fiecare țară; țările fără rezultate sunt estompate). Filtrele pot fi combinate. Atinge un card pentru a deschide vinul în pivniță.</p>
-<p><strong>Regula intervalului:</strong> „Bea de la” = anul + 1. „Bea până” depinde de tipul de vin și de soi. Dacă ai vinuri mai vechi cu alte valori, le poți recalcula pe toate odată în Setări (<a href="#setup">secțiunea 11</a>, „Recalculează intervalul de consum”).</p>
+<p><strong>Regula intervalului:</strong> „Bea de la” = anul + 1. „Bea până” depinde de tipul de vin și de soi. Dacă ai vinuri mai vechi cu alte valori, le poți recalcula pe toate odată în Setări cu „Actualizează toate vinurile (IA)” (<a href="#setup">secțiunea 11</a>): înainte de a începe, aplicația întreabă dacă intervalele de consum trebuie recalculate după această regulă.</p>
 
 <!-- ───────────────── 6 ───────────────── -->
 <h2 id="racks">6. Rafturi și depozitare</h2>
@@ -229,8 +229,7 @@
 <p>Afișează scanările IA rămase, ID-ul dispozitivului și – la nevoie – <em>Reîncarcă credite</em> sau un cod de deblocare. Vezi <a href="#privacy">secțiunea 13</a>.</p>
 <h3>Bază de date vinuri</h3>
 <ul>
-<li><strong>Actualizează toate vinurile (IA):</strong> completează regiunea, țara, soiul, intervalul de consum, temperatura de servire și prețul lipsă pentru toate vinurile (în versiunea web și imaginile sticlelor). Valorile existente rămân. Dacă există deja temperaturi de servire, aplicația întreabă mai întâi dacă acestea trebuie înlocuite și ele cu valori IA.</li>
-<li><strong>Recalculează intervalul de consum:</strong> setează „Bea de la” la anul + 1 pentru toate vinurile cu un an (valorile introduse manual sunt suprascrise și ele) și ajustează „Bea până” unde este nevoie. Aplicația indică mai întâi numărul de vinuri și cere confirmare. <em>Sfat: exportă mai întâi un backup JSON.</em></li>
+<li><strong>Actualizează toate vinurile (IA):</strong> completează regiunea, țara, soiul, intervalul de consum, temperatura de servire și prețul lipsă pentru toate vinurile (în versiunea web și imaginile sticlelor). Valorile existente rămân. Dacă există deja temperaturi de servire, aplicația întreabă mai întâi dacă acestea trebuie înlocuite și ele cu valori IA. Întreabă și dacă intervalele de consum ale tuturor vinurilor trebuie recalculate după regulă: „Bea de la” se setează la anul + 1 (valorile introduse manual sunt suprascrise și ele), iar „Bea până” se ajustează unde este nevoie; aplicația indică mai întâi numărul de vinuri și întreabă. Întrebarea apare doar dacă s-ar schimba ceva la cel puțin un vin. <em>Sfat: exportă mai întâi un backup JSON.</em></li>
 </ul>
 <h3>Rafturi</h3>
 <p>Vezi <a href="#racks">secțiunea 6</a>. Titlul afișează numărul de rafturi.</p>

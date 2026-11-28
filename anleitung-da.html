@@ -15,12 +15,12 @@
   .back{margin:0 0 6px} .toapp{display:none} @media (display-mode: standalone){.toapp{display:inline}}
   @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
 </style></head><body>
-<!--update-2026-11-27-->
+<!--update-2026-11-27--><!--update-2026-11-28-->
 <p class="back"><span class="toapp"><a href="index.html">← Til kælderen</a> &nbsp;·&nbsp; </span><a href="support.html">← Tilbage til support</a></p>
 <div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html" selected>Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
 
 <h1>Brugervejledning – Weinkeller</h1>
-<p><small>Opdateret: 27. november 2026 · Appversion 2.0</small></p>
+<p><small>Opdateret: 28. november 2026 · Appversion 2.0</small></p>
 
 <div class="toc">
 
@@ -76,7 +76,7 @@
 <ul>
 <li><strong>Drikkevindue:</strong> Så snart du angiver årgangen, sætter appen ”Drik fra” til <strong>årgang + 1</strong>. ”Drik til” afhænger af vintype og drue (en rødvin holder længere end en rosé). Du kan til enhver tid ændre begge.</li>
 <li><strong>Beholdning, Min og Maks:</strong> Hvis du angiver et minimum, advarer appen, når beholdningen falder under det, og tilbyder at sætte vinen på ønskelisten (<a href="#cellar">afsnit 3</a>).</li>
-<li><strong>Eget foto:</strong> ”Tag / vælg foto” knytter et foto til vinen. AI’en finder flasken på fotoet og beskærer billedet tæt omkring den (det koster ét AI-kald; hvis der ikke findes en flaske, eller AI ikke er tilgængelig, bliver fotoet uændret). Fotoet bliver på denne enhed og er med i JSON-backuppen. Når skylagring er slået til, vælger du for hvert foto, om det gemmes ”I skyen (på alle enheder)” eller ”Kun på denne telefon”.</li>
+<li><strong>Eget foto:</strong> ”Tag / vælg foto” knytter et foto til vinen. AI’en finder flasken på fotoet og placerer den midt i en rolig portrætramme; hvor flasken står tæt på fotoets kant, fortsættes kanten (det koster ét AI-kald; hvis der ikke findes en flaske, eller AI ikke er tilgængelig, bliver fotoet uændret, og appen fortæller dig det). Har vinen allerede et foto, spørger appen, om det nye skal erstatte det. Fotoet bliver på denne enhed og er med i JSON-backuppen. Når skylagring er slået til, vælger du for hvert foto, om det gemmes ”I skyen (på alle enheder)” eller ”Kun på denne telefon”.</li>
 </ul>
 <h3>b) Scan etiket (AI)</h3>
 <p>Tryk på <em>Scan etiket (AI)</em> og fotografér flaskens etiket. AI’en aflæser navn, årgang, type, region, land og drue og vurderer drikkevindue og serveringstemperatur. Kontrollér værdierne og gem. Før første brug beder appen om dit samtykke (<a href="#privacy">afsnit 13</a>).</p>
@@ -135,7 +135,7 @@
 <tr><td><strong>Overskredet</strong></td><td>Efter ”Drik til” – drik den hurtigst muligt</td></tr>
 </tbody></table>
 <p><strong>Filtre:</strong> efter vintype, efter status og efter <strong>land</strong> (rullemenu med antal pr. land; lande uden resultater er nedtonede). Filtrene kan kombineres. Tryk på et kort for at åbne vinen i kælderen.</p>
-<p><strong>Reglen for vinduet:</strong> ”Drik fra” = årgang + 1. ”Drik til” afhænger af vintype og drue. Hvis du har ældre vine med andre værdier, kan du genberegne dem alle på én gang i Opsætning (<a href="#setup">afsnit 11</a>, ”Genberegn drikkevindue”).</p>
+<p><strong>Reglen for vinduet:</strong> ”Drik fra” = årgang + 1. ”Drik til” afhænger af vintype og drue. Hvis du har ældre vine med andre værdier, kan du i Opsætning lade dem alle genberegne på én gang med ”Opdater alle vine (AI)” (<a href="#setup">afsnit 11</a>): Før start spørger appen, om drikkevinduerne skal genberegnes efter denne regel.</p>
 
 <!-- ───────────────── 6 ───────────────── -->
 <h2 id="racks">6. Reoler og placering</h2>
@@ -229,8 +229,7 @@
 <p>Viser de resterende AI-scanninger, enheds-ID’et og – når det er nødvendigt – <em>Tilføj kreditter</em> eller en oplåsningskode. Se <a href="#privacy">afsnit 13</a>.</p>
 <h3>Vindatabase</h3>
 <ul>
-<li><strong>Opdater alle vine (AI):</strong> udfylder manglende region, land, drue, drikkevindue, serveringstemperatur og pris for alle vine (i webversionen også flaskebilleder). Eksisterende værdier bliver bevaret. Hvis der allerede findes serveringstemperaturer, spørger appen først, om de også skal erstattes af AI-værdier.</li>
-<li><strong>Genberegn drikkevindue:</strong> sætter ”Drik fra” til årgang + 1 for alle vine med en årgang (håndindtastede værdier bliver også overskrevet) og justerer ”Drik til”, hvor det er nødvendigt. Appen oplyser først antallet af vine og beder om bekræftelse. <em>Tip: Eksportér først en JSON-backup.</em></li>
+<li><strong>Opdater alle vine (AI):</strong> udfylder manglende region, land, drue, drikkevindue, serveringstemperatur og pris for alle vine (i webversionen også flaskebilleder). Eksisterende værdier bliver bevaret. Hvis der allerede findes serveringstemperaturer, spørger appen først, om de også skal erstattes af AI-værdier. Den spørger også, om drikkevinduerne for alle vine skal genberegnes efter reglen: ”Drik fra” sættes til årgang + 1 (håndindtastede værdier bliver overskrevet), og ”Drik til” justeres, hvor det er nødvendigt; appen oplyser først antallet af vine og spørger. Spørgsmålet vises kun, hvis mindst én vin ville blive ændret. <em>Tip: Eksportér først en JSON-backup.</em></li>
 </ul>
 <h3>Reoler</h3>
 <p>Se <a href="#racks">afsnit 6</a>. Overskriften viser antallet af reoler.</p>

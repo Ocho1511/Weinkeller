@@ -15,12 +15,12 @@
   .back{margin:0 0 6px} .toapp{display:none} @media (display-mode: standalone){.toapp{display:inline}}
   @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
 </style></head><body>
-<!--update-2026-11-27-->
+<!--update-2026-11-27--><!--update-2026-11-28-->
 <p class="back"><span class="toapp"><a href="index.html">← A la bodega</a> &nbsp;·&nbsp; </span><a href="support.html">← Volver al soporte</a></p>
 <div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html">Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html" selected>Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
 
 <h1>Guía de usuario – Weinkeller</h1>
-<p><small>Actualizado: 27 de noviembre de 2026 · Versión de la app 2.0</small></p>
+<p><small>Actualizado: 28 de noviembre de 2026 · Versión de la app 2.0</small></p>
 
 <div class="toc">
 
@@ -76,7 +76,7 @@
 <ul>
 <li><strong>Ventana de consumo:</strong> En cuanto introduces la añada, la app pone “Beber desde” en <strong>añada + 1</strong>. “Beber hasta” depende del tipo de vino y de la uva (un tinto aguanta más que un rosado). Puedes cambiar ambos en cualquier momento.</li>
 <li><strong>Existencias, Mín y Máx:</strong> Si indicas un mínimo, la app te avisa cuando las existencias bajan de él y te ofrece añadir el vino a la lista de deseos (<a href="#cellar">apartado 3</a>).</li>
-<li><strong>Foto propia:</strong> “Hacer / elegir foto” adjunta una foto al vino. La IA encuentra la botella en la foto y recorta la imagen ajustándola a ella (esto usa una llamada a la IA; si no se encuentra ninguna botella o la IA no está disponible, la foto se queda como está). La foto se queda en este dispositivo y se incluye en la copia JSON. Con el almacenamiento en la nube activado, eliges para cada foto si se guarda “En la nube (en todos los dispositivos)” o “Solo en este móvil”.</li>
+<li><strong>Foto propia:</strong> “Hacer / elegir foto” adjunta una foto al vino. La IA encuentra la botella en la foto y la coloca centrada en un marco vertical sereno; donde la botella queda cerca del borde de la foto, el borde se prolonga (esto usa una llamada a la IA; si no se encuentra ninguna botella o la IA no está disponible, la foto se queda como está y la app te lo indica). Si el vino ya tiene una foto, la app pregunta si la nueva debe sustituirla. La foto se queda en este dispositivo y se incluye en la copia JSON. Con el almacenamiento en la nube activado, eliges para cada foto si se guarda “En la nube (en todos los dispositivos)” o “Solo en este móvil”.</li>
 </ul>
 <h3>b) Escanear etiqueta (IA)</h3>
 <p>Toca <em>Escanear etiqueta (IA)</em> y fotografía la etiqueta de la botella. La IA lee nombre, añada, tipo, región, país y uva, y estima la ventana de consumo y la temperatura de servicio. Revisa los valores y guarda. Antes del primer uso, la app te pide tu consentimiento (<a href="#privacy">apartado 13</a>).</p>
@@ -135,7 +135,7 @@
 <tr><td><strong>Pasado</strong></td><td>Después de “Beber hasta” – bébelo cuanto antes</td></tr>
 </tbody></table>
 <p><strong>Filtros:</strong> por tipo de vino, por estado y por <strong>país</strong> (desplegable con el número por país; los países sin coincidencias aparecen en gris). Los filtros se pueden combinar. Toca una ficha para abrir el vino en la bodega.</p>
-<p><strong>La regla de la ventana:</strong> “Beber desde” = añada + 1. “Beber hasta” depende del tipo de vino y de la uva. Si tienes vinos más antiguos con otros valores, puedes recalcularlos todos de una vez en Ajustes (<a href="#setup">apartado 11</a>, “Recalcular ventana de consumo”).</p>
+<p><strong>La regla de la ventana:</strong> “Beber desde” = añada + 1. “Beber hasta” depende del tipo de vino y de la uva. Si tienes vinos más antiguos con otros valores, puedes recalcularlos todos de una vez en Ajustes con “Actualizar todos los vinos (IA)” (<a href="#setup">apartado 11</a>): antes de empezar, la app pregunta si las ventanas de consumo deben recalcularse según esta regla.</p>
 
 <!-- ───────────────── 6 ───────────────── -->
 <h2 id="racks">6. Estantes y colocación</h2>
@@ -229,8 +229,7 @@
 <p>Muestra los escaneos de IA restantes, el ID del dispositivo y, cuando hace falta, <em>Recargar crédito</em> o un código de desbloqueo. Consulta el <a href="#privacy">apartado 13</a>.</p>
 <h3>Base de datos de vinos</h3>
 <ul>
-<li><strong>Actualizar todos los vinos (IA):</strong> rellena la región, el país, la uva, la ventana de consumo, la temperatura de servicio y el precio que falten en todos los vinos (en la versión web, también imágenes de botellas). Los valores existentes se mantienen. Si ya hay temperaturas de servicio, la app pregunta primero si también deben sustituirse por valores de la IA.</li>
-<li><strong>Recalcular ventana de consumo:</strong> pone “Beber desde” en añada + 1 para todos los vinos con añada (los valores introducidos a mano también se sobrescriben) y ajusta “Beber hasta” cuando hace falta. La app indica primero el número de vinos y pide confirmación. <em>Consejo: exporta antes una copia JSON.</em></li>
+<li><strong>Actualizar todos los vinos (IA):</strong> rellena la región, el país, la uva, la ventana de consumo, la temperatura de servicio y el precio que falten en todos los vinos (en la versión web, también imágenes de botellas). Los valores existentes se mantienen. Si ya hay temperaturas de servicio, la app pregunta primero si también deben sustituirse por valores de la IA. Además pregunta si las ventanas de consumo de todos los vinos deben recalcularse según la regla: “Beber desde” se fija en añada + 1 (los valores introducidos a mano se sobrescriben) y “Beber hasta” se ajusta cuando hace falta; la app indica antes el número de vinos y pregunta. La pregunta solo aparece si al menos un vino cambiaría. <em>Consejo: exporta antes una copia JSON.</em></li>
 </ul>
 <h3>Estantes</h3>
 <p>Consulta el <a href="#racks">apartado 6</a>. El encabezado muestra el número de estantes.</p>

@@ -15,12 +15,12 @@
   .back{margin:0 0 6px} .toapp{display:none} @media (display-mode: standalone){.toapp{display:inline}}
   @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
 </style></head><body>
-<!--update-2026-11-27-->
+<!--update-2026-11-27--><!--update-2026-11-28-->
 <p class="back"><span class="toapp"><a href="index.html">← Do sklepa</a> &nbsp;·&nbsp; </span><a href="support.html">← Zpět na podporu</a></p>
 <div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html" selected>Čeština</option><option value="anleitung-da.html">Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html">Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
 
 <h1>Uživatelská příručka – Weinkeller</h1>
-<p><small>Aktualizováno: 27. listopadu 2026 · Verze aplikace 2.0</small></p>
+<p><small>Aktualizováno: 28. listopadu 2026 · Verze aplikace 2.0</small></p>
 
 <div class="toc">
 
@@ -76,7 +76,7 @@
 <ul>
 <li><strong>Okno pití:</strong> Jakmile zadáte ročník, aplikace nastaví „Pít od“ na <strong>ročník + 1</strong>. „Pít do“ závisí na typu vína a odrůdě (červené vydrží déle než rosé). Obojí můžete kdykoli změnit.</li>
 <li><strong>Zásoba, Min a Max:</strong> Zadáte-li minimum, aplikace vás upozorní, když zásoba klesne pod něj, a nabídne, že víno zapíše na seznam přání (<a href="#cellar">kapitola 3</a>).</li>
-<li><strong>Vlastní foto:</strong> „Vyfotit / vybrat foto“ připojí k vínu fotografii. AI najde na fotografii láhev a obrázek na ni těsně ořízne (spotřebuje jedno volání AI; pokud se láhev nenajde nebo AI není k dispozici, fotografie zůstane beze změny). Fotografie zůstane v tomto zařízení a je součástí zálohy JSON. Při zapnutém cloudu si u každé fotografie vyberete, zda se uloží „V cloudu (na všech zařízeních)“, nebo „Jen v tomto telefonu“.</li>
+<li><strong>Vlastní foto:</strong> „Vyfotit / vybrat foto“ připojí k vínu fotografii. AI najde na fotografii láhev a umístí ji doprostřed klidného obrazu na výšku; kde je láhev blízko okraje fotografie, okraj se dokreslí (spotřebuje se jedno volání AI; pokud se láhev nenajde nebo AI není k dispozici, fotografie zůstane beze změny a aplikace vám to oznámí). Pokud už víno fotografii má, aplikace se zeptá, zda ji má nová nahradit. Fotografie zůstane v tomto zařízení a je součástí zálohy JSON. Při zapnutém cloudu si u každé fotografie vyberete, zda se uloží „V cloudu (na všech zařízeních)“, nebo „Jen v tomto telefonu“.</li>
 </ul>
 <h3>b) Naskenovat etiketu (AI)</h3>
 <p>Klepněte na <em>Naskenovat etiketu (AI)</em> a vyfoťte etiketu lahve. AI přečte název, ročník, typ, region, zemi a odrůdu a odhadne okno pití a teplotu podávání. Hodnoty zkontrolujte a uložte. Před prvním použitím vás aplikace požádá o souhlas (<a href="#privacy">kapitola 13</a>).</p>
@@ -135,7 +135,7 @@
 <tr><td><strong>Překročeno</strong></td><td>Po „Pít do“ – vypijte co nejdříve</td></tr>
 </tbody></table>
 <p><strong>Filtry:</strong> podle typu vína, podle stavu a podle <strong>země</strong> (rozbalovací seznam s počtem u každé země; země bez shody jsou zašedlé). Filtry lze kombinovat. Klepnutím na kartu otevřete víno ve sklepě.</p>
-<p><strong>Pravidlo pro okno:</strong> „Pít od“ = ročník + 1. „Pít do“ závisí na typu vína a odrůdě. Máte-li starší vína s jinými hodnotami, můžete je všechna najednou přepočítat v Nastavení (<a href="#setup">kapitola 11</a>, „Přepočítat okno pití“).</p>
+<p><strong>Pravidlo pro okno:</strong> „Pít od“ = ročník + 1. „Pít do“ závisí na typu vína a odrůdě. Máte-li starší vína s jinými hodnotami, můžete je všechna najednou přepočítat v Nastavení pomocí „Aktualizovat všechna vína (AI)“ (<a href="#setup">kapitola 11</a>): před spuštěním se aplikace zeptá, zda se okna pití mají přepočítat podle tohoto pravidla.</p>
 
 <!-- ───────────────── 6 ───────────────── -->
 <h2 id="racks">6. Regály a ukládání</h2>
@@ -229,8 +229,7 @@
 <p>Zobrazuje zbývající AI skeny, ID zařízení a – je-li třeba – <em>Dobít kredity</em> nebo odemykací kód. Viz <a href="#privacy">kapitola 13</a>.</p>
 <h3>Databáze vín</h3>
 <ul>
-<li><strong>Aktualizovat všechna vína (AI):</strong> doplní chybějící region, zemi, odrůdu, okno pití, teplotu podávání a cenu u všech vín (ve webové verzi i obrázky lahví). Stávající hodnoty zůstanou. Pokud už teploty podávání existují, aplikace se nejprve zeptá, zda je také nahradit hodnotami z AI.</li>
-<li><strong>Přepočítat okno pití:</strong> nastaví „Pít od“ na ročník + 1 u všech vín s ročníkem (ručně zadané hodnoty se také přepíšou) a podle potřeby upraví „Pít do“. Aplikace nejprve uvede počet vín a požádá o potvrzení. <em>Tip: nejdřív exportujte zálohu JSON.</em></li>
+<li><strong>Aktualizovat všechna vína (AI):</strong> doplní chybějící region, zemi, odrůdu, okno pití, teplotu podávání a cenu u všech vín (ve webové verzi i obrázky lahví). Stávající hodnoty zůstanou. Pokud už teploty podávání existují, aplikace se nejprve zeptá, zda je také nahradit hodnotami z AI. Zeptá se také, zda se mají okna pití všech vín přepočítat podle pravidla: „Pít od“ se nastaví na ročník + 1 (ručně zadané hodnoty se přepíšou) a „Pít do“ se podle potřeby upraví; aplikace nejprve uvede počet vín a zeptá se. Otázka se zobrazí jen tehdy, pokud by se u alespoň jednoho vína něco změnilo. <em>Tip: nejdřív exportujte zálohu JSON.</em></li>
 </ul>
 <h3>Regály</h3>
 <p>Viz <a href="#racks">kapitola 6</a>. Nadpis zobrazuje počet regálů.</p>

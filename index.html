@@ -1563,13 +1563,6 @@ input[type="file"] { display: none; }
           <div class="desc" data-i18n="enrich_desc">Fehlende Region, Land, Rebsorte, Trinkfenster & Preis ergänzen</div>
         </div>
       </div>
-      <div class="export-card" id="drinkrule-btn" onclick="recalcDrinkWindows()" style="margin-top:10px">
-        <div class="export-icon">📅</div>
-        <div class="export-info">
-          <div class="title" data-i18n="drinkrule_btn">Trinkfenster neu berechnen</div>
-          <div class="desc" data-i18n="drinkrule_desc">Trinken ab = Jahrgang + 1; Trinken bis nach Weinart und Rebsorte</div>
-        </div>
-      </div>
       <div id="enrich-progress" style="display:none; margin-top:12px">
         <div class="enrich-prog-head">
           <span id="enrich-prog-label">0 / 0</span>
@@ -2876,6 +2869,59 @@ async function photoRefine(dataUrl, rect) {
     return { x: Math.round(rect.x + x1 / sc), y: Math.round(rect.y + y1 / sc), w: Math.round((x2 - x1) / sc), h: Math.round((y2 - y1) / sc) };
   } catch (e) { return rect; }
 }
+// Flasche (Rechteck rect in Pixeln von dataUrl) mittig in einen ruhigen Rahmen im Hochformat setzen (längste Seite maxDim)
+async function photoCompose(dataUrl, rect, maxDim) {
+  const img = await photoLoadImg(dataUrl), W = img.naturalWidth, H = img.naturalHeight;
+  const cx = rect.x + rect.w / 2, cy = rect.y + rect.h / 2;
+  const fh = rect.h * 1.12, fw = Math.max(fh * 2 / 3, rect.w * 1.35);   // Hochformat 2:3, bei sehr breiten Flaschen entsprechend breiter
+  const fx = cx - fw / 2, fy = cy - fh / 2;
+  const sc = maxDim / Math.max(fw, fh);
+  const c = document.createElement('canvas');
+  c.width = Math.max(1, Math.round(fw * sc)); c.height = Math.max(1, Math.round(fh * sc));
+  const g = c.getContext('2d', { willReadFrequently: true });
+  // Hintergrundfarbe: Mittelwert (Median) aus dem äußeren Rand des ganzen Fotos
+  let bg = [128, 128, 128], tiny = null;
+  try {
+    const t = document.createElement('canvas'); t.width = 64; t.height = Math.max(8, Math.round(64 * H / W));
+    const tg = t.getContext('2d', { willReadFrequently: true }); tg.drawImage(img, 0, 0, t.width, t.height);
+    const d = tg.getImageData(0, 0, t.width, t.height).data, ring = [];
+    for (let y = 0; y < t.height; y++) for (let x = 0; x < t.width; x++) if (x < 3 || y < 3 || x >= t.width - 3 || y >= t.height - 3) ring.push((y * t.width + x) * 4);
+    const med = (k) => { const a = ring.map(i => d[i + k]).sort((p, q) => p - q); return a[a.length >> 1]; };
+    bg = [med(0), med(1), med(2)];
+    tiny = { d, w: t.width, h: t.height };
+  } catch (e) {}
+  g.fillStyle = 'rgb(' + bg.join(',') + ')'; g.fillRect(0, 0, c.width, c.height);
+  // sichtbarer Teil des Fotos innerhalb des Rahmens
+  const sx = Math.max(0, fx), sy = Math.max(0, fy), ex = Math.min(W, fx + fw), ey = Math.min(H, fy + fh);
+  if (ex > sx && ey > sy) {
+    const dx = (sx - fx) * sc, dy = (sy - fy) * sc, dw = (ex - sx) * sc, dh = (ey - sy) * sc;
+    g.drawImage(img, sx, sy, ex - sx, ey - sy, dx, dy, dw, dh);
+    // Fehlender Rand (Flasche nahe am Fotorand): Randpixel des Fotos nach außen fortsetzen, damit keine harte Kante entsteht.
+    // Berührt die Flasche selbst den Fotorand, bleibt es bei der Hintergrundfarbe (sonst würde die Flasche verschmiert).
+    // Randstreifen (je 2 Pixel im kleinen Abbild) gelten nur dann als Hintergrund, wenn ihre Farbe nah an der Hintergrundfarbe liegt
+    const edgeBg = (x0, y0, x1, y1) => {
+      if (!tiny) return false;
+      const k = tiny.w / W, a = Math.max(0, Math.floor(x0 * k)), b = Math.min(tiny.w, Math.max(a + 1, Math.ceil(x1 * k))), cc = Math.max(0, Math.floor(y0 * k)), dd = Math.min(tiny.h, Math.max(cc + 1, Math.ceil(y1 * k)));
+      let r = 0, gg = 0, bl = 0, n = 0;
+      for (let y = cc; y < dd; y++) for (let x = a; x < b; x++) { const i = (y * tiny.w + x) * 4; r += tiny.d[i]; gg += tiny.d[i + 1]; bl += tiny.d[i + 2]; n++; }
+      return n > 0 && Math.hypot(r / n - bg[0], gg / n - bg[1], bl / n - bg[2]) < 60;
+    };
+    const tw = tiny ? tiny.w : 64;
+    const okL = edgeBg(0, sy, 3 * W / tw, ey) && rect.x > W * 0.005, okR = edgeBg(W - 3 * W / tw, sy, W, ey) && rect.x + rect.w < W * 0.995;
+    const okT = edgeBg(sx, 0, ex, 3 * W / tw) && rect.y > H * 0.005, okB = edgeBg(sx, H - 3 * W / tw, ex, H) && rect.y + rect.h < H * 0.995;
+    const right = dx + dw, bottom = dy + dh, S = 4;
+    const strip = (a, b, c2, d2, e2, f2, g2, h2) => { if (g2 > 0.5 && h2 > 0.5) g.drawImage(img, a, b, c2, d2, e2, f2, g2, h2); };
+    if (dx > 0.5 && okL) strip(0, sy, S, ey - sy, 0, dy, dx, dh);
+    if (right < c.width - 0.5 && okR) strip(W - S, sy, S, ey - sy, right, dy, c.width - right, dh);
+    if (dy > 0.5 && okT) strip(sx, 0, ex - sx, S, dx, 0, dw, dy);
+    if (bottom < c.height - 0.5 && okB) strip(sx, H - S, ex - sx, S, dx, bottom, dw, c.height - bottom);
+    if (dx > 0.5 && dy > 0.5 && okL && okT) strip(0, 0, S, S, 0, 0, dx, dy);
+    if (right < c.width - 0.5 && dy > 0.5 && okR && okT) strip(W - S, 0, S, S, right, 0, c.width - right, dy);
+    if (dx > 0.5 && bottom < c.height - 0.5 && okL && okB) strip(0, H - S, S, S, 0, bottom, dx, c.height - bottom);
+    if (right < c.width - 0.5 && bottom < c.height - 0.5 && okR && okB) strip(W - S, H - S, S, S, right, bottom, c.width - right, c.height - bottom);
+  }
+  return c.toDataURL('image/jpeg', 0.88);
+}
 async function photoBottleBox(dataUrl, W, H) {
   const HU = Math.round(H * 1000 / W);
   const resp = await aiFetch(SCAN_PROXY_URL, {
@@ -2911,7 +2957,7 @@ async function photoPrepare(file, boxId) {
     rect = photoFrameRect(box, bi.naturalWidth, bi.naturalHeight);
     if (rect) rect = await photoRefine(big, rect);
   } catch (e) { rect = null; }   // kein Guthaben/keine Einwilligung/Netz: Foto bleibt, wie es ist
-  return { url: await photoCrop(big, rect, 1000), framed: !!rect };
+  return { url: rect ? await photoCompose(big, rect, 1000) : await photoCrop(big, null, 1000), framed: !!rect };
 }
 // Speichern-Knopf eines Fensters sperren, solange das Foto noch bearbeitet wird (sonst ginge es beim schnellen Speichern verloren)
 function photoBusy(modalId, on) { const b = document.querySelector('#' + modalId + ' .btn-primary, #' + modalId + ' #add-save-btn'); if (b) b.disabled = !!on; }
@@ -3126,7 +3172,7 @@ function maturationOffset(grape, type) {
 }
 let autoDrink = { from: null, to: null };
 // Einmalig für alle Weine: "ab" = Jahrgang + 1 (auch von Hand eingetragene Werte werden überschrieben); "bis" bleibt, wenn es nach "ab" liegt, sonst Tabellenwert nach Weinart/Rebsorte. Weine ohne Jahrgang bleiben unverändert.
-function recalcDrinkWindows() {
+function drinkWindowPlan() {
   const plan = [];
   wines.forEach(w => {
     if (!drinkYearOk(w.year)) return;
@@ -3135,13 +3181,11 @@ function recalcDrinkWindows() {
     if (!to || to <= from) to = Math.max(w.year + maturationOffset(w.grape, w.type)[1], from + 1);
     if (w.drinkFrom !== from || w.drinkTo !== to) plan.push([w, from, to]);
   });
-  if (!plan.length) { showToast(t('drinkrule_done', { n: 0 })); return; }
-  if (!confirm(t('drinkrule_confirm', { n: plan.length }))) return;
+  return plan;
+}
+function applyDrinkPlan(plan) {
   plan.forEach(([w, from, to]) => { w.drinkFrom = from; w.drinkTo = to; });
   save();
-  renderKeller();
-  if (typeof renderTrinkreife === 'function') renderTrinkreife();
-  showToast(t('drinkrule_done', { n: plan.length }));
 }
 function fixFormDrinkWindow() {
   const y = parseInt(document.getElementById('f-year').value);
@@ -3754,6 +3798,9 @@ async function enrichAllWines() {
   if (!ensureAiConsent()) return;
   // Gibt es schon Trinktemperaturen: bewusst fragen, ob sie (auch selbst eingetragene) durch KI-Werte ersetzt werden sollen; sonst werden nur fehlende ergänzt
   const overwriteTemp = targets.some(w => w.tempFrom != null) && confirm(t('confirm_enrich_temp'));
+  // Trinkfenster nach der Regel neu berechnen (lokal, ohne KI; überschreibt auch von Hand eingetragene Werte)? Nur fragen, wenn sich bei mindestens einem Wein etwas ändern würde
+  const winPlan = drinkWindowPlan();
+  if (winPlan.length && confirm(t('drinkrule_confirm', { n: winPlan.length }))) applyDrinkPlan(winPlan);
   // Native App: reicht das KI-Guthaben nicht für alle Weine mit fehlenden Angaben, vorher darauf hinweisen
   if (isNativeApp() && typeof aiCredits === 'number') {
     const needAi = overwriteTemp ? targets.length : targets.filter(w => !w.region || !w.country || !w.grape || !w.drinkFrom || !w.drinkTo || w.tempFrom == null || !w.price).length;
@@ -4022,7 +4069,7 @@ de: {
   toast_price_ok: "Preis gefunden: {p} ✓",
   setup_db: "Weindatenbank",
   enrich_btn: "Alle Weine aktualisieren (KI)",
-  enrich_desc: "Fehlende Region, Land, Rebsorte, Trinkfenster, Trinktemperatur & Preis ergänzen",
+  enrich_desc: "Fehlende Angaben ergänzen (Region, Land, Rebsorte, Trinktemperatur, Preis) und auf Wunsch die Trinkfenster neu berechnen",
   confirm_enrich: "{n} Wein(e) werden per KI aktualisiert (fehlende Angaben). Fortfahren? (kostet minimal pro Wein)",
   toast_enrich_none: "Keine Weine vorhanden",
   toast_enrich_done: "{n} Wein(e) ergänzt ✓",
@@ -4520,7 +4567,7 @@ en: {
   toast_price_ok: "Price found: {p} ✓",
   setup_db: "Wine database",
   enrich_btn: "Update all wines (AI)",
-  enrich_desc: "Fill in missing region, country, grape, drinking window, serving temperature & price",
+  enrich_desc: "Fill in missing details (region, country, grape, serving temperature, price) and, if you like, recalculate drinking windows",
   confirm_enrich: "{n} wine(s) will be updated via AI (missing details). Continue? (small cost per wine)",
   toast_enrich_none: "No wines yet",
   toast_enrich_done: "{n} wine(s) enriched ✓",
@@ -5018,7 +5065,7 @@ es: {
   toast_price_ok: "Precio encontrado: {p} ✓",
   setup_db: "Base de datos de vinos",
   enrich_btn: "Actualizar todos los vinos (IA)",
-  enrich_desc: "Completar región, país, uva, ventana de consumo, temperatura de servicio y precio faltantes",
+  enrich_desc: "Completa los datos que faltan (región, país, uva, temperatura de servicio, precio) y, si quieres, recalcula las ventanas de consumo",
   confirm_enrich: "{n} vino(s) se actualizarán con IA (datos faltantes). ¿Continuar? (coste mínimo por vino)",
   toast_enrich_none: "Aún no hay vinos",
   toast_enrich_done: "{n} vino(s) completados ✓",
@@ -5516,7 +5563,7 @@ sv: {
   toast_price_ok: "Pris hittat: {p} ✓",
   setup_db: "Vindatabas",
   enrich_btn: "Uppdatera alla viner (AI)",
-  enrich_desc: "Komplettera region, land, druva, dryckesfönster, serveringstemperatur och pris som saknas",
+  enrich_desc: "Fyller i saknade uppgifter (region, land, druva, serveringstemperatur, pris) och räknar vid önskemål om dryckesfönstren",
   confirm_enrich: "{n} vin(er) uppdateras med AI (saknade uppgifter). Fortsätta? (liten kostnad per vin)",
   toast_enrich_none: "Inga viner finns",
   toast_enrich_done: "{n} vin(er) kompletterade ✓",
@@ -6014,7 +6061,7 @@ da: {
   toast_price_ok: "Pris fundet: {p} ✓",
   setup_db: "Vindatabase",
   enrich_btn: "Opdater alle vine (AI)",
-  enrich_desc: "Udfyld manglende region, land, drue, drikkevindue, serveringstemperatur og pris",
+  enrich_desc: "Udfylder manglende oplysninger (region, land, drue, serveringstemperatur, pris) og genberegner efter ønske drikkevinduerne",
   confirm_enrich: "{n} vin(e) opdateres med AI (manglende oplysninger). Fortsæt? (lille omkostning pr. vin)",
   toast_enrich_none: "Ingen vine findes",
   toast_enrich_done: "{n} vin(e) udfyldt ✓",
@@ -6512,7 +6559,7 @@ fi: {
   toast_price_ok: "Hinta löytyi: {p} ✓",
   setup_db: "Viinitietokanta",
   enrich_btn: "Päivitä kaikki viinit (tekoäly)",
-  enrich_desc: "Täydennä puuttuva alue, maa, rypäle, juoma-aikaikkuna, tarjoilulämpötila ja hinta",
+  enrich_desc: "Täydentää puuttuvat tiedot (alue, maa, rypäle, tarjoilulämpötila, hinta) ja laskee halutessasi juomaikkunat uudelleen",
   confirm_enrich: "{n} viiniä päivitetään tekoälyllä (puuttuvat tiedot). Jatketaanko? (pieni kustannus per viini)",
   toast_enrich_none: "Ei viinejä",
   toast_enrich_done: "{n} viiniä täydennetty ✓",
@@ -7010,7 +7057,7 @@ ru: {
   toast_price_ok: "Цена найдена: {p} ✓",
   setup_db: "База вин",
   enrich_btn: "Обновить все вина (ИИ)",
-  enrich_desc: "Дополнить регион, страну, сорт, окно потребления, температуру подачи и цену",
+  enrich_desc: "Дополняет недостающие данные (регион, страна, сорт, температура подачи, цена) и по желанию пересчитывает окна употребления",
   confirm_enrich: "{n} вино(вин) будут обновлены через ИИ (недостающие данные). Продолжить? (небольшая плата за вино)",
   toast_enrich_none: "Вин нет",
   toast_enrich_done: "{n} вино(вин) дополнено ✓",
@@ -7508,7 +7555,7 @@ it: {
   toast_price_ok: "Prezzo trovato: {p} ✓",
   setup_db: "Database vini",
   enrich_btn: "Aggiorna tutti i vini (IA)",
-  enrich_desc: "Completa regione, paese, vitigno, finestra di consumo, temperatura di servizio e prezzo mancanti",
+  enrich_desc: "Completa i dati mancanti (regione, paese, vitigno, temperatura di servizio, prezzo) e, se vuoi, ricalcola le finestre di consumo",
   confirm_enrich: "{n} vino/i verranno aggiornati con IA (dati mancanti). Continuare? (piccolo costo per vino)",
   toast_enrich_none: "Nessun vino presente",
   toast_enrich_done: "{n} vino/i completati ✓",
@@ -8006,7 +8053,7 @@ fr: {
   toast_price_ok: "Prix trouvé : {p} ✓",
   setup_db: "Base de vins",
   enrich_btn: "Mettre à jour tous les vins (IA)",
-  enrich_desc: "Compléter la région, le pays, le cépage, la fenêtre de dégustation, la température de service et le prix manquants",
+  enrich_desc: "Complète les informations manquantes (région, pays, cépage, température de service, prix) et, si vous le souhaitez, recalcule les fenêtres de dégustation",
   confirm_enrich: "{n} vin(s) seront mis à jour par IA (données manquantes). Continuer ? (petit coût par vin)",
   toast_enrich_none: "Aucun vin",
   toast_enrich_done: "{n} vin(s) complétés ✓",
@@ -8504,7 +8551,7 @@ pl: {
   toast_price_ok: "Znaleziono cenę: {p} ✓",
   setup_db: "Baza win",
   enrich_btn: "Zaktualizuj wszystkie wina (AI)",
-  enrich_desc: "Uzupełnij brakujący region, kraj, szczep, okno picia, temperaturę podawania i cenę",
+  enrich_desc: "Uzupełnia brakujące dane (region, kraj, szczep, temperatura podawania, cena) i na życzenie przelicza okna picia",
   confirm_enrich: "{n} win zostanie zaktualizowanych przez AI (brakujące dane). Kontynuować? (niewielki koszt za wino)",
   toast_enrich_none: "Brak win",
   toast_enrich_done: "Uzupełniono {n} win ✓",
@@ -9002,7 +9049,7 @@ hu: {
   toast_price_ok: "Ár megtalálva: {p} ✓",
   setup_db: "Boradatbázis",
   enrich_btn: "Összes bor frissítése (MI)",
-  enrich_desc: "Hiányzó régió, ország, szőlő, fogyasztási időszak, felszolgálási hőmérséklet és ár kiegészítése",
+  enrich_desc: "Kitölti a hiányzó adatokat (régió, ország, szőlőfajta, tálalási hőmérséklet, ár), kérésre pedig újraszámolja az ivási időablakokat",
   confirm_enrich: "{n} bort frissít az MI (hiányzó adatok). Folytatod? (boronként csekély költség)",
   toast_enrich_none: "Nincs bor",
   toast_enrich_done: "{n} bor kiegészítve ✓",
@@ -9500,7 +9547,7 @@ cs: {
   toast_price_ok: "Cena nalezena: {p} ✓",
   setup_db: "Databáze vín",
   enrich_btn: "Aktualizovat všechna vína (AI)",
-  enrich_desc: "Doplnit chybějící region, zemi, odrůdu, okno pití, teplotu podávání a cenu",
+  enrich_desc: "Doplní chybějící údaje (region, země, odrůda, teplota podávání, cena) a na přání přepočítá okna pití",
   confirm_enrich: "{n} vín bude aktualizováno pomocí AI (chybějící údaje). Pokračovat? (malý náklad na víno)",
   toast_enrich_none: "Žádná vína",
   toast_enrich_done: "Doplněno {n} vín ✓",
@@ -9998,7 +10045,7 @@ sk: {
   toast_price_ok: "Cena nájdená: {p} ✓",
   setup_db: "Databáza vín",
   enrich_btn: "Aktualizovať všetky vína (AI)",
-  enrich_desc: "Doplniť chýbajúci región, krajinu, odrodu, okno pitia, teplotu podávania a cenu",
+  enrich_desc: "Doplní chýbajúce údaje (región, krajina, odroda, teplota podávania, cena) a na požiadanie prepočíta okná pitia",
   confirm_enrich: "{n} vín bude aktualizovaných pomocou AI (chýbajúce údaje). Pokračovať? (malý náklad na víno)",
   toast_enrich_none: "Žiadne vína",
   toast_enrich_done: "Doplnených {n} vín ✓",
@@ -10496,7 +10543,7 @@ ro: {
   toast_price_ok: "Preț găsit: {p} ✓",
   setup_db: "Bază de date vinuri",
   enrich_btn: "Actualizează toate vinurile (IA)",
-  enrich_desc: "Completează regiunea, țara, soiul, fereastra de consum, temperatura de servire și prețul lipsă",
+  enrich_desc: "Completează datele lipsă (regiune, țară, soi, temperatură de servire, preț) și, dacă vrei, recalculează ferestrele de băut",
   confirm_enrich: "{n} vin(uri) vor fi actualizate prin IA (date lipsă). Continui? (cost mic per vin)",
   toast_enrich_none: "Niciun vin",
   toast_enrich_done: "{n} vin(uri) completate ✓",
@@ -10994,7 +11041,7 @@ hr: {
   toast_price_ok: "Cijena pronađena: {p} ✓",
   setup_db: "Baza vina",
   enrich_btn: "Ažuriraj sva vina (UI)",
-  enrich_desc: "Dopuni regiju, zemlju, sortu, razdoblje konzumacije, temperaturu posluživanja i cijenu koji nedostaju",
+  enrich_desc: "Dopunjava podatke koji nedostaju (regija, zemlja, sorta, temperatura posluživanja, cijena) i po želji ponovno izračunava razdoblja pijenja",
   confirm_enrich: "{n} vino(a) bit će ažurirano putem UI-a (podaci koji nedostaju). Nastaviti? (mali trošak po vinu)",
   toast_enrich_none: "Nema vina",
   toast_enrich_done: "Dopunjeno {n} vina ✓",
@@ -11492,7 +11539,7 @@ pt: {
   toast_price_ok: "Preço encontrado: {p} ✓",
   setup_db: "Base de dados de vinhos",
   enrich_btn: "Atualizar todos os vinhos (IA)",
-  enrich_desc: "Completar região, país, casta, janela de consumo, temperatura de serviço e preço em falta",
+  enrich_desc: "Completa os dados em falta (região, país, casta, temperatura de serviço, preço) e, se quiser, recalcula as janelas de consumo",
   confirm_enrich: "{n} vinho(s) serão atualizados por IA (dados em falta). Continuar? (pequeno custo por vinho)",
   toast_enrich_none: "Nenhum vinho",
   toast_enrich_done: "{n} vinho(s) completados ✓",
@@ -11990,7 +12037,7 @@ no: {
   toast_price_ok: "Pris funnet: {p} ✓",
   setup_db: "Vindatabase",
   enrich_btn: "Oppdater alle viner (KI)",
-  enrich_desc: "Fyll ut manglende region, land, drue, drikkevindu, serveringstemperatur og pris",
+  enrich_desc: "Fyller ut manglende opplysninger (region, land, drue, serveringstemperatur, pris) og beregner på ønske drikkevinduene på nytt",
   confirm_enrich: "{n} vin(er) oppdateres med KI (manglende opplysninger). Fortsette? (liten kostnad per vin)",
   toast_enrich_none: "Ingen viner",
   toast_enrich_done: "{n} vin(er) fylt ut ✓",
@@ -12488,7 +12535,7 @@ nl: {
   toast_price_ok: "Prijs gevonden: {p} ✓",
   setup_db: "Wijndatabase",
   enrich_btn: "Alle wijnen bijwerken (AI)",
-  enrich_desc: "Ontbrekende regio, land, druif, drinkvenster, serveertemperatuur en prijs aanvullen",
+  enrich_desc: "Vult ontbrekende gegevens aan (regio, land, druif, serveertemperatuur, prijs) en berekent op verzoek de drinkvensters opnieuw",
   confirm_enrich: "{n} wijn(en) worden bijgewerkt via AI (ontbrekende gegevens). Doorgaan? (kleine kosten per wijn)",
   toast_enrich_none: "Geen wijnen aanwezig",
   toast_enrich_done: "{n} wijn(en) aangevuld ✓",
@@ -12986,7 +13033,7 @@ el: {
   toast_price_ok: "Βρέθηκε τιμή: {p} ✓",
   setup_db: "Βάση κρασιών",
   enrich_btn: "Ενημέρωση όλων των κρασιών (AI)",
-  enrich_desc: "Συμπλήρωση περιοχής, χώρας, ποικιλίας, παραθύρου κατανάλωσης, θερμοκρασίας σερβιρίσματος & τιμής που λείπουν",
+  enrich_desc: "Συμπληρώνει τα στοιχεία που λείπουν (περιοχή, χώρα, ποικιλία, θερμοκρασία σερβιρίσματος, τιμή) και, αν θέλεις, ξαναυπολογίζει τα παράθυρα κατανάλωσης",
   confirm_enrich: "Θα ενημερωθούν μέσω AI {n} κρασί(ά) (στοιχεία που λείπουν). Συνέχεια; (μικρό κόστος ανά κρασί)",
   toast_enrich_none: "Δεν υπάρχουν κρασιά ακόμη",
   toast_enrich_done: "Εμπλουτίστηκαν {n} κρασί(ά) ✓",
@@ -13484,7 +13531,7 @@ uk: {
   toast_price_ok: "Ціну знайдено: {p} ✓",
   setup_db: "База вин",
   enrich_btn: "Оновити всі вина (ШІ)",
-  enrich_desc: "Заповнити відсутні регіон, країну, сорт, вікно споживання, температуру подачі та ціну",
+  enrich_desc: "Доповнює відсутні дані (регіон, країна, сорт, температура подавання, ціна) і за бажанням перераховує вікна вживання",
   confirm_enrich: "Вин для оновлення через ШІ: {n} (відсутні дані). Продовжити? (невелика вартість за кожне вино)",
   toast_enrich_none: "Вин ще немає",
   toast_enrich_done: "Оновлено вин: {n} ✓",
@@ -13982,7 +14029,7 @@ ja: {
   toast_price_ok: "価格が見つかりました: {p} ✓",
   setup_db: "ワインデータベース",
   enrich_btn: "すべてのワインを更新（AI）",
-  enrich_desc: "不足している地域、国、ぶどう品種、飲み頃、飲用温度、価格を補完します",
+  enrich_desc: "不足している情報（地域、国、品種、提供温度、価格）を補い、希望すれば飲み頃も再計算します",
   confirm_enrich: "{n}件のワインをAIで更新します（不足情報）。続行しますか？（ワイン1件ごとに少額の費用がかかります）",
   toast_enrich_none: "ワインがまだありません",
   toast_enrich_done: "{n}件のワインを補完しました ✓",
@@ -14480,7 +14527,7 @@ ko: {
   toast_price_ok: "가격을 찾았어요: {p} ✓",
   setup_db: "와인 데이터베이스",
   enrich_btn: "모든 와인 업데이트 (AI)",
-  enrich_desc: "빠진 지역, 국가, 품종, 음용 적기, 음용 온도, 가격을 채워요",
+  enrich_desc: "부족한 정보(지역, 국가, 품종, 서빙 온도, 가격)를 채우고, 원하면 음용 시기도 다시 계산합니다",
   confirm_enrich: "와인 {n}개를 AI로 업데이트해요 (빠진 정보). 계속할까요? (와인당 소액의 비용이 들어요)",
   toast_enrich_none: "아직 와인이 없어요",
   toast_enrich_done: "와인 {n}개를 보강했어요 ✓",
@@ -14978,7 +15025,7 @@ zh: {
   toast_price_ok: "已找到价格：{p} ✓",
   setup_db: "葡萄酒数据库",
   enrich_btn: "更新所有葡萄酒（AI）",
-  enrich_desc: "补全缺失的产区、国家、葡萄品种、适饮期、适饮温度和价格",
+  enrich_desc: "补全缺失的信息（产区、国家、葡萄品种、饮用温度、价格），并可按需重新计算适饮期",
   confirm_enrich: "将通过 AI 更新 {n} 款酒（补全缺失信息）。是否继续？（每款酒会产生少量费用）",
   toast_enrich_none: "还没有葡萄酒",
   toast_enrich_done: "已补全 {n} 款酒 ✓",
@@ -15476,7 +15523,7 @@ hi: {
   toast_price_ok: "कीमत मिली: {p} ✓",
   setup_db: "वाइन डेटाबेस",
   enrich_btn: "सभी वाइन अपडेट करें (AI)",
-  enrich_desc: "छूटे हुए क्षेत्र, देश, अंगूर, पीने का समय, परोसने का तापमान और कीमत भरें",
+  enrich_desc: "छूटी हुई जानकारी (क्षेत्र, देश, अंगूर की किस्म, परोसने का तापमान, कीमत) भरता है और चाहें तो पीने की अवधि दोबारा गणना करता है",
   confirm_enrich: "{n} वाइन AI से अपडेट की जाएँगी (छूटी जानकारी)। जारी रखें? (हर वाइन पर मामूली खर्च)",
   toast_enrich_none: "अभी कोई वाइन नहीं है",
   toast_enrich_done: "{n} वाइन की जानकारी भर दी गई ✓",

@@ -15,12 +15,12 @@
   .back{margin:0 0 6px} .toapp{display:none} @media (display-mode: standalone){.toapp{display:inline}}
   @media print{.lang,.back{display:none} body{max-width:none} h2{page-break-after:avoid}}
 </style></head><body>
-<!--update-2026-11-27-->
+<!--update-2026-11-27--><!--update-2026-11-28-->
 <p class="back"><span class="toapp"><a href="index.html">← Do piwnicy</a> &nbsp;·&nbsp; </span><a href="support.html">← Wróć do wsparcia</a></p>
 <div class="lang"><select aria-label="Language / Sprache" onchange="try{localStorage.setItem('wk_guide_lang',this.value.slice(9,-5))}catch(e){}location.href=this.value"><option value="anleitung-cs.html">Čeština</option><option value="anleitung-da.html">Dansk</option><option value="anleitung-de.html">Deutsch</option><option value="anleitung-en.html">English</option><option value="anleitung-el.html">Ελληνικά</option><option value="anleitung-es.html">Español</option><option value="anleitung-fr.html">Français</option><option value="anleitung-hr.html">Hrvatski</option><option value="anleitung-it.html">Italiano</option><option value="anleitung-hu.html">Magyar</option><option value="anleitung-nl.html">Nederlands</option><option value="anleitung-no.html">Norsk</option><option value="anleitung-pl.html" selected>Polski</option><option value="anleitung-pt.html">Português</option><option value="anleitung-ro.html">Română</option><option value="anleitung-ru.html">Русский</option><option value="anleitung-sk.html">Slovenčina</option><option value="anleitung-fi.html">Suomi</option><option value="anleitung-sv.html">Svenska</option><option value="anleitung-uk.html">Українська</option><option value="anleitung-ja.html">日本語</option><option value="anleitung-ko.html">한국어</option><option value="anleitung-zh.html">简体中文</option><option value="anleitung-hi.html">हिन्दी</option></select></div>
 
 <h1>Instrukcja obsługi – Weinkeller</h1>
-<p><small>Zaktualizowano: 27 listopada 2026 · Wersja aplikacji 2.0</small></p>
+<p><small>Zaktualizowano: 28 listopada 2026 · Wersja aplikacji 2.0</small></p>
 
 <div class="toc">
 
@@ -76,7 +76,7 @@
 <ul>
 <li><strong>Okno spożycia:</strong> Gdy tylko wpiszesz rocznik, aplikacja ustawia „Pić od” na <strong>rocznik + 1</strong>. „Pić do” zależy od typu wina i szczepu (czerwone dłużej wytrzymuje niż różowe). Obie wartości możesz zmienić w każdej chwili.</li>
 <li><strong>Zapas, Min i Maks:</strong> Jeśli wpiszesz minimum, aplikacja ostrzeże Cię, gdy zapas spadnie poniżej niego, i zaproponuje dodanie wina do listy życzeń (<a href="#cellar">rozdział 3</a>).</li>
-<li><strong>Własne zdjęcie:</strong> „Zrób / wybierz zdjęcie” dołącza do wina zdjęcie. AI znajduje butelkę na zdjęciu i przycina obraz ciasno wokół niej (zużywa to jedno wywołanie AI; jeśli nie znaleziono butelki lub AI jest niedostępne, zdjęcie pozostaje bez zmian). Zdjęcie zostaje na tym urządzeniu i jest zawarte w kopii JSON. Gdy pamięć w chmurze jest włączona, dla każdego zdjęcia wybierasz, czy zapisać je „W chmurze” (na wszystkich urządzeniach), czy „Tylko na tym telefonie”.</li>
+<li><strong>Własne zdjęcie:</strong> „Zrób / wybierz zdjęcie” dołącza do wina zdjęcie. AI znajduje butelkę na zdjęciu i umieszcza ją na środku spokojnej ramki w pionowym formacie; tam, gdzie butelka stoi blisko krawędzi zdjęcia, krawędź jest przedłużana (zużywa to jedno wywołanie AI; jeśli nie znaleziono butelki lub AI jest niedostępne, zdjęcie pozostaje bez zmian, a aplikacja ci o tym powie). Jeśli wino ma już zdjęcie, aplikacja pyta, czy nowe ma je zastąpić. Zdjęcie zostaje na tym urządzeniu i jest zawarte w kopii JSON. Gdy pamięć w chmurze jest włączona, dla każdego zdjęcia wybierasz, czy zapisać je „W chmurze” (na wszystkich urządzeniach), czy „Tylko na tym telefonie”.</li>
 </ul>
 <h3>b) Skanuj etykietę (AI)</h3>
 <p>Dotknij <em>Skanuj etykietę (AI)</em> i sfotografuj etykietę na butelce. AI odczytuje nazwę, rocznik, typ, region, kraj i szczep oraz szacuje okno spożycia i temperaturę podawania. Sprawdź wartości i zapisz. Przed pierwszym użyciem aplikacja prosi o Twoją zgodę (<a href="#privacy">rozdział 13</a>).</p>
@@ -135,7 +135,7 @@
 <tr><td><strong>Przekroczone</strong></td><td>Po „Pić do” – wypij jak najszybciej</td></tr>
 </tbody></table>
 <p><strong>Filtry:</strong> według typu wina, według stanu i według <strong>kraju</strong> (lista rozwijana z liczbą win dla każdego kraju; kraje bez wyników są wyszarzone). Filtry można łączyć. Dotknij karty, aby otworzyć wino w piwnicy.</p>
-<p><strong>Zasada okna:</strong> „Pić od” = rocznik + 1. „Pić do” zależy od typu wina i szczepu. Jeśli masz starsze wina z innymi wartościami, możesz przeliczyć je wszystkie naraz w Ustawieniach (<a href="#setup">rozdział 11</a>, „Przelicz okno spożycia”).</p>
+<p><strong>Zasada okna:</strong> „Pić od” = rocznik + 1. „Pić do” zależy od typu wina i szczepu. Jeśli masz starsze wina z innymi wartościami, możesz przeliczyć je wszystkie naraz w Ustawieniach za pomocą „Zaktualizuj wszystkie wina (AI)” (<a href="#setup">rozdział 11</a>): przed startem aplikacja pyta, czy okna spożycia przeliczyć według tej zasady.</p>
 
 <!-- ───────────────── 6 ───────────────── -->
 <h2 id="racks">6. Regały i przechowywanie</h2>
@@ -229,8 +229,7 @@
 <p>Pokazuje pozostałe skany AI, identyfikator urządzenia i – w razie potrzeby – <em>Doładuj kredyty</em> lub kod odblokowujący. Zobacz <a href="#privacy">rozdział 13</a>.</p>
 <h3>Baza win</h3>
 <ul>
-<li><strong>Zaktualizuj wszystkie wina (AI):</strong> uzupełnia brakujące dane o regionie, kraju, szczepie, oknie spożycia, temperaturze podawania i cenie dla wszystkich win (w wersji webowej także zdjęcia butelek). Istniejące wartości zostają. Jeśli temperatury podawania już istnieją, aplikacja najpierw pyta, czy mają zostać zastąpione wartościami AI.</li>
-<li><strong>Przelicz okno spożycia:</strong> ustawia „Pić od” na rocznik + 1 dla wszystkich win z rocznikiem (wartości wpisane ręcznie również są nadpisywane) i w razie potrzeby koryguje „Pić do”. Aplikacja najpierw podaje liczbę win i prosi o potwierdzenie. <em>Wskazówka: najpierw wyeksportuj kopię JSON.</em></li>
+<li><strong>Zaktualizuj wszystkie wina (AI):</strong> uzupełnia brakujące dane o regionie, kraju, szczepie, oknie spożycia, temperaturze podawania i cenie dla wszystkich win (w wersji webowej także zdjęcia butelek). Istniejące wartości zostają. Jeśli temperatury podawania już istnieją, aplikacja najpierw pyta, czy mają zostać zastąpione wartościami AI. Pyta też, czy okna spożycia wszystkich win przeliczyć według zasady: „Pić od” jest ustawiane na rocznik + 1 (wartości wpisane ręcznie są nadpisywane), a „Pić do” w razie potrzeby korygowane; aplikacja najpierw podaje liczbę win i pyta o zgodę. Pytanie pojawia się tylko wtedy, gdy zmieniłoby się co najmniej jedno wino. <em>Wskazówka: najpierw wyeksportuj kopię JSON.</em></li>
 </ul>
 <h3>Regały</h3>
 <p>Zobacz <a href="#racks">rozdział 6</a>. Nagłówek pokazuje liczbę regałów.</p>
